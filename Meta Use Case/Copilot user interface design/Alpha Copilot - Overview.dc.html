@@ -4407,7 +4407,7 @@ class Component extends DCLogic {
           ticks.slice().reverse().map((t,i)=>h('div',{key:i},t))),
         h('div',{style:{flex:'0 0 64px',position:'relative',borderLeft:'1px solid var(--line)',borderBottom:'1px solid var(--line)',display:'flex',alignItems:'flex-end',justifyContent:'center'}},
           h('div',{style:{width:48,height:(frac*100)+'%',background:col,borderRadius:'4px 4px 0 0',transition:'height .55s cubic-bezier(.4,0,.2,1)'}}))));
-    const perfCol=this.card({title:'Performance',info:true,big:true,right:detailsHint,onClick:()=>this.openHomePop('performance'),style:{height:'100%'},
+    const perfCol=this.card({title:'Performance',info:true,big:true,right:detailsHint,onClick:()=>this.openHomePop('performance'),
       children:h('div',{style:{flex:1,display:'flex',flexDirection:'column'}},
         h('div',{style:{display:'flex',gap:6,flex:1,minHeight:150}},
           yAxis('Return · multiple'),
@@ -4448,9 +4448,9 @@ class Component extends DCLogic {
         h('div',{title:x.y+': €'+x.v+'m',style:{width:'62%',maxWidth:32,height:(x.v/vmax*100)+'%',background:'var(--data-3)',borderRadius:'4px 4px 0 0',minHeight:2}}),
         h('div',{style:{fontSize:10,color:'var(--muted)',marginTop:5}}, x.y))));
     // Each allocation dimension is its own block
-    const allocBlock=(title,popKey,node)=>this.card({title,info:true,right:detailsHint,onClick:()=>this.openHomePop(popKey),style:{height:'100%'},children:node});
-    const allocHeader=h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,margin:'4px 0 -2px'}},
-      h('div',{style:{fontFamily:SF,fontSize:22,fontWeight:700,letterSpacing:'-.01em'}},'Asset Allocation'),
+    const allocBlock=(title,popKey,node)=>this.card({title,info:true,right:detailsHint,onClick:()=>this.openHomePop(popKey),children:node});
+    const allocHeader=h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,margin:'2px 2px 0'}},
+      h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)'}},'Asset allocation'),
       allocToggle);
     const strategyCard=allocBlock('Strategy','strategy', this.gridBars(stratRows,{max:40,ticks:[0,10,20,30,40],unit:'%',labelW:96,barH:24,gap:10,fmt:fmtUnit}));
     const regionCard=allocBlock('Region','region', this.gridBars(regionRows,{max:50,ticks:[0,25,50],unit:'%',labelW:96,barH:24,gap:10,fmt:fmtUnit}));
@@ -4496,13 +4496,10 @@ class Component extends DCLogic {
     const pacingLink=h('button',{onClick:e=>{e.stopPropagation(); this.setState({ws:'shape',uc:'t1-4',page:'plan',homeLaunched:true,deepLink:null,homePop:null,homeDrill:null,ask:{...this.state.ask,state:'min'}});},
       style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,width:'100%',marginTop:12,border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:10,padding:'10px 13px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},
       h('span',null,'See your future cash flows & pacing'),h('span',{style:{color:'var(--brand)'}},'→'));
-    const cashCol=this.card({title:'Cash Flows',info:true,big:true,right:detailsHint,onClick:()=>this.openHomePop('cashflow'),style:{height:'100%'},
-      children:h('div',{style:{flex:1,display:'flex',flexDirection:'column'}},
-        cfToggle,
-        cfView==='J-curve'? cfJcurve : cfPlot,
-        cfView==='J-curve'
-          ? h('div',{style:{fontSize:11,color:'var(--muted)',textAlign:'center',marginTop:8,lineHeight:1.5}},'Cumulative distributions − capital calls. The dip is the J-curve; it crosses zero when you turn net cash-positive.')
-          : cfLegend,
+    const cashCol=this.card({title:'Cash Flows',info:true,big:true,right:detailsHint,onClick:()=>this.openHomePop('cashflow'),
+      children:h('div',{style:{display:'flex',flexDirection:'column'}},
+        cfPlot,
+        cfLegend,
         cfNetBanner,
         h('div',{style:{marginTop:14}}, kpiGrid([
           ['Cash position',P.cashPosition,'available now'],
@@ -4510,6 +4507,9 @@ class Component extends DCLogic {
           ['Committable',P.committable,'headroom to invest'],
           ['Net cash flow',(cfNet>=0?'+':'−')+'€'+Math.abs(cfNet).toFixed(1)+'m','distributions − calls']])),
         pacingLink)});
+    const jcurveCard=this.card({title:'Cumulative net cash (J-curve)',info:true,onClick:()=>this.openHomePop('cashflow'),
+      children:h('div',{style:{paddingTop:6}}, cfJcurve),
+      caption:'Cumulative distributions − capital calls. The dip is the J-curve; it crosses zero when you turn net cash-positive.'});
 
     // Q4: gentle one-line nudge on the biggest gap to the model target (dismissible)
     const zTop=this.zDeltas('model').filter(r=>Math.abs(r.delta)>=3).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta))[0];
@@ -4519,12 +4519,13 @@ class Component extends DCLogic {
         'You’re ', h('strong',null,(zTop.delta>0?'over':'under')+'-weight '+Math.abs(zTop.delta)+'pp in '+zTop.name), ' versus your ',h('strong',null,this.riskLabel()),' target. Want to rebalance?'),
       h('button',{onClick:()=>this.setState({ws:'shape',uc:'sim',page:'sim',simFocus:'strategy',homeLaunched:true,deepLink:null,homePop:null,homeDrill:null}),style:{border:'1px solid var(--brand)',background:'var(--brand)',color:'#fff',borderRadius:9,padding:'7px 13px',fontSize:12,fontWeight:700,cursor:'pointer',flex:'0 0 auto'}},'Adjust in Simulator →'),
       h('button',{onClick:()=>this.setDtog('nudgeDismiss',true),title:'Dismiss',style:{border:'none',background:'transparent',color:'var(--muted)',cursor:'pointer',fontSize:14,flex:'0 0 auto'}},'✕')) : null;
+    const col=(children)=>h('div',{style:{display:'flex',flexDirection:'column',gap:16,minWidth:0}}, children);
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16,minHeight:'100%'}},
       nudge,
-      h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(360px,1fr))',gridAutoRows:'1fr',gap:18}}, perfCol, cashCol),
-      allocHeader,
-      h('div',{style:{display:'flex',flexWrap:'wrap',justifyContent:'center',alignItems:'stretch',gap:16}},
-        [strategyCard, regionCard, currencyCard, sectorCard, vintageCard].map((c,i)=>h('div',{key:i,style:{flex:'0 0 300px',display:'flex',flexDirection:'column'}}, c))));
+      h('div',{style:{display:'grid',gridTemplateColumns:'minmax(0,1.3fr) minmax(0,0.85fr) minmax(0,1.3fr)',gap:16,alignItems:'start'}},
+        col([perfCol]),
+        col([allocHeader, strategyCard, regionCard, currencyCard, sectorCard, vintageCard]),
+        col([cashCol, jcurveCard])));
   }
 
   HOME_DIMS(){
