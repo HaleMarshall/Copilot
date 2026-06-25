@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+  /* Moonfare real brand system (from reference frontend) */
+  :root{
+    --bg:#FAFAF8; --surface:#FFFFFF; --surface-2:#FAF6EC; --surface-hero:#F4EFE2;
+    --ink:#0E0E0E; --muted:#6B6B6B; --line:#E5E2DC;
+    --brand:#2C2DFE; --brand-ink:#1417C2; --brand-tint-1:#5B5CFF; --brand-tint-2:#9FA0FF; --brand-tint-3:#DEDFFF; --brand-wash:#EEEEFF;
+    --accent-mint:#2D8F6F;
+    --navy:#20243A;
+    --data-1:#2C2DFE; --data-2:#E8732C; --data-3:#5B5CFF; --data-4:#7A6A55; --data-5:#2D8F6F; --data-6:#3E5A5C; --data-7:#7AB89E; --data-8:#C8392F; --data-9:#B5A98F;
+    --over:#2D8F6F; --over-wash:#E6F2EC; --under:#1417C2; --under-wash:#E7E8FA;
+    --positive:#2D8F6F; --negative:#1417C2;
+    --synthetic:#A8771C; --synthetic-wash:#F6EDD7;
+    --gated:#8C887D; --gated-wash:#EFEBE2;
+    --logo-filter:none;
+  }
+  [data-theme="dark"]{
+    --bg:#0E0F16; --surface:#181A24; --surface-2:#20232F; --surface-hero:#23202A;
+    --ink:#ECEDF3; --muted:#9A9EAE; --line:#2A2D3A;
+    --brand:#6E6FFF; --brand-ink:#9596FF; --brand-tint-1:#5152D6; --brand-tint-2:#3C3D86; --brand-tint-3:#272A50; --brand-wash:#1B1C36;
+    --accent-mint:#34C295;
+    --navy:#181A24;
+    --data-1:#5B5CFF; --data-2:#F2904E; --data-3:#8C8DFF; --data-4:#A8957B; --data-5:#34C295; --data-6:#5E8487; --data-7:#9FD0B8; --data-8:#E8554A; --data-9:#C7BBA6;
+    --over:#34C295; --over-wash:#16302A; --under:#8C8DFF; --under-wash:#23264D;
+    --positive:#34C295; --negative:#8C8DFF;
+    --synthetic:#DCB061; --synthetic-wash:#2C2614;
+    --gated:#827E72; --gated-wash:#262420;
+    --logo-filter:none;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+  .mf-serif{font-family:'Source Serif 4',Georgia,serif}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
+  ::-webkit-scrollbar-track{background:transparent}
+  @keyframes shimmer{0%{background-position:-360px 0}100%{background-position:360px 0}}
+  @keyframes alphaIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pushIn{0%{opacity:0;transform:translateY(-26px) scale(.96)}60%{opacity:1}100%{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+</style>
+</helmet>
+
+<div data-theme="{{ theme }}" style="font-family:Inter,system-ui,sans-serif;height:100vh;width:100%;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased">
+
+  <!-- ============ PROFILE BAR ============ -->
+  <header style="flex:0 0 auto;height:62px;display:flex;align-items:center;gap:16px;padding:0 20px;background:var(--navy);color:#fff;border-bottom:1px solid rgba(255,255,255,.12)">
+    <div style="display:flex;align-items:center;gap:11px;min-width:190px">
+      <img src="assets/moonfare_logo_white.png" alt="Moonfare" style="height:23px;width:auto">
+      <span style="font-size:14px;color:rgba(255,255,255,.62)">· <span class="mf-serif" style="font-style:italic">Alpha</span></span>
+    </div>
+    <div style="height:22px;width:1px;background:rgba(255,255,255,.16)"></div>
+    <div style="display:flex;align-items:center;gap:7px;flex-wrap:nowrap;flex:1;min-width:0;overflow:hidden;white-space:nowrap">
+      <span style="font-size:11px;color:rgba(255,255,255,.6)">You:</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.2);color:#fff;padding:4px 10px;border-radius:999px">Dr. Steffen Pauls</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.2);color:#fff;padding:4px 10px;border-radius:999px">Exec / Owner</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.2);color:#fff;padding:4px 10px;border-radius:999px">53</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.2);color:#fff;padding:4px 10px;border-radius:999px">€25M {{ synthChipWealth }}</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.2);color:#fff;padding:4px 10px;border-radius:999px">target 20% {{ synthChipTarget }}</span>
+      {{ riskToggle }}
+      {{ horizonToggle }}
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      {{ themeToggle }}
+      {{ modeMenu }}
+      <div style="width:28px;height:28px;border-radius:999px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">SP</div>
+    </div>
+  </header>
+
+  <!-- ============ BODY ============ -->
+  <div style="flex:1;display:flex;min-height:0">
+
+    <!-- USE-CASE NAVIGATOR -->
+    <nav style="flex:0 0 auto;width:262px;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0">
+      <div style="flex:0 0 auto;padding:14px 16px 11px;border-bottom:1px solid var(--line)">
+        <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Use cases</div>
+        <div style="font-size:15px;font-weight:600;font-family:'Source Serif 4',Georgia,serif;margin-top:2px">25 across three tiers</div>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:12px 0 18px">{{ ucNav }}</div>
+    </nav>
+
+    <!-- CENTRE STAGE -->
+    <main style="flex:1;display:flex;flex-direction:column;min-width:0;position:relative">
+
+      <!-- header: toolbar + tabs -->
+      <div style="flex:0 0 auto;background:var(--surface);border-bottom:1px solid var(--line);position:relative;z-index:20">
+        <div style="display:flex;align-items:center;gap:10px;padding:9px 20px 0">
+          <button onClick="{{ toggleCohort }}" style="display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);height:30px;padding:0 12px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap">
+            <span style="color:var(--muted);font-weight:500">Compare vs</span> {{ cohortLabel }} <span style="color:var(--muted);font-size:10px">▾</span>
+          </button>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+            <span style="font-size:11px;color:var(--muted)">State</span>
+            {{ stateSwitcher }}
+            <button onClick="{{ exportPdf }}" style="display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);height:30px;padding:0 12px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600">⤓ PDF</button>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:8px 20px 9px;overflow-x:auto">{{ pageTabs }}</div>
+
+        <sc-if value="{{ cohortOpen }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ toggleCohort }}" style="position:fixed;inset:0;z-index:24"></div>
+          <div style="position:absolute;top:46px;left:16px;z-index:25;width:300px;max-height:66vh;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 50px -12px rgba(0,0,0,.28);display:flex;flex-direction:column;overflow:hidden">
+            <div style="flex:0 0 auto;padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between">
+              <div>
+                <div style="font-size:15px;font-weight:600;font-family:'Source Serif 4',Georgia,serif">Cohort builder</div>
+                <div style="font-size:11px;color:var(--muted)">Who you compare against</div>
+              </div>
+              <span style="font-family:'Source Serif 4',Georgia,serif;font-weight:600;font-size:20px;color:var(--brand)">n = {{ nDisplay }}</span>
+            </div>
+            <div style="flex:1;overflow-y:auto;padding:14px 16px">{{ cohortPanel }}</div>
+            <div style="flex:0 0 auto;padding:10px 16px;border-top:1px solid var(--line);background:var(--surface-2);font-size:11px;color:var(--muted)">of {{ totalDisplay }} total investors</div>
+          </div>
+        </sc-if>
+      </div>
+
+      <!-- content -->
+      <div style="flex:1;display:flex;flex-direction:column;min-height:0;padding:14px 20px 16px">
+
+        <!-- pagehead -->
+        <div style="flex:0 0 auto;margin-bottom:12px">
+          <div style="font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">{{ stageEyebrow }}</div>
+          <div style="font-size:24px;font-weight:600;letter-spacing:-.01em;font-family:'Source Serif 4',Georgia,serif;margin-top:3px">{{ stageTitle }}</div>
+          <div style="font-size:12.5px;color:var(--muted);margin-top:3px;max-width:780px;text-wrap:pretty">{{ stageSubtitle }}</div>
+        </div>
+
+      <!-- banners -->
+      <sc-if value="{{ showRelax }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:0 0 auto;display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:10px 14px;border-radius:10px;background:var(--brand-wash);border:1px solid var(--brand-tint-3)">
+          <span style="font-size:14px;color:var(--brand)">ⓘ</span>
+          <span style="font-size:12.5px;color:var(--brand-ink);font-weight:600">{{ relaxText }}</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{ showError }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:0 0 auto;display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:10px 14px;border-radius:10px;background:var(--synthetic-wash);border:1px solid var(--synthetic)">
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--synthetic);display:inline-block"></span>
+          <span style="font-size:12.5px;color:var(--ink);font-weight:600">Showing your last saved snapshot — live data is reconnecting.</span>
+          <span style="font-size:11.5px;color:var(--muted);font-family:Inter,system-ui,sans-serif;margin-left:auto">14 Jun 2026 · 09:42</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{ showDeepLink }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:0 0 auto;display:flex;align-items:center;gap:12px;margin-bottom:12px;padding:10px 14px;border-radius:10px;background:var(--surface);border:1px solid var(--brand);box-shadow:0 4px 16px -8px var(--brand)">
+          <span style="font-size:12.5px;font-weight:700;color:var(--brand)">→ Strategy deep-dive (S2)</span>
+          <span style="font-size:12.5px;color:var(--ink)">{{ deepLinkText }}</span>
+          <span style="font-size:11px;color:var(--muted);font-style:italic">— this build ships Overview; S2 would open here with that strategy preselected.</span>
+          <button onClick="{{ clearDeepLink }}" style="margin-left:auto;border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:16px">✕</button>
+        </div>
+      </sc-if>
+
+      <!-- OTHER SURFACES (createElement) -->
+      <sc-if value="{{ showOther }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;overflow:auto">{{ surfaceBody }}</div>
+      </sc-if>
+
+      <!-- 2x2 grid (Overview) -->
+      <sc-if value="{{ showOverview }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:14px;min-height:0">
+
+        <!-- TL -->
+        <section style="background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden">
+          <div style="flex:0 0 auto;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">
+            <div style="display:flex;align-items:center;gap:9px">
+              <h2 style="margin:0;font-size:17px;font-weight:600;font-family:'Source Serif 4',Georgia,serif">Private Markets Allocation</h2>
+              <sc-if value="{{ showRank }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ openRankPop }}" style="border:none;cursor:pointer;background:var(--brand-tint-3);color:var(--brand-ink);font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px">{{ rankLabel }}</button>
+              </sc-if>
+            </div>
+            <div style="display:flex;align-items:center;gap:7px">{{ tlBadge }}{{ tlSynth }}</div>
+          </div>
+          <div style="flex:1;min-height:0;display:flex;align-items:center">{{ tlChart }}</div>
+          <div style="flex:0 0 auto;font-size:12px;line-height:1.45;color:var(--muted);margin-top:8px;text-wrap:pretty">{{ tlCaption }}</div>
+          <div style="flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;margin-top:7px">
+            <button onClick="{{ openTlData }}" style="border:none;background:transparent;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;text-underline-offset:2px">view data</button>
+            <span style="font-size:10px;color:var(--muted);font-family:Inter,system-ui,sans-serif">grounded · {{ snapshotId }}</span>
+          </div>
+        </section>
+
+        <!-- TR -->
+        <section style="background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden">
+          <div style="flex:0 0 auto;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">
+            <h2 style="margin:0;font-size:17px;font-weight:600;font-family:'Source Serif 4',Georgia,serif">Fill Rate</h2>
+            <div style="display:flex;align-items:center;gap:7px">{{ trBadge }}</div>
+          </div>
+          <div style="flex:1;min-height:0;display:flex;align-items:center">{{ trChart }}</div>
+          <div style="flex:0 0 auto;font-size:12px;line-height:1.45;color:var(--muted);margin-top:8px;text-wrap:pretty">{{ trCaption }}</div>
+          <div style="flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;margin-top:7px">
+            <button onClick="{{ openTrData }}" style="border:none;background:transparent;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;text-underline-offset:2px">view data</button>
+            <span style="font-size:10px;color:var(--muted);font-family:Inter,system-ui,sans-serif">grounded · {{ snapshotId }}</span>
+          </div>
+        </section>
+
+        <!-- BL -->
+        <section style="background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden">
+          <div style="flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">
+            <div style="display:flex;align-items:center;gap:9px">
+              <h2 style="margin:0;font-size:17px;font-weight:600;font-family:'Source Serif 4',Georgia,serif">Strategy Mix</h2>
+              {{ blBadge }}
+            </div>
+            {{ blSelector }}
+          </div>
+          <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:space-around;gap:8px;overflow:hidden">{{ blChart }}</div>
+          <div style="flex:0 0 auto;font-size:12px;line-height:1.45;color:var(--muted);margin-top:8px;text-wrap:pretty">{{ blCaption }}</div>
+          <div style="flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;margin-top:7px">
+            <span style="font-size:11px;color:var(--muted)">See your target architecture →</span>
+            <span style="font-size:10px;color:var(--muted);font-family:Inter,system-ui,sans-serif">grounded · {{ snapshotId }}</span>
+          </div>
+        </section>
+
+        <!-- BR -->
+        <section style="background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden">
+          <div style="flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">
+            <div style="display:flex;align-items:center;gap:9px">
+              <h2 style="margin:0;font-size:17px;font-weight:600;font-family:'Source Serif 4',Georgia,serif">{{ brTitle }}</h2>
+              {{ brBadge }}
+            </div>
+            {{ brSelector }}
+          </div>
+          <div style="flex:1;min-height:0;display:flex;align-items:center;overflow:hidden">{{ brChart }}</div>
+          <div style="flex:0 0 auto;font-size:12px;line-height:1.45;color:var(--muted);margin-top:8px;text-wrap:pretty">{{ brCaption }}</div>
+          <div style="flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;margin-top:7px">
+            <button onClick="{{ openBrData }}" style="border:none;background:transparent;color:var(--muted);font-size:11px;cursor:pointer;text-decoration:underline;text-underline-offset:2px">view data</button>
+            <span style="font-size:10px;color:var(--muted);font-family:Inter,system-ui,sans-serif">grounded · {{ snapshotId }}</span>
+          </div>
+        </section>
+
+      </div>
+      </sc-if>
+      </div>
+    </main>
+
+    <!-- ============ ASK ALPHA (right pane) ============ -->
+    {{ askAlpha }}
+  </div>
+
+  <!-- ============ PROVENANCE POPOVER ============ -->
+  <sc-if value="{{ pop }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closePop }}" style="position:fixed;inset:0;z-index:60"></div>
+    <div style="position:fixed;left:{{ popX }};top:{{ popY }};z-index:61;width:320px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 50px -12px rgba(0,0,0,.32);padding:16px;animation:alphaIn .12s ease">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--brand);text-transform:uppercase;margin-bottom:8px">How this was computed</div>
+      <div style="font-size:16px;font-weight:800;margin-bottom:4px">{{ popTitle }}</div>
+      <div style="font-size:13px;color:var(--ink);line-height:1.5;margin-bottom:12px">{{ popValue }}</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.55;border-top:1px solid var(--line);padding-top:10px;font-family:Inter,system-ui,sans-serif">{{ popMethod }}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:11px">
+        <span style="font-size:11px;background:var(--surface-2);border:1px solid var(--line);padding:3px 8px;border-radius:6px">Cohort: {{ popCohort }}</span>
+        <span style="font-size:11px;background:var(--surface-2);border:1px solid var(--line);padding:3px 8px;border-radius:6px;font-family:Inter,system-ui,sans-serif">n = {{ popN }}</span>
+        <span style="font-size:11px;background:var(--surface-2);border:1px solid var(--line);padding:3px 8px;border-radius:6px;font-family:Inter,system-ui,sans-serif">{{ snapshotId }}</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ VIEW DATA MODAL ============ -->
+  <sc-if value="{{ dataModal }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeDataModal }}" style="position:fixed;inset:0;z-index:70;background:rgba(8,9,18,.42);display:flex;align-items:center;justify-content:center;padding:40px">
+      <div onClick="{{ stop }}" style="background:var(--surface);border:1px solid var(--line);border-radius:16px;max-width:560px;width:100%;max-height:80vh;overflow:auto;box-shadow:0 30px 80px -20px rgba(0,0,0,.5)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface)">
+          <div style="font-size:16px;font-weight:800">{{ dataTitle }}</div>
+          <button onClick="{{ closeDataModal }}" style="border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:18px">✕</button>
+        </div>
+        <div style="padding:8px 22px 22px">{{ dataTable }}</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ============ IMPERSONATION BANNER ============ -->
+  <sc-if value="{{ actingAs }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;top:62px;left:0;right:0;z-index:45;display:flex;align-items:center;gap:12px;padding:8px 20px;background:var(--brand);color:#fff;font-size:12.5px">
+      <span style="font-weight:700">Acting as {{ actingAs }}</span>
+      <span style="opacity:.85">· impersonation · every action is audit-logged</span>
+      <button onClick="{{ exitImpersonate }}" style="margin-left:auto;border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.12);color:#fff;border-radius:7px;padding:4px 12px;cursor:pointer;font-size:12px;font-weight:600">← Back to cockpit</button>
+    </div>
+  </sc-if>
+
+  <!-- ============ ADVISOR COCKPIT ============ -->
+  <sc-if value="{{ advisorView }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;top:62px;left:0;right:0;bottom:0;z-index:42;background:var(--bg);overflow:auto">{{ advisorBody }}</div>
+  </sc-if>
+
+  <!-- ============ INTERNAL CONSOLES ============ -->
+  <sc-if value="{{ internalView }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;top:62px;left:0;right:0;bottom:0;z-index:42;background:var(--bg);overflow:auto">{{ internalBody }}</div>
+  </sc-if>
+
+  <!-- ============ WELCOME ============ -->
+  <sc-if value="{{ welcome }}" hint-placeholder-val="{{ true }}">
+    <div style="position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:24px">
+      <div style="max-width:680px;width:100%;background:var(--surface-hero);border:1px solid var(--line);border-radius:18px;padding:44px 48px;box-shadow:0 30px 70px -24px rgba(0,0,0,.25)">
+        <img src="assets/moonfare_logo.png" alt="Moonfare" style="height:24px;width:auto;margin-bottom:22px">
+        <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:8px">Co-Pilot</div>
+        <h1 style="font-family:'Source Serif 4',Georgia,serif;font-size:42px;font-weight:600;margin:0 0 12px;letter-spacing:-.01em">Welcome to Alpha</h1>
+        <p style="font-size:17px;margin:0 0 18px;color:var(--ink)">Your AI-augmented private-markets advisor.</p>
+        <p style="font-size:14px;line-height:1.6;color:var(--muted);margin:0 0 10px">A live peer-group engine over your investor base — compare yourself against peers, the platform, house-view model portfolios, or Harvard / Yale / Princeton endowments, across 25 use cases.</p>
+        <p style="font-size:14px;line-height:1.6;color:var(--muted);margin:0 0 16px">Ask Alpha for context on any chart — answers are grounded in the live database.</p>
+        <p style="font-size:12px;line-height:1.55;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 14px;margin:0 0 26px">Peer &amp; platform figures are real export data. <b style="color:var(--ink)">Modelled, not measured:</b> PM-target %, investable-wealth €, and the model portfolios (a Moonfare house view, unoptimised). Performance uses GP marks; young vintages are not ranked. Informational only — not investment advice.</p>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <span style="font-size:11px;color:var(--muted)">Synthetic demo data · snapshot 2026-06-14</span>
+          <button onClick="{{ enterApp }}" style="background:var(--brand);color:#fff;border:none;border-radius:999px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer">Enter Alpha →</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;defaultTheme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;startState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;happy&quot;,&quot;cold&quot;,&quot;thin&quot;,&quot;gated&quot;,&quot;error&quot;],&quot;default&quot;:&quot;happy&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;askAlphaOpen&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    const h = React.createElement;
+    this.h = h;
+    this.STRATS = [
+      ['buyout','Buyout','--data-1'],['growth','Growth','--data-2'],['venture','Venture','--data-3'],
+      ['credit','Private Credit','--data-4'],['infra','Infrastructure','--data-5'],['realestate','Real Estate','--data-6'],
+      ['secondaries','Secondaries','--data-7'],['ai','AI / Tech','--data-8'],['other','Other','--data-9']
+    ];
+    this.MIX = {
+      you:        {buyout:34,growth:14,venture:10,credit:2, infra:6, realestate:8, secondaries:6,ai:18,other:2},
+      platform:   {buyout:32,growth:16,venture:11,credit:9, infra:7, realestate:8, secondaries:6,ai:10,other:1},
+      model:      {buyout:26,growth:14,venture:8, credit:14,infra:12,realestate:10,secondaries:6,ai:9, other:1}
+    };
+    this.PRESETS = {
+      'like-you':       {label:'People like you', n:41,  median:8.9,  target:12, mix:{buyout:28,growth:13,venture:9,credit:12,infra:8,realestate:9,secondaries:5,ai:15,other:1}},
+      'pe-pros':        {label:'PE professionals', n:118, median:13.4, target:16, mix:{buyout:33,growth:12,venture:10,credit:14,infra:7,realestate:6,secondaries:5,ai:12,other:1}},
+      'family-offices': {label:'Family Offices',   n:64,  median:18.6, target:22, mix:{buyout:24,growth:13,venture:8,credit:10,infra:14,realestate:14,secondaries:6,ai:10,other:1}},
+      'top10':          {label:'Top performers',   n:200, median:21.2, target:24, mix:{buyout:30,growth:16,venture:12,credit:6,infra:6,realestate:6,secondaries:5,ai:18,other:1}}
+    };
+    this.PM = { you:15.7, platform:10.5, model:12, target:20, rank:'Top 18%', rankPos:111, rankOf:2000 };
+    this.state = {
+      theme: props.defaultTheme || 'light',
+      demoState: props.startState || 'happy',
+      cmp:'peers',
+      uc:'t1-5', page:'overview', dtog:{},
+      welcome:true, actingAs:null, fb:{},
+      s2strat:'buyout', s2cmp:'peers',
+      s3cmp:'peers', s4cmp:'peers', s6cmp:'peers', s7cmp:'peers',
+      cohortOpen:false,
+      preset:'like-you',
+      dims:{ ages:['45-54'], region:null, profession:null },
+      paid:false,
+      pop:null, popX:'40%', popY:'40%',
+      deepLink:null,
+      dataModal:null,
+      mode:'Investor',
+      risk:'Balanced', horizon:'7y',
+      ask:{ state: props.askAlphaOpen===false?'min':'open', x:null, y:null, register:'plain',
+            msgs:[ {who:'alpha', segs:[
+              {t:'Hi — I read your portfolio against your cohort. Ask me anything, or tap a prompt below. Every number I give is clickable to show how it was computed.'} ] } ] },
+      _drag:null
+    };
+  }
+
+  /* ---------- cohort math ---------- */
+  cohort(){
+    const p = this.PRESETS[this.state.preset];
+    let n = p.n;
+    const d = this.state.dims;
+    if(d.ages && d.ages.length>1) n += (d.ages.length-1)*22;        // UNION within dim → bigger
+    if(d.region) n = Math.round(n*0.34);                            // INTERSECT across dim → smaller
+    if(d.profession) n = Math.round(n*0.46);
+    let relaxed=false, gated=false, strictN=n;
+    if(this.state.demoState==='thin'){ relaxed=true; }
+    if(this.state.demoState==='gated'){ gated=true; }
+    if(n<9 && !this.state.paid){ gated=true; }
+    else if(n<18){ relaxed=true; n=Math.max(n*3,26)|0; }
+    return { p, n, strictN, relaxed, gated, median:p.median, target:p.target, mix:p.mix };
+  }
+  // peer values nudged by cohort size so changes are visible
+  peerData(){
+    const c=this.cohort();
+    const f=(c.n-c.p.n)*0.012;
+    const median = +(c.median + f).toFixed(1);
+    const target = c.target;
+    // shift mix slightly toward credit as cohort widens, renormalize
+    const mix={}; let sum=0;
+    this.STRATS.forEach(([k])=>{ let v=c.mix[k]+ (k==='credit'? f*0.5 : k==='ai'? -f*0.3 : 0); v=Math.max(v,0); mix[k]=v; sum+=v; });
+    this.STRATS.forEach(([k])=>{ mix[k]=+(mix[k]/sum*100).toFixed(1); });
+    return { median, target, mix, c };
+  }
+  cmpMix(cmp){
+    if(cmp==='you') return this.MIX.you;
+    if(cmp==='platform') return this.MIX.platform;
+    if(cmp==='model') return this.MIX.model;
+    return this.peerData().mix;
+  }
+  zDeltas(cmp){
+    const base = this.cmpMix(cmp);
+    return this.STRATS.map(([k,name,color])=>{
+      const delta = +(this.MIX.you[k]-base[k]).toFixed(1);
+      return { k, name, color, delta, sig: Math.abs(delta)>=2 };
+    }).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
+  }
+
+  /* ---------- small helpers ---------- */
+  cssvar(v){ return `var(${v})`; }
+  openPop(e, obj){
+    e.stopPropagation();
+    const r = e.currentTarget.getBoundingClientRect();
+    let x = Math.min(r.left, window.innerWidth-340), y = r.bottom+8;
+    if(y>window.innerHeight-240) y = Math.max(r.top-240,12);
+    this.setState({ pop:obj, popX:Math.max(x,12)+'px', popY:y+'px' });
+  }
+  seg(opts, val, onChange, opt){
+    const h=this.h; opt=opt||{};
+    return h('div',{style:{display:'inline-flex',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:9,padding:2,gap:2}},
+      opts.map(o=>{
+        const active = o.value===val;
+        return h('button',{ key:o.value, onClick:()=>onChange(o.value),
+          style:{border:'none',cursor:'pointer',borderRadius:7,padding:opt.sm?'3px 8px':'4px 11px',fontSize:opt.sm?11:12,fontWeight:active?700:500,fontFamily:"Inter,system-ui,sans-serif",
+            background:active?'var(--brand)':'transparent', color:active?'#fff':'var(--muted)', transition:'all .12s', whiteSpace:'nowrap'} }, o.label);
+      }));
+  }
+  badge(text, tone){
+    const h=this.h;
+    const map={ conf:{bg:'var(--surface-2)',bd:'var(--line)',c:'var(--muted)'}, synth:{bg:'var(--synthetic-wash)',bd:'var(--synthetic)',c:'var(--synthetic)'} };
+    const s=map[tone||'conf'];
+    return h('span',{style:{display:'inline-flex',alignItems:'center',gap:4,fontSize:11,fontFamily:"Inter,system-ui,sans-serif",fontWeight:600,background:s.bg,border:`1px solid ${s.bd}`,color:s.c,padding:'2px 8px',borderRadius:6,whiteSpace:'nowrap'}}, text);
+  }
+
+  /* ---------- TL chart: BarRow ---------- */
+  tlChart(){
+    const h=this.h; const cold=this.state.demoState==='cold';
+    const pd=this.peerData();
+    const axisMax=22;
+    const rows=[
+      {label:'You',     v:this.PM.you,  color:'--brand', bold:true, ghost:cold},
+      {label:'Peers',   v:pd.median,    color:'--brand-tint-2'},
+      {label:'Platform',v:this.PM.platform, color:'--brand-tint-3'},
+      {label:'Model',   v:this.PM.model,color:'--accent-mint'}
+    ];
+    const ticks=[0,5,10,15,20];
+    const pct=v=>`${(v/axisMax*100)}%`;
+    return h('div',{style:{width:'100%',position:'relative',paddingTop:4}},
+      // target marker
+      h('div',{style:{position:'absolute',left:`calc(58px + (100% - 58px) * ${this.PM.target/axisMax})`,top:0,bottom:18,width:0,borderLeft:'1.5px dashed var(--muted)',zIndex:2}},
+        h('div',{style:{position:'absolute',top:1,left:4,fontSize:9.5,color:'var(--synthetic)',fontWeight:700,whiteSpace:'nowrap',display:'flex',gap:3,alignItems:'center'}},'target 20%',
+          h('span',{style:{background:'var(--synthetic-wash)',color:'var(--synthetic)',padding:'0 4px',borderRadius:4,fontSize:8.5}},'illustrative'))),
+      rows.map((r,i)=> h('div',{key:i,style:{display:'flex',alignItems:'center',gap:8,marginBottom:9,position:'relative',zIndex:1}},
+        h('div',{style:{width:50,flex:'0 0 50px',fontSize:11.5,color:'var(--muted)',textAlign:'right'}}, r.label),
+        h('div',{style:{flex:1,height:14,background:'var(--surface-2)',borderRadius:6,position:'relative',overflow:'visible'}},
+          h('div',{onClick:e=>this.openPop(e,{title:`${r.label} · PM allocation`,value:`${r.v}% of investable wealth in private markets`,method:'%wealth in PM; peer=median, platform=mean over n_with_wealth',cohort:'Peers',n:pd.c.n}),
+            style:{height:'100%',width:r.ghost?'0%':pct(r.v),background:r.ghost?'transparent':`var(${r.color})`,border:r.ghost?'1.5px dashed var(--line)':'none',borderRadius:6,cursor:'pointer',transition:'width .3s ease'}})),
+        h('div',{style:{width:46,flex:'0 0 46px',fontFamily:"Inter,system-ui,sans-serif",fontSize:r.bold?13:12,fontWeight:r.bold?700:500,color:r.ghost?'var(--muted)':'var(--ink)'}}, r.ghost?'—':`${r.v}%`)
+      )),
+      h('div',{style:{display:'flex',justifyContent:'space-between',marginLeft:58,marginTop:2}},
+        ticks.map(t=>h('span',{key:t,style:{fontSize:9.5,color:'var(--muted)',fontFamily:"Inter,system-ui,sans-serif"}}, t+'%')))
+    );
+  }
+
+  /* ---------- TR chart: Fill Rate ---------- */
+  trChart(){
+    const h=this.h; const cold=this.state.demoState==='cold';
+    const pd=this.peerData();
+    const yourPm = cold?0:this.PM.you;
+    const rows=[
+      {label:'Your target', ref:this.PM.target, color:'--brand', synth:true},
+      {label:'Peer target', ref:pd.target, color:'--brand-tint-2'},
+      {label:'Platform',    ref:this.PM.platform, color:'--brand-tint-3', actual:true},
+      {label:'Model target',ref:18, color:'--accent-mint', synth:true}
+    ];
+    const scaleMax=160; const at=v=>`${Math.min(v/scaleMax*100,100)}%`;
+    return h('div',{style:{width:'100%',position:'relative'}},
+      // 100% marker
+      h('div',{style:{position:'absolute',left:`calc(76px + (100% - 76px) * ${100/scaleMax})`,top:0,bottom:14,borderLeft:'1.5px dashed var(--muted)',zIndex:2}},
+        h('div',{style:{position:'absolute',top:1,left:4,fontSize:9,color:'var(--muted)',whiteSpace:'nowrap'}},'100%')),
+      rows.map((r,i)=>{
+        const fill = r.ref? Math.round(yourPm/r.ref*100):0;
+        const over = fill>100;
+        return h('div',{key:i,style:{marginBottom:11,position:'relative',zIndex:1}},
+          h('div',{style:{display:'flex',alignItems:'center',gap:8}},
+            h('div',{style:{width:68,flex:'0 0 68px',fontSize:11,color:'var(--muted)',textAlign:'right',display:'flex',flexDirection:'column',alignItems:'flex-end'}},
+              r.label, r.synth? h('span',{style:{fontSize:8,color:'var(--synthetic)',background:'var(--synthetic-wash)',padding:'0 4px',borderRadius:3,marginTop:1}},'illustrative'):null),
+            h('div',{style:{flex:1,height:15,background:'var(--surface-2)',borderRadius:6,position:'relative',overflow:'visible'}},
+              h('div',{onClick:e=>this.openPop(e,{title:`Fill rate vs ${r.label}`,value:`${fill}% filled — your ${yourPm}% against ${r.label} ${r.ref}%`,method:r.synth?'illustrative target — assigned from your risk class':'fill = your PM% ÷ reference target',cohort:'Peers',n:pd.c.n}),
+                style:{height:'100%',width:cold?'2px':at(fill),background:over?'var(--over)':`var(${r.color})`,borderRadius:6,cursor:'pointer',transition:'width .3s ease',position:'relative'}},
+                over? h('span',{style:{position:'absolute',right:3,top:1,fontSize:9,color:'#fff'}},'▲'):null)),
+            h('div',{style:{width:96,flex:'0 0 96px',fontFamily:"Inter,system-ui,sans-serif",fontSize:11.5,fontWeight:600,color:cold?'var(--muted)':over?'var(--over)':'var(--ink)'}},
+              cold? `0% · ${r.ref}% goal` : `${fill}% · ${r.label.includes('Platform')?'actual':'target'} ${r.ref}%`)
+          )
+        );
+      })
+    );
+  }
+
+  /* ---------- donut ---------- */
+  donut(mixObj, size, centerTop, centerBot, cmpKey){
+    const h=this.h;
+    const slices=this.STRATS.map(([k,name,color])=>({k,name,color,pct:mixObj[k]||0})).filter(s=>s.pct>0);
+    let a=0; const stops=[]; const labels=[];
+    slices.forEach(s=>{ const b=a+s.pct; stops.push(`var(${s.color}) ${a}% ${b}%`);
+      const mid=a+s.pct/2, ang=mid/100*2*Math.PI, R=39;
+      if(s.pct>=6) labels.push({x:50+R*Math.sin(ang), y:50-R*Math.cos(ang), t:Math.round(s.pct)+'%'});
+      a=b; });
+    return h('div',{style:{position:'relative',width:size,height:size,borderRadius:'50%',background:`conic-gradient(${stops.join(',')})`,flex:'0 0 auto'}},
+      h('div',{style:{position:'absolute',inset:'24%',borderRadius:'50%',background:'var(--surface)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',padding:4}},
+        h('div',{style:{fontSize:10.5,fontWeight:700,color:'var(--ink)'}},centerTop),
+        h('div',{style:{fontSize:9,color:'var(--muted)',fontFamily:"Inter,system-ui,sans-serif",marginTop:1}},centerBot)),
+      labels.map((l,i)=>h('div',{key:i,onClick:e=>this.openPop(e,{title:'Strategy slice',value:`${centerTop}: ${l.t}`,method:'share of portfolio NAV by strategy',cohort:cmpKey==='peers'?'Peers':centerTop,n:this.peerData().c.n}),
+        style:{position:'absolute',left:l.x+'%',top:l.y+'%',transform:'translate(-50%,-50%)',fontFamily:"Inter,system-ui,sans-serif",fontSize:10,fontWeight:700,color:'#fff',textShadow:'0 1px 3px rgba(0,0,0,.45)',cursor:'pointer'}}, l.t)));
+  }
+  donutLabel(text){ return this.h('div',{style:{fontSize:10.5,fontWeight:700,color:'var(--muted)',textAlign:'center',marginBottom:3}}, text); }
+
+  blChart(){
+    const h=this.h; const cold=this.state.demoState==='cold';
+    const cmp=this.state.cmp;
+    const cmpName = cmp==='platform'?'Platform':cmp==='model'?'Model':'Peers';
+    const gated = (this.cohort().gated && cmp==='peers');
+    const size=60;
+    const left = h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center'}},
+      this.donutLabel('Your portfolio'),
+      cold? h('div',{style:{width:size,height:size,borderRadius:'50%',border:'2px dashed var(--line)',display:'flex',alignItems:'center',justifyContent:'center',textAlign:'center',fontSize:10.5,color:'var(--muted)',padding:14}},'No holdings yet')
+          : this.donut(this.MIX.you,size,'You','NAV','you'));
+    let right;
+    if(gated){
+      right=h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center'}}, this.donutLabel(cmpName), this.gatedBox(size));
+    } else {
+      right=h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center'}},
+        this.donutLabel(cmpName), this.donut(this.cmpMix(cmp),size,cmpName, cmp==='peers'?`n=${this.peerData().c.n}`:cmp==='model'?'illustrative':'pool', cmp));
+    }
+    const cm=this.cmpMix(cmp);
+    const legend = h('div',{style:{width:'100%',marginTop:2,display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 14px'}},
+      this.STRATS.map(([k,name,color])=>h('div',{key:k,style:{display:'flex',alignItems:'center',gap:5,fontSize:9.5,lineHeight:1.12}},
+        h('span',{style:{width:7,height:7,borderRadius:2,background:`var(${color})`,flex:'0 0 7px'}}),
+        h('span',{style:{flex:1,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},name),
+        h('span',{style:{fontFamily:this.SF,fontWeight:600}}, this.MIX.you[k]+'%'),
+        h('span',{style:{color:'var(--muted)',fontFamily:this.SF}}, (cm[k]||0)+'%'))));
+    return h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',width:'100%',gap:6}},
+      h('div',{style:{display:'flex',gap:16,justifyContent:'center',alignItems:'center'}}, left, right),
+      cold?null:legend);
+  }
+  gatedBox(size){
+    const h=this.h;
+    return h('div',{style:{width:size,height:size,borderRadius:14,background:'var(--gated-wash)',border:'1px solid var(--line)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',padding:12,gap:6}},
+      h('div',{style:{fontSize:18}},'🔒'),
+      h('div',{style:{fontSize:10.5,color:'var(--ink)',fontWeight:600,lineHeight:1.35}},'Only for paid viewers — contact your sales associate'),
+      h('div',{style:{fontSize:9.5,color:'var(--muted)',fontFamily:"Inter,system-ui,sans-serif"}},'5,500 total investors'));
+  }
+
+  /* ---------- BR Z-chart ---------- */
+  brChart(){
+    const h=this.h;
+    if(this.state.demoState==='cold'){
+      return h('div',{style:{width:'100%',textAlign:'center',padding:20,border:'1px dashed var(--line)',borderRadius:12,color:'var(--muted)',fontSize:12.5}},
+        'We\u2019ll show your over/under-weights once you hold a fund.');
+    }
+    const cmp=this.state.cmp;
+    const gated=(this.cohort().gated && cmp==='peers');
+    if(gated) return h('div',{style:{width:'100%',display:'flex',justifyContent:'center'}}, this.gatedBox(150));
+    const rows=this.zDeltas(cmp);
+    const maxAbs=Math.max(...rows.map(r=>Math.abs(r.delta)),4);
+    const cmpName=cmp==='platform'?'Platform':cmp==='model'?'the Model':'Peers';
+    return h('div',{style:{width:'100%'}},
+      rows.map((r,i)=>{
+        const w=Math.abs(r.delta)/maxAbs*100;
+        const fill = !r.sig?'var(--gated)':`var(${r.color})`;
+        const op = r.sig?1:.5;
+        const dirCol = r.delta>0?'var(--over)':'var(--under)';
+        return h('div',{key:r.k,onClick:r.sig?()=>this.zClick(r):null,
+          style:{display:'flex',alignItems:'center',height:19,cursor:r.sig?'pointer':'default',borderRadius:6,opacity:op},
+          onMouseEnter:e=>{e.currentTarget.style.background='var(--surface-2)';}, onMouseLeave:e=>{e.currentTarget.style.background='transparent';}},
+          h('div',{style:{width:104,flex:'0 0 104px',display:'flex',alignItems:'center',gap:5,justifyContent:'flex-end',paddingRight:6}},
+            h('span',{style:{fontSize:11,color:'var(--ink)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}, r.name),
+            h('span',{style:{width:9,height:9,borderRadius:2,background:`var(${r.color})`,flex:'0 0 9px'}})),
+          h('div',{style:{flex:1,display:'flex',alignItems:'center',height:'100%',position:'relative'}},
+            h('div',{style:{position:'absolute',left:'50%',top:0,bottom:0,borderLeft:'1.5px solid var(--ink)',opacity:.55}}),
+            h('div',{style:{width:'50%',display:'flex',justifyContent:'flex-end',paddingRight:1}},
+              r.delta<0? h('div',{style:{width:w+'%',height:11,background:fill,borderRadius:'4px 0 0 4px',display:'flex',alignItems:'center',justifyContent:'flex-start',paddingLeft:4}},
+                h('span',{style:{fontSize:9.5,color:'#fff',fontWeight:700}}, '\u25BC')) :null),
+            h('div',{style:{width:'50%',display:'flex',justifyContent:'flex-start',paddingLeft:1}},
+              r.delta>0? h('div',{style:{width:w+'%',height:11,background:fill,borderRadius:'0 4px 4px 0',display:'flex',alignItems:'center',justifyContent:'flex-end',paddingRight:4}},
+                h('span',{style:{fontSize:9.5,color:'#fff',fontWeight:700}}, '\u25B2')):null)),
+          h('div',{style:{width:78,flex:'0 0 78px',textAlign:'left',paddingLeft:8,fontFamily:"Inter,system-ui,sans-serif",fontSize:11.5,fontWeight:700,color:!r.sig?'var(--muted)':dirCol}},
+            `${r.delta>0?'▲ +':'▼ '}${r.delta}pp`, !r.sig? h('span',{style:{fontSize:8.5,color:'var(--muted)',fontWeight:400,display:'block',marginTop:-2}},'n.s.'):null)
+        );
+      })
+    );
+  }
+  zClick(r){
+    this.setState({ uc:'t1-5', page:'strategy', s2strat:r.k, s2cmp:this.state.cmp });
+  }
+
+  /* ---------- nav rail ---------- */
+  navRail(){
+    const h=this.h; const cur=this.state.surface;
+    const groups=[
+      ['Overview',[['Overview','◫','overview']]],
+      ['Compare',[['Allocation','▦','s2'],['Region','◴','s3'],['Format','▤','s4'],['Vintage','▥','s5'],['Look-through','⬡','s6'],['Performance','▲','s7'],['KPIs','◇','soon']]],
+      ['Plan',[['Architect','✦','soon'],['Pacing','◷','soon'],['Liquidity','≈','soon'],['Projection','⋰','soon']]],
+      ['Act',[['Funds','▣','s13'],['Next','→','soon'],['Explain','?','soon']]],
+      ['Learn',[['Why-not','⊘','soon'],['Managers','◉','soon'],['Macro','◔','soon']]]
+    ];
+    return groups.map((g,gi)=>h('div',{key:gi,style:{display:'flex',flexDirection:'column',alignItems:'center',width:'100%',marginBottom:6}},
+      h('div',{style:{fontSize:8,letterSpacing:'.1em',color:'var(--muted)',textTransform:'uppercase',marginBottom:3,opacity:.7}},g[0]),
+      g[1].map((it,ii)=>{
+        const key=it[2]; const active=(key===cur)||(key==='soon'&&cur==='soon'&&false);
+        const on=key===cur;
+        return h('button',{key:ii,title:it[0],
+          onClick:()=>this.setState({surface:key, soonLabel: key==='soon'?it[0]:this.state.soonLabel}),
+          style:{width:60,padding:'7px 2px',marginBottom:2,border:'none',borderRadius:9,cursor:'pointer',
+            background:on?'var(--brand-wash)':'transparent',color:on?'var(--brand)':'var(--muted)',
+            display:'flex',flexDirection:'column',alignItems:'center',gap:3,fontFamily:"Inter,system-ui,sans-serif"},
+          onMouseEnter:e=>{if(!on)e.currentTarget.style.background='var(--surface-2)';},
+          onMouseLeave:e=>{if(!on)e.currentTarget.style.background='transparent';}},
+          h('span',{style:{fontSize:15,lineHeight:1}},it[1]),
+          h('span',{style:{fontSize:8.5,fontWeight:on?700:500,lineHeight:1.1,textAlign:'center'}},it[0]));
+      })));
+  }
+
+  /* ---------- cohort panel ---------- */
+  cohortPanel(){
+    const h=this.h;
+    const co=this.cohort();
+    const presetChips = Object.keys(this.PRESETS).map(k=>({k,label:this.PRESETS[k].label}));
+    const chip=(active,label,onClick,synth)=> h('button',{key:label,onClick,
+      style:{border:`1px solid ${active?'var(--brand)':'var(--line)'}`,background:active?'var(--brand)':'var(--surface)',color:active?'#fff':'var(--ink)',
+        fontSize:11.5,fontWeight:active?600:500,padding:'5px 10px',borderRadius:999,cursor:'pointer',fontFamily:"Inter,system-ui,sans-serif",display:'inline-flex',alignItems:'center',gap:4},
+      onMouseEnter:e=>{if(!active)e.currentTarget.style.borderColor='var(--brand-tint-2)';},
+      onMouseLeave:e=>{if(!active)e.currentTarget.style.borderColor='var(--line)';}},
+      label, synth? h('span',{style:{fontSize:8,color:active?'#fff':'var(--synthetic)',background:active?'rgba(255,255,255,.2)':'var(--synthetic-wash)',padding:'0 4px',borderRadius:3}},'illus.'):null);
+
+    const group=(title, children, note)=> h('div',{key:title,style:{marginBottom:15}},
+      h('div',{style:{fontSize:11,fontWeight:700,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.06em',marginBottom:7}},title),
+      h('div',{style:{display:'flex',flexWrap:'wrap',gap:6}},children),
+      note? h('div',{style:{fontSize:10,color:'var(--muted)',marginTop:6,fontStyle:'italic'}},note):null);
+
+    const toggleAge=(v)=>{ const a=this.state.dims.ages.slice(); const i=a.indexOf(v); if(i>=0){if(a.length>1)a.splice(i,1);} else a.push(v); this.setState({dims:{...this.state.dims,ages:a}}); };
+    const setDim=(key,v)=>{ this.setState({dims:{...this.state.dims,[key]: this.state.dims[key]===v?null:v}}); };
+
+    return [
+      group('Presets', presetChips.map(p=>chip(this.state.preset===p.k,p.label,()=>this.setState({preset:p.k,dims:{ages:['45-54'],region:null,profession:null}})))),
+      h('div',{key:'algebra',style:{fontSize:10.5,color:'var(--brand-ink)',background:'var(--brand-wash)',borderRadius:8,padding:'7px 9px',marginBottom:15,lineHeight:1.4}},
+        'Adding ages widens your peer group (union); adding a region or profession narrows it (intersect).'),
+      group('Age band', ['35-44','45-54','55-64','65+'].map(a=>chip(this.state.dims.ages.includes(a),a,()=>toggleAge(a)))),
+      group('Risk appetite', ['Conservative','Balanced','Growth','Aggressive','Opportunistic'].map(r=>chip(this.state.risk===r,r,()=>this.setState({risk:r})))),
+      group('Region', ['DACH','UK','Nordics','Benelux'].map(r=>chip(this.state.dims.region===r,r,()=>setDim('region',r))), 'One region selected → cohort intersects.'),
+      group('Profession', ['Consulting','Finance','Tech','Medicine','Family Offices'].map(p=>chip(this.state.dims.profession===p,p,()=>setDim('profession',p)))),
+      group('Family', [chip(false,'2 children',()=>{},true)], 'Limited / illustrative data — not used to slice.'),
+      co.relaxed? h('div',{key:'relax',style:{display:'flex',gap:8,alignItems:'center',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:8,padding:'8px 10px',marginBottom:10}},
+        h('span',null,'ⓘ'), h('span',{style:{fontSize:11,color:'var(--brand-ink)',fontWeight:600}},'Broadened to investors in your wealth & risk band.')):null,
+      co.gated? h('div',{key:'gate',style:{background:'var(--gated-wash)',border:'1px solid var(--line)',borderRadius:8,padding:'10px',marginBottom:10}},
+        h('div',{style:{fontSize:11.5,fontWeight:600}},'🔒 Only for paid viewers'),
+        h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:2}},'Contact your sales associate · 5,500 total investors')):null,
+      // follower
+      h('div',{key:'follow',style:{borderTop:'1px solid var(--line)',paddingTop:13,marginTop:4}},
+        h('div',{style:{fontSize:11,fontWeight:700,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.06em',marginBottom:7,display:'flex',gap:6,alignItems:'center'}},'Follower',
+          h('span',{style:{fontSize:8,color:'var(--synthetic)',background:'var(--synthetic-wash)',padding:'1px 5px',borderRadius:3,textTransform:'none',letterSpacing:0}},'illustrative')),
+        h('div',{style:{display:'flex',gap:6,flexWrap:'wrap'}}, ['All','Peers','Top 10%'].map(f=>chip(f==='Peers',f,()=>{}))))
+    ];
+  }
+
+  /* ---------- Ask Alpha ---------- */
+  askAlpha(){
+    const h=this.h; const a=this.state.ask;
+    const suggestions=['How do I compare to my peers?','What should I do next?','Am I over-concentrated in AI?','Can I commit more?'];
+    if(a.state==='min'){
+      return h('aside',{style:{flex:'0 0 46px',width:46,background:'var(--surface)',borderLeft:'1px solid var(--line)',display:'flex',flexDirection:'column',alignItems:'center',padding:'12px 0',gap:12,cursor:'pointer'},onClick:()=>this.setAsk('open')},
+        h('div',{style:{color:'var(--muted)',fontSize:16}},'‹'),
+        h('div',{style:{width:26,height:26,borderRadius:8,background:'var(--brand)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Source Serif 4',Georgia,serif",fontWeight:700}},'α'),
+        h('div',{style:{writingMode:'vertical-rl',transform:'rotate(180deg)',fontSize:12,fontWeight:600,color:'var(--ink)',letterSpacing:'.04em',marginTop:6}},'Ask Alpha'));
+    }
+    const full=a.state==='full';
+    const wrap = full
+      ? {position:'fixed',inset:0,zIndex:55,background:'var(--surface)',display:'flex',flexDirection:'column'}
+      : {flex:'0 0 340px',width:340,background:'var(--surface)',borderLeft:'1px solid var(--line)',display:'flex',flexDirection:'column',minHeight:0,overflow:'hidden'};
+    const inner = {maxWidth: full?720:'none', margin: full?'0 auto':0, width:full?'100%':'auto'};
+    const hasConvo = a.msgs.length>1;
+    return h('aside',{style:wrap},
+      // header
+      h('div',{style:{flex:'0 0 auto',display:'flex',alignItems:'center',gap:9,padding:'13px 15px',borderBottom:'1px solid var(--line)'}},
+        h('span',{onClick:()=>this.setAsk(full?'open':'min'),title:'Collapse',style:{cursor:'pointer',color:'var(--muted)',fontSize:16}}, full?'⤡':'›'),
+        h('div',{style:{width:28,height:28,borderRadius:999,background:'var(--brand)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Source Serif 4',Georgia,serif",fontWeight:700}},'α'),
+        h('div',{style:{flex:1,minWidth:0}},
+          h('div',{style:{fontSize:14,fontWeight:600}},'Ask Alpha'),
+          h('div',{style:{fontSize:10.5,color:'var(--muted)',display:'flex',alignItems:'center',gap:5}}, h('span',{style:{width:6,height:6,borderRadius:'50%',background:'var(--over)',display:'inline-block'}}),'live · Claude CLI')),
+        this.seg([{label:'Plain',value:'plain'},{label:'Detail',value:'detail'}], a.register, v=>this.setAsk(null,{register:v}), {sm:true}),
+        h('button',{title:full?'Shrink':'Full screen',onClick:()=>this.setAsk(full?'open':'full'),style:this.askBtn()}, full?'⤡':'⤢')),
+      // body
+      h('div',{style:{flex:1,overflowY:'auto',padding:'16px',display:'flex',flexDirection:'column',gap:12,...inner}},
+        hasConvo
+          ? a.msgs.map((m,i)=>this.askBubble(m,i))
+          : h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',textAlign:'center',padding:'14px 4px'}},
+              h('div',{style:{width:46,height:46,borderRadius:14,background:'linear-gradient(135deg,var(--brand),var(--brand-tint-1))',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Source Serif 4',Georgia,serif",fontSize:22,fontWeight:700,boxShadow:'0 6px 18px -6px var(--brand)',marginBottom:12}},'α'),
+              h('div',{style:{fontFamily:"'Source Serif 4',Georgia,serif",fontSize:17,fontWeight:600}},'Ask Alpha anything'),
+              h('div',{style:{fontSize:12,color:'var(--muted)',lineHeight:1.5,maxWidth:240,margin:'6px 0 16px'}},'Live answers grounded in your real portfolio, your peer group, and the Moonfare house view.'),
+              h('div',{style:{display:'flex',flexDirection:'column',gap:8,width:'100%'}}, suggestions.map(sg=>h('button',{key:sg,onClick:()=>this.askSend(sg),
+                style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,textAlign:'left',width:'100%',padding:'11px 13px',border:'1px solid var(--line)',borderRadius:12,background:'var(--surface)',fontSize:12.5,fontWeight:500,color:'var(--ink)',cursor:'pointer'}},
+                sg, h('span',{style:{color:'var(--brand)',fontWeight:700}},'→'))))),
+        a.typing? h('div',{key:'typ',style:{alignSelf:'flex-start',display:'flex',gap:4,padding:'10px 14px',background:'var(--surface-2)',borderRadius:'14px 14px 14px 4px'}},
+          [0,1,2].map(d=>h('span',{key:d,style:{width:6,height:6,borderRadius:'50%',background:'var(--muted)',animation:`blink 1.2s ${d*0.2}s infinite`}}))):null),
+      // foot
+      h('div',{style:{flex:'0 0 auto',padding:'10px 14px 14px',borderTop:'1px solid var(--line)',...inner}},
+        hasConvo? h('div',{style:{display:'flex',gap:6,flexWrap:'wrap',marginBottom:9}},
+          suggestions.slice(0,3).map(s=>h('button',{key:s,onClick:()=>this.askSend(s),
+            style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',fontSize:11,padding:'5px 10px',borderRadius:999,cursor:'pointer'}},s))):null,
+        h('div',{style:{display:'flex',gap:8,alignItems:'center',background:'var(--surface)',border:'1px solid var(--line)',borderRadius:999,padding:'4px 4px 4px 14px'}},
+          h('input',{placeholder:'Ask Alpha…',value:a.input||'',onChange:e=>this.setAsk(null,{input:e.target.value}),
+            onKeyDown:e=>{if(e.key==='Enter'&&(a.input||'').trim())this.askSend(a.input);},
+            style:{flex:1,border:'none',background:'transparent',outline:'none',fontSize:13,color:'var(--ink)'}}),
+          h('button',{onClick:()=>{if((a.input||'').trim())this.askSend(a.input);}, disabled:!(a.input||'').trim(),
+            style:{border:'none',borderRadius:999,padding:'8px 14px',cursor:(a.input||'').trim()?'pointer':'not-allowed',background:(a.input||'').trim()?'var(--brand)':'var(--line)',color:'#fff',fontSize:12,fontWeight:600}},'Send')))
+    );
+  }
+  askBtn(){ return {border:'none',background:'transparent',color:'var(--muted)',cursor:'pointer',fontSize:14,width:26,height:26,borderRadius:7}; }
+  askBubble(m,i){
+    const h=this.h;
+    if(m.who==='user') return h('div',{key:i,style:{alignSelf:'flex-end',maxWidth:'82%',background:'var(--brand)',color:'#fff',padding:'9px 13px',borderRadius:'14px 14px 4px 14px',fontSize:13,lineHeight:1.45}}, m.text);
+    return h('div',{key:i,style:{alignSelf:'flex-start',maxWidth:'88%'}},
+      h('div',{style:{background:'var(--surface-2)',border:'1px solid var(--line)',padding:'11px 14px',borderRadius:'14px 14px 14px 4px',fontSize:13,lineHeight:1.55,color:'var(--ink)'}},
+        m.segs.map((s,j)=> s.chip
+          ? h('button',{key:j,onClick:e=>this.openPop(e,{title:s.chip,value:s.prov||s.chip,method:s.method||'computed from your portfolio vs cohort',cohort:'Peers',n:this.peerData().c.n}),
+              style:{display:'inline-flex',alignItems:'center',gap:3,background:'var(--brand-wash)',color:'var(--brand-ink)',border:'1px solid var(--brand-tint-3)',borderRadius:6,padding:'0 6px',margin:'0 1px',fontFamily:"Inter,system-ui,sans-serif",fontSize:12,fontWeight:700,cursor:'pointer'}}, s.chip)
+          : h('span',{key:j},s.t)),
+        m.detail && this.state.ask.register==='detail'? h('div',{style:{marginTop:8,paddingTop:8,borderTop:'1px solid var(--line)',fontSize:12,color:'var(--muted)'}},m.detail):null),
+      h('div',{style:{fontSize:9.5,color:'var(--muted)',fontFamily:"Inter,system-ui,sans-serif",marginTop:4,marginLeft:4}},`grounded · ${this.snapshotId()}`));
+  }
+  ANSWERS(q){
+    const A={
+      'How do I compare to my peers?':{segs:[{t:'You hold '},{chip:'16%',prov:'15.7% of investable wealth in private markets'},{t:' of your wealth in private markets — well above the '},{chip:'9%',prov:'8.9% peer median'},{t:' peer median. Your mix leans into AI and away from private credit, where you\u2019re '},{chip:'\u22129.8pp',prov:'you 2% vs peers 12%'},{t:' underweight. Overall you rank in the '},{chip:'Top 18%',prov:'111 of 2,000 investors by PM allocation'},{t:' of all investors.'}],detail:'Method: %wealth in PM; peer = median over n=41 with wealth reported; CI95 [7.4, 10.4]. Snapshot synthetic-2026-06-14.'},
+      'What should I do next?':{segs:[{t:'Your biggest gap is private credit at '},{chip:'\u22129.8pp',prov:'vs peers'},{t:' versus peers and '},{chip:'\u221212pp',prov:'vs the model'},{t:' versus the model. Closing part of it would also lift your fill rate toward your own '},{chip:'20%',prov:'illustrative target from your risk class'},{t:' target. I can show eligible private-credit funds when you\u2019re ready.'}]},
+      'Am I over-concentrated in AI?':{segs:[{t:'You hold '},{chip:'18%',prov:'AI / Tech share of portfolio'},{t:' in AI / Tech versus '},{chip:'15%',prov:'peer AI share'},{t:' for peers — '},{chip:'+3.1pp',prov:'significant overweight'},{t:' overweight, and significant. It\u2019s a tilt, not yet a red flag; the look-through view shows your true economic AI exposure is higher once embedded names are counted.'}]},
+      'Can I commit more?':{segs:[{t:'Yes — you\u2019ve filled '},{chip:'131%',prov:'of peer target 12%'},{t:' of your peers\u2019 target but only '},{chip:'79%',prov:'of your own 20% target'},{t:' of your own. That\u2019s headroom of roughly '},{chip:'4.3pp',prov:'20% target \u2212 15.7% actual'},{t:' to your target — room to add without breaking your plan.'}]}
+    };
+    return A[q] || {segs:[{t:'I can only answer with figures I can compute from your portfolio and cohort. Try one of the suggested questions, or ask about allocation, mix, fill rate, or where you\u2019re over/under-weight.'}]};
+  }
+  askSend(q){
+    const msgs=this.state.ask.msgs.concat([{who:'user',text:q}]);
+    this.setAsk(null,{msgs, input:'', typing:true});
+    clearTimeout(this._askT);
+    this._askT=setTimeout(()=>{
+      const ans=this.ANSWERS(q);
+      this.setAsk(null,{ typing:false, msgs: this.state.ask.msgs.concat([{who:'alpha',segs:ans.segs,detail:ans.detail}]) });
+    },750);
+  }
+  setAsk(state, patch){ this.setState({ ask:{...this.state.ask, ...(state?{state}:{}), ...(patch||{})} }); }
+  startDrag(e){
+    const a=this.state.ask;
+    const rect=e.currentTarget.parentElement.getBoundingClientRect();
+    this._drag={ ox:e.clientX-rect.left, oy:e.clientY-rect.top };
+    const move=ev=>{ this.setAsk(null,{ x: Math.max(0,Math.min(ev.clientX-this._drag.ox, window.innerWidth-380)), y: Math.max(0,Math.min(ev.clientY-this._drag.oy, window.innerHeight-100)) }); };
+    const up=()=>{ window.removeEventListener('mousemove',move); window.removeEventListener('mouseup',up); };
+    window.addEventListener('mousemove',move); window.addEventListener('mouseup',up);
+  }
+
+  /* ---------- top-bar controls ---------- */
+  themeToggle(){
+    return this.seg([{label:'☀',value:'light'},{label:'☾',value:'dark'}], this.state.theme, v=>this.setState({theme:v}), {sm:true});
+  }
+  modeMenu(){
+    const h=this.h;
+    return this.seg([{label:'Investor',value:'Investor'},{label:'Advisor',value:'Advisor'},{label:'Internal',value:'Internal'}], this.state.mode, v=>this.setState({mode:v,actingAs:null}), {sm:true});
+  }
+  riskToggle(){
+    const h=this.h;
+    return h('button',{onClick:()=>{const o=['Conservative','Balanced','Growth','Aggressive','Opportunistic'];const i=o.indexOf(this.state.risk);this.setState({risk:o[(i+1)%o.length]});},
+      title:'Risk appetite — click to cycle (re-renders peers)',
+      style:{border:'1px solid var(--line)',background:'var(--surface-2)',color:'var(--ink)',fontSize:12,padding:'3px 9px',borderRadius:7,cursor:'pointer',display:'inline-flex',alignItems:'center',gap:5,fontFamily:"Inter,system-ui,sans-serif"}},
+      this.state.risk, h('span',{style:{fontSize:8,color:'var(--synthetic)',background:'var(--synthetic-wash)',padding:'0 4px',borderRadius:3}},'illus.'));
+  }
+  horizonToggle(){
+    const h=this.h;
+    return h('button',{onClick:()=>{const o=['3y','5y','7y','10y','15y'];const i=o.indexOf(this.state.horizon);this.setState({horizon:o[(i+1)%o.length]});},
+      title:'Investment horizon — click to cycle',
+      style:{border:'1px solid var(--line)',background:'var(--surface-2)',color:'var(--ink)',fontSize:12,padding:'3px 9px',borderRadius:7,cursor:'pointer',fontFamily:"Inter,system-ui,sans-serif"}}, this.state.horizon);
+  }
+  stateSwitcher(){
+    return this.seg([
+      {label:'Happy',value:'happy'},{label:'Cold-start',value:'cold'},{label:'Thin',value:'thin'},{label:'Gated',value:'gated'},{label:'Error',value:'error'}
+    ], this.state.demoState, v=>this.setState({demoState:v}), {sm:true});
+  }
+
+  /* ---------- view-data tables ---------- */
+  dataTable(){
+    const h=this.h; const which=this.state.dataModal;
+    const tbl=(head,rows)=>h('table',{style:{width:'100%',borderCollapse:'collapse',fontSize:13}},
+      h('thead',null,h('tr',null,head.map((c,i)=>h('th',{key:i,style:{textAlign:i?'right':'left',padding:'8px 6px',borderBottom:'2px solid var(--line)',color:'var(--muted)',fontSize:11,textTransform:'uppercase',letterSpacing:'.05em'}},c)))),
+      h('tbody',null,rows.map((r,ri)=>h('tr',{key:ri},r.map((c,ci)=>h('td',{key:ci,style:{textAlign:ci?'right':'left',padding:'8px 6px',borderBottom:'1px solid var(--line)',fontFamily:ci?"Inter,system-ui,sans-serif":'inherit',fontWeight:ci?600:400}},c))))));
+    const pd=this.peerData();
+    if(which==='tl') return tbl(['Actor','% of wealth'],[['You',this.PM.you+'%'],['Peers (median)',pd.median+'%'],['Platform (avg)',this.PM.platform+'%'],['Model',this.PM.model+'%'],['Your target',this.PM.target+'%']]);
+    if(which==='tr') return tbl(['Reference','Target %','Fill %'],[['Your target','20%',Math.round(this.PM.you/20*100)+'%'],['Peer target',pd.target+'%',Math.round(this.PM.you/pd.target*100)+'%'],['Platform (actual)','10.5%',Math.round(this.PM.you/10.5*100)+'%'],['Model target','18%',Math.round(this.PM.you/18*100)+'%']]);
+    if(which==='br'){ const rows=this.zDeltas(this.state.cmp).map(r=>[r.name,(r.delta>0?'+':'')+r.delta+'pp', r.sig?'significant':'n.s.']); return tbl(['Strategy','Δ vs '+this.state.cmp,'Significance'],rows); }
+    return null;
+  }
+
+  snapshotId(){ return 'snapshot synthetic-2026-06-14'; }
+
+  /* ====================== USE CASES ====================== */
+  UC(){
+    if(this._uc) return this._uc;
+    const S=['Investor profile & targets','Holdings & transactions','Fund performance & cash-flows','Portfolio-company look-through','Model portfolios','Platform demand & fill','Secondary market','Call & advisory transcripts'];
+    const mk=(id,tier,title,meta,q,caps,sources,pages)=>({id,tier,title,meta,q,caps,sources,pages});
+    const T1=[
+      mk('t1-1',1,'Allocation Architect','Design your optimal long-term private-markets architecture — total %, strategy mix, number of funds, core vs satellite.',
+        ['How much of my wealth should be in private markets?','How many funds should I own over five years?','What should be core and what satellite?'],
+        ['Total PM allocation recommendation','Strategy-mix recommendation','Number-of-funds plan','Core / satellite structure'],
+        [S[0],S[4],S[2],'Outcomes across similar clients'],
+        [{id:'arch',label:'Architecture',view:'scaffold',viz:'arch'},{id:'mix',label:'Strategy mix',view:'s2'},{id:'funds',label:'# of funds',view:'scaffold',viz:'funds'},{id:'core',label:'Core / Satellite',view:'scaffold',viz:'arch'}]),
+      mk('t1-2',1,'Next Best Action','Tell me exactly what to do next — a specific named fund, a secondary, sell, or do nothing — sized for my portfolio.',
+        ['What should I do next in my portfolio?','Should I invest in Fund X now or wait?','Which opportunity best fits my gap?'],
+        ['Recommend a named opportunity','Primary vs secondary','Invest now vs wait','Recommend ticket size','“Do nothing” when right'],
+        [S[1],S[5],'Model portfolio logic','Passed-on opportunities'],
+        [{id:'rec',label:'Recommendation',view:'scaffold',viz:'nba'},{id:'funds',label:'Matched funds',view:'s13'},{id:'ticket',label:'Ticket size',view:'scaffold',viz:'ticket'}]),
+      mk('t1-3',1,'Explainable Recommendation','Make the recommendation logic transparent — the top reasons, the risks, and who should not invest.',
+        ['Why is Moonfare recommending Fund X?','Why Fund X rather than Fund Y?','What would make Moonfare not recommend this?'],
+        ['Top 5 reasons for a fund','Why this strategy now','Why this manager / team','What risks we see · who should not invest'],
+        ['IC memos & logic','DD materials','Manager evaluations','Suitability framework'],
+        [{id:'why',label:'Why this fund',view:'scaffold',viz:'reasons'},{id:'risks',label:'Risks & fit',view:'scaffold',viz:'reasons'},{id:'vs',label:'Vs alternatives',view:'scaffold',viz:'compare'}]),
+      mk('t1-4',1,'Commitment Pacing','Spread commitments over time by year, vintage, strategy and ticket size for maximum diversification.',
+        ['How should I spread commitments over 3–5 years?','Am I too concentrated in 2021–22?','How many commitments next year?'],
+        ['3- and 5-year pacing plan','Vintage diversification','Pacing by strategy','Smooth the J-curve'],
+        [S[1],'Historical pacing across clients','Fund lifecycle patterns','House vintage view'],
+        [{id:'plan',label:'5-year plan',view:'scaffold',viz:'forecast'},{id:'vintage',label:'Vintage spread',view:'s5'},{id:'ticket',label:'Ticket pacing',view:'scaffold',viz:'ticket'}]),
+      mk('t1-5',1,'Multi-Layer Peer Benchmarking','Compare yourself to meaningful peer groups — not one generic benchmark — across allocation, strategy, region, format and vintage.',
+        ['How do people like me invest?','How do people in my profession invest?','Are my peers in buying or waiting mode?'],
+        ['Cohort · risk · profession · region','Allocation & strategy comparison','Vintage & pacing comparison','Ticket & activity comparison'],
+        [S[0],S[1],'Risk classification','Profession & region segmentation'],
+        [{id:'overview',label:'Overview',view:'overview'},{id:'strategy',label:'Strategy',view:'s2'},{id:'region',label:'Region',view:'s3'},{id:'format',label:'Format',view:'s4'},{id:'vintage',label:'Vintage',view:'s5'}]),
+      mk('t1-6',1,'Excellence Benchmarking','Compare to people you can learn from — best performers, PE professionals, family offices, endowment-style investors.',
+        ['How do the best performers build portfolios?','How do PE professionals allocate differently?','How do family offices pace?'],
+        ['Best-performers benchmark','PE-professional benchmark','Family-office benchmark','Endowment-style benchmark'],
+        ['Investor-level outcomes','Competence segmentation','Construction patterns','Long-term pacing histories'],
+        [{id:'best',label:'Best performers',view:'scaffold',viz:'zbest'},{id:'fo',label:'Family offices',view:'scaffold',viz:'zbest'},{id:'pe',label:'PE professionals',view:'scaffold',viz:'scorecard'}]),
+      mk('t1-7',1,'Liquidity & Commitment Intelligence','Understand calls, distributions, overcommitment risk and how much you can still safely commit.',
+        ['Can I safely make another commitment?','What calls & distributions over 24 months?','How illiquid is my book in practice?'],
+        ['Capital-call forecast','Distribution forecast','Overcommitment & liquidity stress','Investable-capacity estimate'],
+        [S[1],S[2],'Deployment & distribution stage','Client cash-flow patterns'],
+        [{id:'calls',label:'Calls & distributions',view:'scaffold',viz:'forecast'},{id:'capacity',label:'Capacity',view:'scaffold',viz:'capacity'},{id:'stress',label:'Liquidity stress',view:'scaffold',viz:'forecast'}]),
+      mk('t1-8',1,'Fund vs Fund Comparison','Compare named opportunities with deep PM intelligence — performance, fees, strategy, team and lifecycle.',
+        ['Compare Fund X with Fund Y.','Which has the more robust team and strategy?','Which buyout fund has the most attractive fees?'],
+        ['Fund A vs Fund B','Fee & term comparison','Document-based strategy compare','Team & lifecycle comparison'],
+        [S[2],'Fee / term data',S[3],'DD materials, PPMs, LPAs'],
+        [{id:'browse',label:'Open funds',view:'s13'},{id:'avb',label:'Fund A vs B',view:'scaffold',viz:'compare'}]),
+      mk('t1-9',1,'Look-Through & Concentration','Reveal hidden concentration and real underlying exposure beneath the fund layer.',
+        ['Am I more concentrated than I think?','Where do multiple funds overlap underneath?','In which AI companies am I indirectly invested?'],
+        ['Sector / geography / currency concentration','Manager & vintage concentration','Company-overlap detection','Look-through hidden bets'],
+        [S[3],S[1],'Fund metadata','Direct-investment data'],
+        [{id:'sectors',label:'Sectors',view:'s6'},{id:'overlap',label:'Company overlap',view:'scaffold',viz:'overlap'},{id:'ai',label:'AI exposure',view:'scaffold',viz:'ai'}]),
+      mk('t1-10',1,'Sentiment & Intent Intelligence','Track what investors are thinking, worrying about and preparing to do — before they act.',
+        ['Are investors leaning in or pulling back?','What concerns dominate conversations now?','Are people shifting to secondaries?'],
+        ['Buying vs waiting vs selling mode','Top-question dashboard','Concern heatmap','Sentiment by region / risk / profession'],
+        [S[7],'Question logs','Engagement behavior','Intent signals'],
+        [{id:'mode',label:'Buying vs waiting',view:'notconnected'},{id:'concerns',label:'Concern heatmap',view:'notconnected'}]),
+      mk('t1-11',1,'Missed Opportunity Analysis','Show which good opportunities you plausibly should have done — but did not.',
+        ['Which funds fit me well but I passed on?','What pattern explains my missed opportunities?','Does Fund X resemble a past missed winner?'],
+        ['Best missed opportunities','Missed that matched my gap','Missed by vintage / strategy','Pattern of missed opportunities'],
+        ['Historical offering history','Profile at time of offer','Engagement / non-investment history','Ex-post performance of passed funds'],
+        [{id:'missed',label:'Best missed',view:'scaffold',viz:'missed'},{id:'pattern',label:'Pattern',view:'scaffold',viz:'reasons'}]),
+      mk('t1-12',1,'Performance Attribution','Explain what drove the portfolio over a quarter or over time.',
+        ['Which funds contributed most this quarter?','Which funds are still in the J-curve?','Which strategies drove my returns?'],
+        ['Quarterly / yearly review','Top contributors & detractors','Attribution by strategy / vintage','J-curve & underdelivery flags'],
+        [S[1],S[2],'NAV changes, calls, distributions',S[3]],
+        [{id:'review',label:'Review',view:'s7'},{id:'attr',label:'Attribution',view:'scaffold',viz:'attr'},{id:'contrib',label:'Contributors',view:'scaffold',viz:'contrib'}]),
+      mk('t1-13',1,'Forward Projection','Project what the portfolio is likely to look like under base, optimistic and downside assumptions.',
+        ['What could my portfolio look like in two years?','What happens if I add Fund X?','When should distributions improve?'],
+        ['Future NAV & J-curve','Base / optimistic / downside','Projection with a revised pacing plan','Projection if adding a named fund'],
+        [S[2],'Deployment & lifecycle data',S[1],'Macro assumptions'],
+        [{id:'nav',label:'NAV projection',view:'scaffold',viz:'forecast'},{id:'scenarios',label:'Scenarios',view:'scaffold',viz:'forecast'},{id:'add',label:'Add a fund',view:'scaffold',viz:'forecast'}])
+    ];
+    const T2=[
+      mk('t2-1',2,'Portfolio Completion','Identify what is missing and which specific investments best complete the portfolio.',
+        ['What is the missing piece in my portfolio?','Which current fund best fills that gap?','Am I missing a stabilising strategy?'],
+        ['Missing strategy / vintage / geography','Missing liquidity / defensive ballast','Best fills by named fund','Fills relative to the model'],
+        ['Current portfolio','Model architecture','Current offering inventory','Outcomes across similar portfolios'],
+        [{id:'gap',label:'Missing pieces',view:'scaffold',viz:'zbest'},{id:'fill',label:'Best fills',view:'s13'}]),
+      mk('t2-2',2,'Model Portfolio Benchmarking','Compare against Moonfare’s internal reference architecture for your risk class.',
+        ['How far am I from the model for my risk class?','Where am I over- or under-weight?','Which fund best closes the gap?'],
+        ['Gap to model','Over- / under-weights','Performance vs model','Drift over time'],
+        ['Moonfare model portfolios','Portfolio & risk classification','Drift analysis','Long-term strategy assumptions'],
+        [{id:'gap',label:'Gap to model',view:'scaffold',viz:'zmodel'},{id:'drift',label:'Drift',view:'scaffold',viz:'forecast'}]),
+      mk('t2-3',2,'Peer Behaviour Benchmarking','Compare not only where peers allocate, but how they behave — tickets, counts, activity mode.',
+        ['What is the average ticket in my cohort?','How many investments do people like me make?','Are my peers actively investing now?'],
+        ['Average & median ticket by group','Number of investments','Investments per vintage','Selective vs active vs waiting'],
+        ['Ticket sizes','Investment counts','Vintage activity','Segment activity & intent'],
+        [{id:'ticket',label:'Ticket sizes',view:'scaffold',viz:'scorecard'},{id:'counts',label:'# investments',view:'scaffold',viz:'scorecard'},{id:'mode',label:'Activity mode',view:'scaffold',viz:'mode'}]),
+      mk('t2-4',2,'Scenario-Aware Rebalancing','Adjust future commitments under changing goals, drift or macro assumptions — without forced selling.',
+        ['How do I become more defensive without selling?','How should I rebalance for credit stress?','Secondaries or new commitments to rebalance?'],
+        ['Rebalance toward defence / growth','Reduce hidden concentration','Reduce macro sensitivity','Rebalance via secondaries'],
+        ['Current exposures','Target allocation & constraints','Holdings & strategy mapping','Macro scenario assumptions'],
+        [{id:'defense',label:'More defensive',view:'scaffold',viz:'zmodel'},{id:'sec',label:'Via secondaries',view:'scaffold',viz:'forecast'}]),
+      mk('t2-5',2,'Smart Question Intelligence','Democratise diligence by showing what better investors ask.',
+        ['What are the top questions about Fund X?','What do PE professionals ask that others don’t?','What should I ask given my portfolio?'],
+        ['Top questions from your peers','From your profession','From PE professionals & best performers','Best-practice DD map'],
+        ['Transcripts & question logs','Competence / peer segmentation','Conversation patterns','Named-opportunity context'],
+        [{id:'peers',label:'Peer questions',view:'scaffold',viz:'questions'},{id:'pros',label:'PE-pro questions',view:'scaffold',viz:'questions'}]),
+      mk('t2-6',2,'Secondary Market Intelligence','Turn the internal secondary market into a liquidity and sell-decision engine.',
+        ['Which positions could I sell well internally?','Which funds were most in demand in prior windows?','Should I sell Fund X or keep it?'],
+        ['Should I sell this?','Which positions clear best','Highest buyer interest now','Narrowest-discount candidates'],
+        [S[6],'Buyer demand by fund','Time-to-sale history','Realised discounts'],
+        [{id:'sell',label:'Should I sell?',view:'notconnected'},{id:'demand',label:'Demand by fund',view:'notconnected'}]),
+      mk('t2-7',2,'Delivery & Consistency','Measure the quality of return delivery, not just the level.',
+        ['Which funds delivered returns most consistently?','Which managers are reliable rather than just high-return?','How do Fund X and Y compare on delivery?'],
+        ['Fund consistency score','Distribution stability','Mark-up quality','Return plus delivery quality'],
+        ['Quarterly performance histories','NAV paths','Distributions','Multi-vintage manager histories'],
+        [{id:'score',label:'Consistency',view:'scaffold',viz:'scorecard'},{id:'stability',label:'Distribution stability',view:'scaffold',viz:'forecast'}]),
+      mk('t2-8',2,'Fund Lifecycle & Activity Mode','Show where a fund or strategy stands in its lifecycle — buying or harvesting.',
+        ['Is this fund still in buying mode?','Are funds in this strategy deploying faster than usual?','Is this theme investing or selling?'],
+        ['Buying / selling mode score','Net deployment ratio','Under- vs ahead-of-schedule','Deployment vs fund size'],
+        ['Called vs committed capital','Distributions','Deployment information','Strategy histories'],
+        [{id:'mode',label:'Buying vs harvesting',view:'scaffold',viz:'mode'},{id:'deploy',label:'Net deployment',view:'scaffold',viz:'scorecard'}]),
+      mk('t2-9',2,'Top Manager Patterns','Understand what top-ranked managers systematically do differently.',
+        ['What do top growth managers focus on?','What do leading buyout managers avoid?','What do the top infra managers share?'],
+        ['Shared strategy DNA','What top managers avoid','Industry-focus map','Team blueprint & stability'],
+        ['Manager performance histories',S[3],'Team & DD data','Strategy tagging'],
+        [{id:'dna',label:'Shared DNA',view:'scaffold',viz:'reasons'},{id:'avoid',label:'What they avoid',view:'scaffold',viz:'reasons'}])
+    ];
+    const T3=[
+      mk('t3-1',3,'Platform Demand & Allocation','Make visible how demand behaves on Moonfare’s own platform.',
+        ['Which funds are filling fastest right now?','How likely am I to get a full allocation in Fund X?','Which strategies are in highest demand?'],
+        ['Fund demand heatmap','Time-to-fill predictor','Oversubscription & allocation risk','Demand momentum'],
+        [S[5],'Fill-rate histories','Oversubscription histories','Demand velocity'],
+        [{id:'heat',label:'Demand heatmap',view:'notconnected'},{id:'fill',label:'Time-to-fill',view:'notconnected'}]),
+      mk('t3-2',3,'Why-Not / Suitability','Explain why something attractive may still not be right for you now.',
+        ['Why is Fund X not right for me right now?','Is it liquidity, concentration, vintage or fit?','What would need to change?'],
+        ['Why not now / in this portfolio','Why not at this ticket / liquidity','What would need to change','Suitability & concentration explanation'],
+        ['Risk profile','Liquidity needs','Current holdings','Suitability logic'],
+        [{id:'whynot',label:'Why not now',view:'scaffold',viz:'reasons'},{id:'change',label:'What would change',view:'scaffold',viz:'capacity'}]),
+      mk('t3-3',3,'Macro & Regime Exposure','Connect the portfolio to macro regimes, thematic shifts and resilience.',
+        ['Is my portfolio offensively or defensively positioned?','How exposed am I to a GDP slowdown or inflation?','What hidden macro bets am I carrying?'],
+        ['Offence / defence score','GDP & inflation sensitivity','Hidden macro-bet detector','Resilience vs peers'],
+        ['Allocation trends by cohort','Company-level exposures','Macro factor mapping','GDP / inflation / rates / spreads'],
+        [{id:'score',label:'Offence / defence',view:'scaffold',viz:'mode'},{id:'macro',label:'Macro sensitivity',view:'scaffold',viz:'scorecard'}])
+    ];
+    this._uc=[{tier:1,label:'Tier 1 — Signature / Moat',items:T1},{tier:2,label:'Tier 2 — High-Value',items:T2},{tier:3,label:'Tier 3 — Supporting',items:T3}];
+    return this._uc;
+  }
+  allUC(){ return this.UC().flatMap(t=>t.items); }
+  curUC(){ return this.allUC().find(u=>u.id===this.state.uc)||this.allUC()[0]; }
+  curPage(){ const u=this.curUC(); return u.pages.find(p=>p.id===this.state.page)||u.pages[0]; }
+  selectUC(id){ const u=this.allUC().find(x=>x.id===id); this.setState({uc:id, page:u.pages[0].id, deepLink:null}); }
+
+  ucNav(){
+    const h=this.h; const cur=this.state.uc;
+    return this.UC().map(t=>h('div',{key:t.tier,style:{marginBottom:10}},
+      h('div',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)',padding:'4px 14px 6px'}},t.label),
+      t.items.map((u,i)=>{
+        const on=u.id===cur;
+        return h('button',{key:u.id,onClick:()=>this.selectUC(u.id),
+          style:{display:'flex',alignItems:'center',gap:9,width:'100%',textAlign:'left',padding:'7px 14px',border:'none',cursor:'pointer',
+            background:on?'var(--brand-wash)':'transparent',borderLeft:on?'3px solid var(--brand)':'3px solid transparent'},
+          onMouseEnter:e=>{if(!on)e.currentTarget.style.background='var(--surface-2)';},
+          onMouseLeave:e=>{if(!on)e.currentTarget.style.background='transparent';}},
+          h('span',{style:{flex:'0 0 20px',fontFamily:"'Source Serif 4',Georgia,serif",fontSize:11,fontWeight:700,color:on?'var(--brand)':'var(--muted)'}}, `${t.tier}.${i+1}`),
+          h('span',{style:{fontSize:12.5,fontWeight:on?600:500,color:on?'var(--brand-ink)':'var(--ink)',lineHeight:1.25}}, u.title));
+      })));
+  }
+  pageTabs(){
+    const h=this.h; const u=this.curUC(); const cur=this.state.page;
+    return h('div',{style:{display:'flex',gap:4,flexWrap:'wrap'}}, u.pages.map(p=>{
+      const on=p.id===cur;
+      return h('button',{key:p.id,onClick:()=>this.setState({page:p.id,deepLink:null}),
+        style:{padding:'6px 13px',borderRadius:8,fontSize:12.5,fontWeight:on?600:500,cursor:'pointer',border:'none',
+          background:on?'var(--brand)':'transparent',color:on?'#fff':'var(--ink)'},
+        onMouseEnter:e=>{if(!on)e.currentTarget.style.background='var(--surface-2)';},
+        onMouseLeave:e=>{if(!on)e.currentTarget.style.background='transparent';}}, p.label);
+    }));
+  }
+
+  /* ---- scaffold visualizations ---- */
+  forecastBand(opts){
+    const h=this.h; opts=opts||{};
+    const W=520,H=200,pad=28; const n=10;
+    const base=[]; for(let i=0;i<n;i++){ base.push(opts.curve? opts.curve(i): (i<3? -8+i*3 : -2+(i-2)*9)); }
+    const min=Math.min(...base)-14, max=Math.max(...base)+14;
+    const sx=i=>pad+i/(n-1)*(W-pad*2), sy=v=>H-pad-(v-min)/(max-min)*(H-pad*2);
+    const line=base.map((v,i)=>`${i?'L':'M'}${sx(i)},${sy(v)}`).join(' ');
+    const up=base.map((v,i)=>`${i?'L':'M'}${sx(i)},${sy(v+12)}`).join(' ');
+    const dn=base.map((v,i)=>`${sx(i)},${sy(v-12)}`).reverse().join(' L');
+    const band=`${up} L${dn} Z`;
+    return h('svg',{viewBox:`0 0 ${W} ${H}`,style:{width:'100%',height:'auto'}},
+      h('line',{x1:pad,y1:sy(0),x2:W-pad,y2:sy(0),stroke:'var(--line)','strokeWidth':1}),
+      h('path',{d:band,fill:'var(--brand)','fillOpacity':.12}),
+      h('path',{d:line,fill:'none',stroke:'var(--brand)','strokeWidth':2.5}),
+      base.map((v,i)=> i%3===0? h('text',{key:i,x:sx(i),y:H-8,'textAnchor':'middle',style:{fontSize:9,fill:'var(--muted)'}}, `Y${i}`):null),
+      h('circle',{cx:sx(n-1),cy:sy(base[n-1]),r:4,fill:'var(--brand)'}));
+  }
+  scorecard(rows){
+    const h=this.h;
+    rows = rows || [{l:'Median ticket',you:'€180k',peer:'€128k',up:true},{l:'Commitments / yr',you:'3.2',peer:'2.1',up:true},{l:'# vintages',you:'9',peer:'6',up:true},{l:'Diversification (HHI)',you:'0.14',peer:'0.19',up:true}];
+    return h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}, rows.map((r,i)=>h('div',{key:i,style:{border:'1px solid var(--line)',borderRadius:12,padding:'14px 16px',background:'var(--surface)'}},
+      h('div',{style:{fontSize:11.5,color:'var(--muted)',marginBottom:8}},r.l),
+      h('div',{style:{display:'flex',alignItems:'baseline',gap:10}},
+        h('span',{style:{fontFamily:"'Source Serif 4',Georgia,serif",fontSize:24,fontWeight:600}},r.you),
+        h('span',{style:{fontSize:12,color:r.up?'var(--over)':'var(--under)',fontWeight:600}}, r.up?'▲':'▼'),
+        h('span',{style:{fontSize:11.5,color:'var(--muted)',marginLeft:'auto'}},'peers '+r.peer)))));
+  }
+  fundCompare(){
+    const h=this.h;
+    const rows=[['Net MOIC','2.1x','1.7x',0],['Net IRR','17.4%','13.9%',0],['Mgmt fee','1.5%','2.0%',0],['Vintage','2025','2024',null],['Team stability','Stable','1 key-man change',0]];
+    const col=(nm)=>h('div',{style:{fontFamily:"'Source Serif 4',Georgia,serif",fontSize:15,fontWeight:600,textAlign:'center',paddingBottom:8,borderBottom:'2px solid var(--line)'}},nm);
+    return h('div',{style:{display:'grid',gridTemplateColumns:'1.1fr 1fr 1fr',gap:'0 14px',alignItems:'center'}},
+      h('div'),col('EQT X'),col('a comparable buyout fund'),
+      rows.flatMap((r,i)=>[
+        h('div',{key:'l'+i,style:{fontSize:12,color:'var(--muted)',padding:'9px 0',borderBottom:'1px solid var(--line)'}},r[0]),
+        h('div',{key:'a'+i,style:{textAlign:'center',padding:'9px 0',borderBottom:'1px solid var(--line)',fontWeight:r[3]===0?700:500,color:r[3]===0?'var(--over)':'var(--ink)'}},r[1]),
+        h('div',{key:'b'+i,style:{textAlign:'center',padding:'9px 0',borderBottom:'1px solid var(--line)',color:'var(--muted)'}},r[2])
+      ]));
+  }
+  archBars(){
+    const h=this.h;
+    const rows=[['Core — Buyout & Growth',58,'--data-1'],['Core — Infrastructure',14,'--data-5'],['Satellite — Secondaries',12,'--data-7'],['Satellite — Private Credit',10,'--data-4'],['Satellite — Venture / AI',6,'--data-8']];
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:11}}, rows.map((r,i)=>h('div',{key:i},
+      h('div',{style:{display:'flex',justifyContent:'space-between',fontSize:12,marginBottom:4}}, h('span',null,r[0]), h('span',{style:{fontFamily:"'Source Serif 4',Georgia,serif",fontWeight:600}},r[1]+'%')),
+      h('div',{style:{height:12,background:'var(--surface-2)',borderRadius:6}}, h('div',{style:{width:r[1]+'%',height:'100%',background:`var(${r[2]})`,borderRadius:6}})))));
+  }
+  noteList(items,tone){ const h=this.h; const c=tone==='warn'?'--under':tone==='ok'?'--over':'--brand';
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:9}}, items.map((t,i)=>h('div',{key:i,style:{display:'flex',gap:10,alignItems:'flex-start',fontSize:13,lineHeight:1.45}},
+      h('span',{style:{color:`var(${c})`,flex:'0 0 16px',fontWeight:700}}, tone==='warn'?'!':'•'), h('span',null,t)))); }
+  questionsList(rows){
+    const h=this.h;
+    const data=rows||[['What is the manager’s loss ratio across the last 3 funds?','Best performers',42],['How concentrated is the top-5 holdings exposure?','PE professionals',38],['What changed in the team since the prior fund?','Best performers',31],['How does fee load compare net-of-everything?','Family offices',27],['What is the realistic distribution timing?','Your cohort',24]];
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:8}}, data.map((d,i)=>h('button',{key:i,onClick:()=>this.askFromPage(d[0]),
+      style:{display:'flex',alignItems:'center',gap:12,textAlign:'left',width:'100%',padding:'11px 14px',border:'1px solid var(--line)',borderRadius:10,background:'var(--surface)',cursor:'pointer'}},
+      h('span',{style:{fontFamily:"'Source Serif 4',Georgia,serif",fontSize:13,fontWeight:700,color:'var(--brand)',flex:'0 0 22px'}}, '0'+(i+1)),
+      h('span',{style:{flex:1,fontSize:13,color:'var(--ink)'}},d[0]),
+      h('span',{style:{fontSize:10.5,color:'var(--muted)',background:'var(--surface-2)',padding:'3px 8px',borderRadius:999,whiteSpace:'nowrap'}},d[1]+' · '+d[2])))); 
+  }
+  modeGauge(label,score,left,right){
+    const h=this.h;
+    return h('div',{style:{padding:'4px 0'}},
+      h('div',{style:{display:'flex',justifyContent:'space-between',fontSize:12,marginBottom:6}}, h('span',{style:{color:'var(--muted)'}},left), h('span',{style:{color:'var(--muted)'}},right)),
+      h('div',{style:{position:'relative',height:10,background:'linear-gradient(90deg,var(--under-wash),var(--surface-2),var(--over-wash))',borderRadius:6}},
+        h('div',{style:{position:'absolute',left:`calc(${score}% - 8px)`,top:-3,width:16,height:16,borderRadius:'50%',background:'var(--brand)',border:'2px solid #fff',boxShadow:'0 2px 6px rgba(0,0,0,.2)'}})),
+      h('div',{style:{textAlign:'center',marginTop:8,fontFamily:"'Source Serif 4',Georgia,serif",fontSize:15,fontWeight:600}},label));
+  }
+  reasonsList(items){
+    const h=this.h;
+    items = items || ['Top-quartile across the last three vintages with low dispersion.','Directly closes your largest under-weight (private credit, −9.8pp vs peers).','Manager team intact — no key-man changes since Fund VII.','Fee load is below the platform median for the strategy.','Fits your liquidity profile and 5–10y horizon.'];
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:10}}, items.map((t,i)=>h('div',{key:i,style:{display:'flex',gap:11,alignItems:'flex-start'}},
+      h('span',{style:{flex:'0 0 22px',height:22,borderRadius:'50%',background:'var(--brand-wash)',color:'var(--brand)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700,fontFamily:"'Source Serif 4',Georgia,serif"}},i+1),
+      h('span',{style:{fontSize:13,lineHeight:1.5,color:'var(--ink)'}},t))));
+  }
+  notConnected(page){
+    const h=this.h; const u=this.curUC();
+    const feed={'mode':'advisory transcript & intent','concerns':'advisory transcript & intent','sell':'secondary-market','demand':'secondary-market','heat':'platform-demand','fill':'platform-demand'}[page.id]||'live';
+    return h('div',{style:{display:'flex',alignItems:'center',justifyContent:'center',height:'100%',minHeight:340}},
+      h('div',{style:{maxWidth:460,textAlign:'center',padding:'36px 34px',border:'2px dashed var(--line)',borderRadius:16,background:'var(--surface)'}},
+        h('div',{style:{width:46,height:46,margin:'0 auto 14px',borderRadius:12,border:'2px dashed var(--muted)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--muted)',fontSize:20}},'⛌'),
+        h('div',{style:{fontFamily:"'Source Serif 4',Georgia,serif",fontSize:20,fontWeight:600,marginBottom:8}},`Live when the ${feed} feed connects`),
+        h('div',{style:{fontSize:13,color:'var(--muted)',lineHeight:1.55,marginBottom:16}},`${u.title} runs on signal data that isn’t wired in this build. The interface, cohort logic and Ask Alpha context are ready — it lights up the moment the feed is connected.`),
+        h('div',{style:{display:'flex',gap:6,flexWrap:'wrap',justifyContent:'center'}}, u.caps.slice(0,3).map((c,i)=>h('span',{key:i,style:{fontSize:11,color:'var(--ink)',background:'var(--surface-2)',border:'1px solid var(--line)',padding:'5px 10px',borderRadius:999}},c)))));
+  }
+  askFromPage(q){ this.setAsk('open'); this.askSend(q); }
+
+  scaffoldViz(viz){
+    const h=this.h;
+    if(viz==='forecast') return this.card({title:'Projection · base / optimistic / downside',badge:this.badge('illustrative','synth'),children:this.forecastBand(),caption:'Base case line with the optimistic–downside band; the dot marks the projected end value. Illustrative — modelled, not measured.'});
+    if(viz==='questions') return this.card({title:'Top questions from better investors',children:this.questionsList(),caption:'Ranked by how often each is asked by the selected peer group. Click any to ask Alpha in your own context.'});
+    if(viz==='compare') return this.card({title:'Fund A vs Fund B',children:this.fundCompare(),caption:'Green marks the stronger figure. Sub-k-anonymity comparators are bucketed.'});
+    if(viz==='arch') return this.card({title:'Recommended target architecture',badge:this.badge('illustrative','synth'),children:this.archBars(),caption:'A core/satellite target for your risk class and horizon — the house view, unoptimised.'});
+    if(viz==='reasons') return this.card({title:'Top reasons',children:this.reasonsList(),caption:'Each reason links to the underlying IC logic, DD material or data point on click.'});
+    if(viz==='zmodel'){ const z=this.zDeltas('model'); return this.card({title:'Over / under-weight vs the model',children:h('div',{style:{padding:'8px 0'}},this.miniZ(z)),caption:'Your biggest gap to the model is private credit — the clearest place to rebalance.'}); }
+    if(viz==='zbest'){ const z=this.zDeltas('platform').map(r=>({...r,delta:+(r.delta*1.4).toFixed(1)})); return this.card({title:'How you differ from the excellence group',children:h('div',{style:{padding:'8px 0'}},this.miniZ(z)),caption:'Where best-performers / family offices position differently from you.'}); }
+    if(viz==='scorecard') return this.card({title:'You vs peer median',children:this.scorecard(),caption:'Small-multiple comparison of behaviour, not just allocation.'});
+    if(viz==='mode') return this.card({title:'Activity mode',children:h('div',{style:{display:'flex',flexDirection:'column',gap:18,padding:'8px 4px'}},this.modeGauge('Selective buying',62,'Waiting','Active deployment'),this.modeGauge('Net deploying',55,'Harvesting','Deploying')),caption:'Where you (and the strategy) sit between waiting, deploying and harvesting.'});
+    if(viz==='ticket') return this.card({title:'Recommended ticket & pacing',children:this.scorecard([{l:'Suggested ticket',you:'€150k',peer:'€128k',up:true},{l:'Commitments / yr',you:'3',peer:'2.1',up:true},{l:'Of investable wealth',you:'4.3pp',peer:'—',up:true},{l:'Headroom to target',you:'€1.1m',peer:'—',up:true}]),caption:'Sized to your headroom and pacing without breaking the plan.'});
+    if(viz==='capacity') return this.card({title:'Investable capacity',children:this.scorecard([{l:'Uncalled commitments',you:'€3.4m',peer:'—',up:false},{l:'Liquidity headroom',you:'€1.1m',peer:'—',up:true},{l:'Illiquidity carried',you:'62%',peer:'48%',up:false},{l:'Safe new commitment',you:'€0.8m',peer:'—',up:true}]),caption:'What you can safely commit before liquidity pressure builds.'});
+    if(viz==='nba') return this.card({title:'Your next best action',children:h('div',{style:{display:'flex',flexDirection:'column',gap:12}},
+      h('div',{style:{background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:12,padding:'16px 18px'}},
+        h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'.06em',color:'var(--brand)',textTransform:'uppercase',marginBottom:6}},'Recommended now'),
+        h('div',{style:{fontFamily:"'Source Serif 4',Georgia,serif",fontSize:20,fontWeight:600,marginBottom:4}},'Commit €150k to Ares Private Credit Solutions III'),
+        h('div',{style:{fontSize:13,color:'var(--ink)',lineHeight:1.5}},'Closes your single largest gap (private credit, −9.8pp vs peers / −12pp vs model) and lifts your fill rate toward your 20% target. Primary over secondary here — the current vintage is deploying.')),
+      this.reasonsList(['Closes your biggest under-weight.','Top-quartile manager, team intact.','Fits your liquidity headroom (€1.1m).','Better now than waiting — strong current vintage.'])),caption:'One concrete action, sized and sequenced — or “do nothing” when that’s right.'});
+    if(viz==='ai') return this.card({title:'Embedded AI exposure',badge:this.badge('illustrative','synth'),children:h('div',{style:{display:'flex',gap:18,alignItems:'center',padding:'10px 0'}},
+      h('div',null,h('div',{style:{fontSize:11,color:'var(--muted)'}},'Stated AI'),h('div',{style:{fontFamily:"'Source Serif 4',Georgia,serif",fontSize:30,fontWeight:600}},'15%')),
+      h('div',{style:{color:'var(--muted)',fontSize:20}},'→'),
+      h('div',null,h('div',{style:{fontSize:11,color:'var(--muted)'}},'Estimated economic AI'),h('div',{style:{fontFamily:"'Source Serif 4',Georgia,serif",fontSize:30,fontWeight:600,color:'var(--brand)'}},'~28%'))),
+      caption:'Once embedded AI inside Growth/Tech holdings is counted, your true exposure is far higher than stated.'});
+    if(viz==='overlap') return this.card({title:'Where funds overlap underneath',children:h('div',{style:{display:'flex',flexDirection:'column',gap:9}},
+      [['Databricks','3 funds','--data-8'],['Stripe','2 funds','--data-3'],['a large cloud-infra company','2 funds','--data-5'],['a European software roll-up','2 funds','--data-1']].map((r,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',gap:10,padding:'10px 12px',border:'1px solid var(--line)',borderRadius:10}},
+        h('span',{style:{width:9,height:9,borderRadius:2,background:`var(${r[2]})`}}),h('span',{style:{flex:1,fontSize:13}},r[0]),h('span',{style:{fontSize:12,color:'var(--muted)'}},r[1])))),
+      caption:'Companies you hold through more than one fund — your real concentration. Sub-k-anonymity names are bucketed.'});
+    if(viz==='missed') return this.card({title:'Best opportunities you passed on',children:h('div',{style:{display:'flex',flexDirection:'column',gap:9}},
+      [['A 2022 secondaries fund','matched your gap','+1.9x realised'],['A US growth fund','matched your profile','+2.3x realised'],['An infra continuation vehicle','matched your model','+1.6x realised']].map((r,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',gap:12,padding:'12px 14px',border:'1px solid var(--line)',borderRadius:10}},
+        h('div',{style:{flex:1}},h('div',{style:{fontFamily:"'Source Serif 4',Georgia,serif",fontSize:14,fontWeight:600}},r[0]),h('div',{style:{fontSize:11.5,color:'var(--muted)'}},r[1])),
+        h('span',{style:{fontFamily:"'Source Serif 4',Georgia,serif",fontWeight:600,color:'var(--over)'}},r[2])))),
+      caption:'Opportunities that fit you at the time and later performed — with the pattern that explains them.'});
+    if(viz==='attr'||viz==='contrib'){ const cs=[['EQT IX','+1.8pp','--data-1'],['Thrive VIII','+1.2pp','--data-8'],['General Atlantic','+0.7pp','--data-2'],['Ares PCS','−0.3pp','--data-4'],['Cinven 8','−0.6pp','--data-1']];
+      const max=2; return this.card({title:viz==='attr'?'Attribution by fund':'Top contributors & detractors',children:h('div',{style:{display:'flex',flexDirection:'column',gap:10,padding:'6px 0'}},
+        cs.map((c,i)=>{ const v=parseFloat(c[1]); const pos=v>=0; return h('div',{key:i,style:{display:'flex',alignItems:'center',gap:10}},
+          h('span',{style:{width:110,flex:'0 0 110px',fontSize:12.5}},c[0]),
+          h('div',{style:{flex:1,position:'relative',height:18,display:'flex',justifyContent:pos?'flex-start':'flex-end'}},
+            h('div',{style:{width:Math.abs(v)/max*100+'%',height:'100%',background:pos?'var(--over)':'var(--under)',borderRadius:4}})),
+          h('span',{style:{width:54,flex:'0 0 54px',textAlign:'right',fontFamily:"'Source Serif 4',Georgia,serif",fontWeight:600,color:pos?'var(--over)':'var(--under)'}},c[1])); })),
+        caption:'Contribution to this quarter’s NAV change, by named fund.'}); }
+    if(viz==='funds') return this.card({title:'How many funds, over five years',children:h('div',{style:{display:'flex',flexDirection:'column',gap:14}},
+      this.scorecard([{l:'Funds today',you:'11',peer:'—',up:true},{l:'Target by Y5',you:'18–22',peer:'—',up:true},{l:'New / year',you:'2–3',peer:'2.1',up:true},{l:'Max single-fund weight',you:'8%',peer:'—',up:true}])),
+      caption:'A build-out plan that reaches diversification without over-committing in any one vintage.'});
+    return this.card({title:'Representative output',children:this.scorecard(),caption:'Composed from the same cohort engine and provenance system as every other surface.'});
+  }
+  scaffold(){
+    const h=this.h; const u=this.curUC(); const p=this.curPage();
+    const chip=(t,on)=>h('button',{key:t,onClick:()=>this.askFromPage(t),style:{display:'flex',alignItems:'center',gap:8,textAlign:'left',width:'100%',padding:'10px 12px',border:'1px solid var(--line)',borderRadius:10,background:'var(--surface)',cursor:'pointer',fontSize:12.5,color:'var(--ink)'}},
+      h('span',{style:{color:'var(--brand)',fontWeight:700,flex:'0 0 auto'}},'?'), h('span',{style:{flex:1}},t), h('span',{style:{color:'var(--brand)',fontWeight:700}},'→'));
+    return h('div',{style:{display:'grid',gridTemplateColumns:'320px 1fr',gap:16,alignItems:'start'}},
+      h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
+        h('div',null,
+          h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}},'Ask Alpha'),
+          h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, u.q.map(qq=>chip(qq)))),
+        h('div',null,
+          h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}},'Capabilities'),
+          h('div',{style:{display:'flex',flexDirection:'column',gap:6}}, u.caps.map((c,i)=>h('div',{key:i,style:{display:'flex',gap:9,alignItems:'flex-start',fontSize:12.5}},
+            h('span',{style:{color:'var(--over)',flex:'0 0 auto'}},'✓'), h('span',null,c))))),
+        h('div',null,
+          h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}},'Grounded in'),
+          h('div',{style:{display:'flex',flexWrap:'wrap',gap:6}}, u.sources.map((s,i)=>h('span',{key:i,style:{fontSize:11,color:'var(--ink)',background:'var(--surface-2)',border:'1px solid var(--line)',padding:'4px 9px',borderRadius:999}},s))))),
+      h('div',null, this.scaffoldViz(p.viz)));
+  }
+
+  /* ====================== DEEP PAGES ====================== */
+  SF="'Source Serif 4',Georgia,serif";
+  dtog(k,def){ return (this.state.dtog[k]!==undefined)? this.state.dtog[k] : def; }
+  setDtog(k,v){ this.setState({dtog:{...this.state.dtog,[k]:v}}); }
+  pill(k,opts,def){ return this.seg(opts.map(o=>typeof o==='string'?{label:o,value:o}:o), this.dtog(k,def), v=>this.setDtog(k,v), {sm:true}); }
+  twoCol(a,b,cols){ return this.h('div',{style:{display:'grid',gridTemplateColumns:cols||'1fr 1fr',gap:16,alignItems:'start'}},a,b); }
+  stack(arr){ return this.h('div',{style:{display:'flex',flexDirection:'column',gap:14}},arr); }
+  groupedBars(cats, series){
+    const h=this.h; const max=Math.max(...series.flatMap(s=>s.vals),1)*1.22;
+    return h('div',null,
+      h('div',{style:{display:'flex',alignItems:'flex-end',gap:12,height:188,padding:'0 4px'}},
+        cats.map((c,ci)=>h('div',{key:ci,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',height:'100%'}},
+          h('div',{style:{flex:1,display:'flex',alignItems:'flex-end',gap:3,width:'100%',justifyContent:'center'}},
+            series.map((s,si)=>h('div',{key:si,style:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-end',height:'100%'}},
+              h('div',{style:{fontSize:8.5,fontFamily:this.SF,fontWeight:600,color:'var(--ink)',marginBottom:2,whiteSpace:'nowrap'}}, s.vals[ci]),
+              h('div',{title:`${s.name} ${s.vals[ci]}`,style:{width:Math.max(10,40/series.length),height:(s.vals[ci]/max*100)+'%',background:`var(${s.color})`,borderRadius:'3px 3px 0 0',minHeight:2}})))),
+          h('div',{style:{fontSize:9.5,color:'var(--muted)',marginTop:6,fontFamily:"Inter,system-ui,sans-serif"}},c)))),
+      h('div',{style:{display:'flex',gap:14,justifyContent:'center',marginTop:8,flexWrap:'wrap'}}, series.map((s,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',gap:6,fontSize:11.5}},h('span',{style:{width:9,height:9,borderRadius:2,background:`var(${s.color})`}}),s.name))));
+  }
+  scenarioSvg(series, labels){
+    const h=this.h; const W=560,H=206,pad=30; const n=labels.length;
+    const all=series.flatMap(s=>s.vals.concat(s.band?s.band.up.concat(s.band.down):[]));
+    const min=Math.min(...all,0), max=Math.max(...all);
+    const sx=i=>pad+i/(n-1)*(W-pad*2), sy=v=>H-pad-(v-min)/((max-min)||1)*(H-pad*2);
+    const pp=arr=>arr.map((v,i)=>`${i?'L':'M'}${sx(i)},${sy(v)}`).join(' ');
+    const els=[];
+    series.forEach((s,si)=>{ if(s.band){ const up=pp(s.band.up); const dn=s.band.down.map((v,i)=>`${sx(i)},${sy(v)}`).reverse().join(' L'); els.push(h('path',{key:'bd'+si,d:`${up} L${dn} Z`,fill:`var(${s.color})`,fillOpacity:.12})); } });
+    series.forEach((s,si)=>{ els.push(h('path',{key:'ln'+si,d:pp(s.vals),fill:'none',stroke:`var(${s.color})`,strokeWidth:s.main?2.6:1.8,strokeDasharray:s.dash?'5 4':'none'})); els.push(h('circle',{key:'pt'+si,cx:sx(n-1),cy:sy(s.vals[n-1]),r:3.5,fill:`var(${s.color})`}));
+      if(s.main || !s.band) els.push(h('text',{key:'ev'+si,x:sx(n-1)-6,y:sy(s.vals[n-1])-7,textAnchor:'end',style:{fontSize:11,fontWeight:700,fontFamily:this.SF,fill:`var(${s.color})`}}, s.vals[n-1])); });
+    labels.forEach((l,i)=>{ if(i%2===0||i===n-1) els.push(h('text',{key:'tx'+i,x:sx(i),y:H-8,textAnchor:'middle',style:{fontSize:9,fill:'var(--muted)'}},l)); });
+    return h('svg',{viewBox:`0 0 ${W} ${H}`,style:{width:'100%',height:'auto'}}, h('line',{x1:pad,y1:sy(0),x2:W-pad,y2:sy(0),stroke:'var(--line)',strokeWidth:1}), els);
+  }
+  lineLegend(series){ const h=this.h; return h('div',{style:{display:'flex',gap:16,justifyContent:'center',marginTop:6,flexWrap:'wrap'}}, series.map((s,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',gap:6,fontSize:11.5}}, h('span',{style:{width:14,height:0,borderTop:`2px ${s.dash?'dashed':'solid'} var(${s.color})`}}), s.name))); }
+  gauge(pct,label){
+    const h=this.h; const c=Math.PI*54; const off=c*(1-pct/100);
+    return h('div',{style:{textAlign:'center'}},
+      h('svg',{viewBox:'0 0 140 86',style:{width:170,height:'auto'}},
+        h('path',{d:'M16,78 A54,54 0 0 1 124,78',fill:'none',stroke:'var(--surface-2)',strokeWidth:13,strokeLinecap:'round'}),
+        h('path',{d:'M16,78 A54,54 0 0 1 124,78',fill:'none',stroke:'var(--brand)',strokeWidth:13,strokeLinecap:'round',strokeDasharray:c,strokeDashoffset:off})),
+      h('div',{style:{marginTop:-20,fontFamily:this.SF,fontSize:28,fontWeight:600}},pct+'%'),
+      h('div',{style:{fontSize:12,color:'var(--muted)',marginTop:2}},label));
+  }
+  stackBars(rows){
+    const h=this.h; const max=Math.max(...rows.map(r=>r.segs.reduce((a,s)=>a+s.v,0)),1);
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:12}}, rows.map((r,i)=>h('div',{key:i},
+      h('div',{style:{display:'flex',justifyContent:'space-between',fontSize:12,marginBottom:5}}, h('span',null,r.label), h('span',{style:{fontFamily:this.SF,fontWeight:600}},r.total||'')),
+      h('div',{style:{display:'flex',height:18,borderRadius:6,overflow:'hidden',background:'var(--surface-2)'}}, r.segs.map((s,j)=>h('div',{key:j,title:`${s.name} ${s.v}`,style:{width:(s.v/max*100)+'%',background:`var(${s.color})`,display:'flex',alignItems:'center',justifyContent:'center'}}, (s.v/max*100)>=14? h('span',{style:{fontSize:9,color:'#fff',fontWeight:700,fontFamily:this.SF}}, s.v):null))))));
+  }
+  waterfall(steps){
+    const h=this.h; let cum=0; const pts=steps.map(s=>{ const start=cum; cum+=s.v; return {...s,start,end:cum}; });
+    const max=Math.max(...pts.map(p=>Math.max(p.start,p.end))), min=Math.min(0,...pts.map(p=>Math.min(p.start,p.end)));
+    const H=170; const sy=v=>H-(v-min)/((max-min)||1)*H;
+    return h('div',{style:{display:'flex',alignItems:'flex-end',gap:8,height:H+24}}, pts.map((p,i)=>{
+      const top=sy(Math.max(p.start,p.end)), bh=Math.abs(sy(p.start)-sy(p.end));
+      const col=p.total?'--brand':(p.v>=0?'--over':'--under');
+      return h('div',{key:i,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',height:'100%',justifyContent:'flex-end'}},
+        h('div',{style:{position:'relative',width:'100%',height:H}},
+          h('div',{style:{position:'absolute',left:'20%',right:'20%',top:top,height:Math.max(bh,2),background:`var(${col})`,borderRadius:3}})),
+        h('div',{style:{fontSize:9.5,color:'var(--muted)',marginTop:4,textAlign:'center',lineHeight:1.1}},p.label),
+        h('div',{style:{fontSize:10,fontFamily:this.SF,fontWeight:600,color:p.total?'var(--brand)':(p.v>=0?'var(--over)':'var(--under)')}}, (p.v>0?'+':'')+p.v));
+    }));
+  }
+
+  deepBody(){
+    const key=this.state.uc+':'+this.state.page; const h=this.h;
+    const B={
+      // ---- Allocation Architect ----
+      't1-1:arch':()=>{ const risk=this.dtog('arch','Balanced');
+        const tmix={Conservative:{buyout:22,growth:10,venture:4,credit:20,infra:16,realestate:12,secondaries:10,ai:5,other:1},Balanced:this.MIX.model,Growth:{buyout:30,growth:18,venture:12,credit:6,infra:8,realestate:6,secondaries:5,ai:14,other:1}}[risk];
+        const z=this.STRATS.map(([k,name,color])=>({name,color,delta:+(this.MIX.you[k]-tmix[k]).toFixed(1),sig:Math.abs(this.MIX.you[k]-tmix[k])>=2})).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
+        const core=['buyout','growth','infra'].reduce((a,k)=>a+tmix[k],0);
+        return this.twoCol(
+          this.card({title:'Recommended target architecture',badge:this.badge('illustrative','synth'),right:this.pill('arch',['Conservative','Balanced','Growth'],'Balanced'),children:h('div',null,
+            h('div',{style:{display:'flex',gap:14,marginBottom:14}}, this.archMini('Core',core), this.archMini('Satellite',100-core)),
+            this.archBarsFrom(tmix)),caption:`A core/satellite target for the ${risk} risk class — ${core}% core, ${100-core}% satellite. The house view, unoptimised.`}),
+          this.card({title:'Your gap to this architecture',children:h('div',{style:{padding:'6px 0'}},this.miniZ(z)),caption:'Where your current portfolio sits versus the target — the build-out plan closes these gaps over time.'}));
+      },
+      't1-1:funds':()=>{ const yrs=['Now','Y1','Y2','Y3','Y4','Y5'];
+        return this.twoCol(
+          this.card({title:'Fund build-out over five years',badge:this.badge('illustrative','synth'),children:h('div',null,
+            this.scenarioSvg([{name:'Your plan',color:'--data-1',main:true,vals:[11,13,15,17,19,21]},{name:'Peer pace',color:'--data-7',dash:true,vals:[11,12,13,15,16,18]}],yrs),
+            this.lineLegend([{name:'Your plan',color:'--data-1'},{name:'Peer pace',color:'--data-7',dash:true}])),caption:'A 2–3 fund-per-year cadence reaches ~20 funds by Y5 without over-committing any single vintage.'}),
+          this.card({title:'Target shape',children:this.scorecard([{l:'Funds today',you:'11',peer:'—',up:true},{l:'Target by Y5',you:'18–22',peer:'—',up:true},{l:'New / year',you:'2–3',peer:'2.1',up:true},{l:'Max single-fund weight',you:'8%',peer:'—',up:true}]),caption:'Enough lines for diversification; few enough to stay selective.'}));
+      },
+      't1-1:core':()=>this.twoCol(
+        this.card({title:'Core vs satellite split',children:this.stackBars([{label:'Target',total:'100%',segs:[{name:'Core',v:72,color:'--data-1'},{name:'Satellite',v:28,color:'--data-7'}]},{label:'You today',total:'100%',segs:[{name:'Core',v:64,color:'--data-1'},{name:'Satellite',v:36,color:'--data-7'}]}]),caption:'Core = buyout, growth and infrastructure compounders; satellite = credit, secondaries, venture/AI tilts. You run lighter core than the target.'}),
+        this.card({title:'What sits where',children:this.archBars(),caption:'Each sleeve mapped to its role — core stabilises, satellite adds selective upside.'})),
+      // ---- Next Best Action ----
+      't1-2:rec':()=>this.twoCol(
+        this.scaffoldViz('nba'),
+        this.card({title:'Invest now vs wait',children:h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}},
+          this.choiceCard('Invest now','Ares PCS III',['Closes a −9.8pp gap today','Strong current vintage, deploying','Allocation likely to fill'],true),
+          this.choiceCard('Wait','for a future fund',['Possible better terms later','Gap stays open meanwhile','Allocation risk if it fills'],false)),caption:'The recommendation weighs gap-closing value now against the expected future pipeline.'}),'1.2fr 1fr'),
+      't1-2:ticket':()=>this.twoCol(
+        this.card({title:'Recommended ticket',children:h('div',null,
+          h('div',{style:{fontFamily:this.SF,fontSize:34,fontWeight:600,marginBottom:4}},'€150,000'),
+          h('div',{style:{fontSize:12.5,color:'var(--muted)',marginBottom:14}},'≈ 4.3pp of investable wealth · within your €1.1m liquidity headroom'),
+          this.headroomBar(150,1100)),caption:'Sized to your headroom and pacing — large enough to matter, small enough not to break the plan.'}),
+        this.card({title:'How it compares',children:this.scorecard([{l:'Suggested ticket',you:'€150k',peer:'€128k',up:true},{l:'Commitments / yr',you:'3',peer:'2.1',up:true},{l:'Headroom to target',you:'€1.1m',peer:'—',up:true},{l:'Of PM capital',you:'3.8%',peer:'—',up:true}]),caption:'Your ticket sits a little above the peer median, consistent with your wealth band.'})),
+      // ---- Commitment Pacing ----
+      't1-4:plan':()=>{ const span=this.dtog('pace','5-year'); const yrs=span==='3-year'?['2026','2027','2028']:['2026','2027','2028','2029','2030'];
+        const you=[2.4,2.1,2.6,2.2,1.9].slice(0,yrs.length), peer=[1.8,1.9,2.0,1.8,1.7].slice(0,yrs.length);
+        return this.twoCol(
+          this.card({title:'Commitments per year (€m)',right:this.pill('pace',['3-year','5-year'],'5-year'),children:this.groupedBars(yrs,[{name:'Your plan',color:'--data-1',vals:you},{name:'Peer pace',color:'--data-7',vals:peer}]),caption:'A steady €2m-a-year cadence spreads vintage risk and avoids bunching like your 2021–22 concentration.'}),
+          this.card({title:'Cumulative committed (€m)',children:h('div',null,this.scenarioSvg([{name:'Your plan',color:'--data-1',main:true,vals:[2.4,4.5,7.1,9.3,11.2]},{name:'Peer pace',color:'--data-7',dash:true,vals:[1.8,3.7,5.7,7.5,9.2]}],['2026','2027','2028','2029','2030']),this.lineLegend([{name:'Your plan',color:'--data-1'},{name:'Peer pace',color:'--data-7',dash:true}])),caption:'You deploy a little ahead of peers — front-loading while valuations are reasonable.'}));
+      },
+      't1-4:ticket':()=>this.twoCol(
+        this.card({title:'Ticket pacing',children:this.groupedBars(['2026','2027','2028','2029','2030'],[{name:'Avg ticket (€k)',color:'--data-1',vals:[150,160,150,170,160]}]),caption:'Roughly constant tickets keep diligence quality high across vintages.'}),
+        this.card({title:'Discipline check',children:this.scorecard([{l:'Avg ticket',you:'€158k',peer:'€128k',up:true},{l:'Ticket spread',you:'±€20k',peer:'±€55k',up:true},{l:'Commitments / yr',you:'2.4',peer:'2.1',up:true},{l:'Bunching',you:'low',peer:'med',up:true}]),caption:'Disciplined, near-equal annual deployment — the best-performer pattern.'})),
+      // ---- Liquidity ----
+      't1-7:calls':()=>this.twoCol(
+        this.card({title:'Calls vs distributions (next 8 quarters, €m)',children:h('div',null,this.scenarioSvg([{name:'Distributions',color:'--over',main:true,vals:[0.2,0.3,0.4,0.5,0.7,0.9,1.1,1.3]},{name:'Capital calls',color:'--under',vals:[0.6,0.7,0.5,0.6,0.4,0.4,0.3,0.3]}],['Q3','Q4','Q1','Q2','Q3','Q4','Q1','Q2']),this.lineLegend([{name:'Distributions',color:'--over'},{name:'Capital calls',color:'--under'}])),caption:'Calls dominate near-term; distributions overtake from next year as your 2019–21 funds mature.'}),
+        this.card({title:'Net cash position',children:this.scorecard([{l:'Net 12-mo cash',you:'−€0.9m',peer:'—',up:false},{l:'Uncalled',you:'€3.4m',peer:'—',up:false},{l:'Liquidity buffer',you:'€1.1m',peer:'—',up:true},{l:'Crossover',you:'Q2 2027',peer:'—',up:true}]),caption:'You stay net-negative for ~4 quarters, then flip positive — comfortably within buffer.'})),
+      't1-7:capacity':()=>this.twoCol(
+        this.card({title:'Illiquidity carried',children:h('div',{style:{display:'flex',justifyContent:'center',padding:'14px 0'}},this.gauge(62,'of wealth illiquid')),caption:'62% of your wealth is in illiquid PM commitments — below the 70% ceiling for your risk class.'}),
+        this.card({title:'Safe new commitment',children:this.scorecard([{l:'Liquidity headroom',you:'€1.1m',peer:'—',up:true},{l:'Safe new commitment',you:'€0.8m',peer:'—',up:true},{l:'Uncalled',you:'€3.4m',peer:'—',up:false},{l:'Buffer after',you:'€0.3m',peer:'—',up:true}]),caption:'You can safely add ~€0.8m before liquidity pressure builds.'})),
+      't1-7:stress':()=>this.twoCol(
+        this.card({title:'Liquidity under stress (€m)',children:this.stackBars([{label:'Base',total:'ok',segs:[{name:'Buffer',v:1.1,color:'--over'},{name:'Calls',v:0.9,color:'--under'}]},{label:'Stress',total:'tight',segs:[{name:'Buffer',v:0.6,color:'--over'},{name:'Calls',v:1.3,color:'--under'}]},{label:'Severe',total:'gap',segs:[{name:'Buffer',v:0.3,color:'--under'},{name:'Calls',v:1.6,color:'--under'}]}]),caption:'Under a severe scenario (accelerated calls, paused distributions) your buffer is exceeded — secondaries could relieve it.'}),
+        this.card({title:'Resilience',children:h('div',{style:{display:'flex',justifyContent:'center',padding:'14px 0'}},this.gauge(74,'liquidity resilience')),caption:'Adding semi-liquids or secondaries would lift this score.'})),
+      // ---- Look-through ----
+      't1-9:overlap':()=>this.twoCol(
+        this.scaffoldViz('overlap'),
+        this.card({title:'Manager & vintage concentration',children:h('div',null,this.miniZ([{name:'Top manager',delta:6.2,sig:true},{name:'Top 3 mgrs',delta:9.1,sig:true},{name:'2021 vintage',delta:7.4,sig:true},{name:'Tech sector',delta:5.1,sig:true}].map(r=>({...r,name:r.name})))),caption:'Where you carry more concentration than peers (ppt). Manager and 2021-vintage concentration stand out.'})),
+      't1-9:ai':()=>this.twoCol(
+        this.scaffoldViz('ai'),
+        this.card({title:'Where the embedded AI sits',badge:this.coverageBadge(61),children:this.groupedBars(['Growth','Buyout','Venture','Infra'],[{name:'Stated AI',color:'--data-9',vals:[6,2,5,2]},{name:'Economic AI',color:'--data-8',vals:[12,5,8,3]}]),caption:'Most hidden AI exposure sits inside Growth and Venture holdings, not your stated AI sleeve.'})),
+      // ---- Performance Attribution ----
+      't1-12:attr':()=>this.twoCol(
+        this.card({title:'NAV walk this quarter (€m)',children:this.waterfall([{label:'Open',v:24.0,total:true},{label:'Buyout',v:1.1},{label:'Growth',v:0.8},{label:'AI',v:0.6},{label:'Credit',v:-0.2},{label:'Calls',v:0.9},{label:'Dists',v:-0.6},{label:'Close',v:0,total:true}].map((s,i,a)=>i===a.length-1?{...s,v:0,total:true}:s)),caption:'How the quarter’s NAV moved, contribution by strategy plus cash flows.'}),
+        this.card({title:'Attribution by strategy (pp of NAV)',children:h('div',{style:{padding:'6px 0'}},this.miniZ([{name:'Buyout',delta:1.8,sig:true},{name:'AI / Tech',delta:1.2,sig:true},{name:'Growth',delta:0.7,sig:true},{name:'Infra',delta:0.3,sig:false},{name:'Credit',delta:-0.3,sig:false}])),caption:'Buyout and AI drove the quarter; private credit was a small drag.'})),
+      't1-12:contrib':()=>this.twoCol(
+        this.scaffoldViz('contrib'),
+        this.card({title:'Still in the J-curve',children:h('div',{style:{display:'flex',flexDirection:'column',gap:9}},[['Northwind Infra III','2024','called 38%, marked 0.9x'],['Meridian Growth IV','2024','called 22%, marked 1.0x'],['Helix Credit II','2025','called 14%, too early']].map((r,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',gap:10,padding:'11px 13px',border:'1px solid var(--line)',borderRadius:10}},h('span',{style:{fontSize:15}},'⏳'),h('div',{style:{flex:1}},h('div',{style:{fontFamily:this.SF,fontWeight:600,fontSize:13.5}},r[0]),h('div',{style:{fontSize:11.5,color:'var(--muted)'}},r[2])),h('span',{style:{fontFamily:this.SF,color:'var(--muted)'}},r[1])))),caption:'Young funds dragging on paper — expected, not underperformance. Judge on DPI when realised.'})),
+      // ---- Forward Projection ----
+      't1-13:nav':()=>{ const sc=this.dtog('proj','Base'); const labels=['Now','Y1','Y2','Y3','Y4','Y5'];
+        const base={Base:[24,27,31,36,42,49],Optimistic:[24,29,35,43,52,63],Downside:[24,25,27,30,33,37]}[sc];
+        const band={up:[24,30,36,44,53,64],down:[24,25,27,30,34,39]};
+        return this.twoCol(
+          this.card({title:'Projected NAV (€m)',badge:this.badge('illustrative','synth'),right:this.pill('proj',['Base','Optimistic','Downside'],'Base'),children:h('div',null,this.scenarioSvg([{name:'band',color:'--brand',band:band,vals:base},{name:sc,color:'--data-1',main:true,vals:base}],labels),this.lineLegend([{name:sc+' case',color:'--data-1'},{name:'optimistic–downside band',color:'--brand'}])),caption:`Under the ${sc.toLowerCase()} case your NAV roughly doubles by Y5; the band shows the optimistic–downside range. Modelled, not measured.`}),
+          this.card({title:'What changes',children:this.scorecard([{l:'NAV by Y5',you:'€'+base[5]+'m',peer:'—',up:true},{l:'DPI by Y5',you:'1.4x',peer:'—',up:true},{l:'Distribs start',you:'Q2 2027',peer:'—',up:true},{l:'Peak J-curve',you:'Y1',peer:'—',up:false}]),caption:'Distributions begin to dominate from Y2 as the book matures.'}));
+      },
+      't1-13:scenarios':()=>{ const labels=['Now','Y1','Y2','Y3','Y4','Y5'];
+        return this.card({title:'Three scenarios side by side (NAV €m)',badge:this.badge('illustrative','synth'),children:h('div',null,
+          this.scenarioSvg([{name:'Optimistic',color:'--over',vals:[24,29,35,43,52,63]},{name:'Base',color:'--data-1',main:true,vals:[24,27,31,36,42,49]},{name:'Downside',color:'--under',vals:[24,25,27,30,33,37]}],labels),
+          this.lineLegend([{name:'Optimistic',color:'--over'},{name:'Base',color:'--data-1'},{name:'Downside',color:'--under'}])),caption:'The spread widens with time — most of the uncertainty is in years 3–5 as newer vintages mark up or down.'});
+      },
+      't1-13:add':()=>{ const labels=['Now','Y1','Y2','Y3','Y4','Y5']; const on=this.dtog('add','With Ares PCS')==='With Ares PCS';
+        return this.twoCol(
+          this.card({title:'Projection — add a fund',right:this.pill('add',['Current only','With Ares PCS'],'With Ares PCS'),children:h('div',null,
+            this.scenarioSvg([{name:'Current',color:'--data-7',dash:true,vals:[24,27,31,36,42,49]}].concat(on?[{name:'With Ares PCS',color:'--data-1',main:true,vals:[24.2,27.6,32,37.6,44,51.5]}]:[]),labels),
+            this.lineLegend([{name:'Current only',color:'--data-7',dash:true}].concat(on?[{name:'With Ares PCS III',color:'--data-1'}]:[]))),caption: on?'Adding €150k to Ares PCS lifts projected Y5 NAV by ~€2.5m and pulls distributions earlier — while closing your credit gap.':'Toggle a fund in to see its projected effect on NAV and cash flows.'}),
+          this.card({title:'Impact',children:this.scorecard([{l:'Y5 NAV',you:on?'€51.5m':'€49m',peer:'—',up:true},{l:'Credit gap',you:on?'−3.8pp':'−9.8pp',peer:'—',up:true},{l:'First distrib',you:on?'Q1 2027':'Q2 2027',peer:'—',up:true},{l:'Liquidity hit',you:'€0.15m',peer:'—',up:false}]),caption:'A small, gap-closing addition with an outsized effect on shape.'}));
+      }
+      ,
+      't1-3:why':()=>this.twoCol(
+        this.card({title:'Why Moonfare recommends EQT X',children:this.reasonsList(),caption:'Each reason links to the underlying IC memo, DD material or data point.'}),
+        this.card({title:'At a glance',children:this.scorecard([{l:'Target Net MOIC',you:'2.1x',peer:'1.7x',up:true},{l:'Target Net IRR',you:'18%',peer:'14%',up:true},{l:'Mgmt fee',you:'1.5%',peer:'2.0%',up:true},{l:'Vintage',you:'2025',peer:'—',up:true}]),caption:'The figures behind the recommendation, versus the strategy median.'})),
+      't1-3:risks':()=>this.twoCol(
+        this.card({title:'What risks we see',children:this.noteList(['Concentration: top-5 companies ~38% of fund NAV.','Vintage timing: deploying into a richer entry-multiple environment.','Currency: ~60% EUR exposure for a USD-reporting investor.','Re-up dependency: returns rely on continued GP access.'],'warn'),caption:'The risks Moonfare weighs before recommending — surfaced, not hidden.'}),
+        this.card({title:'Who should not invest',children:this.noteList(['Investors needing liquidity inside 7 years.','Anyone already >12% in large-cap buyout.','Investors below the €50k feeder-minimum comfort.'],'warn'),caption:'Suitability is part of the recommendation — sometimes the answer is “not you, not now”.'})),
+      't1-3:vs':()=>this.twoCol(
+        this.card({title:'EQT X vs a comparable buyout fund',children:this.fundCompare(),caption:'Green marks the stronger figure. Sub-k-anonymity comparators are bucketed.'}),
+        this.card({title:'Why this one',children:this.reasonsList(['Stronger net MOIC and IRR across the last three vintages.','Lower fee load net of everything.','Team intact — no key-man changes.','Better fit to your current under-weights.']),caption:'Why Moonfare picks EQT X over the comparable.'})),
+      't1-6:best':()=>{ const zb=this.zDeltas('platform').map(r=>({...r,delta:+(r.delta*1.5).toFixed(1)})); return this.twoCol(
+        this.card({title:'How best performers are positioned vs you',children:h('div',{style:{padding:'6px 0'}},this.miniZ(zb)),caption:'Where the top-decile tilt differently — more secondaries and buyout, less idle cash.'}),
+        this.card({title:'What they do differently',children:this.scorecard([{l:'# funds',you:'11',peer:'19',up:false},{l:'Vintages spanned',you:'9',peer:'12',up:false},{l:'Avg ticket',you:'€158k',peer:'€240k',up:false},{l:'Secondaries %',you:'6%',peer:'14%',up:false}]),caption:'You vs the best-performer median — more lines, wider vintages, larger tickets.'})); },
+      't1-6:fo':()=>{ const zb=this.zDeltas('model').map(r=>({...r,delta:+(r.delta*1.2).toFixed(1)})); return this.twoCol(
+        this.card({title:'Family-office positioning vs you',children:h('div',{style:{padding:'6px 0'}},this.miniZ(zb)),caption:'Family offices run heavier infrastructure and credit for ballast.'}),
+        this.card({title:'How they pace',children:this.scorecard([{l:'Commitments / yr',you:'2.4',peer:'3.6',up:false},{l:'Vintage spread',you:'9y',peer:'14y',up:false},{l:'Single-fund max',you:'12%',peer:'7%',up:false},{l:'Defensive sleeve',you:'18%',peer:'30%',up:false}]),caption:'Gradual, broadly-diversified deployment with a larger defensive core.'})); },
+      't1-6:pe':()=>this.twoCol(
+        this.card({title:'What PE professionals ask',children:this.questionsList([['What is the realised gross-to-net spread?','PE pros',51],['How much of prior returns came from multiple expansion?','PE pros',44],['What is the loss ratio and recovery on impaired deals?','PE pros',39],['How concentrated is carry among partners?','PE pros',28]]),caption:'The diligence questions professionals ask that cohorts often miss.'}),
+        this.card({title:'How they invest',children:this.scorecard([{l:'Avg ticket',you:'€158k',peer:'€310k',up:false},{l:'# deals / yr',you:'2.4',peer:'1.8',up:true},{l:'Directs / co-invest',you:'12%',peer:'24%',up:false},{l:'Concentration (HHI)',you:'0.14',peer:'0.22',up:true}]),caption:'Larger tickets, fewer but more concentrated bets.'})),
+      't1-8:avb':()=>this.twoCol(
+        this.card({title:'Fund A vs Fund B',children:this.fundCompare(),caption:'Green marks the stronger figure; bucketed where sub-k-anonymity.'}),
+        this.card({title:'Performance side by side',children:this.groupedBars(['DPI','MOIC','IRR ÷10'],[{name:'EQT X',color:'--data-1',vals:[0.72,2.1,1.74]},{name:'Comparable',color:'--data-7',vals:[0.61,1.7,1.39]}]),caption:'EQT X leads on realised DPI and MOIC; IRR shown ÷10 to share the axis.'})),
+      't1-11:missed':()=>this.twoCol(
+        this.scaffoldViz('missed'),
+        this.card({title:'Missed by strategy (count)',children:this.groupedBars(['Secondaries','US Growth','Buyout','Infra','Credit'],[{name:'Passed on',color:'--data-4',vals:[4,3,2,2,1]}]),caption:'You systematically under-engaged secondaries and US growth — both fit your profile.'})),
+      't1-11:pattern':()=>this.twoCol(
+        this.card({title:'The pattern behind your misses',children:this.reasonsList(['You passed most often when the minimum was above your usual ticket.','Secondaries were skipped despite matching your liquidity preference.','US-domiciled funds were under-engaged versus European ones.','Misses clustered in busy commitment quarters.']),caption:'A behavioural pattern — not bad luck. Naming it is how you fix it.'}),
+        this.card({title:'Resembles a current opportunity',children:this.noteList(['Lexington Capital XI resembles a 2022 secondaries fund you passed on that later returned +1.9x.','Same strategy, same profile fit, similar entry discount.'],'ok'),caption:'A live opportunity that looks like a past missed winner.'})),
+      't2-1:gap':()=>this.twoCol(
+        this.card({title:'Where you sit vs the model',children:h('div',{style:{padding:'6px 0'}},this.miniZ(this.zDeltas('model'))),caption:'The clearest missing pieces are private credit and a defensive ballast.'}),
+        this.card({title:'Missing pieces',children:this.noteList(['Private credit — largest single under-weight (−12pp vs model).','A defensive / income sleeve to stabilise cash flows.','2023–24 vintage exposure to smooth bunching.','Geographic: more US, less Europe concentration.'],'warn'),caption:'Ranked by how much each closes your gap to the model.'})),
+      't2-2:gap':()=>this.twoCol(
+        this.card({title:'Over / under-weight vs the model',children:h('div',{style:{padding:'6px 0'}},this.miniZ(this.zDeltas('model'))),caption:'Your biggest gap to the Balanced Compounding model is private credit.'}),
+        this.card({title:'Distance to model',children:this.scorecard([{l:'Total drift',you:'34pp',peer:'—',up:false},{l:'Strategies off',you:'5 / 9',peer:'—',up:false},{l:'Biggest gap',you:'Credit −12',peer:'—',up:false},{l:'Closest fund',you:'Ares PCS',peer:'—',up:true}]),caption:'How far, where, and what closes it fastest.'})),
+      't2-2:drift':()=>this.card({title:'Drift from the model over time (pp)',badge:this.badge('illustrative','synth'),children:h('div',null,this.scenarioSvg([{name:'band',color:'--brand',band:{up:[10,14,20,28,34,34],down:[10,9,9,10,11,12]},vals:[10,12,16,22,28,31]},{name:'drift',color:'--data-1',main:true,vals:[10,12,16,22,28,31]}],['2021','2022','2023','2024','2025','Now']),this.lineLegend([{name:'Total drift (pp)',color:'--data-1'}])),caption:'Your drift from the model widened as newer vintages concentrated — rebalancing future commitments closes it without selling.'}),
+      't2-3:ticket':()=>this.twoCol(
+        this.card({title:'Average ticket by group (€k)',children:this.groupedBars(['You','Cohort','PE pros','Family off.','Best perf.'],[{name:'Avg ticket',color:'--data-1',vals:[158,128,310,240,240]}]),caption:'You write larger tickets than your cohort, smaller than professionals and family offices.'}),
+        this.card({title:'Behaviour vs peers',children:this.scorecard(),caption:'Tickets, cadence, vintages and diversification versus the peer median.'})),
+      't2-3:counts':()=>this.twoCol(
+        this.card({title:'Investments per year by group',children:this.groupedBars(['You','Cohort','PE pros','Family off.'],[{name:'Deals / yr',color:'--data-3',vals:[2.4,2.1,1.8,3.6]}]),caption:'You deploy a little faster than your cohort; family offices spread across more deals.'}),
+        this.card({title:'Activity shape',children:this.scorecard([{l:'Deals / yr',you:'2.4',peer:'2.1',up:true},{l:'# funds',you:'11',peer:'9',up:true},{l:'Per vintage',you:'1.3',peer:'1.1',up:true},{l:'Active now',you:'yes',peer:'select',up:true}]),caption:'How busy you are versus people like you.'})),
+      't2-3:mode':()=>this.twoCol(
+        this.card({title:'Current investment mode',children:h('div',{style:{display:'flex',flexDirection:'column',gap:18,padding:'8px 4px'}},this.modeGauge('You — selective buying',62,'Waiting','Active'),this.modeGauge('Your cohort',48,'Waiting','Active')),caption:'You are in selective-buying mode; your cohort sits closer to wait-and-see.'}),
+        this.card({title:'Mode by group',children:this.scorecard([{l:'You',you:'Selective',peer:'—',up:true},{l:'Cohort',you:'Waiting',peer:'—',up:false},{l:'PE pros',you:'Active',peer:'—',up:true},{l:'Family off.',you:'Gradual',peer:'—',up:true}]),caption:'Who is leaning in and who is holding back right now.'})),
+      't2-4:defense':()=>{ const dir=this.dtog('reb','More defensive'); const z=this.zDeltas('model').map(r=>({...r,delta: dir==='More defensive'? +(r.delta*0.5).toFixed(1): r.delta})); return this.twoCol(
+        this.card({title:'Rebalance target',right:this.pill('reb',['More defensive','More growth'],'More defensive'),children:h('div',{style:{padding:'6px 0'}},this.miniZ(z)),caption: dir==='More defensive'?'A more defensive tilt narrows your gaps via credit and infrastructure — achievable through future commitments, no forced selling.':'A growth tilt leans further into buyout, growth and AI.'}),
+        this.card({title:'How to get there',children:this.noteList(['Direct the next 2–3 commitments into private credit and infrastructure.','Use a secondaries fund to add diversified, shorter-J-curve exposure.','No forced selling — rebalance with new capital.'],'ok'),caption:'Future-commitment rebalancing keeps you invested while shifting the mix.'})); },
+      't2-4:sec':()=>this.twoCol(
+        this.card({title:'Rebalance via secondaries (NAV €m)',children:h('div',null,this.scenarioSvg([{name:'New primaries',color:'--data-7',dash:true,vals:[24,26,29,33,38,44]},{name:'Via secondaries',color:'--data-1',main:true,vals:[24,27,31,35,40,46]}],['Now','Y1','Y2','Y3','Y4','Y5']),this.lineLegend([{name:'New primaries',color:'--data-7',dash:true},{name:'Via secondaries',color:'--data-1'}])),caption:'Secondaries rebalance faster and pull distributions earlier than waiting for new primaries to deploy.'}),
+        this.card({title:'Trade-offs',children:this.scorecard([{l:'Time to rebalance',you:'~12mo',peer:'~36mo',up:true},{l:'J-curve',you:'shorter',peer:'longer',up:true},{l:'Entry discount',you:'8–12%',peer:'—',up:true},{l:'Forced selling',you:'none',peer:'—',up:true}]),caption:'Faster and smoother, at the cost of a modest secondary premium.'})),
+      't2-5:peers':()=>this.twoCol(
+        this.scaffoldViz('questions'),
+        this.card({title:'Best-practice DD map',children:this.noteList(['Team — stability, carry split, key-man cover.','Track record — realised DPI, loss ratio, consistency across vintages.','Strategy — repeatability, edge, entry discipline.','Terms — fees net of everything, GP commitment.'],'ok'),caption:'The diligence skeleton the strongest investors run — adapted to your portfolio.'})),
+      't2-5:pros':()=>this.twoCol(
+        this.card({title:'What PE professionals ask',children:this.questionsList([['What is the realised gross-to-net spread?','PE pros',51],['How much return came from multiple expansion vs growth?','PE pros',44],['What is the loss ratio on impaired deals?','PE pros',39],['How concentrated is carry among partners?','PE pros',28]]),caption:'Professional-grade questions — click any to ask Alpha in your context.'}),
+        this.card({title:'What your cohort tends to miss',children:this.noteList(['Net-of-everything fee math, not just headline rates.','Source of historical returns — leverage vs multiple vs growth.','Team incentive alignment and key-man cover.'],'warn'),caption:'The blind spots professionals probe and cohorts skip.'})),
+      't2-7:score':()=>this.twoCol(
+        this.card({title:'Consistency score by manager',children:this.groupedBars(['EQT','CVC','Cinven','Gen. Atl.','Ares'],[{name:'Consistency',color:'--data-1',vals:[86,79,72,68,61]}]),caption:'Deviation-from-trend across the last 3–5 funds — higher is steadier delivery.'}),
+        this.card({title:'Return vs reliability',children:this.scorecard([{l:'Top return',you:'Thrive',peer:'—',up:true},{l:'Most consistent',you:'EQT',peer:'—',up:true},{l:'Best blend',you:'EQT',peer:'—',up:true},{l:'Watch',you:'Cinven',peer:'—',up:false}]),caption:'Reliability matters as much as the headline number.'})),
+      't2-7:stability':()=>this.card({title:'Distribution stability over years (€m)',children:h('div',null,this.scenarioSvg([{name:'band',color:'--brand',band:{up:[0.4,0.7,1.1,1.5,1.8,2.0],down:[0.2,0.3,0.5,0.7,0.9,1.1]},vals:[0.3,0.5,0.8,1.1,1.4,1.6]},{name:'dist',color:'--data-6',main:true,vals:[0.3,0.5,0.8,1.1,1.4,1.6]}],['Y0','Y1','Y2','Y3','Y4','Y5']),this.lineLegend([{name:'Distributions',color:'--data-6'}])),caption:'Steady, rising distributions with a tightening band — the hallmark of disciplined managers.'}),
+      't2-8:mode':()=>this.twoCol(
+        this.card({title:'Buying vs harvesting',children:h('div',{style:{display:'flex',flexDirection:'column',gap:18,padding:'8px 4px'}},this.modeGauge('Buyout funds',58,'Harvesting','Deploying'),this.modeGauge('Secondaries',34,'Harvesting','Deploying')),caption:'Your buyout funds are still net-deploying; secondaries have tipped toward harvesting.'}),
+        this.card({title:'Lifecycle stage',children:this.scorecard([{l:'Net deployment',you:'55%',peer:'—',up:true},{l:'Ahead / behind',you:'on-pace',peer:'—',up:true},{l:'Harvesting',you:'3 of 11',peer:'—',up:true},{l:'Dry powder',you:'€3.4m',peer:'—',up:false}]),caption:'Where your book sits between building and realising.'})),
+      't2-8:deploy':()=>this.twoCol(
+        this.card({title:'Deployment vs prior years (%)',children:this.groupedBars(['2022','2023','2024','2025'],[{name:'Called',color:'--data-1',vals:[42,58,71,64]},{name:'Strategy avg',color:'--data-7',vals:[48,55,60,62]}]),caption:'Your 2024–25 funds are deploying a touch ahead of the strategy average.'}),
+        this.card({title:'Deployment quality',children:this.scorecard([{l:'Called vs committed',you:'63%',peer:'58%',up:true},{l:'Vs fund size',you:'on-pace',peer:'—',up:true},{l:'Ahead of plan',you:'2 funds',peer:'—',up:true},{l:'Underdeployed',you:'1 fund',peer:'—',up:false}]),caption:'Faster deployment isn’t always better — pace vs discipline.'})),
+      't2-9:dna':()=>this.twoCol(
+        this.card({title:'Shared DNA of top managers',children:this.reasonsList(['Tight sector focus — they win where they have repeatable edge.','Operational value creation over financial engineering.','Stable senior teams with aligned carry.','Disciplined entry — they walk away from priced deals.']),caption:'What the top three managers in each strategy consistently share.'}),
+        this.card({title:'Where top managers focus (count)',children:this.groupedBars(['Software','Health','Industrials','Energy','Consumer'],[{name:'Top-manager focus',color:'--data-1',vals:[9,6,4,3,2]}]),caption:'Convergence around software and healthcare among the strongest managers.'})),
+      't2-9:avoid':()=>this.twoCol(
+        this.card({title:'What top managers avoid',children:this.noteList(['Over-paying at peak multiples — they sit out hot auctions.','Style drift into unfamiliar sectors or geographies.','Over-diversification that dilutes their edge.','Excess leverage that mortgages future returns.'],'warn'),caption:'Discipline by omission — what the best consistently refuse to do.'}),
+        this.card({title:'Team blueprint',children:this.reasonsList(['Low senior-partner turnover across fund generations.','Clear succession and key-man cover.','Carry shared deep into the team, not concentrated at the top.']),caption:'The team structures that correlate with top outcomes.'})),
+      't3-2:whynot':()=>this.twoCol(
+        this.card({title:'Why Fund X isn’t right for you right now',children:this.reasonsList(['Liquidity: it would push your illiquidity above your 70% ceiling.','Concentration: you’re already 12% in large-cap buyout.','Vintage: it bunches into your crowded 2025 vintage.','Better fit exists: a credit fund closes a bigger gap.']),caption:'Attractive in general, but not for this portfolio at this moment.'}),
+        this.card({title:'Which factor is binding',children:this.scorecard([{l:'Liquidity fit',you:'tight',peer:'—',up:false},{l:'Concentration',you:'high',peer:'—',up:false},{l:'Vintage fit',you:'crowded',peer:'—',up:false},{l:'Strategy fit',you:'ok',peer:'—',up:true}]),caption:'The specific reason — liquidity and concentration are binding.'})),
+      't3-2:change':()=>this.twoCol(
+        this.card({title:'What would need to change',children:this.noteList(['A distribution event freeing ~€0.8m of liquidity.','Trimming large-cap buyout below 10%.','Waiting one vintage to avoid 2025 bunching.','Or a smaller ticket that fits today’s headroom.'],'ok'),caption:'Concrete conditions that flip this from “not now” to “yes”.'}),
+        this.card({title:'Capacity today',children:this.scorecard([{l:'Liquidity headroom',you:'€1.1m',peer:'—',up:true},{l:'Safe ticket now',you:'€0.4m',peer:'—',up:true},{l:'After Q2 distribs',you:'€0.9m',peer:'—',up:true},{l:'Vintage clears',you:'2026',peer:'—',up:true}]),caption:'When and how much becomes suitable.'})),
+      't3-3:score':()=>this.twoCol(
+        this.card({title:'Offence / defence score',children:h('div',{style:{display:'flex',justifyContent:'center',padding:'14px 0'}},this.gauge(63,'offensively tilted')),caption:'Your book leans offensive — growth and AI heavy, lighter on defensive credit and infrastructure.'}),
+        this.card({title:'Macro factor exposure vs peers (pp)',children:h('div',{style:{padding:'6px 0'}},this.miniZ([{name:'Rates sensitivity',delta:4.2,sig:true},{name:'Inflation hedge',delta:-5.1,sig:true},{name:'GDP cyclicality',delta:6.0,sig:true},{name:'Energy',delta:-2.2,sig:true}])),caption:'You carry more growth/GDP sensitivity and less inflation protection than peers.'})),
+      't3-3:macro':()=>this.twoCol(
+        this.card({title:'Macro sensitivities',children:this.scorecard([{l:'GDP slowdown',you:'high',peer:'med',up:false},{l:'Inflation',you:'exposed',peer:'hedged',up:false},{l:'Rates',you:'sensitive',peer:'neutral',up:false},{l:'Resilience',you:'0.58',peer:'0.66',up:false}]),caption:'Where your portfolio is most exposed to the macro regime.'}),
+        this.card({title:'Hidden macro bets',children:this.noteList(['Concentrated GDP-cyclical exposure via growth & consumer holdings.','Limited inflation ballast — light on infrastructure and real assets.','Embedded rate sensitivity inside private-credit floaters partly offsets.'],'warn'),caption:'The macro bets you’re carrying without having chosen them.'}))
+    };
+    return B[key]? B[key]() : null;
+  }
+  archMini(label,pct){ const h=this.h; return h('div',{style:{flex:1,border:'1px solid var(--line)',borderRadius:10,padding:'10px 12px'}}, h('div',{style:{fontSize:11,color:'var(--muted)'}},label), h('div',{style:{fontFamily:this.SF,fontSize:22,fontWeight:600}},pct+'%')); }
+  archBarsFrom(mix){ const h=this.h; const rows=this.STRATS.map(([k,name,color])=>({name,color,p:mix[k]})).filter(r=>r.p>0).sort((a,b)=>b.p-a.p);
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:8}}, rows.map((r,i)=>h('div',{key:i},
+      h('div',{style:{display:'flex',justifyContent:'space-between',fontSize:11.5,marginBottom:3}}, h('span',null,r.name), h('span',{style:{fontFamily:this.SF,fontWeight:600}},r.p+'%')),
+      h('div',{style:{height:9,background:'var(--surface-2)',borderRadius:5}}, h('div',{style:{width:r.p*2.2+'%',maxWidth:'100%',height:'100%',background:`var(${r.color})`,borderRadius:5}}))))); }
+  choiceCard(tag,name,points,win){ const h=this.h;
+    return h('div',{style:{border:`1px solid ${win?'var(--brand)':'var(--line)'}`,borderRadius:12,padding:14,background:win?'var(--brand-wash)':'var(--surface)'}},
+      h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:win?'var(--brand)':'var(--muted)'}},tag),
+      h('div',{style:{fontFamily:this.SF,fontSize:16,fontWeight:600,margin:'2px 0 8px'}},name),
+      h('div',{style:{display:'flex',flexDirection:'column',gap:5}}, points.map((p,i)=>h('div',{key:i,style:{display:'flex',gap:7,fontSize:12,color:'var(--ink)'}},h('span',{style:{color:win?'var(--over)':'var(--muted)'}},win?'✓':'·'),p)))); }
+  headroomBar(used,total){ const h=this.h; const pct=Math.round(used/total*100);
+    return h('div',null, h('div',{style:{height:16,background:'var(--surface-2)',borderRadius:8,overflow:'hidden'}}, h('div',{style:{width:pct+'%',height:'100%',background:'var(--brand)',borderRadius:8}})),
+      h('div',{style:{display:'flex',justifyContent:'space-between',fontSize:11,color:'var(--muted)',marginTop:5}}, h('span',null,'€'+used+'k this ticket'), h('span',null,'€'+total+'k headroom'))); }
+
+  /* ====================== OTHER SURFACES ====================== */
+  SURFACE_META(){
+    return {
+      overview:['Overview · Meta-View','Where you stand vs peers, the platform & the model'],
+      s2:['Strategy deep-dive','Your strategy mix and the funds behind it vs the peer weighted-average'],
+      s3:['Region','Geographic exposure of your portfolio vs peers'],
+      s4:['Investment Format','Primary · Secondary · Direct/Co-Invest · Semi-liquid · Fund-of-Fund'],
+      s5:['Vintage','% committed per vintage year, concentration & bunching'],
+      s6:['Look-through / Concentration','Real underlying exposure beneath your funds'],
+      s7:['Performance','DPI · MOIC · Net IRR vs peers and platform, comparable-vintage'],
+      s13:['Funds','Curated opportunities matched to your gaps'],
+      soon:[(this.state.soonLabel||'Surface'),'Composes from the same frame — wired next']
+    };
+  }
+  coverageBadge(pct){ return this.badge(`look-through ${pct}% of NAV`,'conf'); }
+  card(opts){
+    const h=this.h;
+    return h('section',{style:{background:'var(--surface)',border:'1px solid var(--line)',borderRadius:14,padding:18,display:'flex',flexDirection:'column',minWidth:0,...(opts.style||{})}},
+      h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,marginBottom:opts.tight?8:12}},
+        h('div',{style:{display:'flex',alignItems:'center',gap:9}},
+          h('h2',{style:{margin:0,fontSize:17,fontWeight:600,fontFamily:"'Source Serif 4',Georgia,serif"}},opts.title), opts.badge||null),
+        opts.right||null),
+      opts.children,
+      opts.caption? h('div',{style:{fontSize:12,lineHeight:1.45,color:'var(--muted)',marginTop:10,textWrap:'pretty'}},opts.caption):null);
+  }
+  donutNamed(slices, size, top, bot){
+    const h=this.h; const tot=slices.reduce((a,s)=>a+s.p,0)||1;
+    let a=0; const stops=[]; const labels=[];
+    slices.forEach((s,i)=>{ const pc=s.p/tot*100, b=a+pc; stops.push(`var(${s.color}) ${a}% ${b}%`);
+      const mid=a+pc/2, ang=mid/100*2*Math.PI, R=38;
+      if(pc>=9) labels.push({x:50+R*Math.sin(ang),y:50-R*Math.cos(ang),t:Math.round(s.p)+'%'});
+      a=b; });
+    return h('div',{style:{position:'relative',width:size,height:size,borderRadius:'50%',background:`conic-gradient(${stops.join(',')})`,flex:'0 0 auto'}},
+      h('div',{style:{position:'absolute',inset:'25%',borderRadius:'50%',background:'var(--surface)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'}},
+        h('div',{style:{fontSize:10.5,fontWeight:700}},top), h('div',{style:{fontSize:9,color:'var(--muted)',fontFamily:"Inter,system-ui,sans-serif"}},bot)),
+      labels.map((l,i)=>h('div',{key:i,style:{position:'absolute',left:l.x+'%',top:l.y+'%',transform:'translate(-50%,-50%)',fontFamily:"Inter,system-ui,sans-serif",fontSize:10,fontWeight:700,color:'#fff',textShadow:'0 1px 3px rgba(0,0,0,.45)'}},l.t)));
+  }
+  legend(slices){ const h=this.h;
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:5}},
+      slices.map((s,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',gap:7,fontSize:12}},
+        h('span',{style:{width:9,height:9,borderRadius:2,background:`var(${s.color})`,flex:'0 0 9px'}}),
+        h('span',{style:{flex:1,color:'var(--ink)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},s.n),
+        h('span',{style:{fontFamily:"Inter,system-ui,sans-serif",fontWeight:700,color:'var(--muted)'}},s.p+'%'))));
+  }
+  cmpSeg(val,on,opts){ opts=opts||['peers','platform','model'];
+    const lab={peers:'Peers',platform:'Platform',model:'Model',harvard:'Harvard',yale:'Yale'};
+    return this.seg(opts.map(o=>({label:'vs '+lab[o],value:o})), val, on, {sm:true});
+  }
+  miniZ(rows, maxAbs){
+    const h=this.h; maxAbs=maxAbs||Math.max(...rows.map(r=>Math.abs(r.delta)),4);
+    return h('div',{style:{width:'100%'}}, rows.map(r=>{
+      const w=Math.abs(r.delta)/maxAbs*100; const fill=!r.sig?'var(--gated)':(r.color?`var(${r.color})`:(r.delta>0?'var(--over)':'var(--under)'));
+      return h('div',{key:r.name,style:{display:'flex',alignItems:'center',height:26,opacity:r.sig?1:.5}},
+        h('div',{style:{width:104,flex:'0 0 104px',display:'flex',alignItems:'center',justifyContent:'flex-end',gap:5,paddingRight:8,fontSize:11.5}}, r.name, r.color? h('span',{style:{width:9,height:9,borderRadius:2,background:`var(${r.color})`,flex:'0 0 9px'}}):null),
+        h('div',{style:{flex:1,display:'flex',alignItems:'center',position:'relative',height:'100%'}},
+          h('div',{style:{position:'absolute',left:'50%',top:0,bottom:0,borderLeft:'1.5px solid var(--ink)',opacity:.5}}),
+          h('div',{style:{width:'50%',display:'flex',justifyContent:'flex-end'}}, r.delta<0? h('div',{style:{width:w+'%',height:14,background:fill,borderRadius:'4px 0 0 4px'}}):null),
+          h('div',{style:{width:'50%'}}, r.delta>0? h('div',{style:{width:w+'%',height:14,background:fill,borderRadius:'0 4px 4px 0'}}):null)),
+        h('div',{style:{width:62,flex:'0 0 62px',paddingLeft:8,fontFamily:"Inter,system-ui,sans-serif",fontSize:11,fontWeight:700,color:!r.sig?'var(--muted)':(r.delta>0?'var(--over)':'var(--under)')}},`${r.delta>0?'▲ +':'▼ '}${r.delta}pp`));
+    }));
+  }
+
+  /* ---- S2 Strategy ---- */
+  s2Body(){
+    const h=this.h;
+    const YF={ buyout:[{n:'EQT X',p:42},{n:'CVC IX',p:34},{n:'Cinven 8',p:24}], ai:[{n:'Thrive VIII',p:38},{n:'Coatue PE',p:33},{n:'ICONIQ VII',p:29}],
+      credit:[{n:'Ares PCS',p:100}], growth:[{n:'General Atlantic',p:55},{n:'Summit IX',p:45}] };
+    const PF={ buyout:[{n:'EQT X',p:31},{n:'CVC IX',p:27},{n:'a large-cap buyout fund',p:22,k:0},{n:'Permira VIII',p:20}],
+      ai:[{n:'a venture-growth AI fund',p:34,k:0},{n:'Thrive VIII',p:33},{n:'Coatue PE',p:33}],
+      credit:[{n:'Ares PCS',p:40},{n:'Blackstone Credit',p:35},{n:'a direct-lending fund',p:25,k:0}],
+      growth:[{n:'General Atlantic',p:48},{n:'Insight XII',p:30},{n:'TA Associates',p:22}] };
+    const strat=this.state.s2strat; const cmp=this.state.s2cmp;
+    const sName=(this.STRATS.find(x=>x[0]===strat)||[])[1]||'';
+    const yf=(YF[strat]||[{n:'Fund A',p:60},{n:'Fund B',p:40}]).map((f,i)=>({...f,color:`--data-${(i%9)+1}`}));
+    const pf=(PF[strat]||[{n:'a top peer fund',p:55,k:0},{n:'Fund B',p:45}]).map((f,i)=>({...f,color:`--data-${(i%9)+1}`}));
+    // stacked 100 of your mix
+    let acc=0; const segs=this.STRATS.map(([k,n,c])=>{ const p=this.MIX.you[k]; const o={k,n,c,p,left:acc}; acc+=p; return o; });
+    const stacked=h('div',{style:{display:'flex',height:34,borderRadius:8,overflow:'hidden',width:'100%'}},
+      segs.filter(s=>s.p>0).map(s=>h('div',{key:s.k,onClick:()=>this.setState({s2strat:s.k}),title:`${s.n} ${s.p}%`,
+        style:{width:s.p+'%',background:`var(${s.c})`,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',borderRight:'1px solid var(--surface)',outline:s.k===strat?'2px solid var(--ink)':'none',outlineOffset:'-2px'}},
+        s.p>=7? h('span',{style:{fontSize:10.5,fontWeight:700,color:'#fff',textShadow:'0 1px 2px rgba(0,0,0,.4)'}},s.p+'%'):null)));
+    const chips=h('div',{style:{display:'flex',flexWrap:'wrap',gap:6}}, this.STRATS.map(([k,n,c])=>{
+      const on=k===strat;
+      return h('button',{key:k,onClick:()=>this.setState({s2strat:k}),
+        style:{display:'inline-flex',alignItems:'center',gap:6,border:`1px solid ${on?'var(--ink)':'var(--line)'}`,background:on?'var(--ink)':'var(--surface)',color:on?'var(--surface)':'var(--ink)',fontSize:12,fontWeight:on?700:500,padding:'5px 11px',borderRadius:999,cursor:'pointer',fontFamily:"Inter,system-ui,sans-serif"}},
+        h('span',{style:{width:8,height:8,borderRadius:2,background:`var(${c})`}}),n);
+    }));
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:14}},
+      this.card({title:'Your strategy mix',badge:this.badge('100% of NAV'),tight:true,children:h('div',null,stacked,h('div',{style:{marginTop:12}},chips)),
+        caption:'Your buyout sleeve is three funds; your peers concentrate in EQT and CVC. Click a strategy to see the funds behind it.'}),
+      this.card({title:`${sName} — your funds vs the peer weighted-average`,
+        right:this.seg([{label:'Peers',value:'peers'},{label:'Platform',value:'platform'},{label:'Model',value:'model'}],cmp,v=>this.setState({s2cmp:v}),{sm:true}),
+        children:h('div',{style:{display:'flex',gap:24,alignItems:'center',justifyContent:'space-around',flexWrap:'wrap'}},
+          h('div',{style:{display:'flex',gap:16,alignItems:'center'}}, h('div',null,h('div',{style:{fontSize:11,fontWeight:700,color:'var(--muted)',marginBottom:6,textAlign:'center'}},'Your funds'), this.donutNamed(yf,150,sName,'you')), this.legend(yf)),
+          h('div',{style:{width:1,height:120,background:'var(--line)'}}),
+          h('div',{style:{display:'flex',gap:16,alignItems:'center'}}, h('div',null,h('div',{style:{fontSize:11,fontWeight:700,color:'var(--muted)',marginBottom:6,textAlign:'center'}},'Peer weighted-average'), this.donutNamed(pf,150,'Peers',`n=${this.peerData().c.n}`)), this.legend(pf))),
+        caption:'Fund names render inside the pie; sub-k-anonymity funds are bucketed as a labelled bucket (e.g. “a large-cap buyout fund”).'}));
+  }
+
+  /* ---- S3 Region ---- */
+  s3Body(){
+    const h=this.h; const cmp=this.state.s3cmp;
+    const you=[{n:'US',p:46,color:'--data-1'},{n:'Europe',p:38,color:'--data-4'},{n:'Asia',p:11,color:'--data-6'},{n:'RoW',p:5,color:'--data-8'}];
+    const peer={peers:[52,30,13,5],platform:[55,28,12,5],model:[44,34,15,7]}[cmp];
+    const z=[{name:'US',color:'--data-1',delta:+(46-peer[0]).toFixed(1)},{name:'Europe',color:'--data-4',delta:+(38-peer[1]).toFixed(1)},{name:'Asia',color:'--data-6',delta:+(11-peer[2]).toFixed(1)},{name:'RoW',color:'--data-8',delta:+(5-peer[3]).toFixed(1)}].map(r=>({...r,sig:Math.abs(r.delta)>=2}));
+    return h('div',{style:{display:'grid',gridTemplateColumns:'minmax(280px,1fr) minmax(320px,1.3fr)',gap:14}},
+      this.card({title:'Your regional exposure',children:h('div',{style:{display:'flex',gap:20,alignItems:'center',justifyContent:'center',padding:'8px 0'}}, this.donutNamed(you,170,'You','100% NAV'), this.legend(you)),
+        caption:'You are Europe-tilted versus a US-heavy peer median.'}),
+      this.card({title:`Over / under-weight vs ${cmp==='model'?'the Model':cmp[0].toUpperCase()+cmp.slice(1)}`, right:this.cmpSeg(cmp,v=>this.setState({s3cmp:v}),['peers','platform','model']),
+        children:h('div',{style:{padding:'10px 0'}},this.miniZ(z)), caption:'You\u2019re +8pp overweight Europe and ~6pp underweight the US versus peers; non-significant gaps are greyed.'}));
+  }
+
+  /* ---- S4 Format ---- */
+  s4Body(){
+    const h=this.h; const cmp=this.state.s4cmp;
+    const fmts=[{n:'Primary',you:58,color:'--data-1'},{n:'Secondary',you:14,color:'--data-4'},{n:'Direct / Co-Invest',you:12,color:'--data-5'},{n:'Semi-liquid',you:9,color:'--data-6'},{n:'Fund-of-Fund',you:7,color:'--data-8'}];
+    const peer={peers:[64,11,9,8,8],platform:[60,12,10,9,9],model:[55,14,13,10,8]}[cmp];
+    const z=fmts.map((f,i)=>({name:f.n,color:f.color,delta:+(f.you-peer[i]).toFixed(1),sig:Math.abs(f.you-peer[i])>=2}));
+    const max=70;
+    const bars=h('div',{style:{display:'flex',alignItems:'flex-end',gap:18,height:200,padding:'0 4px'}}, fmts.map(f=>h('div',{key:f.n,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',height:'100%'}},
+      h('div',{style:{flex:1,width:'100%',display:'flex',alignItems:'flex-end',justifyContent:'center'}},
+        h('div',{style:{width:'72%',height:(f.you/max*100)+'%',background:`var(${f.color})`,borderRadius:'6px 6px 0 0',display:'flex',alignItems:'flex-start',justifyContent:'center',paddingTop:6,minHeight:24}},
+          h('span',{style:{fontSize:12,fontWeight:700,color:'#fff',fontFamily:"Inter,system-ui,sans-serif"}},f.you+'%'))),
+      h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:8,textAlign:'center',lineHeight:1.2,height:26}},f.n))));
+    return h('div',{style:{display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:14}},
+      this.card({title:'Format split',badge:this.badge('% of NAV'),children:bars,caption:'One bar per format (not a single stacked bar) — you run primary-heavy with a meaningful secondaries sleeve.'}),
+      this.card({title:`Over / under-weight vs ${cmp[0].toUpperCase()+cmp.slice(1)}`,right:this.cmpSeg(cmp,v=>this.setState({s4cmp:v}),['peers','platform','model']),children:h('div',{style:{padding:'10px 0'}},this.miniZ(z)),caption:'You under-index primaries and over-index secondaries vs peers.'}));
+  }
+
+  /* ---- S5 Vintage ---- */
+  s5Body(){
+    const h=this.h;
+    const V=[['2017',6],['2018',9],['2019',11],['2020',8],['2021',19],['2022',21],['2023',14],['2024',9],['2025',3]];
+    const max=24;
+    const bars=h('div',{style:{display:'flex',alignItems:'flex-end',gap:10,height:170}}, V.map(([y,p])=>{
+      const hot=p>=18;
+      return h('div',{key:y,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',height:'100%'}},
+        h('div',{style:{flex:1,width:'100%',display:'flex',alignItems:'flex-end',justifyContent:'center'}},
+          h('div',{style:{width:'66%',height:(p/max*100)+'%',background:hot?'var(--under)':'var(--brand)',borderRadius:'5px 5px 0 0',display:'flex',alignItems:'flex-start',justifyContent:'center',paddingTop:4,minHeight:16}},
+            h('span',{style:{fontSize:10,fontWeight:700,color:'#fff',fontFamily:"Inter,system-ui,sans-serif"}},p+'%'))),
+        h('div',{style:{fontSize:10,color:'var(--muted)',marginTop:6,fontFamily:"Inter,system-ui,sans-serif"}},y));
+    }));
+    // heatmap vintage x strategy (compact)
+    const str2=[['Buyout','buyout'],['Growth','growth'],['Venture','venture'],['AI','ai'],['Credit','credit']];
+    const grid=h('div',{style:{display:'grid',gridTemplateColumns:`70px repeat(${V.length},1fr)`,gap:3,alignItems:'center'}},
+      h('div',null), V.map(([y])=>h('div',{key:y,style:{fontSize:9,color:'var(--muted)',textAlign:'center',fontFamily:"Inter,system-ui,sans-serif"}},y.slice(2))),
+      str2.flatMap(([nm,k])=>[h('div',{key:nm,style:{fontSize:10.5,color:'var(--ink)'}},nm), ...V.map(([y,p])=>{
+        const intensity=Math.min((p/24)*(0.5+Math.random()*0.6),1); // illustrative density
+        return h('div',{key:y+k,style:{height:22,borderRadius:4,background:`color-mix(in srgb, var(--brand) ${Math.round(intensity*100)}%, var(--surface-2))`}});
+      })]));
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:14}},
+      this.card({title:'Commitments by vintage',badge:this.badge('9 vintages'),right:h('span',{style:{display:'inline-flex',alignItems:'center',gap:6,fontSize:11.5,fontWeight:700,color:'var(--under)',background:'var(--under-wash)',border:'1px solid var(--under)',padding:'4px 10px',borderRadius:999}},'⚠ Bunched: 2021–22 = 40%'),
+        children:bars,caption:'Shown as % of committed capital (not € totals). Two adjacent vintages hold 40% of your commitments — a bunching flag you may want to smooth.'}),
+      this.card({title:'Vintage × strategy heat-map',badge:this.coverageBadge(88),children:grid,caption:'Darker = more capital committed to that strategy in that vintage. Based on 88% of committed capital that resolves to a strategy.'}));
+  }
+
+  /* ---- S6 Look-through ---- */
+  s6Body(){
+    const h=this.h;
+    const sectors=[{n:'Technology',w:26,color:'--data-1'},{n:'Healthcare',w:16,color:'--data-3'},{n:'Financials',w:13,color:'--data-4'},{n:'Industrials',w:12,color:'--data-5'},{n:'Consumer',w:11,color:'--data-6'},{n:'Energy',w:7,color:'--data-7'},{n:'Materials',w:6,color:'--data-8'},{n:'Comms',w:5,color:'--data-2'},{n:'Real Estate',w:4,color:'--data-9'}];
+    const sorted=[...sectors].sort((a,b)=>b.w-a.w); const cA=[],cB=[]; let sA=0,sB=0;
+    sorted.forEach(it=>{ if(sA<=sB){cA.push(it);sA+=it.w;} else {cB.push(it);sB+=it.w;} });
+    const col=(arr,sum)=>h('div',{style:{flex:`${sum} 1 0`,display:'flex',flexDirection:'column',gap:4}},arr.map(it=>h('div',{key:it.n,onClick:e=>this.openPop(e,{title:it.n,value:`${it.w}% of looked-through NAV · covered 61%`,method:'sector look-through via fund holdings mapping',cohort:'You',n:1}),
+      style:{flex:`${it.w} 1 0`,background:`var(${it.color})`,borderRadius:7,padding:'9px 10px',color:'#fff',display:'flex',flexDirection:'column',justifyContent:'flex-end',cursor:'pointer',overflow:'hidden',minHeight:0}},
+      h('div',{style:{fontSize:11.5,fontWeight:700}},it.n), h('div',{style:{fontFamily:"Inter,system-ui,sans-serif",fontSize:11}},it.w+'%'))));
+    const tree=h('div',{style:{display:'flex',gap:4,height:230}},col(cA,sA),col(cB,sB));
+    const aiCard=h('div',{style:{background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:12,padding:16}},
+      h('div',{style:{fontSize:13,fontWeight:700,marginBottom:10}},'AI exposure read'),
+      h('div',{style:{display:'flex',gap:18,marginBottom:10}},
+        h('div',null,h('div',{style:{fontSize:11,color:'var(--muted)'}},'Stated AI'),h('div',{style:{fontFamily:"Inter,system-ui,sans-serif",fontSize:24,fontWeight:700}},'15%')),
+        h('div',{style:{alignSelf:'center',color:'var(--muted)'}},'→'),
+        h('div',null,h('div',{style:{fontSize:11,color:'var(--muted)',display:'flex',gap:5,alignItems:'center'}},'Est. economic AI',this.badge('illustrative','synth')),h('div',{style:{fontFamily:"Inter,system-ui,sans-serif",fontSize:24,fontWeight:700,color:'var(--brand)'}},'~28%'))),
+      h('div',{style:{fontSize:11.5,color:'var(--muted)',lineHeight:1.5}},'Assumption: embedded AI revenue across portfolio companies counted at estimated economic weight; treat as directional, not verified.'));
+    return h('div',{style:{display:'grid',gridTemplateColumns:'1.5fr 1fr',gap:14}},
+      this.card({title:'Sector look-through',badge:this.coverageBadge(61),children:tree,caption:'Tile size = sector weight of the 61% of NAV we can see through. Low coverage is the headline — we never imply 100%.'}),
+      this.card({title:'Hidden concentration',children:aiCard,caption:'Your stated AI sleeve understates true exposure once embedded AI inside portfolio companies is counted.'}));
+  }
+
+  /* ---- S7 Performance ---- */
+  s7Body(){
+    const h=this.h;
+    const metrics=[{k:'DPI',you:0.72,peer:0.61,plat:0.55,f:v=>v.toFixed(2)+'x'},{k:'MOIC',you:1.84,peer:1.66,plat:1.58,f:v=>v.toFixed(2)+'x'},{k:'Net IRR',you:17.4,peer:14.1,plat:12.8,f:v=>v.toFixed(1)+'%'}];
+    const series=[['You','--brand'],['Peers','--brand-tint-2'],['Platform','--brand-tint-3']];
+    const groups=h('div',{style:{display:'flex',gap:30,padding:'4px 8px'}}, metrics.map(m=>{
+      const max=Math.max(m.you,m.peer,m.plat)*1.3; const vals=[m.you,m.peer,m.plat];
+      return h('div',{key:m.k,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center'}},
+        h('div',{style:{display:'flex',alignItems:'flex-end',gap:12,height:170,width:'100%',justifyContent:'center'}},
+          vals.map((v,i)=>h('div',{key:i,style:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-end',height:'100%'}},
+            h('div',{style:{width:38,height:(v/max*100)+'%',background:`var(${series[i][1]})`,borderRadius:'6px 6px 0 0',display:'flex',alignItems:'flex-start',justifyContent:'center',paddingTop:5,minHeight:30}},
+              h('span',{style:{fontSize:10.5,fontWeight:700,color:'#fff',fontFamily:"Inter,system-ui,sans-serif",writingMode:'horizontal-tb'}},m.f(v)))))),
+        h('div',{style:{fontSize:13,fontWeight:700,marginTop:10}},m.k));
+    }));
+    const leg=h('div',{style:{display:'flex',gap:16,justifyContent:'center',marginTop:6}}, series.map(([n,c])=>h('div',{key:n,style:{display:'flex',alignItems:'center',gap:6,fontSize:12}},h('span',{style:{width:10,height:10,borderRadius:2,background:`var(${c})`}}),n)));
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:14}},
+      this.card({title:'Performance vs comparable-vintage peers',badge:this.badge('n=41 · ±1.5'),children:h('div',null,groups,leg),
+        caption:'Compared only against funds of similar vintage — your realised DPI and Net IRR lead peers and the platform.'}),
+      h('div',{style:{display:'flex',gap:10,alignItems:'center',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:12,padding:'12px 16px'}},
+        h('span',{style:{fontSize:16}},'⏳'),h('span',{style:{fontSize:12.5,color:'var(--muted)'}},'Your 2024–2025 vintages are ',h('b',{style:{color:'var(--ink)'}},'too early to rank'),' — we suppress those metrics rather than zero-fill them.')));
+  }
+
+  /* ---- S13 Funds ---- */
+  s13Body(){
+    const h=this.h;
+    const FUNDS=[
+      {name:'EQT X',mgr:'EQT Partners',logo:'eqt',hero:'header_06',region:'Europe',strat:'Buyout',badge:['Closes fit','fit'],desc:'Large-cap European buyout from a top-quartile manager — directly addresses your private-credit-adjacent primary gap.',size:'€22.0bn',moic:'2.1x',close:'Sep 2026',min:'€50,000'},
+      {name:'Ares Private Credit Solutions III',mgr:'Ares Management',logo:'ares',hero:'header_03',region:'Global',strat:'Private Credit',badge:['Closes your biggest gap','fit'],desc:'Senior direct lending — the single largest under-weight in your portfolio versus both peers and the model.',size:'€8.0bn',moic:'1.5x',close:'Aug 2026',min:'€50,000'},
+      {name:'General Atlantic Investment Partners',mgr:'General Atlantic',logo:'general-atlantic',hero:'header_01',region:'North America',strat:'Growth',badge:['New','new'],desc:'Global growth equity across technology and consumer — complements your existing AI tilt with later-stage diversification.',size:'€6.5bn',moic:'2.4x',close:'Nov 2026',min:'€75,000'},
+      {name:'Lexington Capital Partners XI',mgr:'Lexington Partners',logo:'lexington-partners',hero:'header_07',region:'Global',strat:'Secondaries',badge:['Shorter J-curve','semi'],desc:'Diversified secondaries — faster distributions and vintage diversification to smooth your 2021–22 bunching.',size:'€22.7bn',moic:'1.7x',close:'Dec 2026',min:'€100,000'}
+    ];
+    const badgeColor={fit:'var(--accent-mint)',new:'#28a05a',semi:'var(--brand-tint-1)'};
+    const stat=(l,v)=>h('div',null,h('div',{style:{fontSize:9.5,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em'}},l),h('div',{style:{fontFamily:"'Source Serif 4',Georgia,serif",fontSize:16,fontWeight:600}},v));
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:14,paddingBottom:8}},
+      h('div',{style:{background:'var(--surface-hero)',borderRadius:14,padding:'22px 26px'}},
+        h('div',{style:{fontFamily:"'Source Serif 4',Georgia,serif",fontSize:26,fontWeight:600,marginBottom:8}},'Curated to close your gaps'),
+        h('div',{style:{fontSize:13.5,color:'var(--ink)',maxWidth:760,lineHeight:1.5}},'Four open opportunities matched to the under-weights on your Overview — private credit and primaries first. Of 5,000+ funds reviewed each year, ~2.9% reach the platform.')),
+      FUNDS.map(f=>h('div',{key:f.name,style:{display:'grid',gridTemplateColumns:'260px 1fr',background:'var(--surface)',border:'1px solid var(--line)',borderRadius:14,overflow:'hidden'}},
+        h('div',{style:{position:'relative',minHeight:200,backgroundImage:`linear-gradient(160deg, rgba(0,0,0,.05), rgba(0,0,0,.55)), url(assets/heroes/${f.hero}.jpg)`,backgroundSize:'cover',backgroundPosition:'center'}},
+          h('div',{style:{position:'absolute',top:12,left:12,display:'flex',gap:6}}, h('span',{style:{padding:'4px 10px',borderRadius:999,fontSize:11,fontWeight:600,color:'#fff',background:badgeColor[f.badge[1]]}},f.badge[0])),
+          h('img',{src:`assets/logos/${f.logo}.png`,alt:f.mgr,style:{position:'absolute',left:14,bottom:14,width:52,height:52,borderRadius:12,background:'#fff',padding:6,objectFit:'contain',boxShadow:'0 2px 10px rgba(0,0,0,.18)'}})),
+        h('div',{style:{padding:'16px 20px',display:'flex',flexDirection:'column',gap:9,minWidth:0}},
+          h('div',{style:{fontSize:11,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.06em'}},f.mgr+' · via Moonfare Feeder SCSp'),
+          h('div',{style:{fontFamily:"'Source Serif 4',Georgia,serif",fontSize:19,fontWeight:600}},f.name),
+          h('div',{style:{fontSize:13,color:'#333',lineHeight:1.45}},f.desc),
+          h('div',{style:{display:'flex',gap:6,flexWrap:'wrap'}}, [f.region,f.strat].map(t=>h('span',{key:t,style:{padding:'4px 10px',border:'1px solid var(--line)',borderRadius:999,fontSize:11,background:'var(--surface)'}},t))),
+          h('div',{style:{display:'flex',gap:26,flexWrap:'wrap',paddingTop:10,marginTop:'auto',borderTop:'1px solid var(--line)'}}, stat('Target Size',f.size),stat('Target Net MOIC',f.moic),stat('Expected Close',f.close),stat('Min. investment',f.min)),
+          h('div',{style:{display:'flex',gap:8,marginTop:2}},
+            h('button',{style:{background:'var(--brand)',color:'#fff',border:'none',borderRadius:8,padding:'9px 16px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},'Contact your sales associate'),
+            h('button',{style:{background:'var(--surface)',color:'var(--brand)',border:'1px solid var(--line)',borderRadius:8,padding:'9px 16px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},'View details'))))));
+  }
+
+  /* ---- placeholder ---- */
+  soonBody(){
+    const h=this.h; const meta=this.SURFACE_META().soon;
+    return h('div',{style:{display:'flex',alignItems:'center',justifyContent:'center',height:'100%',minHeight:300}},
+      h('div',{style:{textAlign:'center',maxWidth:440,padding:30,border:'1px dashed var(--line)',borderRadius:16,background:'var(--surface)'}},
+        h('div',{style:{fontSize:30,marginBottom:12,opacity:.5}},'✦'),
+        h('div',{style:{fontSize:18,fontWeight:800,marginBottom:6}},meta[0]),
+        h('div',{style:{fontSize:13,color:'var(--muted)',lineHeight:1.55}},'This surface inherits the same persistent frame, cohort builder, Ask Alpha and provenance system as Overview. The analytical spine — Allocation, Region, Format, Vintage, Look-through, Performance and Funds — is built; this one is wired next.')));
+  }
+
+  surfaceBody(){
+    const v=this.curPage().view;
+    if(v==='s2') return this.s2Body();
+    if(v==='s3') return this.s3Body();
+    if(v==='s4') return this.s4Body();
+    if(v==='s5') return this.s5Body();
+    if(v==='s6') return this.s6Body();
+    if(v==='s7') return this.s7Body();
+    if(v==='s13') return this.s13Body();
+    if(v==='notconnected') return this.notConnected(this.curPage());
+    if(v==='scaffold'){ const d=this.deepBody(); return d || this.scaffold(); }
+    return this.scaffold();
+  }
+
+  /* ====================== ADVISOR & INTERNAL ====================== */
+  CLIENTS(){ return [
+    {id:'c1',name:'Investor · DE-4471',init:'A',prof:'Family Office',region:'DACH',gap:18,liq:'€2.4m',last:'42d',churn:'high',priority:true,trigger:'Sitting on €2.4m uncalled liquidity with an 18pp gap to model — and not contacted in 6 weeks.'},
+    {id:'c2',name:'Investor · UK-1182',init:'B',prof:'Investor / PE',region:'UK',gap:11,liq:'€0.9m',last:'9d',churn:'low',priority:true,trigger:'Viewed two private-credit funds this week — matches their largest under-weight. Warm.'},
+    {id:'c3',name:'Investor · US-7733',init:'C',prof:'Exec / Owner',region:'US / CA',gap:24,liq:'€5.1m',last:'88d',churn:'high',priority:true,trigger:'Largest gap-to-model in the book and a distribution just landed — strong re-up candidate.'},
+    {id:'c4',name:'Investor · CH-3098',init:'D',prof:'Financial Services',region:'DACH',gap:7,liq:'€0.6m',last:'21d',churn:'med',priority:true,trigger:'Vintage bunching flagged; a secondaries allocation would smooth their J-curve.'},
+    {id:'c5',name:'Investor · FR-5521',init:'E',prof:'Medical',region:'S-Europe',gap:5,liq:'€0.3m',last:'15d',churn:'low',trigger:'On track; no action needed this week.'},
+    {id:'c6',name:'Investor · SG-2240',init:'F',prof:'Consulting',region:'Asia',gap:14,liq:'€1.2m',last:'63d',churn:'med',trigger:'Under-allocated to Asia growth; due a check-in.'},
+    {id:'c7',name:'Investor · DE-8810',init:'G',prof:'Legal',region:'DACH',gap:9,liq:'€0.7m',last:'30d',churn:'low',trigger:'Balanced; monitor.'},
+    {id:'c8',name:'Investor · UK-6627',init:'H',prof:'Eng / Tech',region:'UK',gap:16,liq:'€1.8m',last:'51d',churn:'med',trigger:'Heavy single-manager concentration; suggest diversifying.'}
+  ]; }
+  setFb(id,v){ this.setState({fb:{...this.state.fb,[id]:v}}); }
+  impersonate(c){ this.setState({actingAs:c.name, uc:'t1-5', page:'overview'}); }
+  fbBtns(id){ const h=this.h; const opts=['Helpful','Wrong product','Wrong timing','Wrong context','Client not ready','Compliance','Better action']; const sel=this.state.fb[id];
+    return h('div',{style:{display:'flex',gap:6,flexWrap:'wrap',marginTop:11}}, opts.map(o=>{ const on=sel===o;
+      return h('button',{key:o,onClick:()=>this.setFb(id,o),style:{fontSize:11,padding:'4px 10px',borderRadius:999,border:`1px solid ${on?'var(--brand)':'var(--line)'}`,background:on?'var(--brand)':'var(--surface)',color:on?'#fff':'var(--muted)',cursor:'pointer'}}, (o==='Helpful'&&on?'✓ ':'')+o); })); }
+  churnPill(c){ const h=this.h; const map={high:['--under','High'],med:['--synthetic','Medium'],low:['--over','Low']}[c]; return h('span',{style:{display:'inline-flex',alignItems:'center',gap:5,fontSize:11,fontWeight:600,color:`var(${map[0]})`}}, h('span',{style:{width:7,height:7,borderRadius:'50%',background:`var(${map[0]})`}}), map[1]); }
+  advisorBody(){
+    const h=this.h; const CL=this.CLIENTS(); const queue=CL.filter(c=>c.priority);
+    const initAv=(c)=>h('div',{style:{width:36,height:36,flex:'0 0 36px',borderRadius:'50%',background:'var(--brand-wash)',color:'var(--brand)',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:this.SF,fontWeight:700}},c.init);
+    const stat=(l,v,col)=>h('div',null,h('div',{style:{fontSize:10,color:'var(--muted)'}},l),h('div',{style:{fontFamily:this.SF,fontSize:14,fontWeight:600,color:col||'var(--ink)'}},v));
+    const qRow=(c)=>h('div',{key:c.id,style:{display:'flex',gap:14,alignItems:'flex-start',background:'var(--surface)',border:'1px solid var(--line)',borderRadius:12,padding:'15px 16px'}},
+      initAv(c),
+      h('div',{style:{flex:1,minWidth:0}},
+        h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:3,flexWrap:'wrap'}},
+          h('span',{style:{fontFamily:this.SF,fontSize:15,fontWeight:600}},c.name),
+          h('span',{style:{fontSize:11,color:'var(--muted)',background:'var(--surface-2)',border:'1px solid var(--line)',padding:'2px 8px',borderRadius:999}},c.prof),
+          h('span',{style:{fontSize:11,color:'var(--muted)',background:'var(--surface-2)',border:'1px solid var(--line)',padding:'2px 8px',borderRadius:999}},c.region)),
+        h('div',{style:{fontSize:13,color:'var(--ink)',lineHeight:1.5,marginBottom:10}},h('b',{style:{color:'var(--brand)'}},'Why now: '),c.trigger),
+        h('div',{style:{display:'flex',gap:26,flexWrap:'wrap'}}, stat('Gap to model',c.gap+'pp','var(--under)'), stat('Liquidity headroom',c.liq), stat('Last contact',c.last+' ago'), h('div',null,h('div',{style:{fontSize:10,color:'var(--muted)'}},'Churn risk'),this.churnPill(c.churn))),
+        this.fbBtns(c.id)),
+      h('button',{onClick:()=>this.impersonate(c),style:{flex:'0 0 auto',alignSelf:'center',background:'var(--brand)',color:'#fff',border:'none',borderRadius:9,padding:'9px 15px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},'Open copilot →'));
+    const th=(t)=>h('th',{style:{textAlign:'left',padding:'9px 10px',fontSize:10.5,textTransform:'uppercase',letterSpacing:'.04em',color:'var(--muted)',borderBottom:'2px solid var(--line)'}},t);
+    const td=(c2)=>h('td',{style:{padding:'10px',borderBottom:'1px solid var(--line)',fontSize:12.5}},c2);
+    const book=h('table',{style:{width:'100%',borderCollapse:'collapse',background:'var(--surface)',border:'1px solid var(--line)',borderRadius:12,overflow:'hidden'}},
+      h('thead',null,h('tr',null,th('Client'),th('Profile'),th('Gap'),th('Liquidity'),th('Last contact'),th('Churn'),th(''))),
+      h('tbody',null,CL.map(c=>h('tr',{key:c.id,style:{cursor:'pointer'},onClick:()=>this.impersonate(c)},
+        td(h('span',{style:{display:'flex',alignItems:'center',gap:9}},initAv(c),h('span',{style:{fontFamily:this.SF,fontWeight:600}},c.name))),
+        td(c.prof+' · '+c.region),
+        td(h('span',{style:{fontFamily:this.SF,fontWeight:600,color: c.gap>=15?'var(--under)':'var(--ink)'}},c.gap+'pp')),
+        td(h('span',{style:{fontFamily:this.SF}},c.liq)),
+        td(c.last+' ago'),
+        td(this.churnPill(c.churn)),
+        td(h('span',{style:{color:'var(--brand)',fontWeight:600}},'Open →'))))));
+    return h('div',{style:{maxWidth:1080,margin:'0 auto',padding:'22px 24px 40px'}},
+      h('div',{style:{marginBottom:18}},
+        h('div',{style:{fontSize:10.5,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Advisor · Relationship Manager — 8 clients'),
+        h('div',{style:{fontFamily:this.SF,fontSize:26,fontWeight:600,margin:'3px 0 2px'}},'Who to call this week — and why'),
+        h('div',{style:{fontSize:12.5,color:'var(--muted)'}},'Prioritised by gap-to-model, liquidity headroom and churn risk. Click any client to open their copilot (impersonation is audit-logged).')),
+      h('div',{style:{display:'flex',flexDirection:'column',gap:12,marginBottom:26}}, queue.map(qRow)),
+      h('div',{style:{fontFamily:this.SF,fontSize:18,fontWeight:600,marginBottom:10}},'Full book'),
+      book);
+  }
+  ncPanel(title,sub){ const h=this.h; return h('div',{style:{border:'2px dashed var(--line)',borderRadius:14,background:'var(--surface)',padding:'26px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',minHeight:200}},
+    h('div',{style:{width:42,height:42,borderRadius:11,border:'2px dashed var(--muted)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--muted)',fontSize:18,marginBottom:12}},'⛌'),
+    h('div',{style:{fontFamily:this.SF,fontSize:15,fontWeight:600,marginBottom:6}},title),
+    h('div',{style:{fontSize:12,color:'var(--muted)',lineHeight:1.5,maxWidth:320}},sub)); }
+  internalBody(){
+    const h=this.h;
+    return h('div',{style:{maxWidth:1080,margin:'0 auto',padding:'22px 24px 40px'}},
+      h('div',{style:{marginBottom:18}},
+        h('div',{style:{fontSize:10.5,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Internal · Moonfare — aggregate only'),
+        h('div',{style:{fontFamily:this.SF,fontSize:26,fontWeight:600,margin:'3px 0 2px'}},'Firm-level intelligence'),
+        h('div',{style:{fontSize:12.5,color:'var(--muted)'}},'Aggregate consoles for sales, product and IC — never per-identifiable client.')),
+      h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}},
+        this.card({title:'Cohort allocation trend (last 6 quarters)',children:this.groupedBars(['Q1','Q2','Q3','Q4','Q1','Q2'],[{name:'Private credit %',color:'--data-4',vals:[8,9,11,12,13,15]},{name:'Secondaries %',color:'--data-7',vals:[5,5,6,7,8,9]}]),caption:'Platform-wide drift toward private credit and secondaries — aggregate across all investors.'}),
+        this.card({title:'Manager-pattern intelligence',children:this.groupedBars(['Software','Health','Industrials','Energy','Consumer'],[{name:'Top-manager focus',color:'--data-1',vals:[9,6,4,3,2]}]),caption:'Where top-ranked managers concentrate — aggregated from the manager universe.'}),
+        h('div',null,this.ncPanel('Investor sentiment heatmap','Live when the advisory-transcript & intent feed connects.')),
+        h('div',null,this.ncPanel('Platform demand board','Live when the subscription & fill-rate feed connects.'))));
+  }
+
+  /* ---------- captions / badges ---------- */
+  renderVals(){
+    const h=this.h; const s=this.state; const co=this.cohort(); const pd=this.peerData();
+    const cmpName=c=>c==='platform'?'Platform':c==='model'?'the Model':c==='you'?'You':'Peers';
+    // BL caption
+    const blCap = {
+      peers:'Your buyout-heavy mix leans further into AI than your peers and lighter on private credit.',
+      platform:'Compared with the whole platform, your mix concentrates more in growth and AI.',
+      model:'Versus the recommended model for your risk profile, you over-index AI and under-index private credit.',
+      you:'Pick a comparison to see how your mix differs.'
+    }[s.cmp];
+    // BR caption
+    const zr=this.zDeltas(s.cmp);
+    const ai=zr.find(r=>r.k==='ai'), cr=zr.find(r=>r.k==='credit');
+    const brCap = s.demoState==='cold'
+      ? 'You hold no funds yet — we\u2019ll surface your over/under-weights once you do.'
+      : (s.cmp==='model'
+        ? `Versus the model, your biggest gap is private credit (${cr.delta}pp). Click a bar to drill in.`
+        : `You\u2019re ${ai.delta>0?'+':''}${ai.delta}pp overweight AI and ${cr.delta}pp underweight private credit versus ${cmpName(s.cmp).toLowerCase()} — click a bar to see the funds behind it.`);
+    // TR caption
+    const peerFill=Math.round(this.PM.you/pd.target*100), modelFill=Math.round(this.PM.you/18*100);
+    const trCap = s.demoState==='cold'
+      ? 'You haven\u2019t started yet — that\u2019s 20% of headroom to your target, not a gap to apologise for.'
+      : `You\u2019ve filled ${peerFill}% of your peers\u2019 target and ${modelFill}% of the model\u2019s — you still have headroom to your own 20% target.`;
+    // TL caption
+    const tlCap = s.demoState==='cold'
+      ? 'Your portfolio will appear here. Peers hold a median 9% of wealth in private markets; the model suggests 18%.'
+      : `You hold 16% of your wealth in private markets — above the ${Math.round(pd.median)}% peer median, below the 18% model. That puts you in the top 18% of all investors.`;
+
+    const confN = co.relaxed? co.n : pd.c.n;
+    const blBadge = s.cmp==='model'? this.badge('illustrative model','synth') : s.cmp==='platform'? this.badge('n = 2,000') : this.badge(`n = ${confN} · ±1.5`);
+    const brBadge = s.cmp==='model'? this.badge('illustrative model','synth') : this.badge(`n = ${confN} · ±1.5`);
+
+    return {
+      theme:s.theme,
+      cohortOpen:s.cohortOpen, cohortClosed:!s.cohortOpen,
+      synthChipWealth: h('span',{style:{fontSize:8,color:'var(--synthetic)',background:'var(--synthetic-wash)',padding:'1px 4px',borderRadius:3}},'illus.'),
+      synthChipTarget: h('span',{style:{fontSize:8,color:'var(--synthetic)',background:'var(--synthetic-wash)',padding:'1px 4px',borderRadius:3}},'illus.'),
+      riskToggle:this.riskToggle(), horizonToggle:this.horizonToggle(),
+      themeToggle:this.themeToggle(), modeMenu:this.modeMenu(),
+      ucNav:this.ucNav(), pageTabs:this.pageTabs(), cohortPanel:this.cohortPanel(),
+      stageEyebrow: (()=>{ const u=this.curUC(); const tier=this.UC().find(t=>t.tier===u.tier); const idx=tier.items.findIndex(x=>x.id===u.id)+1; return `${tier.label} · ${u.tier}.${idx}`; })(),
+      stageTitle:this.curUC().title, stageSubtitle:this.curUC().meta,
+      showOverview: this.curPage().view==='overview', showOther: this.curPage().view!=='overview', surfaceBody:this.surfaceBody(),
+      cohortLabel: this.PRESETS[s.preset].label,
+      welcome:s.welcome, enterApp:()=>this.setState({welcome:false}),
+      actingAs:s.actingAs, exitImpersonate:()=>this.setState({actingAs:null}),
+      advisorView: s.mode==='Advisor' && !s.actingAs, internalView: s.mode==='Internal' && !s.actingAs,
+      advisorBody:this.advisorBody(), internalBody:this.internalBody(),
+      nDisplay: co.gated? '—' : co.n, totalDisplay:'5,500',
+      stateSwitcher:this.stateSwitcher(),
+      // banners
+      showRelax: co.relaxed && !co.gated, relaxText:'Broadened to investors in your wealth & risk band.',
+      showError: s.demoState==='error',
+      showDeepLink: !!s.deepLink, deepLinkText: s.deepLink? `${s.deepLink.strat} · vs ${cmpName(s.deepLink.cmp)} · ${s.deepLink.delta>0?'+':''}${s.deepLink.delta}pp` : '',
+      clearDeepLink:()=>this.setState({deepLink:null}),
+      // TL
+      showRank: s.demoState!=='cold', rankLabel:this.PM.rank,
+      openRankPop:e=>this.openPop(e,{title:'Allocation rank',value:`Ranked ${this.PM.rankPos} of ${this.PM.rankOf} investors by private-markets allocation — Top 18%.`,method:'rank over all N investors by %wealth in PM',cohort:'All investors',n:this.PM.rankOf}),
+      tlBadge:this.badge(`n = ${pd.c.n} · ±1.5`), tlSynth:this.badge('illustrative','synth'),
+      tlChart:this.tlChart(), tlCaption:tlCap, openTlData:()=>this.setState({dataModal:'tl'}),
+      // TR
+      trBadge:this.badge(`n = ${pd.c.n} · ±1.5`), trChart:this.trChart(), trCaption:trCap, openTrData:()=>this.setState({dataModal:'tr'}),
+      // BL
+      blBadge, blSelector:this.seg([{label:'Peers',value:'peers'},{label:'Platform',value:'platform'},{label:'Model',value:'model'}], s.cmp, v=>this.setState({cmp:v}),{sm:true}),
+      blChart:this.blChart(), blCaption:blCap,
+      // BR
+      brTitle:`Over / Under-weight vs ${cmpName(s.cmp)}`, brBadge,
+      brSelector:null,
+      brChart:this.brChart(), brCaption:brCap, openBrData:()=>this.setState({dataModal:'br'}),
+      snapshotId:this.snapshotId(),
+      exportPdf:()=>window.print(),
+      toggleCohort:()=>this.setState({cohortOpen:!s.cohortOpen}),
+      // ask alpha
+      askAlpha:this.askAlpha(),
+      // popover
+      pop:s.pop, popX:s.popX, popY:s.popY, closePop:()=>this.setState({pop:null}),
+      popTitle:s.pop&&s.pop.title, popValue:s.pop&&s.pop.value, popMethod:s.pop&&s.pop.method, popCohort:s.pop&&s.pop.cohort, popN:s.pop&&s.pop.n,
+      // data modal
+      dataModal:s.dataModal, dataTitle: s.dataModal==='tl'?'Private Markets Allocation — data': s.dataModal==='tr'?'Fill Rate — data':'Over / Under-weight — data',
+      dataTable:this.dataTable(), closeDataModal:()=>this.setState({dataModal:null}), stop:e=>e.stopPropagation()
+    };
+  }
+}
+</script>
+</body>
+</html>

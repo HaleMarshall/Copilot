@@ -1,0 +1,697 @@
+Moonfare AI Copilot Use Cases
+Framing
+The goal is not to build dozens of isolated AI features.
+The goal is to build a private markets operating system that helps an investor:
+construct a portfolio
+compare it to meaningful benchmarks
+understand what is happening inside it
+forecast what is likely to happen next
+identify the best next specific action
+evaluate named opportunities
+compare herself/himself with peers
+learn from past decisions
+use Moonfare’s internal market, demand, and investor-intelligence data
+The key reason Moonfare can do this in a differentiated way is that the underlying data is dense and proprietary:
+Core proprietary Moonfare data
+investor profile, investment targets, risk appetite, profession, geography, family/life-stage, age, wealth bucket
+investor holdings, commitments, ticket sizes, transaction history, vintage activity
+fund performance, NAV, calls, distributions, deployment and exit histories
+private fund portfolio company data and direct investment look-through
+PPMs, LPAs, DD materials, IC materials, recommendation logic
+platform demand, oversubscription, fill rates, allocation outcomes
+internal secondary market liquidity and pricing histories
+sales and advisory call transcripts, investor questions, sentiment, intent signals
+Moonfare model portfolios and advisory frameworks
+historical Moonfare opportunities the investor did or did not invest in
+Most important external data
+macro indicators: GDP, inflation, rates, energy, credit spreads, FX
+market, news, and thematic developments
+Moonfare model portfolios
+Moonfare macro view
+Tier 1 — Signature / Moat Use Cases
+These are the strongest applications because they combine:
+highest customer value
+deepest proprietary data moat
+strongest strategic relevance
+1. Private Markets Allocation Architect
+Meta use case
+Design the investor’s optimal long-term private markets architecture across strategies, number of funds, core/satellite structure, and role in customer’s total asset allocation.
+More detailed sub-use cases
+Total PM allocation recommendation – this depends on customer’s risk appetite and investment targets
+Strategy mix recommendation, e.g. buy-out, secondaries, infra, co-investments, directs
+Number of total funds recommendation (portfolio of x funds tob e build over time)
+Example insights / user questions
+How much of my overall wealth should be in private markets?
+How many funds should I own over five years?
+What should be core exposure and what should be satellite?
+How should someone with my investment targets structure PM exposure?
+How would my portfolio look like if I were willing to take more risk?
+How should my architecture differ from that of a single family office?
+Key proprietary Moonfare data
+investor overall asset allocation
+PM portfolio and historical behavior
+investor target allocation and liquidity preferences
+Moonfare model portfolios for different risk classes
+historical outcomes across similar clients
+fund performance and cash-flow histories
+2. Next Best Action Engine
+Meta use case
+Tell the investor what to do next, including recommending a specific named fund, direct investment, secondary opportunity, selling over the secondary market or no action at all.
+More detailed sub-use cases
+Recommend a specific current Moonfare opportunity by name
+Recommend a specific fund versus another named fund
+Recommend a specific current fund versus waiting for future expected opportunities on Moonfare
+Recommend a specific current fund versus a similar fund the investor passed on in the past
+Recommend primaries vs secondaries
+Recommend invest now vs wait
+Recommend buy vs rebalance, i.e. sell over the seondary market
+Recommend “do nothing” when appropriate
+Recommend ticket size for the next action
+Recommend order of actions if there are multiple
+Example insights / user questions
+What should I do next in my private markets portfolio?
+What is the best current Moonfare opportunity for me right now?
+Should I invest in Fund X now, or wait for something better likely to come to the platform?
+Compare Fund X against the similar funds I did not draw in the past.
+Should I invest in this named fund, buy a secondary, or do nothing?
+Which opportunity best fits my current portfolio gap?
+Shall I rebalance my portfolio and sell over the secondary market?
+Key proprietary Moonfare data
+investor holdings and transaction history
+investor profile, risk appetite, liquidity preference, target allocation
+model portfolio logic
+historical decision patterns
+current Moonfare offering set
+expected future pipeline visibility where internally available
+internal demand and allocation pressure
+internal secondary market data
+historical passed-on opportunities
+IC recommendations and suitability logic
+PPMs, LPAs, DD materials, portfolio company data
+Most important external data
+current market and news context
+3. Explainable Investment Recommendation Engine
+Meta use case
+Make Moonfare’s recommendation logic transparent, specific, and explainable.
+More detailed sub-use cases
+Top 5 reasons why Moonfare recommends a named fund
+Top 5 reasons why Moonfare recommends a named direct investment
+Why this strategy now
+Why this manager
+Why this team
+Why this fund versus other comparable current funds
+Why this fund versus future expected opportunities
+Why this fund versus past opportunities the investor passed on
+Why it fits this investor
+What risks Moonfare sees
+Who should not invest
+How it compares with alternatives
+Example insights / user questions
+Why is Moonfare recommending Fund X?
+Why Fund X rather than Fund Y?
+Why invest in this direct rather than wait for something else?
+Why does this fit me, given what I already own?
+What would make Moonfare not recommend this fund?
+Key proprietary Moonfare data
+IC memos and logic
+DD materials
+manager evaluations
+PPMs, LPAs, investment docs
+suitability framework
+current and historical named opportunities
+fund performance and portfolio company data
+4. Commitment Pacing Planner
+Meta use case
+Recommend how the investor should spread commitments over time by year, vintage, strategy, and ticket size to achieve maximum diversification
+More detailed sub-use cases
+3-year overall pacing plan
+5-year overall pacing plan
+Vintage diversification planner, with recommendation to overweight or underweight vintages
+Commitment pacing by strategy (how much much to deploy by when)?
+Total annual commitment recommendation
+Ticket size pacing
+How many commitments per year
+How to smooth J-curve
+How to avoid bunching exposure into a single year
+Example insights / user questions
+How should I spread commitments over the next 3–5 years?
+Am I too concentrated in the 2025/2026 vintages?
+How many new commitments should I make next year?
+Should I use secondaries to accelerate portfolio build-out?
+How do best performers pace compared with me?
+Key proprietary Moonfare data
+investor commitment history
+historical pacing patterns across clients
+fund lifecycle and deployment patterns
+Most important external data
+vintage environment context; when do overweight/underweight – house view!
+5. Multi-Layer Peer Benchmarking
+Meta use case
+Compare the investor to multiple meaningful peer groups, not one generic benchmark.
+More detailed sub-use cases
+Cohort benchmark
+same age
+similar life situation, family structure / children
+similar wealth bucket
+same investment targets
+Risk benchmark
+same risk appetite
+similar illiquidity tolerance
+Cohort + risk benchmark
+Profession benchmark
+same profession
+adjacent profession
+Regional benchmark
+Germany vs UK vs US vs Singapore etc.
+Overall asset allocation comparison
+Private markets allocation comparison
+Strategy mix comparison
+Vintage and pacing comparison
+Ticket size and number-of-investments comparison
+Current investment mode comparison (in buying or in selling mode)
+Example insights / user questions
+How do people like me invest?
+How do people in my profession invest?
+How do people who are at my life stage invest?
+Do US investors with my profile allocate more to private markets?
+Do people in my wealth bucket take more risk than I do?
+Are peers in my cohort currently in buying or wait and see mode?
+Key proprietary Moonfare data
+investor demographics and profile
+profession, region, family/life-stage segmentation
+wealth bucket
+asset allocation
+investment targets
+risk classification
+holdings, commitments, ticket sizes, transaction history
+6. Excellence Benchmarking
+Meta use case
+Compare the investor to excellence groups that are not “people like me,” but “people I can learn from.”
+More detailed sub-use cases
+Best performers benchmark (investors on the Moonfare platform with an outstanding track record)
+Most competent investors benchmark, e.g. PE professionals or top angel benchmark for direct investments
+Single family office benchmark
+Institutional-style benchmark, e.g. semi-instituions, endowments
+What do the best performers do differently?
+What do competent investors do differently?
+How do family offices differ in pacing, ticketing, and diversification?
+What do PE professionals ask that others do not?
+Example insights / user questions
+How do the best-performing investors build their portfolios?
+How do PE professionals allocate differently from my cohort?
+How do family offices pace commitments?
+Are competent investors more diversified by vintage?
+What do the strongest investors do that I do not?
+Key proprietary Moonfare data
+investor-level outcomes
+segmentation by profession / competence / investor type
+portfolio construction patterns
+long-term transaction and pacing histories
+question / diligence behavior
+7. Cash-flow, Liquidity &amp; Commitment Intelligence
+Meta use case
+Help the investor understand cash flows, capital calls, future distributions, overcommitment risk, liquidity pressure, and investable capacity.
+More detailed sub-use cases
+Capital call forecast
+Distribution forecast
+Overcommitment risk
+Liquidity stress view
+Investable capacity estimate
+Should I commit more right now?
+How much illiquidity do I already carry?
+How much dry powder / future commitment space do I still have?
+How do secondaries or semi-liquid strategies change my liquidity profile?
+Example insights / user questions
+Can I safely make another commitment?
+What calls and distributions should I expect over the next 24 months?
+How illiquid is my PM book in practice?
+Would adding this fund create too much pressure on future calls?
+Should I add more semi-liquids or secondaries to stabilize cash flows?
+Key proprietary Moonfare data
+investor commitments and holdings
+fund cash-flow histories and forecast
+deployment and distribution stage
+investor liquidity preferences
+historical client cash-flow patterns
+8. Fund Selection &amp; Fund-vs-Fund Comparison
+Meta use case
+Support investor choice between named opportunities with richer PM intelligence than a generic screener.
+More detailed sub-use cases
+Fund A vs Fund B
+Current named fund vs another current Moonfare fund
+Current named fund vs historical fund you passed on
+Current named fund vs future likely comparable fund
+Performance comparison
+Fee and term comparison
+Document-based strategy comparison
+Sector and geography comparison
+Consistency comparison
+Deployment and lifecycle comparison
+Team comparison / Team changes since last fund (key men only)
+Example insights / user questions
+Compare Fund X with Fund Y.
+Compare Fund X with similar funds I did not invest in before.
+Which one has the more robust team and strategy?
+Which buy-out fund in the Moonfare platform has the most attractive fees?
+Key proprietary Moonfare data
+performance histories
+fee / term data
+portfolio company data
+DD materials, PPMs, LPAs
+internal manager assessments
+current and historical named opportunities
+9. Portfolio Look-Through &amp; Concentration Radar
+Meta use case
+Reveal hidden concentration and real underlying exposure underneath the fund layer.
+More detailed sub-use cases
+Sector concentration
+Geography concentration
+Currency concentration
+Manager concentration
+Vintage concentration
+Company overlap detection
+Theme exposure
+Look-through hidden bets
+Compare my exposure vs peers / best performers / model portfolio
+Example insights / user questions
+Am I more concentrated than I think?
+Do I have too much indirect software exposure?
+Where do multiple funds overlap underneath?
+How does my look-through exposure compare to that of PE professionals?
+In which AI companies am I indirectly invested?
+Key proprietary Moonfare data
+portfolio company look-through data
+investor holdings
+fund metadata
+direct investment data
+Most important external data
+classification frameworks for portfolio companies
+10. Investor Sentiment &amp; Intent Intelligence
+Meta use case
+Track what investors are thinking, worrying about, and preparing to do before they act.
+More detailed sub-use cases
+Buying mode vs waiting mode vs selling mode
+Top question dashboard
+Concern heatmap
+Sentiment by region
+Sentiment by risk group
+Sentiment by profession
+Sentiment by competence group
+Reallocation intent
+Liquidity-seeking vs opportunity-seeking
+Early warning demand signals
+What themes or worries dominate the conversation now?
+Example insights / user questions
+Are investors currently leaning in or pulling back?
+What concerns dominate client conversations right now?
+Are people planning to shift toward semi-liquids or secondaries?
+How is sentiment among PE professionals different from general HNWI clients?
+Are my peers in Germany more cautious than similar investors in the US?
+Key proprietary Moonfare data
+sales and advisory call transcripts
+question logs
+browsing and engagement behavior
+transaction intent signals
+secondary market interest
+investor segmentation
+Most important external data
+market and macro news context
+11. Opportunity Gap / Missed Opportunity Analysis
+Meta use case
+Show which good opportunities the investor plausibly should have done, but did not.
+More detailed sub-use cases
+Best missed opportunities
+Missed opportunities that matched my strategy
+Missed opportunities that matched my profile
+Missed opportunities that matched my portfolio gap
+Missed opportunities by vintage
+Missed opportunities by strategy
+What would have changed if I had invested?
+Pattern of missed opportunities
+Current opportunity that resembles a past missed winner
+Example insights / user questions
+Which Moonfare investments fit me well but I passed on?
+Which good opportunities did I miss in secondaries, US growth, buyout, infrastructure?
+What pattern explains my missed opportunities?
+Did I systematically underinvest in a strategy that suited me?
+Does Fund X resemble opportunities I passed on before that later performed well?
+Key proprietary Moonfare data
+historical offering history
+investor profile and portfolio at time of offer
+investor viewing / engagement / non-investment history
+ex post performance of passed-on opportunities
+named opportunity history
+12. Performance Attribution &amp; Yearly &amp; Quarterly Review
+Meta use case
+Explain what drove the portfolio over a quarter or over time.
+More detailed sub-use cases
+Quarterly and yearly performance review
+Overall performance
+Performance against public benchmarks
+Top contributors / detractors
+NAV growth attribution
+Distribution attribution
+Capital call attribution
+Which funds are still in J-curve
+Which funds are underdelivering compared to peers
+Performance attribution by strategy
+Performance attribution by vintage
+Performance attribution by sector / geography
+Which named funds drove the quarter
+Which funds had strongest capital drawdown vs strongest realization
+Example insights / user questions
+Which funds contributed most this quarter?
+Which funds are still dragging because they are too early?
+Which named funds drove the biggest NAV increase?
+Which strategies contributed most to my PM returns?
+Which funds have called the most capital but not yet delivered much value?
+Key proprietary Moonfare data
+holdings and cash-flow history
+fund-level performance histories
+NAV changes, calls, distributions
+direct investment performance
+portfolio company exposure data
+External data
+Public benchmarks
+13. Forward Portfolio Projection
+Meta use case
+Project what the portfolio is likely to look like in the future under different assumptions.
+More detailed sub-use cases
+Future NAV projection
+J-curve trajectory
+Base case / optimistic / downside scenario
+Projection with current portfolio only
+Projection with a revised pacing plan
+Projection if adding a named fund
+Projection if using more secondaries or semi-liquids
+Example insights / user questions
+What could my portfolio look like in two years?
+What happens if I add Fund X?
+How would a more secondary-heavy plan change my future liquidity?
+When should my distribution profile improve?
+What happens if I keep investing at my current pace?
+Key proprietary Moonfare data
+fund cash-flow histories
+deployment and lifecycle data
+investor commitments and holdings
+strategy- and vintage-specific historical behavior
+fund-level performance histories
+Most important external data
+macro assumptions
+Tier 2 — High-Value / Strongly Defensible Use Cases
+1. Portfolio Completion Engine
+Meta use case
+Identify what is missing from the current portfolio and which specific investments best complete it.
+More detailed sub-use cases
+Missing strategy detection
+Missing vintage detection
+Missing geography
+Missing liquidity / income profile
+Missing defensive ballast
+Best missing pieces by named current fund
+Best missing pieces by type of opportunity
+Best missing pieces relative to model portfolio
+Best missing pieces relative to best performers / professionals / family offices
+Example insights / user questions
+What is the missing piece in my portfolio?
+Which current Moonfare fund best fills that gap?
+What should I add to improve my vintage diversification?
+Am I missing a stabilizing strategy like secondaries or credit?
+Key proprietary Moonfare data
+current portfolio
+model architecture
+current offering inventory
+historical outcomes across similar portfolios
+2. Model Portfolio Benchmarking
+Meta use case
+Compare the investor against Moonfare’s internal reference portfolio architecture.
+More detailed sub-use cases
+Gap to model
+Over- / underweights
+Performance vs model
+Vintage comparison
+Liquidity profile vs model
+Behavior vs model
+What the model would have implied over time
+Which current fund best closes the gap to the model
+Example insights / user questions
+How far am I from the Moonfare model for my risk class?
+Where am I over- or underweight?
+Which current opportunity best reduces the gap?
+How did my portfolio behave relative to the model?
+Key proprietary Moonfare data
+Moonfare model portfolios
+investor portfolio and risk classification
+drift analysis
+Most important external data
+optional long-term assumptions by strategy
+3. Peer Behavior &amp; Activity Benchmarking
+Meta use case
+Compare not only where peers allocate, but how they behave in practice.
+More detailed sub-use cases
+Average ticket size by peer group
+Median ticket size
+Number of investments by peer group
+Investments per vintage / year
+Current investment mode
+Selective buying vs active deployment vs waiting
+Concentration vs diversification
+How profession peers differ
+How best performers differ
+How PE professionals differ
+How family offices differ
+Example insights / user questions
+What is the average ticket size in my cohort?
+How many investments do people like me typically make?
+Are my peers actively investing right now?
+Do PE professionals write larger tickets but do fewer deals?
+Do family offices invest more gradually across vintages?
+Key proprietary Moonfare data
+ticket sizes
+investment counts
+vintage activity
+segment-level activity and intent signals
+peer segmentation
+4. Scenario-Aware Rebalancing Advisor
+Meta use case
+Help investors adjust future commitments under changing goals, drift, or macro assumptions.
+More detailed sub-use cases
+Rebalance toward more defense
+Rebalance toward more growth
+Reblance towards less credit
+Reduce hidden concentration
+Reduce macro sensitivity, shift to more resilient funds
+Reduce inflation exposure
+Adjust future commitments without forced selling
+Rebalance using secondaries
+Rebalance relative to model portfolio
+Rebalance relative to peers or excellence groups
+Example insights / user questions
+How do I become more defensive without selling too much?
+How should I rebalance if I am worried about credit stress?
+What future commitments would improve my resilience?
+Should I use secondaries or new commitments to rebalance?
+Key proprietary Moonfare data
+current exposures
+target allocation and constraints
+holdings and strategy mapping
+portfolio company exposures
+Most important external data
+macro scenario assumptions
+5. Smart Question &amp; Due Diligence Intelligence
+Meta use case
+Democratize better diligence by showing what better investors ask.
+More detailed sub-use cases
+Top questions from your peers
+Top questions from people with your cohort and risk profile
+Top questions from people in your profession
+Top questions from most competent investors
+Top questions from PE professionals
+Top questions from best performers
+Top questons from Moonfare investment team
+Best-practice DD map
+Smart question prompts for your portfolio context
+Questions you should ask before investing in a named fund
+Example insights / user questions
+What are the top 10 questions my peers ask about Fund X?
+What do PE professionals ask that others do not?
+What do the best-performing investors ask before investing?
+What should I ask, given my portfolio and risk profile?
+What questions do competent investors ask that my cohort tends to miss?
+Key proprietary Moonfare data
+transcripts and question logs
+investor segmentation by competence / peer group / profession
+conversation patterns
+historical interaction data
+named opportunity context
+Most important external data
+generally none
+6. Secondary Market Intelligence
+Meta use case
+Turn Moonfare’s internal secondary market into a portfolio construction, liquidity, and sell-decision engine.
+More detailed sub-use cases
+Should I sell this?
+Which positions would likely clear best?
+Which funds historically had strongest demand in secondary windows?
+Which positions are likely to attract the highest buyer interest now?
+Which positions are more likely to clear at narrower discounts?
+Buy-side opportunity identification in secondary windows
+Example insights / user questions
+Which of my positions could I likely sell well through Moonfare’s internal market?
+Which funds were most in demand in prior secondary windows?
+Should I sell Fund X or keep it?
+Which funds are practically most liquid inside Moonfare?
+If I need liquidity, what are my best exit candidates?
+Key proprietary Moonfare data
+internal secondary market transactions
+buyer demand by fund
+time-to-sale history
+realized discounts
+fill rates and unsuccessful placements
+repeat liquidity patterns across windows
+7. Delivery &amp; Consistency Intelligence
+Meta use case
+Measure the quality of return delivery, not just the return level.
+More detailed sub-use cases
+Fund consistency score; deviation from standard return, last 3 funds, last 5 funds
+Distribution stability over years
+Capital call distribution over investment years
+Markup quality – do marks mirror reality outcomes based on past data
+Compare named funds on return plus delivery quality
+Example insights / user questions
+Which funds delivered strongest returns most consistently?
+Which managers are reliable rather than just high-return?
+How does Fund X compare with Fund Y on delivery quality?
+Which managers show the best consistency across vintages?
+Which funds are disciplined across the investment period, i.e. more or less equal investment per year
+Key proprietary Moonfare data
+quarterly performance histories
+NAV paths
+distributions
+multi-vintage manager histories
+fund-level historical data
+8. Fund Lifecycle &amp; Activity Mode
+Meta use case
+Show where a fund or strategy actually stands in its lifecycle and whether it is buying or harvesting.
+More detailed sub-use cases
+Buying mode score
+Selling mode score
+Net deployment ratio
+Underdeployed vs ahead-of-schedule
+How current deployment compares with past years
+How deployment compares relative to total fund size
+Compare named funds on actual deployment / exit behavior
+Example insights / user questions
+Is this fund still in buying mode?
+Are funds in this strategy currently deploying faster than usual?
+Are they harvesting more than usual?
+Is this strategy/investment theme in an investing or selling phase?
+Key proprietary Moonfare data
+called vs committed capital
+distributions
+deployment information
+portfolio company transaction data
+strategy histories
+9. Top Manager Pattern Intelligence
+Meta use case
+Understand what top-ranked managers systematically do differently.
+More detailed sub-use cases
+Shared strategy DNA of top performers
+What top managers avoid
+Industry focus map
+Team blueprint; key men stability
+What top three managers in growth / buyout / infra have in common
+Example insights / user questions
+What do top growth managers consistently focus on?
+What do leading buyout managers avoid?
+What do the top three infra managers have in common?
+Which team structures correlate with top outcomes?
+Are top players in a strategy converging around the same subsegments?
+Key proprietary Moonfare data
+manager performance histories
+portfolio company data
+team and DD data
+strategy tagging
+Most important external data
+broader manager universe context
+Tier 3 — Important Supporting / Trust / Platform Use Cases
+1. Platform Demand &amp; Allocation Intelligence
+Meta use case
+Make visible how demand behaves on Moonfare’s own platform.
+More detailed sub-use cases
+Fund demand heatmap
+Time-to-fill / sell-out predictor
+Oversubscription risk
+Allocation risk
+Demand momentum
+How quickly comparable funds historically filled
+Which strategies and themes are hottest now
+How likely an investor is to get a full allocation in a named fund
+Example insights / user questions
+Which funds are filling fastest right now?
+How likely am I to get a full allocation in Fund X?
+Which strategies are currently in highest demand?
+How quickly did comparable funds sell out in the past?
+Key proprietary Moonfare data
+subscription and allocation requests
+fill-rate histories
+oversubscription histories
+demand velocity
+named opportunity demand
+Most important external data
+fundraising environment context
+2. Personalized Why-Not / Suitability Engine
+Meta use case
+Explain why something attractive may still not be right for this investor now.
+More detailed sub-use cases
+Why not now
+Why not in this portfolio
+Why not at this ticket size
+Why not given current liquidity
+What would need to change
+Suitability and concentration explanation
+Why this named fund is good generally but not right for you
+Why Moonfare would recommend waiting
+Example insights / user questions
+Why is Fund X not right for me right now?
+Is the issue liquidity, concentration, vintage, or strategy fit?
+What would need to change for this to become suitable?
+Why would Moonfare recommend waiting rather than investing now?
+Key proprietary Moonfare data
+risk profile
+liquidity needs
+current holdings
+suitability logic
+named current opportunity data
+Most important external data
+regulatory suitability context
+3. Trend, Regime &amp; Macro Exposure Intelligence
+Meta use case
+Connect the portfolio to macro regimes, thematic shifts, and portfolio resilience.
+More detailed sub-use cases
+Cohort trend intelligence
+Theme momentum dashboard
+Regime shift detector
+Client flow intelligence
+Portfolio offense / defense score
+GDP scenario exposure
+Inflation sensitivity
+Energy price sensitivity
+Hidden macro bet detector
+Resilience score
+Macro exposure comparison vs peers / best performers / family offices
+How investors reacted to recent credit stress
+Example insights / user questions
+Is my portfolio offensively or defensively positioned?
+How exposed am I to GDP slowdown or inflation?
+Are my peers rotating toward AI, defense, or credit?
+What hidden macro bets am I carrying?
+How resilient is my portfolio relative to PE professionals or family offices?
+Key proprietary Moonfare data
+investor allocation trends by cohort
+holdings and company-level exposures
+changes in demand and behavior
+portfolio-level macro factor mapping
+Most important external data
+GDP, inflation, rates, energy, credit spreads
+market and thematic news data

@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Alpha · Moonfare Private Markets Co-Pilot</title>
+<link rel="stylesheet" href="/static/styles.css">
+<script src="/static/chart.umd.min.js"></script>
+<script src="/static/vendor/jspdf.umd.min.js"></script>
+<script src="/static/vendor/html2canvas.min.js"></script>
+</head>
+<body>
+
+<!-- WELCOME -->
+<div id="welcome">
+  <div class="welcome-card">
+    <img src="/static/moonfare_logo.png" alt="Moonfare" class="logo-img" style="height: 26px; margin-bottom: 22px;">
+    <div class="eyebrow" style="margin-bottom: 8px;">Co-Pilot</div>
+    <h1 class="serif" style="font-size: 42px; margin: 0 0 14px 0;">Welcome to Alpha</h1>
+    <p style="font-size: 17px; margin: 0 0 20px 0;">Your AI-augmented Private Markets advisor.</p>
+    <p class="muted" style="line-height: 1.55; margin: 0 0 10px 0;">
+      Live peer-group engine over your investor base —
+      compare against peers, the platform, house-view model portfolios, or Harvard / Yale / Princeton endowments.
+    </p>
+    <p class="muted" style="line-height: 1.55; margin: 0 0 10px 0;">
+      Ask Alpha for context on any chart — answers come from the live database via a logged-in Claude session.
+    </p>
+    <p class="txt-xs muted" style="line-height: 1.5; margin: 0 0 28px 0; padding: 8px 10px; background: var(--mf-warm); border-radius: 8px;">
+      Peer/platform figures are real export data. <b>Modelled, not measured:</b> PM-target %, investable-wealth €,
+      and the model portfolios (a Moonfare house view, unoptimised). Performance uses GP marks; young vintages are
+      not ranked. Informational only — not investment advice.
+    </p>
+    <div class="flex jc-b ai-c">
+      <div class="txt-xs muted">Production build · running on localhost · file-watcher live</div>
+      <button onclick="enterApp()" class="bg-brand r-pill" style="padding: 12px 26px; font-size: 14px;">Enter Alpha →</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div class="app">
+
+  <header class="topbar flex ai-c gap-3 bd-b">
+    <img src="/static/moonfare_logo_white.png" alt="Moonfare" class="logo-img">
+    <span class="txt-sm muted">· Alpha</span>
+    <div style="width: 1px; height: 22px; background: var(--mf-line); margin: 0 6px;"></div>
+    <span class="txt-xs muted">You:</span>
+    <span class="chip" id="chip-name">Dr. Steffen Pauls</span>
+    <span class="chip" id="chip-prof">Exec/Owner</span>
+    <span class="chip" id="chip-age">53</span>
+    <span class="chip" id="chip-wealth">€25M Investable</span>
+    <div class="flex ai-c gap-2" style="margin-left: 6px;">
+      <span class="txt-xs muted">Target %:</span>
+      <input id="targetPct" type="range" min="5" max="100" value="35" oninput="onProfileChange()" style="width: 110px;">
+      <span id="targetPctVal" class="txt-xs semibold" style="white-space:nowrap; margin-right:10px;">35%</span>
+    </div>
+    <div class="flex ai-c gap-2">
+      <span class="txt-xs muted">Risk:</span>
+      <select id="risk" onchange="onProfileChange()" class="hairline r-sm bg-white txt-xs" style="padding: 5px 8px;"></select>
+    </div>
+    <div class="flex ai-c gap-2">
+      <span class="txt-xs muted">Horizon:</span>
+      <select id="horizon" onchange="onProfileChange()" class="hairline r-sm bg-white txt-xs" style="padding: 5px 8px;">
+        <option>1–3y</option><option>3–5y</option><option selected>5–10y</option><option>10y+</option>
+      </select>
+    </div>
+    <div class="ml-a flex ai-c gap-2">
+      <button onclick="rotateInvestor()" class="navbtn" title="Switch to another real investor (identity stays masked) — shows the tool works for any investor">Rotate investor</button>
+      <button onclick="exportPDF()" class="navbtn">PDF ↓</button>
+      <button onclick="refreshDB()" class="navbtn" title="Force refresh of the database from data/ files">↻ DB</button>
+      <div class="avatar avatar-ink" id="userAvatar">SP</div>
+    </div>
+  </header>
+
+  <div class="main">
+
+    <!-- LEFT cohort panel -->
+    <aside id="cohortPanel" class="cohort bd-r scroll-y">
+      <div class="bd-b flex ai-c jc-b" style="padding: 14px 16px;">
+        <div>
+          <div class="eyebrow">Compare against</div>
+          <div class="serif" style="font-size: 17px; margin-top: 4px;">My Peers</div>
+        </div>
+        <button onclick="toggleCohort()" id="collapseBtn" class="muted" style="font-size: 16px;">‹</button>
+      </div>
+      <div class="cohort-body" id="cohortInner">
+        <!-- populated by JS once /api/risk_profiles resolves -->
+      </div>
+    </aside>
+
+    <!-- CENTRE -->
+    <section class="center relative bg-paper">
+      <div class="pagenav flex ai-c bd-b">
+        <div class="tabwrap" id="pageNav">
+          <!-- populated by JS -->
+        </div>
+        <div id="pageBadge" class="ml-a txt-xs muted"></div>
+      </div>
+
+      <div class="pagehead">
+        <div class="eyebrow" id="pageEyebrow">Page 1</div>
+        <h2 class="h2" id="pageTitle" style="margin: 4px 0 4px;">Overview</h2>
+        <p class="txt-sm muted" id="pageSub" style="margin: 0;"></p>
+      </div>
+
+      <div id="grid" class="grid grid-2x2"></div>
+
+      <div id="blockOverlay">
+        <div class="panel">
+          <div class="eyebrow brand" style="margin-bottom: 8px;">Only for paid viewers</div>
+          <div class="serif" style="font-size: 22px; margin-bottom: 10px;">Contact your sales associate</div>
+          <button onclick="loosenCohort()" class="bg-brand r-pill" style="padding: 8px 16px; font-size: 12px;">Loosen filters</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT-SIDE COLLAPSIBLE CHAT -->
+    <aside id="chatPane" class="chat-pane">
+      <div class="chat-head">
+        <span class="collapse-icon" onclick="toggleChat()"></span>
+        <div class="avatar avatar-brand full">α</div>
+        <div class="full">
+          <div class="medium txt-sm">Ask Alpha</div>
+          <div class="txt-xs muted">live · Claude CLI</div>
+        </div>
+      </div>
+      <div id="chatBody" class="chat-body">
+        <div id="chatIntro" class="chat-intro">
+          <div class="chat-intro-avatar">α</div>
+          <div class="chat-intro-title">Ask Alpha anything</div>
+          <div class="chat-intro-sub">Live answers grounded in your real portfolio, your peer group, and the Moonfare house view.</div>
+          <div class="chat-suggest">
+            <button onclick="askAlpha('Why am I underweight Buyout vs my peers?')" class="suggest-card">Why am I underweight Buyout vs my peers?<span class="arr">→</span></button>
+            <button onclick="askAlpha('How does my portfolio compare to the Balanced Compounding model?')" class="suggest-card">How do I compare to the Balanced model?<span class="arr">→</span></button>
+            <button onclick="askAlpha('What open Moonfare funds match my biggest gaps?')" class="suggest-card">Which open funds close my biggest gaps?<span class="arr">→</span></button>
+            <button onclick="askAlpha('Show me my AI exposure including embedded AI inside Growth/Tech.')" class="suggest-card">What is my total AI exposure?<span class="arr">→</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="chat-foot">
+        <input id="chatInput" type="text" placeholder="Ask Alpha…" class="chat-input" onkeydown="if(event.key==='Enter'){askAlpha(this.value); this.value=''}">
+        <button onclick="askAlpha(document.getElementById('chatInput').value); document.getElementById('chatInput').value=''" class="bg-brand r-pill" style="padding: 8px 14px; font-size: 12px;">Send</button>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+<div id="fundModal" class="modal-overlay" onclick="if(event.target===this) closeFundModal()"></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

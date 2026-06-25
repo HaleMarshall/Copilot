@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Moonfare Alpha Co-Pilot — end-to-end user flow (BPMN 2.0)
+  One continuous loop across four verbs. Each verb is a COLLAPSED sub-process:
+  double-click it in any BPMN modeler (Camunda Modeler, bpmn.io, draw.io) to drill
+  into the use cases it contains. Every task carries <documentation> describing the
+  AI involvement and the data it needs. Lanes: Investor (does), Alpha AI (reasons),
+  Moonfare Data (proprietary + external feeds the AI is grounded in).
+-->
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+  id="defs_moonfare_copilot" targetNamespace="http://moonfare.com/alpha">
+
+  <bpmn:collaboration id="Collab_Copilot">
+    <bpmn:participant id="Part_Copilot" name="Moonfare Alpha Co-Pilot" processRef="P_Copilot"/>
+  </bpmn:collaboration>
+
+  <bpmn:process id="P_Copilot" isExecutable="false">
+    <bpmn:laneSet id="Lanes">
+      <bpmn:lane id="Lane_Investor" name="Investor">
+        <bpmn:flowNodeRef>Start</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PG_fork</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>SP_Understand</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>SP_Shape</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>SP_Act</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G3</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>SP_Research</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_AI" name="Alpha AI (reasoning + provenance)">
+        <bpmn:flowNodeRef>AskAlpha</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_ask</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Data" name="Moonfare Data (proprietary + external)"/>
+    </bpmn:laneSet>
+
+    <bpmn:startEvent id="Start" name="Investor opens Alpha">
+      <bpmn:outgoing>f1</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:parallelGateway id="PG_fork" name="">
+      <bpmn:incoming>f1</bpmn:incoming>
+      <bpmn:outgoing>f2</bpmn:outgoing>
+      <bpmn:outgoing>f3</bpmn:outgoing>
+    </bpmn:parallelGateway>
+
+    <!-- ============ VERB 1: UNDERSTAND (Overview) ============ -->
+    <bpmn:subProcess id="SP_Understand" name="UNDERSTAND — Portfolio Overview (where am I?)">
+      <bpmn:documentation>Landing canvas: Performance, Asset Allocation, Cash Flows. Any chart click opens an about-me detail overlay with the funds you hold. Footer bridges to SHAPE.</bpmn:documentation>
+      <bpmn:incoming>f2</bpmn:incoming>
+      <bpmn:outgoing>f4</bpmn:outgoing>
+      <bpmn:startEvent id="u_start"><bpmn:outgoing>uf1</bpmn:outgoing></bpmn:startEvent>
+      <bpmn:task id="uc_home" name="Portfolio Overview (home)">
+        <bpmn:documentation>AI: Ask Alpha context on every figure. Data: holdings, NAV, calls/distributions.</bpmn:documentation>
+        <bpmn:incoming>uf1</bpmn:incoming><bpmn:outgoing>uf2</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t1_12" name="t1-12 Performance Attribution &amp; Review">
+        <bpmn:documentation>Entry: click Performance card. AI: ranks contributors/detractors, narrates the quarter. Data: cash-flow history, fund-level performance, public benchmarks.</bpmn:documentation>
+        <bpmn:incoming>uf2</bpmn:incoming><bpmn:outgoing>uf3</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t1_9" name="t1-9 Portfolio Look-Through &amp; Concentration Radar">
+        <bpmn:documentation>Entry: click Currency/Sector/Region -> overlay -> full breakdown. AI: flags hidden concentration. Data: portfolio-company look-through, fund metadata.</bpmn:documentation>
+        <bpmn:incoming>uf3</bpmn:incoming><bpmn:outgoing>uf4</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t1_7" name="t1-7 Cash-flow, Liquidity &amp; Commitment Intelligence">
+        <bpmn:documentation>Entry: click Cash Flows card. AI: 'can I safely commit?' judgement, call/distribution forecast. Data: commitments, fund cash-flow forecasts, liquidity prefs.</bpmn:documentation>
+        <bpmn:incoming>uf4</bpmn:incoming><bpmn:outgoing>uf5</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t1_10" name="t1-10 Investor Sentiment &amp; Intent (signal-gated)">
+        <bpmn:documentation>State: not-connected until feeds wired. AI: classifies buying/waiting/selling intent. Data: call transcripts, question logs, engagement.</bpmn:documentation>
+        <bpmn:incoming>uf5</bpmn:incoming><bpmn:outgoing>uf6</bpmn:outgoing></bpmn:task>
+      <bpmn:endEvent id="u_end"><bpmn:incoming>uf6</bpmn:incoming></bpmn:endEvent>
+      <bpmn:sequenceFlow id="uf1" sourceRef="u_start" targetRef="uc_home"/>
+      <bpmn:sequenceFlow id="uf2" sourceRef="uc_home" targetRef="uc_t1_12"/>
+      <bpmn:sequenceFlow id="uf3" sourceRef="uc_t1_12" targetRef="uc_t1_9"/>
+      <bpmn:sequenceFlow id="uf4" sourceRef="uc_t1_9" targetRef="uc_t1_7"/>
+      <bpmn:sequenceFlow id="uf5" sourceRef="uc_t1_7" targetRef="uc_t1_10"/>
+      <bpmn:sequenceFlow id="uf6" sourceRef="uc_t1_10" targetRef="u_end"/>
+    </bpmn:subProcess>
+
+    <bpmn:exclusiveGateway id="G1" name="What next?">
+      <bpmn:incoming>f4</bpmn:incoming>
+      <bpmn:outgoing>f5</bpmn:outgoing>
+      <bpmn:outgoing>f6</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- ============ VERB 2: SHAPE (Simulator) ============ -->
+    <bpmn:subProcess id="SP_Shape" name="SHAPE — Simulator (where should I be?)">
+      <bpmn:documentation>Per-dimension rows: current pie -> sliders -> live target pie -> live z-chart (gap). 'Build my target with Alpha' onboards new investors. Each row bridges to ACT via 'Suggest funds'.</bpmn:documentation>
+      <bpmn:incoming>f5</bpmn:incoming>
+      <bpmn:outgoing>f7</bpmn:outgoing>
+      <bpmn:startEvent id="s_start"><bpmn:outgoing>sf1</bpmn:outgoing></bpmn:startEvent>
+      <bpmn:task id="uc_sim" name="Simulator (home) — current vs target, live">
+        <bpmn:documentation>AI: 'Build my target' generates house-view target from risk/horizon answers. Data: current mix, Moonfare model portfolios.</bpmn:documentation>
+        <bpmn:incoming>sf1</bpmn:incoming><bpmn:outgoing>sf2</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t1_1" name="t1-1 PM Allocation Architect">
+        <bpmn:documentation>Entry: Strategy row + AI build-target. AI: proposes optimal architecture (PM%, mix, #funds, core/satellite). Data: total asset allocation, targets, model portfolios.</bpmn:documentation>
+        <bpmn:incoming>sf2</bpmn:incoming><bpmn:outgoing>sf3</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t1_4" name="t1-4 Commitment Pacing Planner">
+        <bpmn:documentation>AI: recommends 3/5y cadence to smooth J-curve, avoid vintage bunching. Data: commitment history, fund lifecycle, house vintage view.</bpmn:documentation>
+        <bpmn:incoming>sf3</bpmn:incoming><bpmn:outgoing>sf4</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t1_5" name="t1-5 Multi-Layer Peer Benchmarking">
+        <bpmn:documentation>Entry: Peer-group lever (cohort builder) drives every chart. AI: builds cohort, computes medians. Data: demographics, profile, holdings.</bpmn:documentation>
+        <bpmn:incoming>sf4</bpmn:incoming><bpmn:outgoing>sf5</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t1_6" name="t1-6 Excellence Benchmarking">
+        <bpmn:documentation>AI: 'what the best do differently' (best performers / PE pros / family offices). Data: segmented investor outcomes &amp; construction patterns.</bpmn:documentation>
+        <bpmn:incoming>sf5</bpmn:incoming><bpmn:outgoing>sf6</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t1_13" name="t1-13 Forward Portfolio Projection">
+        <bpmn:documentation>AI: projects saved target forward (base/optimistic/downside, +fund X). Data: cash-flow histories, lifecycle, macro assumptions.</bpmn:documentation>
+        <bpmn:incoming>sf6</bpmn:incoming><bpmn:outgoing>sf7</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t2_1" name="t2-1 Portfolio Completion Engine">
+        <bpmn:documentation>Entry: z-chart gap -> 'complete this gap'. AI: identifies missing piece + best filler fund. Data: portfolio, model, current inventory.</bpmn:documentation>
+        <bpmn:incoming>sf7</bpmn:incoming><bpmn:outgoing>sf8</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t2_2" name="t2-2 Model Portfolio Benchmarking">
+        <bpmn:documentation>Entry: target-vs-model overlay + 'Target=Model' lever. AI: computes drift &amp; gap. Data: model portfolios, drift analysis.</bpmn:documentation>
+        <bpmn:incoming>sf8</bpmn:incoming><bpmn:outgoing>sf9</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t2_3" name="t2-3 Peer Behaviour &amp; Activity Benchmarking">
+        <bpmn:documentation>AI: compares HOW peers behave (tickets, counts, activity mode). Data: ticket sizes, counts, vintage activity, intent.</bpmn:documentation>
+        <bpmn:incoming>sf9</bpmn:incoming><bpmn:outgoing>sf10</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t2_4" name="t2-4 Scenario-Aware Rebalancing">
+        <bpmn:documentation>Entry: macro overlay lever. AI: rebalance via future commitments, no forced selling. Data: exposures, constraints, macro scenarios.</bpmn:documentation>
+        <bpmn:incoming>sf10</bpmn:incoming><bpmn:outgoing>sf11</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t3_3" name="t3-3 Trend, Regime &amp; Macro Exposure">
+        <bpmn:documentation>Entry: macro/scenario overlay. AI: maps portfolio to macro factors, offence/defence + resilience. Data: allocation trends, company exposures, GDP/inflation/rates/spreads.</bpmn:documentation>
+        <bpmn:incoming>sf11</bpmn:incoming><bpmn:outgoing>sf12</bpmn:outgoing></bpmn:task>
+      <bpmn:endEvent id="s_end"><bpmn:incoming>sf12</bpmn:incoming></bpmn:endEvent>
+      <bpmn:sequenceFlow id="sf1" sourceRef="s_start" targetRef="uc_sim"/>
+      <bpmn:sequenceFlow id="sf2" sourceRef="uc_sim" targetRef="uc_t1_1"/>
+      <bpmn:sequenceFlow id="sf3" sourceRef="uc_t1_1" targetRef="uc_t1_4"/>
+      <bpmn:sequenceFlow id="sf4" sourceRef="uc_t1_4" targetRef="uc_t1_5"/>
+      <bpmn:sequenceFlow id="sf5" sourceRef="uc_t1_5" targetRef="uc_t1_6"/>
+      <bpmn:sequenceFlow id="sf6" sourceRef="uc_t1_6" targetRef="uc_t1_13"/>
+      <bpmn:sequenceFlow id="sf7" sourceRef="uc_t1_13" targetRef="uc_t2_1"/>
+      <bpmn:sequenceFlow id="sf8" sourceRef="uc_t2_1" targetRef="uc_t2_2"/>
+      <bpmn:sequenceFlow id="sf9" sourceRef="uc_t2_2" targetRef="uc_t2_3"/>
+      <bpmn:sequenceFlow id="sf10" sourceRef="uc_t2_3" targetRef="uc_t2_4"/>
+      <bpmn:sequenceFlow id="sf11" sourceRef="uc_t2_4" targetRef="uc_t3_3"/>
+      <bpmn:sequenceFlow id="sf12" sourceRef="uc_t3_3" targetRef="s_end"/>
+    </bpmn:subProcess>
+
+    <!-- ============ VERB 3: ACT (Opportunities) ============ -->
+    <bpmn:subProcess id="SP_Act" name="ACT — Opportunities (so what do I do?)">
+      <bpmn:documentation>Ranked next actions weighted by the investor's priorities. Each action exposes Why-this / Why-not / Compare / Questions panels and bridges to RESEARCH.</bpmn:documentation>
+      <bpmn:incoming>f6</bpmn:incoming>
+      <bpmn:incoming>f7</bpmn:incoming>
+      <bpmn:outgoing>f8</bpmn:outgoing>
+      <bpmn:startEvent id="a_start"><bpmn:outgoing>af1</bpmn:outgoing></bpmn:startEvent>
+      <bpmn:task id="uc_opp" name="Opportunities (home) / Next Best Action">
+        <bpmn:documentation>AI: ranks the single best next action. Data: simulator output, profile, current inventory.</bpmn:documentation>
+        <bpmn:incoming>af1</bpmn:incoming><bpmn:outgoing>af2</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t1_2" name="t1-2 Next Best Action Engine">
+        <bpmn:documentation>AI: invest now/wait, primary vs secondary, buy vs rebalance, do-nothing, ticket size, order. Data: holdings, profile, pipeline, internal demand.</bpmn:documentation>
+        <bpmn:incoming>af2</bpmn:incoming><bpmn:outgoing>af3</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t1_3" name="t1-3 Explainable Recommendation ('Why this?')">
+        <bpmn:documentation>Entry: 'Why this?' on any action. AI: top-5 reasons (strategy/manager/team/fit), risks, who-shouldn't. Data: IC memos, DD, suitability framework.</bpmn:documentation>
+        <bpmn:incoming>af3</bpmn:incoming><bpmn:outgoing>af4</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t3_2" name="t3-2 Why-Not / Suitability">
+        <bpmn:documentation>Entry: 'Why not now?'. AI: explains the negative recommendation (liquidity/concentration/vintage/fit) + what would change. Data: risk profile, liquidity, suitability.</bpmn:documentation>
+        <bpmn:incoming>af4</bpmn:incoming><bpmn:outgoing>af5</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t1_8" name="t1-8 Fund Selection &amp; Fund-vs-Fund">
+        <bpmn:documentation>Entry: 'Compare'. AI: A vs B vs passed-on vs future, fees/terms/team. Data: performance, fees, DD, portfolio-company data.</bpmn:documentation>
+        <bpmn:incoming>af5</bpmn:incoming><bpmn:outgoing>af6</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t1_11" name="t1-11 Opportunity Gap / Missed Opportunity">
+        <bpmn:documentation>Entry: 'What you passed on' lane. AI: finds plausibly-should-have-done + the pattern. Data: offering history, engagement, ex-post performance.</bpmn:documentation>
+        <bpmn:incoming>af6</bpmn:incoming><bpmn:outgoing>af7</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t2_5" name="t2-5 Smart Question &amp; DD Intelligence">
+        <bpmn:documentation>Entry: 'Questions to ask'. AI: surfaces better diligence questions by peer/profession/PE/best/team. Data: transcripts, question logs.</bpmn:documentation>
+        <bpmn:incoming>af7</bpmn:incoming><bpmn:outgoing>af8</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t2_6" name="t2-6 Secondary Market Intelligence (signal-gated)">
+        <bpmn:documentation>Entry: 'Sell instead?' lane. AI: sell-decision + clearing estimate. Data: internal secondary transactions, buyer demand, discounts.</bpmn:documentation>
+        <bpmn:incoming>af8</bpmn:incoming><bpmn:outgoing>af9</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t3_1" name="t3-1 Platform Demand &amp; Allocation (signal-gated)">
+        <bpmn:documentation>Entry: demand badge on opportunity card. AI: predicts fill &amp; allocation likelihood. Data: subscription/fill-rate/oversubscription histories.</bpmn:documentation>
+        <bpmn:incoming>af9</bpmn:incoming><bpmn:outgoing>af10</bpmn:outgoing></bpmn:task>
+      <bpmn:endEvent id="a_end"><bpmn:incoming>af10</bpmn:incoming></bpmn:endEvent>
+      <bpmn:sequenceFlow id="af1" sourceRef="a_start" targetRef="uc_opp"/>
+      <bpmn:sequenceFlow id="af2" sourceRef="uc_opp" targetRef="uc_t1_2"/>
+      <bpmn:sequenceFlow id="af3" sourceRef="uc_t1_2" targetRef="uc_t1_3"/>
+      <bpmn:sequenceFlow id="af4" sourceRef="uc_t1_3" targetRef="uc_t3_2"/>
+      <bpmn:sequenceFlow id="af5" sourceRef="uc_t3_2" targetRef="uc_t1_8"/>
+      <bpmn:sequenceFlow id="af6" sourceRef="uc_t1_8" targetRef="uc_t1_11"/>
+      <bpmn:sequenceFlow id="af7" sourceRef="uc_t1_11" targetRef="uc_t2_5"/>
+      <bpmn:sequenceFlow id="af8" sourceRef="uc_t2_5" targetRef="uc_t2_6"/>
+      <bpmn:sequenceFlow id="af9" sourceRef="uc_t2_6" targetRef="uc_t3_1"/>
+      <bpmn:sequenceFlow id="af10" sourceRef="uc_t3_1" targetRef="a_end"/>
+    </bpmn:subProcess>
+
+    <bpmn:exclusiveGateway id="G3" name="Research a fund?">
+      <bpmn:incoming>f8</bpmn:incoming>
+      <bpmn:outgoing>f9</bpmn:outgoing>
+      <bpmn:outgoing>f10</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- ============ VERB 4: RESEARCH (Funds &amp; Managers) ============ -->
+    <bpmn:subProcess id="SP_Research" name="RESEARCH — Funds &amp; Managers (one fund deeply)">
+      <bpmn:documentation>One fund/manager in depth. Reached from any opportunity via 'Open fund'. Tabs: delivery quality, lifecycle, manager patterns.</bpmn:documentation>
+      <bpmn:incoming>f9</bpmn:incoming>
+      <bpmn:outgoing>f11</bpmn:outgoing>
+      <bpmn:startEvent id="r_start"><bpmn:outgoing>rf1</bpmn:outgoing></bpmn:startEvent>
+      <bpmn:task id="uc_t2_7" name="t2-7 Delivery &amp; Consistency">
+        <bpmn:documentation>AI: scores delivery quality (consistency, distribution stability, mark-up realism) vs return level. Data: quarterly histories, NAV paths, distributions.</bpmn:documentation>
+        <bpmn:incoming>rf1</bpmn:incoming><bpmn:outgoing>rf2</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t2_8" name="t2-8 Fund Lifecycle &amp; Activity Mode">
+        <bpmn:documentation>AI: classifies buying vs harvesting, net deployment vs schedule/size. Data: called vs committed, distributions, deployment.</bpmn:documentation>
+        <bpmn:incoming>rf2</bpmn:incoming><bpmn:outgoing>rf3</bpmn:outgoing></bpmn:task>
+      <bpmn:task id="uc_t2_9" name="t2-9 Top Manager Pattern Intelligence">
+        <bpmn:documentation>AI: extracts top-manager patterns (shared DNA, what they avoid, team blueprint). Data: manager histories, portfolio-company data, team/DD.</bpmn:documentation>
+        <bpmn:incoming>rf3</bpmn:incoming><bpmn:outgoing>rf4</bpmn:outgoing></bpmn:task>
+      <bpmn:endEvent id="r_end"><bpmn:incoming>rf4</bpmn:incoming></bpmn:endEvent>
+      <bpmn:sequenceFlow id="rf1" sourceRef="r_start" targetRef="uc_t2_7"/>
+      <bpmn:sequenceFlow id="rf2" sourceRef="uc_t2_7" targetRef="uc_t2_8"/>
+      <bpmn:sequenceFlow id="rf3" sourceRef="uc_t2_8" targetRef="uc_t2_9"/>
+      <bpmn:sequenceFlow id="rf4" sourceRef="uc_t2_9" targetRef="r_end"/>
+    </bpmn:subProcess>
+
+    <bpmn:endEvent id="End" name="Decision taken / portfolio updated">
+      <bpmn:incoming>f10</bpmn:incoming>
+      <bpmn:incoming>f11</bpmn:incoming>
+      <bpmn:incoming>f14</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- ============ Always-on assistant lane ============ -->
+    <bpmn:task id="AskAlpha" name="Ask Alpha (NL router to any use case)">
+      <bpmn:documentation>Omnipresent left rail. Resolves a natural-language question to the right panel in any verb (homeIntent/ANSWERS). Every number it returns is clickable and grounded ('grounded · snapshot id').</bpmn:documentation>
+      <bpmn:incoming>f3</bpmn:incoming>
+      <bpmn:incoming>f13</bpmn:incoming>
+      <bpmn:outgoing>f12</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="G_ask" name="Another question?">
+      <bpmn:incoming>f12</bpmn:incoming>
+      <bpmn:outgoing>f13</bpmn:outgoing>
+      <bpmn:outgoing>f14</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- ============ data artifacts (what feeds the AI) ============ -->
+    <bpmn:textAnnotation id="TA_Prop"><bpmn:text>Proprietary moat data: holdings, transactions, fund cash-flows, portfolio-company look-through, IC/DD docs, internal secondary book, platform demand, call transcripts, model portfolios.</bpmn:text></bpmn:textAnnotation>
+    <bpmn:textAnnotation id="TA_Macro"><bpmn:text>External data: GDP, inflation, rates, energy, credit spreads, FX, thematic news, public benchmarks, Moonfare macro view.</bpmn:text></bpmn:textAnnotation>
+    <bpmn:association id="as1" sourceRef="TA_Prop" targetRef="SP_Act"/>
+    <bpmn:association id="as2" sourceRef="TA_Macro" targetRef="SP_Shape"/>
+
+    <!-- ============ top-level flow ============ -->
+    <bpmn:sequenceFlow id="f1" sourceRef="Start" targetRef="PG_fork"/>
+    <bpmn:sequenceFlow id="f2" sourceRef="PG_fork" targetRef="SP_Understand"/>
+    <bpmn:sequenceFlow id="f3" sourceRef="PG_fork" targetRef="AskAlpha"/>
+    <bpmn:sequenceFlow id="f4" sourceRef="SP_Understand" targetRef="G1"/>
+    <bpmn:sequenceFlow id="f5" name="Reshape my target" sourceRef="G1" targetRef="SP_Shape"/>
+    <bpmn:sequenceFlow id="f6" name="Act now" sourceRef="G1" targetRef="SP_Act"/>
+    <bpmn:sequenceFlow id="f7" name="Then act on it" sourceRef="SP_Shape" targetRef="SP_Act"/>
+    <bpmn:sequenceFlow id="f8" sourceRef="SP_Act" targetRef="G3"/>
+    <bpmn:sequenceFlow id="f9" name="Yes — study the fund" sourceRef="G3" targetRef="SP_Research"/>
+    <bpmn:sequenceFlow id="f10" name="No — done" sourceRef="G3" targetRef="End"/>
+    <bpmn:sequenceFlow id="f11" sourceRef="SP_Research" targetRef="End"/>
+    <bpmn:sequenceFlow id="f12" sourceRef="AskAlpha" targetRef="G_ask"/>
+    <bpmn:sequenceFlow id="f13" name="Ask again" sourceRef="G_ask" targetRef="AskAlpha"/>
+    <bpmn:sequenceFlow id="f14" name="Done" sourceRef="G_ask" targetRef="End"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="Diagram">
+    <bpmndi:BPMNPlane id="Plane" bpmnElement="Collab_Copilot">
+      <bpmndi:BPMNShape id="di_part" bpmnElement="Part_Copilot" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="1540" height="560"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="di_lane_inv" bpmnElement="Lane_Investor" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="1510" height="240"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="di_lane_ai" bpmnElement="Lane_AI" isHorizontal="true">
+        <dc:Bounds x="190" y="320" width="1510" height="150"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="di_lane_data" bpmnElement="Lane_Data" isHorizontal="true">
+        <dc:Bounds x="190" y="470" width="1510" height="170"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="di_start" bpmnElement="Start"><dc:Bounds x="230" y="180" width="36" height="36"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="210" y="220" width="80" height="27"/></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="di_pg" bpmnElement="PG_fork"><dc:Bounds x="300" y="180" width="36" height="36"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="di_u" bpmnElement="SP_Understand" isExpanded="false"><dc:Bounds x="370" y="148" width="150" height="100"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="di_g1" bpmnElement="G1"><dc:Bounds x="560" y="180" width="36" height="36"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="545" y="224" width="66" height="14"/></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="di_s" bpmnElement="SP_Shape" isExpanded="false"><dc:Bounds x="630" y="148" width="150" height="100"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="di_a" bpmnElement="SP_Act" isExpanded="false"><dc:Bounds x="890" y="148" width="150" height="100"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="di_g3" bpmnElement="G3"><dc:Bounds x="1080" y="180" width="36" height="36"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="1058" y="224" width="82" height="14"/></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="di_r" bpmnElement="SP_Research" isExpanded="false"><dc:Bounds x="1150" y="148" width="150" height="100"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="di_end" bpmnElement="End"><dc:Bounds x="1360" y="180" width="36" height="36"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="1330" y="220" width="100" height="27"/></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="di_ask" bpmnElement="AskAlpha"><dc:Bounds x="370" y="350" width="160" height="70"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="di_gask" bpmnElement="G_ask"><dc:Bounds x="600" y="367" width="36" height="36"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="586" y="343" width="64" height="14"/></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="di_ta_prop" bpmnElement="TA_Prop"><dc:Bounds x="380" y="500" width="320" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="di_ta_macro" bpmnElement="TA_Macro"><dc:Bounds x="740" y="500" width="320" height="80"/></bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="di_f1" bpmnElement="f1"><di:waypoint x="266" y="198"/><di:waypoint x="300" y="198"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="di_f2" bpmnElement="f2"><di:waypoint x="336" y="198"/><di:waypoint x="370" y="198"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="di_f3" bpmnElement="f3"><di:waypoint x="318" y="216"/><di:waypoint x="318" y="385"/><di:waypoint x="370" y="385"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="di_f4" bpmnElement="f4"><di:waypoint x="520" y="198"/><di:waypoint x="560" y="198"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="di_f5" bpmnElement="f5"><di:waypoint x="596" y="198"/><di:waypoint x="630" y="198"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="556" y="118" width="92" height="14"/></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="di_f6" bpmnElement="f6"><di:waypoint x="578" y="216"/><di:waypoint x="578" y="280"/><di:waypoint x="965" y="280"/><di:waypoint x="965" y="248"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="700" y="262" width="50" height="14"/></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="di_f7" bpmnElement="f7"><di:waypoint x="780" y="198"/><di:waypoint x="890" y="198"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="800" y="180" width="70" height="14"/></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="di_f8" bpmnElement="f8"><di:waypoint x="1040" y="198"/><di:waypoint x="1080" y="198"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="di_f9" bpmnElement="f9"><di:waypoint x="1116" y="198"/><di:waypoint x="1150" y="198"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="1086" y="118" width="104" height="14"/></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="di_f10" bpmnElement="f10"><di:waypoint x="1098" y="216"/><di:waypoint x="1098" y="300"/><di:waypoint x="1378" y="300"/><di:waypoint x="1378" y="216"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="1200" y="282" width="60" height="14"/></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="di_f11" bpmnElement="f11"><di:waypoint x="1300" y="198"/><di:waypoint x="1360" y="198"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="di_f12" bpmnElement="f12"><di:waypoint x="530" y="385"/><di:waypoint x="600" y="385"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="di_f13" bpmnElement="f13"><di:waypoint x="618" y="367"/><di:waypoint x="618" y="330"/><di:waypoint x="450" y="330"/><di:waypoint x="450" y="350"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="500" y="312" width="60" height="14"/></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="di_f14" bpmnElement="f14"><di:waypoint x="636" y="385"/><di:waypoint x="1378" y="385"/><di:waypoint x="1378" y="216"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="1000" y="367" width="40" height="14"/></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="di_as1" bpmnElement="as1"><di:waypoint x="540" y="500"/><di:waypoint x="700" y="320"/><di:waypoint x="965" y="248"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="di_as2" bpmnElement="as2"><di:waypoint x="900" y="500"/><di:waypoint x="800" y="320"/><di:waypoint x="705" y="248"/></bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
