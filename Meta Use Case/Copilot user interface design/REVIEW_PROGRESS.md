@@ -80,4 +80,19 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 54 Full-fund-page 'Take action' → 'Suggest similar funds' (held) — Take-action card uses holding-aware `fundActions` (item 38). Verified live on EQT IX full page: shows '✨ Suggest similar funds', no 'Buy now'; logicError null.
 - ☑ 55 Currency breakdown parity — currency uses the shared `homeDrillBody` path (same holdings table, metric/sort toggles, drillBigBlock, blue Alpha panel, gap CTA). Verified live: currency buckets EUR(4)/USD(3)/GBP(1) populate from fund meta; logicError null.
 
-**NEXT: item 56** — make all concentration dimensions full-breakdown-able (56–68 cluster: NAV/Committed toggles, exec summary, etc.).
+## 56–68 Overview drill-down + NAV/Committed + nav label
+- ⊘ 56 All concentration dimensions full-breakdown-able — confirmed: Strategy/Region/Currency/Sector/Vintage overview cards each `allocBlock(...onClick:openHomePop(popKey))` → teaser → 'See full breakdown' → homeDrill full breakdown. None a dead-end.
+- ☐ 57 NAV vs Committed toggle on allocation/concentration views
+- ☐ 58 Default the NAV/Committed toggle to NAV
+- ☐ 59 Rename UNDERSTAND 'Home' → 'Overview' (+ breadcrumb)
+- ☐ 60 Clicking UNDERSTAND always lands on Overview first
+- ☐ 61 Split AI out of Tech in Sector donut
+- ⊘ 62 Cart icon = 'already held' marker on top holdings — done via shopBtn held marker (38); confirm on Top-holdings list
+- ⊘ 63 Held fund pop-up CTA → suggest similar — done via fundActions (38)
+- ⊘ 64 Not-held pop-up CTA → Buy now — done via fundActions (38)
+- ☐ 65 Performance KPIs NAV-based by default
+- ☐ 66 Remove fill-rate metric from Overview
+- ☐ 67 NAV/Committed toggle on every breakdown view
+- ☐ 68 Default NAV on breakdown toggle
+
+**NEXT: item 57** — NAV vs Committed toggle on allocation/concentration views.
