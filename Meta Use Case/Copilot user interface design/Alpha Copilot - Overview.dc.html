@@ -384,9 +384,8 @@
         <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:8px">Co-Pilot</div>
         <h1 style="font-family:'Source Serif 4',Georgia,serif;font-size:42px;font-weight:600;margin:0 0 12px;letter-spacing:-.01em">Welcome to Alpha</h1>
         <p style="font-size:17px;margin:0 0 18px;color:var(--ink)">Your AI-augmented private-markets advisor.</p>
-        <p style="font-size:14px;line-height:1.6;color:var(--muted);margin:0 0 10px">A live peer-group engine over your investor base — compare yourself against peers, the platform, house-view model portfolios, or Harvard / Yale / Princeton endowments, across 25 use cases.</p>
-        <p style="font-size:14px;line-height:1.6;color:var(--muted);margin:0 0 16px">Ask Alpha for context on any chart — answers are grounded in the live database.</p>
-        <p style="font-size:12px;line-height:1.55;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 14px;margin:0 0 26px">Peer &amp; platform figures are real export data. <b style="color:var(--ink)">Modelled, not measured:</b> PM-target %, investable-wealth €, and the model portfolios (a Moonfare house view, unoptimised). Performance uses GP marks; young vintages are not ranked. Informational only — not investment advice.</p>
+        <p style="font-size:14px;line-height:1.6;color:var(--muted);margin:0 0 10px">This tool allows you to build your tailored private-markets portfolio by your own. You can simulate your portfolio. You can compare yourself against peers, the platform, house view, model portfolios, or Harvard / Princeton endowments and many more applications.</p>
+        <p style="font-size:14px;line-height:1.6;color:var(--muted);margin:0 0 26px">Ask Alpha for context only. The chart answers are grounded on Moonfare's set of proprietary data.</p>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
           <span style="font-size:11px;color:var(--muted)">Synthetic demo data · snapshot 2026-06-14</span>
           <button onClick="{{ enterApp }}" style="background:var(--brand);color:#fff;border:none;border-radius:999px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer">Enter Alpha →</button>
@@ -398,7 +397,7 @@
   <!-- ============ THEME PICKER (first-time only, before entering Ask Alpha) ============ -->
   <sc-if value="{{ showThemePicker }}" hint-placeholder-val="{{ false }}">
     <div style="position:fixed;inset:0;z-index:90;background:rgba(8,9,18,.55);display:flex;align-items:center;justify-content:center;padding:32px">
-      <div style="max-width:560px;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:30px 32px;box-shadow:0 30px 90px -20px rgba(8,9,18,.6)">
+      <div style="max-width:680px;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:38px 40px;box-shadow:0 30px 90px -20px rgba(8,9,18,.6)">
         {{ themePickerBody }}
       </div>
     </div>
@@ -1418,39 +1417,39 @@ class Component extends DCLogic {
   ]; }
   themeCard(t, selected, onClick, big){
     const h=this.h; const on=selected===t.id;
-    const mock=h('div',{style:{borderRadius:8,overflow:'hidden',border:'1px solid '+t.line,background:t.bg,height:big?74:58}},
-      h('div',{style:{height:big?16:13,background:t.top,display:'flex',alignItems:'center',padding:'0 6px',gap:3}},
-        [0,1,2].map(i=>h('span',{key:i,style:{width:4,height:4,borderRadius:'50%',background:'rgba(255,255,255,.5)'}}))),
-      h('div',{style:{padding:big?'8px':'6px'}},
-        h('div',{style:{background:t.panel,border:'1px solid '+t.line,borderRadius:5,padding:big?'8px':'6px',display:'flex',flexDirection:'column',gap:4}},
-          h('div',{style:{height:6,width:'62%',borderRadius:3,background:t.bar}}),
-          h('div',{style:{height:5,width:'88%',borderRadius:3,background:t.sub}}),
-          h('div',{style:{height:5,width:'46%',borderRadius:3,background:t.sub}}))));
+    const mock=h('div',{style:{borderRadius:9,overflow:'hidden',border:'1px solid '+t.line,background:t.bg,height:big?96:58}},
+      h('div',{style:{height:big?20:13,background:t.top,display:'flex',alignItems:'center',padding:'0 7px',gap:3}},
+        [0,1,2].map(i=>h('span',{key:i,style:{width:5,height:5,borderRadius:'50%',background:'rgba(255,255,255,.5)'}}))),
+      h('div',{style:{padding:big?'11px':'6px'}},
+        h('div',{style:{background:t.panel,border:'1px solid '+t.line,borderRadius:6,padding:big?'11px':'6px',display:'flex',flexDirection:'column',gap:5}},
+          h('div',{style:{height:7,width:'62%',borderRadius:3,background:t.bar}}),
+          h('div',{style:{height:6,width:'88%',borderRadius:3,background:t.sub}}),
+          h('div',{style:{height:6,width:'46%',borderRadius:3,background:t.sub}}))));
     return h('button',{key:t.id,onClick,
-      style:{flex:'1 1 0',minWidth:0,textAlign:'left',cursor:'pointer',borderRadius:12,padding:8,
+      style:{flex:'1 1 0',minWidth:0,textAlign:'left',cursor:'pointer',borderRadius:13,padding:big?11:8,
         border:'1.5px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',transition:'border-color .15s'}},
       mock,
-      h('div',{style:{display:'flex',alignItems:'center',gap:6,marginTop:8}},
-        h('span',{style:{fontSize:14}},t.icon),
-        h('span',{style:{fontSize:13,fontWeight:700,color:on?'var(--brand-ink)':'var(--ink)'}},t.name),
-        on?h('span',{style:{marginLeft:'auto',color:'var(--brand)',fontWeight:700,fontSize:13}},'✓'):null),
-      h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:2,lineHeight:1.35}},t.desc));
+      h('div',{style:{display:'flex',alignItems:'center',gap:6,marginTop:big?11:8}},
+        h('span',{style:{fontSize:big?16:14}},t.icon),
+        h('span',{style:{fontSize:big?14.5:13,fontWeight:700,color:on?'var(--brand-ink)':'var(--ink)'}},t.name),
+        on?h('span',{style:{marginLeft:'auto',color:'var(--brand)',fontWeight:700,fontSize:14}},'✓'):null),
+      h('div',{style:{fontSize:big?12:11,color:'var(--muted)',marginTop:3,lineHeight:1.35}},t.desc));
   }
   themeChooser(onPick, big){ const h=this.h;
-    return h('div',{style:{display:'flex',gap:10}}, this.themeMeta().map(t=>this.themeCard(t, this.state.theme, ()=>onPick(t), big))); }
+    return h('div',{style:{display:'flex',gap:big?14:10}}, this.themeMeta().map(t=>this.themeCard(t, this.state.theme, ()=>onPick(t), big))); }
   // pre-entry theme popup — toggle to preview live across the whole app, then commit
   themePickerBody(){
     const h=this.h; const SF=this.SF; const cur=(this.themeMeta().find(t=>t.id===this.state.theme)||{}).name||'Light';
     return h('div',null,
-      h('div',{style:{display:'flex',alignItems:'center',gap:11,marginBottom:6}},
-        h('img',{src:'assets/askalpha-logo.png',alt:'',style:{width:38,height:38,borderRadius:11,flex:'0 0 38px',boxShadow:'0 8px 20px -8px rgba(0,0,0,.4)'}}),
+      h('div',{style:{display:'flex',alignItems:'center',gap:13,marginBottom:6}},
+        h('img',{src:'assets/askalpha-logo.png',alt:'',style:{width:46,height:46,borderRadius:13,flex:'0 0 46px',boxShadow:'0 8px 20px -8px rgba(0,0,0,.4)'}}),
         h('div',null,
-          h('div',{style:{fontSize:10,letterSpacing:'.12em',textTransform:'uppercase',color:'var(--brand)',fontWeight:700}},'AskAlpha · by Moonfare'),
-          h('div',{style:{fontFamily:SF,fontSize:21,fontWeight:600,letterSpacing:'-.01em'}},'Make Alpha yours'))),
-      h('p',{style:{fontSize:13.5,color:'var(--muted)',lineHeight:1.5,margin:'4px 0 18px'}},'Pick a look to start with. Tap each one to preview it live across the whole app — you can change it anytime in Settings.'),
+          h('div',{style:{fontSize:10.5,letterSpacing:'.12em',textTransform:'uppercase',color:'var(--brand)',fontWeight:700}},'AskAlpha · by Moonfare'),
+          h('div',{style:{fontFamily:SF,fontSize:25,fontWeight:600,letterSpacing:'-.01em'}},'Make Alpha yours'))),
+      h('p',{style:{fontSize:14,color:'var(--muted)',lineHeight:1.5,margin:'6px 0 22px'}},'Pick a look to start with. Tap each one to preview it live across the whole app — you can change it anytime in Settings.'),
       this.themeChooser(t=>this.setState({theme:t.id}), true),
       h('button',{onClick:()=>this.commitTheme(),
-        style:{marginTop:20,width:'100%',border:'none',background:'var(--brand)',color:'#fff',borderRadius:12,padding:'13px',fontSize:14,fontWeight:700,cursor:'pointer'}},
+        style:{marginTop:24,width:'100%',border:'none',background:'var(--brand)',color:'#fff',borderRadius:13,padding:'15px',fontSize:15,fontWeight:700,cursor:'pointer'}},
         'Continue with '+cur+' →'));
   }
   commitTheme(){ this.setState({showThemePicker:false}); }
