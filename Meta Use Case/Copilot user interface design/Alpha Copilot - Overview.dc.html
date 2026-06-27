@@ -3574,13 +3574,15 @@ class Component extends DCLogic {
       h('span',{style:{fontSize:11.5,color:'var(--muted)',fontWeight:600}},'Metric'),
       this.seg(this.METRICS().map(m=>({label:m,value:m})), this.drillMetric(), v=>this.setDtog('drillMetric',v), {sm:true})); }
   holdingsTable(funds){ const h=this.h; const SF=this.SF; const m=this.drillMetric();
-    const head=h('div',{style:{display:'grid',gridTemplateColumns:'1.7fr 0.9fr 0.9fr 1fr',gap:10,alignItems:'center',padding:'6px 11px',fontSize:10.5,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--muted)',fontWeight:700,borderBottom:'1px solid var(--line)'}},
-      h('span',null,'Investment'), h('span',{style:{textAlign:'right'}},m), h('span',{style:{textAlign:'right'}},'NAV'), h('span',{style:{textAlign:'right'}},''));
-    const rows=funds.map((f,i)=>h('div',{key:f.id,style:{display:'grid',gridTemplateColumns:'1.7fr 0.9fr 0.9fr 1fr',gap:10,alignItems:'center',padding:'9px 11px',borderBottom:i<funds.length-1?'1px solid var(--line)':'none',cursor:'pointer'},
+    const COLS='1.6fr 0.95fr 0.85fr 0.85fr 1fr';
+    const head=h('div',{style:{display:'grid',gridTemplateColumns:COLS,gap:10,alignItems:'center',padding:'6px 11px',fontSize:10.5,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--muted)',fontWeight:700,borderBottom:'1px solid var(--line)'}},
+      h('span',null,'Investment'), h('span',null,'Invested'), h('span',{style:{textAlign:'right'}},m), h('span',{style:{textAlign:'right'}},'NAV'), h('span',{style:{textAlign:'right'}},''));
+    const rows=funds.map((f,i)=>h('div',{key:f.id,style:{display:'grid',gridTemplateColumns:COLS,gap:10,alignItems:'center',padding:'9px 11px',borderBottom:i<funds.length-1?'1px solid var(--line)':'none',cursor:'pointer'},
         onClick:()=>this.openFund(f.id),
         onMouseEnter:e=>{e.currentTarget.style.background='var(--surface-2)';},
         onMouseLeave:e=>{e.currentTarget.style.background='transparent';}},
-      h('div',{style:{minWidth:0}}, h('div',{style:{fontFamily:SF,fontSize:13,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},f.name), h('div',{style:{fontSize:11,color:'var(--muted)'}}, f.strat+' · '+f.vintage)),
+      h('div',{style:{minWidth:0}}, h('div',{style:{fontFamily:SF,fontSize:13,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},f.name), h('div',{style:{fontSize:11,color:'var(--muted)'}}, f.strat)),
+      h('div',{style:{fontSize:12,color:'var(--ink)',fontFamily:SF,fontWeight:600}}, f.month||(f.vintage+'')),
       h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:14,fontWeight:700,color:'var(--brand-ink)'}}, this.metricVal(f,m)),
       h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:13,fontWeight:600}}, f.nav),
       h('div',{style:{display:'flex',justifyContent:'flex-end'}}, this.shopBtn(f.name,f.strat,true))));
