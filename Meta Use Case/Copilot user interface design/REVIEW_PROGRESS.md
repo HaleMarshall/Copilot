@@ -62,8 +62,8 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - Shared holding-aware logic above also pre-satisfies 54 (Take-action 'Suggest similar funds'), 62 (held cart marker), 63/64 (pop-up CTA conditional on holding status) — will confirm each in its own location when reached.
 - ☑ 39 Strategy-detail individual-investments table w/ per-investment metric toggles — new `holdingsTable(funds)` + `holdingsMetricToggle()` (`drillMetric` dtog, default IRR); full-breakdown fundsCard now renders each bucket as a table (Investment | metric | NAV | held-marker), one metric column driven by the IRR/DPI/TVPI/MOIC/DVPI toggle. Verified live: toggle lists all 5; column switches IRR→DVPI (EQT IX 19.4%→2.3x).
 - ☑ 40 Month & Year per holding — added 'Invested' column to `holdingsTable` showing `f.month` (e.g. 'Mar 2019'). Verified live: EQT IX Mar 2019, Thrive Jul 2021.
-- ☐ 41 Sort by Month/Year
-- ☐ 42 Default-sort best-performing first
+- ☑ 41 Sort by Month/Year — `holdingsMetricToggle` now has a Sort control (Best first / Newest / Oldest); `sortHoldings` + `monthNum` parser. Verified live: Newest = Aug 2024→Mar 2019; Oldest = Mar 2019→Aug 2024.
+- ☑ 42 Default-sort best-performing first — `drillSort` defaults to 'perf' (selected metric descending). Verified live: default order 19.4%→16.1%→14.2%→…→losers (−4.0%, −1.2%) at bottom. (41+42 share one sort control.)
 - ⊘ 43 Reject 'What works well in your portfolio?' chip (keep view as-is) — confirm none present
 - ☐ 44 Header 'Funds you hold by strategy'
 - ☐ 45 Larger middle-row overview block

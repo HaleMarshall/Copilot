@@ -3569,11 +3569,21 @@ class Component extends DCLogic {
   }
   /* item 39 — individual investments rendered table-style; one metric column driven by the toggle (IRR/DPI/TVPI/MOIC/DVPI) */
   drillMetric(){ return this.dtog('drillMetric','IRR'); }
+  drillSort(){ return this.dtog('drillSort','perf'); } /* item 42 — default best-performing first */
+  monthNum(f){ const MO={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+    const s=(f&&f.month)||''; const mm=s.slice(0,3); const yr=parseInt(s.slice(-4),10); if(!yr) return (f&&f.vintage||0)*12;
+    return yr*12+(MO[mm]||0); }
+  sortHoldings(funds){ const s=this.drillSort(); const m=this.drillMetric(); const a=funds.slice();
+    if(s==='newest') return a.sort((x,y)=>this.monthNum(y)-this.monthNum(x));
+    if(s==='oldest') return a.sort((x,y)=>this.monthNum(x)-this.monthNum(y));
+    return a.sort((x,y)=>this.metricNum(y,m)-this.metricNum(x,m)); /* 'perf' — best by the selected metric first */ }
   holdingsMetricToggle(){ const h=this.h;
-    return h('div',{style:{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}},
-      h('span',{style:{fontSize:11.5,color:'var(--muted)',fontWeight:600}},'Metric'),
-      this.seg(this.METRICS().map(m=>({label:m,value:m})), this.drillMetric(), v=>this.setDtog('drillMetric',v), {sm:true})); }
-  holdingsTable(funds){ const h=this.h; const SF=this.SF; const m=this.drillMetric();
+    return h('div',{style:{display:'flex',alignItems:'center',gap:14,flexWrap:'wrap'}},
+      h('div',{style:{display:'flex',alignItems:'center',gap:8}}, h('span',{style:{fontSize:11.5,color:'var(--muted)',fontWeight:600}},'Metric'),
+        this.seg(this.METRICS().map(m=>({label:m,value:m})), this.drillMetric(), v=>this.setDtog('drillMetric',v), {sm:true})),
+      h('div',{style:{display:'flex',alignItems:'center',gap:8}}, h('span',{style:{fontSize:11.5,color:'var(--muted)',fontWeight:600}},'Sort'),
+        this.seg([{label:'Best first',value:'perf'},{label:'Newest',value:'newest'},{label:'Oldest',value:'oldest'}], this.drillSort(), v=>this.setDtog('drillSort',v), {sm:true}))); }
+  holdingsTable(funds){ const h=this.h; const SF=this.SF; const m=this.drillMetric(); funds=this.sortHoldings(funds);
     const COLS='1.6fr 0.95fr 0.85fr 0.85fr 1fr';
     const head=h('div',{style:{display:'grid',gridTemplateColumns:COLS,gap:10,alignItems:'center',padding:'6px 11px',fontSize:10.5,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--muted)',fontWeight:700,borderBottom:'1px solid var(--line)'}},
       h('span',null,'Investment'), h('span',null,'Invested'), h('span',{style:{textAlign:'right'}},m), h('span',{style:{textAlign:'right'}},'NAV'), h('span',{style:{textAlign:'right'}},''));
