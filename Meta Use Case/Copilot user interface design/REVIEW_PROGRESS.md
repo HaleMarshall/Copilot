@@ -78,6 +78,6 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ⊘ 52 Keep fund mini-modal — confirmed: `fundModalBody` has Overview/Delivery/Lifecycle/Manager tabs, KPI row (TVPI+DVPI), About this fund, + 'Open full fund page' (line 3928). Kept.
 - ⊘ 53 Keep full fund page + DVPI in KPI row — confirmed live: `fundPageBody` KPI row has TVPI & DVPI (added item 37), Key facts + Fund documents present.
 - ☑ 54 Full-fund-page 'Take action' → 'Suggest similar funds' (held) — Take-action card uses holding-aware `fundActions` (item 38). Verified live on EQT IX full page: shows '✨ Suggest similar funds', no 'Buy now'; logicError null.
-- ☐ 55 Currency breakdown parity
+- ☑ 55 Currency breakdown parity — currency uses the shared `homeDrillBody` path (same holdings table, metric/sort toggles, drillBigBlock, blue Alpha panel, gap CTA). Verified live: currency buckets EUR(4)/USD(3)/GBP(1) populate from fund meta; logicError null.
 
-**NEXT: item 47** — always-present 'Suggest funds to fill the gaps' CTA on breakdown views.
+**NEXT: item 56** — make all concentration dimensions full-breakdown-able (56–68 cluster: NAV/Committed toggles, exec summary, etc.).
