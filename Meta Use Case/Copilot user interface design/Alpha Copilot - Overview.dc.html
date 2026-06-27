@@ -3548,14 +3548,14 @@ class Component extends DCLogic {
   closeHomePop(){ this.setState({homePop:null, homeFocusCat:null}); }
   /* per-fund look-through tags so a dimension click can show which funds drive each bucket */
   HELD_META(){ if(this.DB) return this.DB.empty?{}:(this.DB.heldMeta||{}); return {
-    eqtix:{currency:'EUR',region:'DACH',sector:'Industrials',strat:'buyout',vintage:2019,nav:4.6},
+    eqtix:{currency:'EUR',region:'Europe',sector:'Industrials',strat:'buyout',vintage:2019,nav:4.6},
     thrive8:{currency:'USD',region:'USA',sector:'Tech',strat:'ai',vintage:2021,nav:3.1},
     ga:{currency:'USD',region:'USA',sector:'Tech',strat:'growth',vintage:2020,nav:2.4},
-    cvc9:{currency:'EUR',region:'DACH',sector:'Industrials',strat:'buyout',vintage:2022,nav:2.0},
+    cvc9:{currency:'EUR',region:'Europe',sector:'Industrials',strat:'buyout',vintage:2022,nav:2.0},
     arespcs:{currency:'USD',region:'USA',sector:'Financials',strat:'credit',vintage:2023,nav:1.5},
-    cinven8:{currency:'EUR',region:'DACH',sector:'Healthcare',strat:'buyout',vintage:2021,nav:1.8},
-    northwind:{currency:'EUR',region:'DACH',sector:'Energy',strat:'infra',vintage:2024,nav:0.7},
-    meridian:{currency:'GBP',region:'RoW',sector:'Tech',strat:'growth',vintage:2024,nav:0.5}
+    cinven8:{currency:'EUR',region:'Europe',sector:'Healthcare',strat:'buyout',vintage:2021,nav:1.8},
+    northwind:{currency:'EUR',region:'Europe',sector:'Energy',strat:'infra',vintage:2024,nav:0.7},
+    meridian:{currency:'GBP',region:'APAC',sector:'Tech',strat:'growth',vintage:2024,nav:0.5}
   }; }
   /* vintage distribution by NAV (€m) across commitment years */
   VINTAGES(){ const m=this.HELD_META(); const o={}; Object.keys(m).forEach(id=>{ const v=m[id].vintage; o[v]=(o[v]||0)+m[id].nav; });
