@@ -565,7 +565,8 @@ class Component extends DCLogic {
       h('div',{style:{fontSize:12.5,color:'var(--ink)',lineHeight:1.55,marginBottom:11}}, body),
       h('div',{style:{display:'flex',gap:8,flexWrap:'wrap'}},
         h('button',{onClick:act,style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:9,padding:'8px 13px',fontSize:12.5,fontWeight:700,cursor:'pointer'}}, cta),
-        h('button',{onClick:()=>this.setDtog('memdone:'+mem.kind,true),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:9,padding:'8px 13px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},'Dismiss')));
+        h('button',{onClick:()=>this.setDtog('memdone:'+mem.kind,true),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:9,padding:'8px 13px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},'Dismiss'),
+        h('button',{onClick:()=>this.launchWS('understand'),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:9,padding:'8px 13px',fontSize:12.5,fontWeight:600,cursor:'pointer',marginLeft:'auto'}},'Skip to dashboard →')));
   }
 
   /* ---------- investor lifecycle (tweak) → internal data state ---------- */
@@ -1282,14 +1283,16 @@ class Component extends DCLogic {
   setAsk(state, patch){ this.setState({ ask:{...this.state.ask, ...(state?{state}:{}), ...(patch||{})} }); }
 
   /* ---------- Home chat (chat-first landing) ---------- */
+  // Six top-level use-case questions (item 27) + the AI look-through chip kept near top (item 28).
+  // Portfolio-standing chip is first (item 22).
   HOME_PROMPTS(){ return [
-    {q:'How am I doing versus my peers?', it:{ws:'shape',uc:'t1-5',page:'overview',label:'Peer Benchmarking'}},
-    {q:'Where should my allocation be?',  it:{ws:'shape',uc:'t1-1',page:'arch',label:'Allocation Architect'}},
-    {q:'What should I do next?',          it:{ws:'act',  uc:'t1-2',page:'rec',label:'Next Best Action'}},
-    {q:'Am I over-concentrated in AI?',   it:{ws:'understand',uc:'t1-9',page:'sectors',label:'Look-Through'}},
-    {q:'Am I invested in SpaceX?',         it:{ws:'understand',uc:'t1-9',page:'sectors',label:'Company Look-Through'}},
-    {q:'Can I commit more right now?',    it:{ws:'understand',uc:'t1-7',page:'calls',label:'Liquidity'}},
-    {q:'What could my portfolio look like in two years?', it:{ws:'shape',uc:'t1-13',page:'nav',label:'Forward Projection'}}
+    {q:'Where do I stand with my portfolio?',          it:{ws:'understand',uc:'home', page:'home',   label:'Portfolio Overview'}},
+    {q:'Am I over-concentrated in AI?',                it:{ws:'understand',uc:'t1-9', page:'sectors',label:'Look-Through'}},
+    {q:'Where is my performance so far?',              it:{ws:'understand',uc:'t1-12',page:'review', label:'Performance'}},
+    {q:'Did I miss something?',                        it:{ws:'act',       uc:'t1-11',page:'missed', label:'Missed Opportunities'}},
+    {q:'What are my peers doing?',                     it:{ws:'shape',     uc:'sim',  page:'compare',label:'Comparison'}},
+    {q:'Do you want to follow someone?',               it:{ws:'shape',     uc:'sim',  page:'compare',label:'Follow a group'}},
+    {q:'Do you want to simulate a different target?',  it:{ws:'shape',     uc:'sim',  page:'sim',    label:'Simulator'}}
   ]; }
   // keyword → the use case that answers it (null when nothing matches). Drives Ask Alpha routing everywhere.
   navFor(t){
@@ -1345,7 +1348,7 @@ class Component extends DCLogic {
     const h=this.h; const a=this.state.ask; const hasConvo=a.msgs.length>1; const ob=this.state.obActive;
     const hour=(new Date()).getHours(); const greet = hour<5?'Still up':hour<12?'Good morning':hour<18?'Good afternoon':hour<22?'Good evening':'Working late';
     const input = h('div',{style:{display:'flex',gap:10,alignItems:'center',background:'var(--surface)',border:'1px solid var(--hero-line)',borderRadius:16,padding:'7px 7px 7px 18px',boxShadow:'0 20px 50px -20px rgba(0,0,0,.45)',width:'100%',maxWidth:640}},
-      h('input',{placeholder:'Ask Alpha anything about your portfolio…',value:a.input||'',autoFocus:true,
+      h('input',{placeholder:'Ask me anything — private markets, your portfolio, ideas, what your peers are doing, or what you’ve missed…',value:a.input||'',autoFocus:true,
         onChange:e=>this.setAsk(null,{input:e.target.value}),
         onKeyDown:e=>{if(e.key==='Enter'&&(a.input||'').trim())this.homeSend(a.input);},
         style:{flex:1,border:'none',background:'transparent',outline:'none',fontSize:15,color:'var(--ink)',fontFamily:'Inter,system-ui,sans-serif'}}),
@@ -1369,7 +1372,7 @@ class Component extends DCLogic {
         [0,1,2].map(d=>h('span',{key:d,style:{width:7,height:7,borderRadius:'50%',background:'var(--hero-soft)',animation:`blink 1.2s ${d*0.2}s infinite`}}))):null) : null;
 
     const prompts = ob? null : h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:11,width:'100%',maxWidth:640,marginTop:22}},
-      this.HOME_PROMPTS().slice(0, hasConvo?2:6).map((p,i)=>h('button',{key:i,onClick:()=>this.homeAsk(p.q,p.it),
+      this.HOME_PROMPTS().slice(0, hasConvo?2:7).map((p,i)=>h('button',{key:i,onClick:()=>this.homeAsk(p.q,p.it),
         style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,textAlign:'left',padding:'13px 16px',borderRadius:13,cursor:'pointer',
           background:'var(--hero-chip)',border:'1px solid var(--hero-line)',color:'var(--hero-ink)',transition:'background .15s'}},
         h('span',{style:{fontSize:13,fontWeight:500,lineHeight:1.35}},p.q),

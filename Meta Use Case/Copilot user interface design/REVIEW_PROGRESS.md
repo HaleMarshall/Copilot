@@ -34,4 +34,16 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 19 Enter Alpha → chat first, not portfolio — verified `landedChat:true` (enterApp homeLaunched:false → homeHero chat)
 - ⊘ 20 New user → questions → chat — form → Save → chat landing (done in 6)
 
-**NEXT: item 21** — Chat input placeholder / suggestion chips cluster (21–29).
+## 21–29 Chat input + suggestion chips
+- ☑ 21 Broaden placeholder beyond portfolio — "Ask me anything — private markets, your portfolio, ideas, what your peers are doing, or what you've missed…"
+- ☑ 22 Portfolio-standing chip first — "Where do I stand with my portfolio?" → Portfolio Overview (uc home/home)
+- ☑ 23 Performance chip → Performance — "Where is my performance so far?" → t1-12/review (verified route)
+- ☑ 24 Invest/simulate chip → Simulator — "Do you want to simulate a different target?" → sim/sim
+- ⊘ 25 Page-relevant Q docks chat with summary — existing agentic behaviour (homeAsk/homeNav navigate + open chat panel); confirmed
+- ⊘ 26 No autocomplete — none present; fixed chips only
+- ☑ 27 Six use-case chips — HOME_PROMPTS replaced (stand/performance/missed/peers/follow/simulate)
+- ☑ 28 Keep AI over-concentration chip near top — kept as 2nd chip
+- ☑ 29 Permanent 'Skip to dashboard' on the 'Since we last spoke' card — added → launchWS('understand')
+- Notes: landing now shows 7 chips (slice 0,7). 0 console errors.
+
+**NEXT: item 30** — Top nav cluster (30–36): Set-target position, nav order, notif badge, notification copy, unlabeled element.
