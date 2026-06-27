@@ -24,4 +24,14 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 12 Experience field removed
 - Notes: `saveProfileToDB` now persists goal/liquidity/strategyPref/consent; verified profile row written; 0 console errors. (Items 18/19/20 largely satisfied by this: first-time-only gate via obFirstTime; Enter→chat landing with form over it; new user → form → chat.)
 
-**NEXT: item 13** — Set-target page cluster (13–16).
+## 13–20 Set-target page + entry/onboarding flow
+- ☑ 13 'Go to Simulator' CTA for strategy/regions/currency — `simCTA` on Set-target card → routes to Simulator
+- ⊘ 14 Do NOT add Liquidity to Set-target card — confirmed; no Liquidity field on the card (the word appears only in suggestion prose)
+- ☑ 15 Add Main goal (Hauptziel) to Set-target card — `goalField`
+- ☑ 16 Add Investment Target to Set-target card — same field (Main goal · Investment Target; per item 7 they're one concept)
+- ⊘ 17 Embed Welcome/Enter like 'Ask Luna' — real-Moonfare integration, out of scope for the standalone prototype; entry screen already models the pattern
+- ⊘ 18 First-time onboarding only for new users — `obFirstTime()` gates the form (done in 6)
+- ☑ 19 Enter Alpha → chat first, not portfolio — verified `landedChat:true` (enterApp homeLaunched:false → homeHero chat)
+- ⊘ 20 New user → questions → chat — form → Save → chat landing (done in 6)
+
+**NEXT: item 21** — Chat input placeholder / suggestion chips cluster (21–29).

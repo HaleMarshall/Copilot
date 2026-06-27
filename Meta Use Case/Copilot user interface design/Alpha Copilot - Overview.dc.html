@@ -1519,10 +1519,19 @@ class Component extends DCLogic {
       h('select',{value:s.riskId,onChange:e=>this.setState({riskId:e.target.value}),style:selStyle}, this.RISKS.map(r=>h('option',{key:r.id,value:r.id},r.short))));
     const horizonField=field('Investment horizon',null,
       h('select',{value:s.horizon2,onChange:e=>this.setState({horizon2:e.target.value}),style:selStyle}, ['1–3y','3–5y','5–10y','10y+'].map(o=>h('option',{key:o,value:o},o))));
+    // item 15/16 — Main goal · Investment Target on the core card (same concept per item 7)
+    const goalField=field('Main goal · Investment Target','The high-level objective the advisor re-confirms with you.',
+      h('select',{value:s.goal,onChange:e=>this.setState({goal:e.target.value}),style:selStyle}, this.GOALS().map(o=>h('option',{key:o,value:o},o))));
+    // item 13 — strategy/regions/currency are not edited here; route to the Simulator
+    const simCTA=h('button',{onClick:()=>this.setState({showTarget:false,ws:'shape',uc:'sim',page:'sim',homeLaunched:true,deepLink:null,homePop:null,homeDrill:null,ask:{...this.state.ask,state:'min'}}),
+      style:{display:'flex',width:'100%',alignItems:'center',justifyContent:'space-between',gap:8,marginTop:14,border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:11,padding:'11px 13px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},
+      h('span',null,'Adjust your strategies, regions & currency'),h('span',{style:{color:'var(--brand)',fontWeight:700}},'→ enter the Simulator'));
+    // item 14 — Liquidity intentionally excluded from this core card
     const targetCard=card('Your target', h('div',null,
-      h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:16}}, wealthField, riskField, horizonField, field('','',h('div'))),
+      h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:16}}, wealthField, riskField, horizonField, goalField),
       sliderField,
-      h('div',{style:{marginTop:18}}, h('button',{onClick:()=>{this.saveProfileToDB(); this.setState({showTarget:false});},style:{width:'100%',border:'none',background:'var(--brand)',color:'#fff',borderRadius:11,padding:'13px',fontSize:14,fontWeight:700,cursor:'pointer'}},'Save target'))));
+      simCTA,
+      h('div',{style:{marginTop:16}}, h('button',{onClick:()=>{this.saveProfileToDB(); this.setState({showTarget:false});},style:{width:'100%',border:'none',background:'var(--brand)',color:'#fff',borderRadius:11,padding:'13px',fontSize:14,fontWeight:700,cursor:'pointer'}},'Save target'))));
 
     // ---- notes from conversations ----
     const mems=((this.DB&&this.DB.memories)||[]).slice();
