@@ -46,4 +46,14 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 29 Permanent 'Skip to dashboard' on the 'Since we last spoke' card — added → launchWS('understand')
 - Notes: landing now shows 7 chips (slice 0,7). 0 console errors.
 
-**NEXT: item 30** — Top nav cluster (30–36): Set-target position, nav order, notif badge, notification copy, unlabeled element.
+## 30–36 Top nav + notifications
+- ☑ 30 Set-target button → right cluster next to Target indicator (header template)
+- ⊘ 31 Nav order Understand→Shape→Act→Research (Research last) — confirmed
+- ⊘ 32 Keep notification bell badge — unchanged (badge shows unread count)
+- ☑ 33 'Closing soon' notifications — Ares + new 'GA AI Opportunities is closing soon'
+- ☑ 34 Headline + CTA on every notification — all items now have a cta (Ensure your allocation, Ensure your first-close discount, Put it back to work, View your performance, Review liquidity)
+- ☑ 35 Factual tone, no hype — verified ('closing soon', 'first close imminent'; no 'last chance')
+- ☑ 36 Unlabeled element — added 'Show as' label to the bare €/% allocation toggle (item ambiguous in review; addressed most likely candidate)
+- Verified: notif panel shows closing-soon + CTAs + AI fund; 'Show as' in DOM; 0 console errors.
+
+**NEXT: item 37** — DVPI metric + holdings cluster (37–45).

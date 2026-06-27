@@ -81,8 +81,8 @@
     <div style="height:24px;width:1px;background:var(--topbar-line);flex:0 0 auto"></div>
     <!-- the spine: four workspaces — left-aligned -->
     {{ wsNav }}
-    {{ setTargetBtn }}
     <div style="margin-left:auto;display:flex;align-items:center;gap:10px;flex:0 0 auto">
+      {{ setTargetBtn }}
       {{ allocInfo }}
       <div style="height:22px;width:1px;background:var(--topbar-line);flex:0 0 auto"></div>
       {{ modeMenu }}
@@ -1641,11 +1641,13 @@ class Component extends DCLogic {
       {icon:'⭐',logo:'kkr',fund:'KKR North America XIII',unread:true,title:gl+' just invested in KKR North America XIII',body:(g==='top10'?'7 of the platform’s top-10% performers':'5 investors in your peer group')+' committed in the last 30 days. Tap to view the fund.',cta:'View fund',act:()=>this.openFollowFund('kkr13')},
       {icon:'⭐',logo:'lexington-partners',fund:'Lexington Capital Partners XII',unread:true,title:gl+' added Lexington Capital Partners XII',body:(g==='top10'?'4 top performers':'3 peers in your group')+' added secondaries this month.',cta:'View fund',act:()=>this.openFollowFund('lex12')}
     ] : [];
+    // Every notification follows headline + factual body + a call-to-action (items 33-35). Tone stays factual — no hype.
     return follow.concat([
-      {icon:'💶',logo:'eqt',fund:'EQT IX',unread:true,title:'Distribution received — EQT IX',body:'EQT IX returned €120k to your account; your DPI moved to 1.1×.'},
-      {icon:'⏳',logo:'ares',fund:'Ares Private Credit III',unread:true,title:'Ares Private Credit III closing soon',body:'The fund that closes your biggest gap (private credit) is 64% filled and closes Aug 2026.',cta:'Review',act:()=>this.goOppFromNotif()},
-      {icon:'📈',fund:null,unread:false,title:'Quarterly NAV updated',body:'Your portfolio NAV rose to €27.6m (+€3.6m this quarter).'},
-      {icon:'📄',logo:'ares',fund:'Northwind Infra III',unread:false,title:'New capital call — Northwind Infra III',body:'A €60k call is scheduled for next quarter. Your liquidity buffer covers it comfortably.'}
+      {icon:'⏳',logo:'ares',fund:'Ares Private Credit III',unread:true,title:'Ares Private Credit III is closing soon',body:'The fund that closes your biggest gap (private credit) is 64% filled — first close imminent.',cta:'Ensure your allocation',act:()=>this.goOppFromNotif()},
+      {icon:'⏳',logo:'general-atlantic',fund:'GA AI Opportunities',unread:true,title:'GA AI Opportunities is closing soon',body:'A top-ten performing manager just invested; the first-close window is open.',cta:'Ensure your first-close discount',act:()=>this.goOppFromNotif()},
+      {icon:'💶',logo:'eqt',fund:'EQT IX',unread:true,title:'Distribution received — EQT IX',body:'EQT IX returned €120k to your account; your DPI moved to 1.1×.',cta:'Put it back to work',act:()=>this.goOppFromNotif()},
+      {icon:'📈',fund:null,unread:false,title:'Quarterly NAV updated',body:'Your portfolio NAV rose to €27.6m (+€3.6m this quarter).',cta:'View your performance',act:()=>this.setState({showNotif:false,ws:'understand',uc:'t1-12',page:'review',homeLaunched:true,deepLink:null,homePop:null})},
+      {icon:'📄',logo:'ares',fund:'Northwind Infra III',unread:false,title:'New capital call — Northwind Infra III',body:'A €60k call is scheduled for next quarter; your liquidity buffer covers it comfortably.',cta:'Review liquidity',act:()=>this.setState({showNotif:false,ws:'understand',uc:'t1-7',page:'calls',homeLaunched:true,deepLink:null,homePop:null})}
     ]); }
   goOppFromNotif(){ this.setState({showNotif:false, showToast:false, ws:'act', uc:'opp', page:'opp', homeLaunched:true, deepLink:null, homePop:null, homeDrill:null, ask:{...this.state.ask,state:'min'}}); }
   notifPanelBody(){
@@ -4427,7 +4429,9 @@ class Component extends DCLogic {
     const NAV=(P.nav)||0;
     const allocUnit=this.dtog('allocUnit','%');
     const fmtUnit=(pct)=> allocUnit==='€' ? ('€'+(pct/100*NAV).toFixed(1)+'m') : ((Math.round(pct*10)/10)+'%');
-    const allocToggle=h('div',{style:{display:'flex',alignItems:'center',gap:8}}, this.seg([{label:'%',value:'%'},{label:'€',value:'€'}], allocUnit, v=>this.setDtog('allocUnit',v),{sm:true}));
+    const allocToggle=h('div',{style:{display:'flex',alignItems:'center',gap:7}},
+      h('span',{style:{fontSize:10.5,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em',fontWeight:600}},'Show as'),
+      this.seg([{label:'%',value:'%'},{label:'€',value:'€'}], allocUnit, v=>this.setDtog('allocUnit',v),{sm:true}));
     const donutRow=(slices,centerTop,onClick)=>h('div',{onClick,style:{display:'flex',alignItems:'center',gap:18,cursor:onClick?'pointer':'default'}},
       this.donutNamed(slices,124,centerTop,'mix'),
       h('div',{style:{flex:1,display:'flex',flexDirection:'column',gap:7}}, slices.map((s,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',gap:9,fontSize:12.5}},
