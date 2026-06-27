@@ -3567,6 +3567,25 @@ class Component extends DCLogic {
         h('div',{style:{textAlign:'right',flex:'0 0 auto'}}, h('div',{style:{fontFamily:SF,fontSize:13,fontWeight:600}},f.nav), h('div',{style:{fontSize:10.5,color:'var(--muted)'}},'NAV'))),
       this.fundActions(f.name,true));
   }
+  /* item 39 — individual investments rendered table-style; one metric column driven by the toggle (IRR/DPI/TVPI/MOIC/DVPI) */
+  drillMetric(){ return this.dtog('drillMetric','IRR'); }
+  holdingsMetricToggle(){ const h=this.h;
+    return h('div',{style:{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}},
+      h('span',{style:{fontSize:11.5,color:'var(--muted)',fontWeight:600}},'Metric'),
+      this.seg(this.METRICS().map(m=>({label:m,value:m})), this.drillMetric(), v=>this.setDtog('drillMetric',v), {sm:true})); }
+  holdingsTable(funds){ const h=this.h; const SF=this.SF; const m=this.drillMetric();
+    const head=h('div',{style:{display:'grid',gridTemplateColumns:'1.7fr 0.9fr 0.9fr 1fr',gap:10,alignItems:'center',padding:'6px 11px',fontSize:10.5,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--muted)',fontWeight:700,borderBottom:'1px solid var(--line)'}},
+      h('span',null,'Investment'), h('span',{style:{textAlign:'right'}},m), h('span',{style:{textAlign:'right'}},'NAV'), h('span',{style:{textAlign:'right'}},''));
+    const rows=funds.map((f,i)=>h('div',{key:f.id,style:{display:'grid',gridTemplateColumns:'1.7fr 0.9fr 0.9fr 1fr',gap:10,alignItems:'center',padding:'9px 11px',borderBottom:i<funds.length-1?'1px solid var(--line)':'none',cursor:'pointer'},
+        onClick:()=>this.openFund(f.id),
+        onMouseEnter:e=>{e.currentTarget.style.background='var(--surface-2)';},
+        onMouseLeave:e=>{e.currentTarget.style.background='transparent';}},
+      h('div',{style:{minWidth:0}}, h('div',{style:{fontFamily:SF,fontSize:13,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},f.name), h('div',{style:{fontSize:11,color:'var(--muted)'}}, f.strat+' · '+f.vintage)),
+      h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:14,fontWeight:700,color:'var(--brand-ink)'}}, this.metricVal(f,m)),
+      h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:13,fontWeight:600}}, f.nav),
+      h('div',{style:{display:'flex',justifyContent:'flex-end'}}, this.shopBtn(f.name,f.strat,true))));
+    return h('div',{style:{border:'1px solid var(--line)',borderRadius:10,background:'var(--surface)',overflow:'hidden'}}, head, rows);
+  }
   kpiTiles(tiles){ const h=this.h; const SF=this.SF;
     return h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}, tiles.map((t,i)=>
       h('div',{key:i,style:{border:'1px solid var(--line)',borderRadius:12,padding:'11px 13px',background:'var(--surface-2)'}},
@@ -4623,6 +4642,7 @@ class Component extends DCLogic {
     const fundRows=rows.filter(r=>byCat[r.k]&&byCat[r.k].length).sort((a,b)=>(a.k===focus?-1:b.k===focus?1:0));
     const fundsCard=this.card({title:'Funds you hold, by '+d.label.toLowerCase(),badge:this.badge('your portfolio','conf'),style:{height:'100%'},
       children:h('div',{style:{display:'flex',flexDirection:'column',gap:14}},
+        h('div',{style:{display:'flex',justifyContent:'flex-end'}}, this.holdingsMetricToggle()),
         fundRows.map((r,i)=>{ const on=r.k===focus;
           return h('div',{key:i,style:{padding:on?'11px 12px':'0',borderRadius:on?12:0,background:on?'var(--brand-wash)':'transparent',border:on?'1px solid var(--brand-tint-3)':'1px solid transparent'}},
           h('div',{style:{display:'flex',alignItems:'center',gap:9,marginBottom:9}},
@@ -4630,9 +4650,9 @@ class Component extends DCLogic {
             h('span',{style:{fontFamily:SF,fontWeight:on?700:600,fontSize:15}},r.n),
             h('span',{style:{fontSize:12,color:'var(--muted)'}},r.you+'% of NAV · '+byCat[r.k].length+' fund'+(byCat[r.k].length>1?'s':'')),
             on?h('span',{style:{marginLeft:'auto',fontSize:10.5,fontWeight:700,color:'var(--brand)'}},'SELECTED'):null),
-          h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(210px,1fr))',gap:9}}, byCat[r.k].map(f=>this.heldFundRow(f)))); }),
+          this.holdingsTable(byCat[r.k])); }),
         empty.length? h('div',{style:{fontSize:12.5,color:'var(--muted)',fontStyle:'italic',lineHeight:1.5}}, 'No direct holdings in '+empty.map(r=>r.n).join(', ')+'.'):null),
-      caption:'A pure reporting view of which funds sit in each '+d.label.toLowerCase()+' — the kind of read you would hand to your family office. Click any fund for detail.'});
+      caption:'A pure reporting view of which funds sit in each '+d.label.toLowerCase()+' — switch the metric toggle to query IRR · DPI · TVPI · MOIC · DVPI per investment. Click any fund for detail.'});
 
     // #4 — AI summary side panel that fills the right-hand whitespace
     const allFunds=roster.filter(f=>catOf(f)!=null);
