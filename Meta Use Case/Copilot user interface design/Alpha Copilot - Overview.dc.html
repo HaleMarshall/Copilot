@@ -403,6 +403,15 @@
     </div>
   </sc-if>
 
+  <!-- ============ NEW-CUSTOMER ONBOARDING FORM (one-time, single sheet) ============ -->
+  <sc-if value="{{ showOnboardForm }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:88;background:rgba(8,9,18,.55);display:flex;align-items:center;justify-content:center;padding:28px;overflow:auto">
+      <div style="max-width:640px;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:30px 32px;box-shadow:0 30px 90px -20px rgba(8,9,18,.6);margin:auto">
+        {{ onboardFormBody }}
+      </div>
+    </div>
+  </sc-if>
+
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;,&quot;hybrid&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;investor&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;New investor&quot;,&quot;Existing investor&quot;,&quot;Late-stage investor&quot;],&quot;default&quot;:&quot;Existing investor&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
@@ -482,6 +491,7 @@ class Component extends DCLogic {
       mode:'Investor',
       risk:'Balanced', horizon:'7y', investWealthM:8,
       showProfile:false, showNotif:false, showToast:true, cart:[], showCart:false, cartCommitted:false, showOnboard:false, seenOnboard:false, onboardStep:0, obActive:false, obStep:0, showThemePicker:false, showTarget:false, following:'top10',
+      showOnboardForm:false, goal:'Build personal wealth', liquidity:'Medium', strategyPref:'Diversified', obConsent:false,
       ask:{ state: props.askAlphaOpen===true?'open':'min', x:null, y:null, register:'plain',
             msgs:[ {who:'alpha', segs:[
               {t:'Hi — I read your portfolio against your cohort. Ask me anything, or tap a prompt below. Every number I give is clickable to show how it was computed.'} ] } ] },
@@ -513,7 +523,8 @@ class Component extends DCLogic {
   wealthText(){ const m=+this.state.investWealthM||0; if(m<=0) return '€0'; if(m>=1000) return '€'+(m/1000).toFixed(m%1000?1:0)+'bn'; if(m>=1) return '€'+(Number.isInteger(m)?m:m.toFixed(1))+'m'; return '€'+Math.round(m*1000)+'k'; }
   saveProfileToDB(){
     const p={risk:this.state.riskId, horizon:this.state.horizon2, wealth:this.wealthText(), wealthM:this.state.investWealthM, targetPct:this.state.targetPct,
-      theme:this.state.theme, will:this.dtog('obWill',''), context:this.dtog('obContext','')};
+      theme:this.state.theme, goal:this.state.goal, liquidity:this.state.liquidity, strategyPref:this.state.strategyPref, consent:!!this.state.obConsent,
+      will:this.dtog('obWill',''), context:this.dtog('obContext','')};
     fetch('/api/profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)})
       .then(r=>r.json()).then(()=>this.refreshDB()).catch(()=>{});
   }
@@ -1353,7 +1364,7 @@ class Component extends DCLogic {
             m.nav? h('button',{onClick:()=>this.homeNav(m.nav),
               style:{display:'inline-flex',alignItems:'center',gap:7,marginTop:9,border:'none',background:'var(--brand)',color:'#fff',borderRadius:11,padding:'9px 15px',fontSize:13,fontWeight:700,cursor:'pointer'}},
               'Take me to '+m.nav.label, h('span',null,'→')):null,
-            (m.onb && ob && (i===a.msgs.length-2) && this.state.obStep===m.onb.step)? this.obControl():null)),
+            null)),
       a.typing? h('div',{key:'t',style:{alignSelf:'flex-start',display:'flex',gap:5,padding:'12px 16px',background:'var(--hero-chip)',borderRadius:'15px 15px 15px 5px'}},
         [0,1,2].map(d=>h('span',{key:d,style:{width:7,height:7,borderRadius:'50%',background:'var(--hero-soft)',animation:`blink 1.2s ${d*0.2}s infinite`}}))):null) : null;
 
@@ -1729,82 +1740,54 @@ class Component extends DCLogic {
       h('div',{style:{marginTop:12}}, tab==='settings'?settings : (tab==='funds'?myfunds : docs)));
   }
   /* ---------- In-chat onboarding (first-time investors only, typed live) ---------- */
-  obSteps(){
-    const RISKS=this.RISKS;
-    return [
-      {key:'will', kind:'chips', q:'First — how actively are you looking to deploy right now?', opts:['Actively investing','Selectively adding','Holding / observing','Seeking liquidity'], apply:v=>this.setDtog('obWill',v)},
-      {key:'risk', kind:'chips', q:'What’s your risk appetite? It sets your house-view target.', opts:RISKS.map(r=>r.short), apply:v=>{const r=RISKS.find(x=>x.short===v); if(r)this.setState({riskId:r.id});}},
-      {key:'horizon', kind:'chips', q:'Over what horizon are you investing?', opts:['1–3y','3–5y','5–10y','10y+'], apply:v=>this.setState({horizon2:v})},
-      {key:'wealth', kind:'wealth', q:'Roughly how much investable wealth are you working with?'},
-      {key:'target', kind:'slider', q:'And what share of that would you like in private markets?'},
-      {key:'context', kind:'text', q:'Last one — anything I should know? A market you’re wary of, a liquidity event coming up, a theme you like… (optional)'}
-    ];
-  }
   // first-time = data is loaded, no investor profile has ever been saved, and not already shown this session
   obFirstTime(){ return this.state.dbLoaded && !this.dbEmpty() && (((this.DB&&this.DB.profiles)||[]).length===0) && !this.state.seenOnboard; }
-  startOnboardingChat(){
-    if(this.state.obActive) return;
-    this.setState({ obActive:true, obStep:0, ask:{...this.state.ask, state:'min'} });
-    this.setAsk(null,{ typing:true });
-    clearTimeout(this._obT);
-    this._obT=setTimeout(()=>{
-      this.setAsk(null,{ typing:false, msgs:this.state.ask.msgs.concat([{who:'alpha', segs:[{t:'Welcome to Ask Alpha — I already know you from Moonfare. Let me confirm a few things, once, then I’ll take it from there.'}]}]) });
-      this._obAsk(0);
-    }, 750);
+  GOALS(){ return ['Retirement / pension','Wealth for my children','Build personal wealth','Preserve & grow capital','Diversify beyond public markets']; }
+  LIQUIDITY_OPTS(){ return ['Low — happy to lock up long-term','Medium','High — I may need access']; }
+  STRAT_PREF_OPTS(){ return ['Diversified','Buyout-led','Growth & venture','Income / yield']; }
+  /* one-time new-customer onboarding — a single fill-in form (replaces the old chat flow) */
+  onboardFormBody(){
+    const h=this.h; const SF=this.SF; const s=this.state;
+    const sel=(label,val,opts,on)=>h('div',null,
+      h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--muted)',marginBottom:6}},label),
+      h('select',{value:val,onChange:e=>on(e.target.value),style:{width:'100%',border:'1px solid var(--line)',background:'var(--surface)',color:'var(--ink)',borderRadius:9,padding:'9px 10px',fontSize:13.5,fontFamily:'Inter,system-ui,sans-serif',cursor:'pointer'}},
+        opts.map(o=>h('option',{key:(o.value!=null?o.value:o),value:(o.value!=null?o.value:o)}, (o.label!=null?o.label:o)))));
+    const consent=this.state.obConsent;
+    return h('div',null,
+      // header — item 10
+      h('div',{style:{display:'flex',alignItems:'center',gap:13,marginBottom:6}},
+        h('img',{src:'assets/askalpha-logo.png',alt:'',style:{width:42,height:42,borderRadius:12,flex:'0 0 42px',boxShadow:'0 8px 20px -8px rgba(0,0,0,.4)'}}),
+        h('div',null,
+          h('div',{style:{fontSize:10.5,letterSpacing:'.12em',textTransform:'uppercase',color:'var(--brand)',fontWeight:700}},'Key information'),
+          h('div',{style:{fontFamily:SF,fontSize:23,fontWeight:600,letterSpacing:'-.01em'}},'We need a few key details'))),
+      h('p',{style:{fontSize:13.5,color:'var(--muted)',lineHeight:1.5,margin:'4px 0 18px'}},'Takes you one or two minutes. We ask once — returning to Alpha later goes straight to your portfolio.'),
+      // field set — items 7, 9, 12 (no Experience)
+      h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:14}},
+        sel('Main goal · Investment Target', s.goal, this.GOALS(), v=>this.setState({goal:v})),
+        sel('Risk profile', s.riskId, this.RISKS.map(r=>({value:r.id,label:r.short})), v=>this.setState({riskId:v})),
+        sel('Investment horizon', s.horizon2, ['1–3y','3–5y','5–10y','10y+'], v=>this.setState({horizon2:v})),
+        sel('Liquidity', s.liquidity, this.LIQUIDITY_OPTS(), v=>this.setState({liquidity:v})),
+        sel('Strategy preference', s.strategyPref, this.STRAT_PREF_OPTS(), v=>this.setState({strategyPref:v}))),
+      // free-text — item 11 (advisor-style examples; no regions/currencies, no theme/book)
+      h('div',{style:{marginBottom:16}},
+        h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--muted)',marginBottom:6}},'Anything I should know?'),
+        h('textarea',{value:this.dtog('obContext',''),onChange:e=>this.setDtog('obContext',e.target.value),rows:2,
+          placeholder:'e.g. the Iran situation worries me · a liquidity event coming up · in 10 months I have a wedding and need $60,000',
+          style:{width:'100%',border:'1px solid var(--line)',background:'var(--surface)',color:'var(--ink)',borderRadius:10,padding:'10px 12px',fontSize:13,fontFamily:'Inter,system-ui,sans-serif',resize:'vertical',lineHeight:1.45}}),
+        h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:5}},'Geopolitical views, upcoming liquidity events or personal events — I’ll use these to follow up later. (Regions & currencies are set in the Simulator.)')),
+      // consent — item 8
+      h('label',{style:{display:'flex',gap:10,alignItems:'flex-start',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:10,padding:'12px 13px',cursor:'pointer',marginBottom:16}},
+        h('input',{type:'checkbox',checked:consent,onChange:e=>this.setState({obConsent:e.target.checked}),style:{marginTop:2,accentColor:'var(--brand)',cursor:'pointer',flex:'0 0 auto'}}),
+        h('span',{style:{fontSize:12.5,color:'var(--ink)',lineHeight:1.5}},'I understand that Alpha is an illustrative planning tool — figures shown are modelled and not investment advice — and I consent to Moonfare using my profile to tailor what Alpha shows me.')),
+      h('button',{onClick:()=>{ if(consent) this.submitOnboardForm(); }, disabled:!consent,
+        style:{width:'100%',border:'none',borderRadius:13,padding:'15px',fontSize:15,fontWeight:700,cursor:consent?'pointer':'not-allowed',color:'#fff',background:consent?'var(--brand)':'var(--line)'}},
+        'Save & enter Alpha →'));
   }
-  _obAsk(i){
-    const steps=this.obSteps();
-    if(i>=steps.length) return this._obFinish();
-    this.setState({obStep:i});
-    this.setAsk(null,{typing:true});
-    clearTimeout(this._obT);
-    this._obT=setTimeout(()=>{
-      const s=steps[i];
-      this.setAsk(null,{ typing:false, msgs:this.state.ask.msgs.concat([{who:'alpha', segs:[{t:s.q}], onb:{step:i,kind:s.kind}}]) });
-    }, 700);
-  }
-  obAnswer(i, label){
-    const s=this.obSteps()[i]; if(s&&s.apply) s.apply(label);
-    this.setAsk(null,{ msgs:this.state.ask.msgs.concat([{who:'user', text:label}]) });
-    this._obAsk(i+1);
-  }
-  obFinishText(skip){
-    const ctx=skip?'':this.dtog('obContext','').trim();
-    if(ctx){ this.setAsk(null,{ msgs:this.state.ask.msgs.concat([{who:'user', text:'“'+ctx+'”'}]) }); this.saveChat('user', ctx); }
-    this._obFinish();
-  }
-  _obFinish(){
+  submitOnboardForm(){
+    const ctx=this.dtog('obContext','').trim();
+    if(ctx) this.saveChat('user', ctx);            // feed RM memory
     this.saveProfileToDB();
-    this.setState({obStep:this.obSteps().length});
-    this.setAsk(null,{typing:true});
-    clearTimeout(this._obT);
-    this._obT=setTimeout(()=>{
-      this.setAsk(null,{ typing:false, msgs:this.state.ask.msgs.concat([{who:'alpha', segs:[{t:'Perfect — you’re all set, Steffen. I’ve saved this to your Investor Profile so I won’t ask again. Ask me anything, or tap a prompt below to dive in.'}]}]) });
-      this.setState({obActive:false, seenOnboard:true});
-    }, 800);
-  }
-  // the live control rendered under the current onboarding question bubble
-  obControl(){
-    const h=this.h; const SF=this.SF; const i=this.state.obStep; const s=this.obSteps()[i]; if(!s) return null;
-    if(s.kind==='chips') return h('div',{style:{display:'flex',flexWrap:'wrap',gap:8,marginTop:11}}, s.opts.map(o=>h('button',{key:o,onClick:()=>this.obAnswer(i,o),
-      style:{border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:999,padding:'8px 14px',fontSize:12.5,fontWeight:600,cursor:'pointer'}}, o)));
-    if(s.kind==='wealth') return h('div',{style:{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap',marginTop:11}},
-      h('div',{style:{display:'flex',alignItems:'center',gap:6,border:'1px solid var(--line)',background:'var(--surface)',borderRadius:10,padding:'8px 12px'}},
-        h('span',{style:{fontSize:14,color:'var(--muted)'}},'€'),
-        h('input',{type:'number',min:0,step:0.5,autoFocus:true,value:this.state.investWealthM,onChange:e=>this.setState({investWealthM:Math.max(0,+e.target.value||0)}),style:{width:92,border:'none',background:'transparent',outline:'none',fontSize:15,fontWeight:700,color:'var(--ink)',fontFamily:SF}}),
-        h('span',{style:{fontSize:13,color:'var(--muted)'}},'million')),
-      h('button',{onClick:()=>this.obAnswer(i,this.wealthText()+' investable'),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'9px 15px',fontSize:13,fontWeight:700,cursor:'pointer'}},'Continue →'));
-    if(s.kind==='slider') return h('div',{style:{display:'flex',gap:12,alignItems:'center',flexWrap:'wrap',marginTop:11}},
-      h('div',{style:{display:'flex',alignItems:'center',gap:10,flex:1,minWidth:200,maxWidth:340}},
-        h('input',{type:'range',min:5,max:100,value:this.state.targetPct,onChange:e=>this.setState({targetPct:+e.target.value}),style:{flex:1,accentColor:'var(--brand)',cursor:'pointer'}}),
-        h('span',{style:{fontFamily:SF,fontWeight:700,fontSize:16,minWidth:46}}, this.state.targetPct+'%')),
-      h('button',{onClick:()=>this.obAnswer(i,this.state.targetPct+'% to private markets'),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'9px 15px',fontSize:13,fontWeight:700,cursor:'pointer'}},'Continue →'));
-    // free-text — they actually type into the chat
-    return h('div',{style:{marginTop:11}},
-      h('div',{style:{display:'flex',gap:8,alignItems:'center',background:'var(--surface)',border:'1px solid var(--line)',borderRadius:12,padding:'5px 5px 5px 14px'}},
-        h('input',{type:'text',autoFocus:true,placeholder:'e.g. cautious on US exposure; liquidity event in March…',value:this.dtog('obContext',''),onChange:e=>this.setDtog('obContext',e.target.value),onKeyDown:e=>{if(e.key==='Enter')this.obFinishText();},style:{flex:1,border:'none',background:'transparent',outline:'none',fontSize:13,color:'var(--ink)'}}),
-        h('button',{onClick:()=>this.obFinishText(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:9,padding:'9px 14px',fontSize:12.5,fontWeight:700,cursor:'pointer',flex:'0 0 auto'}},'Send →')),
-      h('div',{style:{marginTop:7}}, h('button',{onClick:()=>this.obFinishText(true),style:{border:'none',background:'transparent',color:'var(--muted)',fontSize:12,fontWeight:600,cursor:'pointer'}},'Skip — nothing to add')));
+    this.setState({ showOnboardForm:false, seenOnboard:true });
   }
   stateSwitcher(){
     return this.seg([
@@ -5480,8 +5463,9 @@ class Component extends DCLogic {
       stageTitle:this.curUC().title, stageSubtitle:this.curUC().meta,
       showOverview: this.curPage().view==='overview', showOther: this.curPage().view!=='overview', surfaceBody:this.surfaceBody(),
       cohortLabel: this.cohortSummary(),
-      welcome:s.welcome, enterApp:()=>{ this.setState({welcome:false,ws:'understand',homeLaunched:false}); if(this.obFirstTime()){ clearTimeout(this._obStart); this._obStart=setTimeout(()=>this.startOnboardingChat(),600); } },
+      welcome:s.welcome, enterApp:()=>{ this.setState({welcome:false,ws:'understand',homeLaunched:false, showOnboardForm:this.obFirstTime()}); },
       showThemePicker:s.showThemePicker, themePickerBody:this.themePickerBody(),
+      showOnboardForm:s.showOnboardForm, onboardFormBody: s.showOnboardForm? this.onboardFormBody() : null,
       showProfile:s.showProfile, closeProfile:()=>this.setState({showProfile:false}), profileModalBody:this.profileModalBody(),
       showNotif:s.showNotif, closeNotif:()=>this.setState({showNotif:false}), notifPanelBody:this.notifPanelBody(),
       showToast: s.showToast && s.homeLaunched && this.curPage().view==='home' && !s.welcome, toastBody:this.toastBody(),
