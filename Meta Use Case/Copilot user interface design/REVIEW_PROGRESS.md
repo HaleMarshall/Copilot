@@ -68,4 +68,16 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 44 Header 'Funds you hold by strategy' — dropped the comma on all 3 fund-card titles → "Funds you hold by {strategy/region/currency/vintage}"; metric functions (DPI/IRR/TVPI/MOIC/DVPI) + sort already on this detail view (39–42). Syntax OK.
 - ☑ 45 Larger middle-row overview block — new `drillBigBlock(rows,byCat,label)` 'Portfolio at a glance' card inserted as the middle row of homeDrillBody; compact = top-3 ranked bars + '⤢ Go bigger'; expanded = large per-bucket cards (big fund-count, %NAV, fund-name chips) + '↙ Show compact' (dtog `drillBig`). Verified live: compact→Go bigger, big→Show compact + all 8 fund chips; logicError null.
 
-**NEXT: item 46** — Alpha's Insights panel blue (46–55 cluster).
+## 46–55 Breakdown views (blue Alpha panel, gap CTA, region/currency parity, fund modal/page)
+- ☑ 46 Alpha's read panel blue — `card()` gained `tone:'alpha'` (brand→brand-ink gradient, white title/text/caption, matches Set-target brand blue per item 72); strategy/region/currency detail `summaryCard` now `tone:'alpha'` with white-recolored inner text + white gap-CTA button. Verified live: alphaBg gradient, white title; plain cards unchanged; logicError null.
+- ☐ 47 Always show 'Suggest funds to fill the gaps' on breakdown views
+- ☐ 48 Keep intermediate teaser page
+- ☐ 49 Teaser leads with 'Your Top Five Performing Investments' + See full breakdown
+- ☐ 50 Region breakdown parity (toggles/sort/blue Alpha panel)
+- ☐ 51 'All details' link per individual investment
+- ⊘ 52 Keep fund mini-modal (confirm)
+- ⊘ 53 Keep full fund page + add DVPI to KPI row (DVPI added in 37 — confirm)
+- ☐ 54 Full-fund-page 'Take action' → 'Suggest similar funds' (held) — pre-wired via fundActions (38); confirm on full page
+- ☐ 55 Currency breakdown parity
+
+**NEXT: item 47** — always-present 'Suggest funds to fill the gaps' CTA on breakdown views.

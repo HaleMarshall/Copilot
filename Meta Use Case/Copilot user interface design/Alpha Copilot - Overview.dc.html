@@ -3221,16 +3221,20 @@ class Component extends DCLogic {
   coverageBadge(pct){ return this.badge(`look-through ${pct}% of NAV`,'conf'); }
   card(opts){
     const h=this.h;
+    const alpha = opts.tone==='alpha'; /* item 46/72 — Alpha panels rendered in the brand dark-blue (matches the Set-target button) */
+    const base = alpha
+      ? {background:'linear-gradient(135deg, var(--brand) 0%, var(--brand-ink) 100%)',border:'1px solid var(--brand)',color:'#fff'}
+      : {background:'var(--surface)',border:'1px solid var(--line)'};
     return h('section',{onClick:opts.onClick||null,
-      onMouseEnter:opts.onClick?(e=>{e.currentTarget.style.boxShadow='0 8px 26px -14px rgba(20,24,58,.38)';e.currentTarget.style.borderColor='var(--brand-tint-3)';}):null,
-      onMouseLeave:opts.onClick?(e=>{e.currentTarget.style.boxShadow='none';e.currentTarget.style.borderColor='var(--line)';}):null,
-      style:{background:'var(--surface)',border:'1px solid var(--line)',borderRadius:14,padding:18,display:'flex',flexDirection:'column',minWidth:0,cursor:opts.onClick?'pointer':'default',transition:'box-shadow .18s ease, border-color .18s ease',...(opts.style||{})}},
+      onMouseEnter:opts.onClick?(e=>{e.currentTarget.style.boxShadow='0 8px 26px -14px rgba(20,24,58,.38)';e.currentTarget.style.borderColor=alpha?'var(--brand)':'var(--brand-tint-3)';}):null,
+      onMouseLeave:opts.onClick?(e=>{e.currentTarget.style.boxShadow='none';e.currentTarget.style.borderColor=alpha?'var(--brand)':'var(--line)';}):null,
+      style:{...base,borderRadius:14,padding:18,display:'flex',flexDirection:'column',minWidth:0,cursor:opts.onClick?'pointer':'default',transition:'box-shadow .18s ease, border-color .18s ease',...(opts.style||{})}},
       h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,marginBottom:opts.tight?8:12}},
         h('div',{style:{display:'flex',alignItems:'center',gap:9}},
-          h('h2',{style:{margin:0,fontSize:opts.big?22:17,fontWeight:opts.big?700:600,letterSpacing:opts.big?'-.01em':'0',fontFamily:"'Source Serif 4',Georgia,serif"}},opts.title), opts.info?h('span',{style:{fontSize:13,color:'var(--muted)',border:'1px solid var(--line)',borderRadius:'50%',width:16,height:16,display:'inline-flex',alignItems:'center',justifyContent:'center',lineHeight:1}},'i'):null, opts.badge||null),
+          h('h2',{style:{margin:0,fontSize:opts.big?22:17,fontWeight:opts.big?700:600,letterSpacing:opts.big?'-.01em':'0',fontFamily:"'Source Serif 4',Georgia,serif",color:alpha?'#fff':undefined}},opts.title), opts.info?h('span',{style:{fontSize:13,color:'var(--muted)',border:'1px solid var(--line)',borderRadius:'50%',width:16,height:16,display:'inline-flex',alignItems:'center',justifyContent:'center',lineHeight:1}},'i'):null, opts.badge||null),
         opts.right||null),
       opts.children,
-      opts.caption? h('div',{style:{fontSize:12,lineHeight:1.45,color:'var(--muted)',marginTop:10,textWrap:'pretty'}},opts.caption):null);
+      opts.caption? h('div',{style:{fontSize:12,lineHeight:1.45,color:alpha?'rgba(255,255,255,.72)':'var(--muted)',marginTop:10,textWrap:'pretty'}},opts.caption):null);
   }
   donutNamed(slices, size, top, bot){
     const h=this.h; const tot=slices.reduce((a,s)=>a+s.p,0)||1;
@@ -4706,14 +4710,14 @@ class Component extends DCLogic {
     const allFunds=roster.filter(f=>catOf(f)!=null);
     const totNav=allFunds.reduce((a,f)=>a+((meta[f.id]||{}).nav||0),0);
     const topF=allFunds.slice().sort((a,b)=>((meta[b.id]||{}).nav||0)-((meta[a.id]||{}).nav||0))[0];
-    const summaryCard=this.card({title:'Alpha’s read on your '+d.label.toLowerCase()+' funds',badge:this.badge('AI','synth'),style:{height:'100%'},
+    const summaryCard=this.card({title:'Alpha’s read on your '+d.label.toLowerCase()+' funds',badge:this.badge('AI','synth'),tone:'alpha',style:{height:'100%'},
       children:h('div',{style:{display:'flex',flexDirection:'column',gap:14}},
-        h('div',{style:{fontSize:13,lineHeight:1.6,color:'var(--ink)'}},
-          'Your '+d.label.toLowerCase()+' exposure is led by ',h('strong',null,heavy.n),' ('+heavy.you+'% of NAV)',topF?[', with ',h('strong',{key:'t'},topF.name),' your largest single fund']:null,'. ',
-          empty.length? ['You have ',h('strong',{key:'e'},'no direct fund'),' in '+empty.map(r=>r.n).join(', ')+' — clear places to add if you want the exposure.'] : 'You hold direct funds across every bucket — a well-rounded book.'),
+        h('div',{style:{fontSize:13,lineHeight:1.6,color:'rgba(255,255,255,.92)'}},
+          'Your '+d.label.toLowerCase()+' exposure is led by ',h('strong',{style:{color:'#fff'}},heavy.n),' ('+heavy.you+'% of NAV)',topF?[', with ',h('strong',{key:'t',style:{color:'#fff'}},topF.name),' your largest single fund']:null,'. ',
+          empty.length? ['You have ',h('strong',{key:'e',style:{color:'#fff'}},'no direct fund'),' in '+empty.map(r=>r.n).join(', ')+' — clear places to add if you want the exposure.'] : 'You hold direct funds across every bucket — a well-rounded book.'),
         this.kpiTiles([['Funds held',allFunds.length+''],['NAV in this book','€'+totNav.toFixed(1)+'m'],['Buckets covered',fundRows.length+' of '+rows.length],['Largest holding',topF?topF.name:'—']]),
         h('button',{onClick:()=>this.setState({homeDrill:null,homeFocusCat:null,simSuggest:(key==='strategy'?'strategy':key)}),
-          style:{border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:10,padding:'11px',fontSize:12.5,fontWeight:600,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'✦ Suggest funds to fill the gaps  →')),
+          style:{border:'none',background:'#fff',color:'var(--brand-ink)',borderRadius:10,padding:'11px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'✦ Suggest funds to fill the gaps  →')),
       caption:'A plain-language read of your '+d.label.toLowerCase()+' book and where the gaps are.'});
 
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
