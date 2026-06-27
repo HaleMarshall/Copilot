@@ -82,8 +82,8 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 
 ## 56–68 Overview drill-down + NAV/Committed + nav label
 - ⊘ 56 All concentration dimensions full-breakdown-able — confirmed: Strategy/Region/Currency/Sector/Vintage overview cards each `allocBlock(...onClick:openHomePop(popKey))` → teaser → 'See full breakdown' → homeDrill full breakdown. None a dead-end.
-- ☐ 57 NAV vs Committed toggle on allocation/concentration views
-- ☐ 58 Default the NAV/Committed toggle to NAV
+- ☑ 57 NAV vs Committed toggle on allocation views — added Basis (NAV/Committed) toggle to the Asset-allocation header; `basisPct(key)` recomputes strategy/region/currency/sector % from held funds' committed weight (nav+navUncommitted) on Committed basis; € total switches NAV↔Committed (`committedTotal`). Verified live: Committed strategy buyout 43/growth 20.5/…; € total €16.6m→€24.4m; logicError null.
+- ☑ 58 Default the NAV/Committed toggle to NAV — `allocBasis()` defaults 'NAV'. Verified live: defaultBasis='NAV'.
 - ☐ 59 Rename UNDERSTAND 'Home' → 'Overview' (+ breadcrumb)
 - ☐ 60 Clicking UNDERSTAND always lands on Overview first
 - ☐ 61 Split AI out of Tech in Sector donut

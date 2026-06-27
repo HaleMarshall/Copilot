@@ -2602,6 +2602,21 @@ class Component extends DCLogic {
   SF="'Source Serif 4',Georgia,serif";
   dtog(k,def){ return (this.state.dtog[k]!==undefined)? this.state.dtog[k] : def; }
   setDtog(k,v){ this.setState({dtog:{...this.state.dtog,[k]:v}}); }
+  /* items 57/58/67/68 — NAV vs Committed basis for allocation views; NAV is the default ('how you're invested now'). Committed adds capital still to be called (nav + navUncommitted). */
+  allocBasis(){ return this.dtog('allocBasis','NAV'); }
+  eurNum(s){ return parseFloat(String(s==null?'':s).replace(/[^0-9.\-]/g,''))||0; }
+  fundCommitted(f){ return this.eurNum(f.nav)+this.eurNum(f.navUncommitted); }
+  committedTotal(){ return this.HELD_FUNDS().reduce((a,f)=>a+this.fundCommitted(f),0); }
+  navTotal(){ return this.HELD_FUNDS().reduce((a,f)=>a+this.eurNum(f.nav),0); }
+  /* basis-aware % map for a dimension. NAV → look-through HOME_DIMS .actual; Committed → recomputed from held funds' committed weight. */
+  basisPct(key){ const d=this.HOME_DIMS().find(x=>x.key===key); const actual=(d&&d.actual)||{};
+    if(this.allocBasis()!=='Committed') return actual;
+    const meta=this.HELD_META(); const roster=this.HELD_FUNDS();
+    const catOf=(f)=> key==='strategy'? (meta[f.id]||{}).strat : (meta[f.id]||{})[key];
+    let tot=0; const raw={}; roster.forEach(f=>{ const c=catOf(f); if(c==null) return; const w=this.fundCommitted(f); raw[c]=(raw[c]||0)+w; tot+=w; }); tot=tot||1;
+    const out={}; Object.keys(actual).forEach(k=>{ out[k]= raw[k]? Math.round(raw[k]/tot*1000)/10 : 0; });
+    Object.keys(raw).forEach(k=>{ if(out[k]===undefined) out[k]=Math.round(raw[k]/tot*1000)/10; });
+    return out; }
   pill(k,opts,def){ return this.seg(opts.map(o=>typeof o==='string'?{label:o,value:o}:o), this.dtog(k,def), v=>this.setDtog(k,v), {sm:true}); }
   twoCol(a,b,cols){ return this.h('div',{style:{display:'grid',gridTemplateColumns:cols||'1fr 1fr',gap:16,alignItems:'stretch'}},a,b); }
   stack(arr){ return this.h('div',{style:{display:'flex',flexDirection:'column',gap:14}},arr); }
@@ -4525,20 +4540,26 @@ class Component extends DCLogic {
         h('div',{onClick:e=>e.stopPropagation()}, this.topHoldingsModule()))});
 
     // ============ COLUMN 2 — ASSET ALLOCATION (unified data → persistent colours) ============
-    const sd=dim('strategy');
+    const basis=this.allocBasis(); // item 57/58 — NAV (default) vs Committed
+    const sd=dim('strategy'); const sp=this.basisPct('strategy');
     const bigStrats=['buyout','ai','growth','venture','directs','infra','credit'];
-    const stratRows=bigStrats.map(k=>{ const s=this.STRATS.find(x=>x[0]===k); return {label:s[1], v:sd.actual[k]||0, color:s[2], onClick:()=>this.openHomePop('strategy',k)}; });
-    const rd=dim('region');
-    const regionRows=Object.keys(rd.actual).map(k=>({label:k, v:rd.actual[k], color:rd.colors[k], onClick:()=>this.openHomePop('region',k)}));
-    const cd=dim('currency'); const ccySlices=Object.keys(cd.actual).map(k=>({n:k,p:cd.actual[k],color:cd.colors[k]}));
-    const secd=dim('sector'); const secSlices=Object.keys(secd.actual).map(k=>({n:k,p:secd.actual[k],color:secd.colors[k]}));
-    // A11: € / % unit toggle on the allocation breakdowns (€ derived from portfolio NAV in the DB)
+    const stratRows=bigStrats.map(k=>{ const s=this.STRATS.find(x=>x[0]===k); return {label:s[1], v:sp[k]||0, color:s[2], onClick:()=>this.openHomePop('strategy',k)}; });
+    const rd=dim('region'); const rp=this.basisPct('region');
+    const regionRows=Object.keys(rd.actual).map(k=>({label:k, v:rp[k]||0, color:rd.colors[k], onClick:()=>this.openHomePop('region',k)}));
+    const cd=dim('currency'); const cp=this.basisPct('currency'); const ccySlices=Object.keys(cd.actual).map(k=>({n:k,p:cp[k]||0,color:cd.colors[k]}));
+    const secd=dim('sector'); const secp=this.basisPct('sector'); const secSlices=Object.keys(secd.actual).map(k=>({n:k,p:secp[k]||0,color:secd.colors[k]}));
+    // A11: € / % unit toggle on the allocation breakdowns (€ derived from the basis total — NAV or Committed)
     const NAV=(P.nav)||0;
+    const basisTot= basis==='Committed' ? this.committedTotal() : NAV;
     const allocUnit=this.dtog('allocUnit','%');
-    const fmtUnit=(pct)=> allocUnit==='€' ? ('€'+(pct/100*NAV).toFixed(1)+'m') : ((Math.round(pct*10)/10)+'%');
-    const allocToggle=h('div',{style:{display:'flex',alignItems:'center',gap:7}},
-      h('span',{style:{fontSize:10.5,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em',fontWeight:600}},'Show as'),
-      this.seg([{label:'%',value:'%'},{label:'€',value:'€'}], allocUnit, v=>this.setDtog('allocUnit',v),{sm:true}));
+    const fmtUnit=(pct)=> allocUnit==='€' ? ('€'+(pct/100*basisTot).toFixed(1)+'m') : ((Math.round(pct*10)/10)+'%');
+    const allocToggle=h('div',{style:{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}},
+      h('div',{style:{display:'flex',alignItems:'center',gap:6}},
+        h('span',{style:{fontSize:10.5,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em',fontWeight:600}},'Basis'),
+        this.seg([{label:'NAV',value:'NAV'},{label:'Committed',value:'Committed'}], basis, v=>this.setDtog('allocBasis',v),{sm:true})),
+      h('div',{style:{display:'flex',alignItems:'center',gap:6}},
+        h('span',{style:{fontSize:10.5,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em',fontWeight:600}},'Show as'),
+        this.seg([{label:'%',value:'%'},{label:'€',value:'€'}], allocUnit, v=>this.setDtog('allocUnit',v),{sm:true})));
     const donutRow=(slices,centerTop,onClick)=>h('div',{onClick,style:{display:'flex',alignItems:'center',gap:18,cursor:onClick?'pointer':'default'}},
       this.donutNamed(slices,124,centerTop,'mix'),
       h('div',{style:{flex:1,display:'flex',flexDirection:'column',gap:7}}, slices.map((s,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',gap:9,fontSize:12.5}},
