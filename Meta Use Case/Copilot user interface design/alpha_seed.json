@@ -242,7 +242,11 @@
       "nav": "€4.6m",
       "called": "92%",
       "stage": "Harvesting",
-      "note": "Top contributor this quarter — three portfolio exits marked up."
+      "note": "Top contributor this quarter — three portfolio exits marked up.",
+      "tvpi": "2.4x",
+      "dvpi": "2.3x",
+      "month": "Mar 2019",
+      "navUncommitted": "€0.2m"
     },
     {
       "id": "thrive8",
@@ -258,7 +262,11 @@
       "nav": "€3.1m",
       "called": "74%",
       "stage": "Buying",
-      "note": "AI holdings re-rated; still early on realisations."
+      "note": "AI holdings re-rated; still early on realisations.",
+      "tvpi": "2.0x",
+      "dvpi": "1.9x",
+      "month": "Jul 2021",
+      "navUncommitted": "€1.0m"
     },
     {
       "id": "ga",
@@ -274,7 +282,11 @@
       "nav": "€2.4m",
       "called": "81%",
       "stage": "Deploying",
-      "note": "Steady growth-equity compounding across tech & consumer."
+      "note": "Steady growth-equity compounding across tech & consumer.",
+      "tvpi": "1.8x",
+      "dvpi": "1.7x",
+      "month": "Feb 2020",
+      "navUncommitted": "€0.6m"
     },
     {
       "id": "cvc9",
@@ -290,7 +302,11 @@
       "nav": "€2.0m",
       "called": "58%",
       "stage": "Buying",
-      "note": "Mid-life European buyout — tracking plan."
+      "note": "Mid-life European buyout — tracking plan.",
+      "tvpi": "1.5x",
+      "dvpi": "1.4x",
+      "month": "Sep 2022",
+      "navUncommitted": "€1.1m"
     },
     {
       "id": "arespcs",
@@ -306,7 +322,11 @@
       "nav": "€1.5m",
       "called": "46%",
       "stage": "Deploying",
-      "note": "Income accruing; mark held flat — small drag this quarter."
+      "note": "Income accruing; mark held flat — small drag this quarter.",
+      "tvpi": "1.2x",
+      "dvpi": "1.1x",
+      "month": "May 2023",
+      "navUncommitted": "€1.4m"
     },
     {
       "id": "cinven8",
@@ -322,7 +342,11 @@
       "nav": "€1.8m",
       "called": "69%",
       "stage": "Buying",
-      "note": "One holding written down — biggest detractor this quarter."
+      "note": "One holding written down — biggest detractor this quarter.",
+      "tvpi": "1.3x",
+      "dvpi": "1.2x",
+      "month": "Nov 2021",
+      "navUncommitted": "€0.8m"
     },
     {
       "id": "northwind",
@@ -338,7 +362,11 @@
       "nav": "€0.7m",
       "called": "38%",
       "stage": "J-curve",
-      "note": "Young infra fund — J-curve trough, expected."
+      "note": "Young infra fund — J-curve trough, expected.",
+      "tvpi": "0.9x",
+      "dvpi": "0.9x",
+      "month": "Jan 2024",
+      "navUncommitted": "€1.2m"
     },
     {
       "id": "meridian",
@@ -354,7 +382,11 @@
       "nav": "€0.5m",
       "called": "22%",
       "stage": "J-curve",
-      "note": "Recently called; too early to mark."
+      "note": "Recently called; too early to mark.",
+      "tvpi": "1.0x",
+      "dvpi": "1.0x",
+      "month": "Aug 2024",
+      "navUncommitted": "€1.5m"
     }
   ],
   "heldMeta": {

@@ -3385,16 +3385,25 @@ class Component extends DCLogic {
 
   /* ---- fund roster for Performance Attribution (real holdings) ---- */
   HELD_FUNDS(){ if(this.DB) return this.DB.empty?[]:(this.DB.heldFunds||[]); return [
-    {id:'eqtix',name:'EQT IX',mgr:'EQT Partners',logo:'eqt',strat:'Buyout',vintage:2019,contrib:1.8,moic:'2.3x',dpi:'1.1x',irr:'19.4%',nav:'€4.6m',called:'92%',stage:'Harvesting',note:'Top contributor this quarter — three portfolio exits marked up.'},
-    {id:'thrive8',name:'Thrive Capital VIII',mgr:'Thrive Capital',logo:'general-atlantic',strat:'AI / Tech',vintage:2021,contrib:1.2,moic:'1.9x',dpi:'0.3x',irr:'16.1%',nav:'€3.1m',called:'74%',stage:'Buying',note:'AI holdings re-rated; still early on realisations.'},
-    {id:'ga',name:'General Atlantic IP',mgr:'General Atlantic',logo:'general-atlantic',strat:'Growth',vintage:2020,contrib:0.7,moic:'1.7x',dpi:'0.5x',irr:'14.2%',nav:'€2.4m',called:'81%',stage:'Deploying',note:'Steady growth-equity compounding across tech & consumer.'},
-    {id:'cvc9',name:'CVC IX',mgr:'CVC Capital',logo:'eqt',strat:'Buyout',vintage:2022,contrib:0.4,moic:'1.4x',dpi:'0.2x',irr:'11.8%',nav:'€2.0m',called:'58%',stage:'Buying',note:'Mid-life European buyout — tracking plan.'},
-    {id:'arespcs',name:'Ares PCS',mgr:'Ares Management',logo:'ares',strat:'Private Credit',vintage:2023,contrib:-0.3,moic:'1.1x',dpi:'0.1x',irr:'8.4%',nav:'€1.5m',called:'46%',stage:'Deploying',note:'Income accruing; mark held flat — small drag this quarter.'},
-    {id:'cinven8',name:'Cinven 8',mgr:'Cinven',logo:'eqt',strat:'Buyout',vintage:2021,contrib:-0.6,moic:'1.2x',dpi:'0.1x',irr:'7.1%',nav:'€1.8m',called:'69%',stage:'Buying',note:'One holding written down — biggest detractor this quarter.'},
-    {id:'northwind',name:'Northwind Infra III',mgr:'Northwind',logo:'ares',strat:'Infrastructure',vintage:2024,contrib:-0.2,moic:'0.9x',dpi:'0.0x',irr:'−4.0%',nav:'€0.7m',called:'38%',stage:'J-curve',note:'Young infra fund — J-curve trough, expected.'},
-    {id:'meridian',name:'Meridian Growth IV',mgr:'Meridian',logo:'general-atlantic',strat:'Growth',vintage:2024,contrib:-0.1,moic:'1.0x',dpi:'0.0x',irr:'−1.2%',nav:'€0.5m',called:'22%',stage:'J-curve',note:'Recently called; too early to mark.'}
+    {id:'eqtix',name:'EQT IX',mgr:'EQT Partners',logo:'eqt',strat:'Buyout',vintage:2019,month:'Mar 2019',contrib:1.8,moic:'2.3x',tvpi:'2.4x',dvpi:'2.3x',dpi:'1.1x',irr:'19.4%',nav:'€4.6m',navUncommitted:'€0.2m',called:'92%',stage:'Harvesting',note:'Top contributor this quarter — three portfolio exits marked up.'},
+    {id:'thrive8',name:'Thrive Capital VIII',mgr:'Thrive Capital',logo:'general-atlantic',strat:'AI / Tech',vintage:2021,month:'Jul 2021',contrib:1.2,moic:'1.9x',tvpi:'2.0x',dvpi:'1.9x',dpi:'0.3x',irr:'16.1%',nav:'€3.1m',navUncommitted:'€1.0m',called:'74%',stage:'Buying',note:'AI holdings re-rated; still early on realisations.'},
+    {id:'ga',name:'General Atlantic IP',mgr:'General Atlantic',logo:'general-atlantic',strat:'Growth',vintage:2020,month:'Feb 2020',contrib:0.7,moic:'1.7x',tvpi:'1.8x',dvpi:'1.7x',dpi:'0.5x',irr:'14.2%',nav:'€2.4m',navUncommitted:'€0.6m',called:'81%',stage:'Deploying',note:'Steady growth-equity compounding across tech & consumer.'},
+    {id:'cvc9',name:'CVC IX',mgr:'CVC Capital',logo:'eqt',strat:'Buyout',vintage:2022,month:'Sep 2022',contrib:0.4,moic:'1.4x',tvpi:'1.5x',dvpi:'1.4x',dpi:'0.2x',irr:'11.8%',nav:'€2.0m',navUncommitted:'€1.1m',called:'58%',stage:'Buying',note:'Mid-life European buyout — tracking plan.'},
+    {id:'arespcs',name:'Ares PCS',mgr:'Ares Management',logo:'ares',strat:'Private Credit',vintage:2023,month:'May 2023',contrib:-0.3,moic:'1.1x',tvpi:'1.2x',dvpi:'1.1x',dpi:'0.1x',irr:'8.4%',nav:'€1.5m',navUncommitted:'€1.4m',called:'46%',stage:'Deploying',note:'Income accruing; mark held flat — small drag this quarter.'},
+    {id:'cinven8',name:'Cinven 8',mgr:'Cinven',logo:'eqt',strat:'Buyout',vintage:2021,month:'Nov 2021',contrib:-0.6,moic:'1.2x',tvpi:'1.3x',dvpi:'1.2x',dpi:'0.1x',irr:'7.1%',nav:'€1.8m',navUncommitted:'€0.8m',called:'69%',stage:'Buying',note:'One holding written down — biggest detractor this quarter.'},
+    {id:'northwind',name:'Northwind Infra III',mgr:'Northwind',logo:'ares',strat:'Infrastructure',vintage:2024,month:'Jan 2024',contrib:-0.2,moic:'0.9x',tvpi:'0.9x',dvpi:'0.9x',dpi:'0.0x',irr:'−4.0%',nav:'€0.7m',navUncommitted:'€1.2m',called:'38%',stage:'J-curve',note:'Young infra fund — J-curve trough, expected.'},
+    {id:'meridian',name:'Meridian Growth IV',mgr:'Meridian',logo:'general-atlantic',strat:'Growth',vintage:2024,month:'Aug 2024',contrib:-0.1,moic:'1.0x',tvpi:'1.0x',dvpi:'1.0x',dpi:'0.0x',irr:'−1.2%',nav:'€0.5m',navUncommitted:'€1.5m',called:'22%',stage:'J-curve',note:'Recently called; too early to mark.'}
   ]; }
   fundById(id){ return this.HELD_FUNDS().find(f=>f.id===id) || this.FOLLOW_FUNDS().find(f=>f.id===id); }
+  /* items 38/54/63/64 — holding status drives the fund CTA: held → "Suggest similar funds"; not-held → "Buy now" */
+  isHeld(name){ return this.HELD_FUNDS().some(f=>f.name===name); }
+  suggestSimilar(name,strat){ const f=this.HELD_FUNDS().find(x=>x.name===name); const s=strat||(f&&f.strat)||'';
+    this.setState({showCart:false,showNotif:false,showProfile:false});
+    this.homeSend('Suggest similar '+(s?s+' ':'')+'funds to '+name+' that I don’t already hold and are available on Moonfare now'); }
+  /* metric set used by holdings/strategy toggles + KPI rows (item 37 — DVPI added) */
+  METRICS(){ return ['IRR','DPI','TVPI','MOIC','DVPI']; }
+  metricVal(f,m){ const k={IRR:'irr',DPI:'dpi',TVPI:'tvpi',MOIC:'moic',DVPI:'dvpi'}[m]||'irr'; return (f&&f[k])||'—'; }
+  metricNum(f,m){ return parseFloat(this.metricVal(f,m))||0; }
   /* ---- Follow function (A32): prospective funds your followed group just committed to ---- */
   FOLLOW_FUNDS(){ if(this.DB) return this.DB.empty?[]:(this.DB.followFunds||[]); return [
     {id:'kkr13',name:'KKR North America XIII',mgr:'KKR',strat:'Buyout',region:'North America',size:'€19.0bn',tgt:'2.0–2.2x',close:'Oct 2026',min:'€50,000',prospect:true,
@@ -3461,7 +3470,7 @@ class Component extends DCLogic {
           h('div',{style:{fontSize:12,color:'var(--muted)'}}, prospect?('Open · closes '+(f.close||'soon')):('Vintage '+(f.vintage||m.vintage)+' · '+f.stage))),
         h('button',{onClick:close,title:'Close',style:{border:'1px solid var(--line)',background:'var(--surface-2)',color:'var(--muted)',width:30,height:30,borderRadius:8,cursor:'pointer',fontSize:15,flex:'0 0 auto'}},'✕')),
       prospect?null:h('div',{style:{flex:'0 0 auto',display:'flex',gap:10,flexWrap:'wrap',padding:'14px 22px',borderBottom:'1px solid var(--line)',background:'var(--surface-2)'}},
-        stat('This-qtr contribution',(pos?'+':'')+f.contrib+'pp',pos?'var(--over)':'var(--under)'), stat('Net MOIC',f.moic), stat('DPI',f.dpi), stat('Net IRR',f.irr), stat('Your NAV',f.nav), stat('Called',f.called)),
+        stat('This-qtr contribution',(pos?'+':'')+f.contrib+'pp',pos?'var(--over)':'var(--under)'), stat('Net MOIC',f.moic), stat('TVPI',f.tvpi), stat('DVPI',f.dvpi), stat('DPI',f.dpi), stat('Net IRR',f.irr), stat('Your NAV',f.nav), stat('Called',f.called)),
       h('div',{style:{flex:1,overflowY:'auto',padding:'18px 22px'}},
         h('div',{style:{display:'grid',gridTemplateColumns:'1.6fr 1fr',gap:18,maxWidth:1100,margin:'0 auto',alignItems:'start'}}, main, side)));
   }
@@ -3473,6 +3482,10 @@ class Component extends DCLogic {
   inCart(name){ return (this.state.cart||[]).some(x=>x.name===name); }
   /* compact shop/buy icon — shown next to a fund name anywhere it appears in a list */
   shopBtn(name,strat,sm){ const h=this.h; const inC=this.inCart(name);
+    if(this.isHeld(name)){ /* item 62 — held funds show a static cart marker, not a buy action */
+      return h('span',{title:'Already in your portfolio',
+        style:{flex:'0 0 auto',display:'inline-flex',alignItems:'center',justifyContent:'center',gap:4,border:'1px solid var(--over)',background:'var(--over-wash)',color:'var(--over)',borderRadius:8,padding:sm?'4px 7px':'6px 10px',fontSize:sm?11:12,fontWeight:700,whiteSpace:'nowrap'}}, sm?'🛒':'🛒 Held');
+    }
     return h('button',{onClick:e=>{e.stopPropagation();this.addToCart(name,strat);},title:inC?'In cart':'Add to cart',
       style:{flex:'0 0 auto',display:'inline-flex',alignItems:'center',justifyContent:'center',gap:4,border:'1px solid '+(inC?'var(--over)':'var(--brand-tint-3)'),background:inC?'var(--over-wash)':'var(--surface)',color:inC?'var(--over)':'var(--brand-ink)',borderRadius:8,padding:sm?'4px 7px':'6px 10px',fontSize:sm?11:12,fontWeight:700,cursor:'pointer',whiteSpace:'nowrap'}}, inC?'🛒✓':('🛒'+(sm?'':' Buy')));
   }
@@ -3481,14 +3494,17 @@ class Component extends DCLogic {
   removeFromCart(name){ this.setState({cart:(this.state.cart||[]).filter(x=>x.name!==name)}); }
   setCartTicket(name,v){ this.setState({cart:(this.state.cart||[]).map(x=>x.name===name?{...x,ticket:Math.max(50,v)}:x)}); }
   /* reusable: Add-to-portfolio + Watchlist + Buy(cart) — shown wherever a fund appears */
-  fundActions(name,sm,strat){ const h=this.h; const inW=(this.state.watchlist||[]).includes(name); const inP=(this.state.portfolioAdds||[]).includes(name); const inC=this.inCart(name);
+  fundActions(name,sm,strat){ const h=this.h; const inW=(this.state.watchlist||[]).includes(name); const inP=(this.state.portfolioAdds||[]).includes(name); const inC=this.inCart(name); const held=this.isHeld(name);
     const pad=sm?'6px 10px':'9px 14px'; const fs=sm?11.5:12.5;
     return h('div',{style:{display:'flex',gap:8,flexWrap:'wrap'}},
-      h('button',{onClick:e=>{e.stopPropagation();this.addToCart(name,strat);},
-        style:{border:'none',borderRadius:9,padding:pad,fontSize:fs,fontWeight:700,cursor:'pointer',background:inC?'var(--over)':'var(--brand)',color:'#fff',fontFamily:'Inter,system-ui,sans-serif'}}, inC?'🛒 In cart':'🛒 Buy now'),
-      h('button',{onClick:e=>{e.stopPropagation();this.addToPortfolio(name);},
+      held
+        ? h('button',{onClick:e=>{e.stopPropagation();this.suggestSimilar(name,strat);},title:'You already hold this fund — see comparable funds on the platform',
+            style:{border:'none',borderRadius:9,padding:pad,fontSize:fs,fontWeight:700,cursor:'pointer',background:'var(--brand)',color:'#fff',fontFamily:'Inter,system-ui,sans-serif'}}, '✨ Suggest similar funds')
+        : h('button',{onClick:e=>{e.stopPropagation();this.addToCart(name,strat);},
+            style:{border:'none',borderRadius:9,padding:pad,fontSize:fs,fontWeight:700,cursor:'pointer',background:inC?'var(--over)':'var(--brand)',color:'#fff',fontFamily:'Inter,system-ui,sans-serif'}}, inC?'🛒 In cart':'🛒 Buy now'),
+      held?null:h('button',{onClick:e=>{e.stopPropagation();this.addToPortfolio(name);},
         style:{border:'1px solid '+(inP?'var(--over)':'var(--brand-tint-3)'),borderRadius:9,padding:pad,fontSize:fs,fontWeight:600,cursor:'pointer',background:inP?'var(--over-wash)':'var(--surface)',color:inP?'var(--over)':'var(--brand-ink)',fontFamily:'Inter,system-ui,sans-serif'}}, inP?'✓ In portfolio plan':'＋ Portfolio plan'),
-      h('button',{onClick:e=>{e.stopPropagation();this.toggleWatch(name);},
+      held?null:h('button',{onClick:e=>{e.stopPropagation();this.toggleWatch(name);},
         style:{border:'1px solid '+(inW?'var(--brand)':'var(--line)'),background:inW?'var(--brand-wash)':'var(--surface)',color:inW?'var(--brand-ink)':'var(--muted)',borderRadius:9,padding:pad,fontSize:fs,fontWeight:600,cursor:'pointer'}}, inW?'♥ Watchlisted':'♡ Watchlist'));
   }
   cartBtn(){ const h=this.h; const n=(this.state.cart||[]).length;
@@ -3767,7 +3783,7 @@ class Component extends DCLogic {
         'Look-through: primarily '+(m.sector||'diversified')+' companies, '+(m.region||'global')+', '+(m.currency||'multi-currency')+'-denominated.'];
       body=h('div',null,
         h('div',{style:{display:'flex',gap:8,padding:'14px 16px',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:12,marginBottom:12,flexWrap:'wrap'}},
-          stat('This-qtr contribution',(pos?'+':'')+f.contrib+'pp',pos?'var(--over)':'var(--under)'), stat('Net MOIC',f.moic), stat('DPI',f.dpi), stat('Net IRR',f.irr)),
+          stat('This-qtr contribution',(pos?'+':'')+f.contrib+'pp',pos?'var(--over)':'var(--under)'), stat('Net MOIC',f.moic), stat('TVPI',f.tvpi), stat('DVPI',f.dvpi), stat('DPI',f.dpi), stat('Net IRR',f.irr)),
         h('div',{style:{display:'flex',gap:8,padding:'12px 16px',border:'1px solid var(--line)',borderRadius:12,marginBottom:12,flexWrap:'wrap'}},
           stat('Your NAV',f.nav), stat('Called',f.called), stat('Uncalled',(Math.max(0,100-calledNum))+'%'), stat('Vintage',(m.vintage||f.vintage)+'')),
         h('div',{style:{display:'flex',gap:8,flexWrap:'wrap',marginBottom:14}}, chip('Strategy',f.strat), chip('Region',m.region||'—'), chip('Sector',m.sector||'—'), chip('Currency',m.currency||'—'), chip('Stage',f.stage)),
@@ -4337,14 +4353,14 @@ class Component extends DCLogic {
   topHoldingsModule(){
     const h=this.h; const SF=this.SF;
     const metric=this.dtog('topHoldMetric','IRR');
-    const num=(f)=> metric==='IRR'? parseFloat(f.irr) : (metric==='DPI'? parseFloat(f.dpi) : parseFloat(f.moic));
-    const fmt=(f)=> metric==='IRR'? f.irr : (metric==='DPI'? f.dpi : f.moic);
+    const num=(f)=> this.metricNum(f,metric);
+    const fmt=(f)=> this.metricVal(f,metric);
     const ranked=this.HELD_FUNDS().slice().sort((a,b)=>num(b)-num(a)).slice(0,4);
     const max=Math.max(...ranked.map(num),0.0001);
     return h('div',{style:{marginTop:16}},
       h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,marginBottom:10}},
         h('div',{style:{fontFamily:SF,fontSize:13.5,fontWeight:700}},'Top holdings by '+metric),
-        this.seg(['IRR','DPI','MOIC'].map(m=>({label:m,value:m})), metric, v=>this.setDtog('topHoldMetric',v), {sm:true})),
+        this.seg(this.METRICS().map(m=>({label:m,value:m})), metric, v=>this.setDtog('topHoldMetric',v), {sm:true})),
       h('div',{style:{display:'flex',flexDirection:'column',gap:8}}, ranked.map((f,i)=>h('div',{key:f.id,style:{display:'flex',alignItems:'center',gap:8}},
         h('button',{onClick:()=>this.openFund(f.id),
           style:{flex:1,minWidth:0,display:'flex',alignItems:'center',gap:10,textAlign:'left',border:'1px solid var(--line)',background:'var(--surface-2)',borderRadius:9,padding:'8px 10px',cursor:'pointer'}},
