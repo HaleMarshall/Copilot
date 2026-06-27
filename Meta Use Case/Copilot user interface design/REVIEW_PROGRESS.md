@@ -70,7 +70,7 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 
 ## 46–55 Breakdown views (blue Alpha panel, gap CTA, region/currency parity, fund modal/page)
 - ☑ 46 Alpha's read panel blue — `card()` gained `tone:'alpha'` (brand→brand-ink gradient, white title/text/caption, matches Set-target brand blue per item 72); strategy/region/currency detail `summaryCard` now `tone:'alpha'` with white-recolored inner text + white gap-CTA button. Verified live: alphaBg gradient, white title; plain cards unchanged; logicError null.
-- ☐ 47 Always show 'Suggest funds to fill the gaps' on breakdown views
+- ☑ 47 Always show 'Suggest funds to fill the gaps' — extracted reusable `gapCTA(key,white)`; strategy/region/currency summaryCard uses it; added a blue Alpha's-read panel + gapCTA to the vintage breakdown (which previously had none). Verified live: vintage drill now has gap CTA + Alpha panel; logicError null.
 - ☐ 48 Keep intermediate teaser page
 - ☐ 49 Teaser leads with 'Your Top Five Performing Investments' + See full breakdown
 - ☐ 50 Region breakdown parity (toggles/sort/blue Alpha panel)

@@ -4628,6 +4628,13 @@ class Component extends DCLogic {
       dim('region','Region'), dim('currency','Currency'), dim('sector','Sector')
     ];
   }
+  /* item 47 — 'Suggest funds to fill the gaps' must always be present on every breakdown view */
+  gapCTA(key, white){ const h=this.h;
+    return h('button',{onClick:()=>this.setState({homeDrill:null,homeFocusCat:null,simSuggest:(key==='strategy'?'strategy':key)}),
+      style:white
+        ? {border:'none',background:'#fff',color:'var(--brand-ink)',borderRadius:10,padding:'11px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}
+        : {border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:10,padding:'11px 16px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},
+      '✦ Suggest funds to fill the gaps  →'); }
   vintageDrillBody(){
     const h=this.h; const SF=this.SF; const vint=this.VINTAGES(); const meta=this.HELD_META(); const roster=this.HELD_FUNDS();
     const byYr={}; roster.forEach(f=>{ const y=(meta[f.id]||{}).vintage; (byYr[y]=byYr[y]||[]).push(f); });
@@ -4655,7 +4662,12 @@ class Component extends DCLogic {
           h('span',{style:{fontSize:12,color:'var(--muted)'}},'€'+x.v+'m · '+byYr[x.y].length+' fund'+(byYr[x.y].length>1?'s':''))),
         h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))',gap:9}}, byYr[x.y].map(f=>this.heldFundRow(f)))))),
       caption:'A pure reporting view of which funds sit in each vintage year. Click any fund for detail.'});
-    return h('div',{style:{display:'flex',flexDirection:'column',gap:16}}, this.twoCol(mixCard,insightCard,'1.3fr 1fr'), fundsCard);
+    const gapCard=this.card({title:'Alpha’s read on your vintage spread',badge:this.badge('AI','synth'),tone:'alpha',
+      children:h('div',{style:{display:'flex',flexDirection:'column',gap:12}},
+        h('div',{style:{fontSize:13,lineHeight:1.6,color:'rgba(255,255,255,.92)'}},'You have committed across ',h('strong',{style:{color:'#fff'}},years.length+' of '+vint.length+' years'),'. Spreading new commitments into under-weighted vintages smooths your J-curve.'),
+        this.gapCTA('vintage',true)),
+      caption:'Vintage diversification is the simplest lever on cash-flow timing.'});
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:16}}, this.twoCol(mixCard,insightCard,'1.3fr 1fr'), this.twoCol(fundsCard,gapCard,'1.7fr 1fr'));
   }
   homeDrillBody(key){
     const h=this.h; const SF=this.SF;
@@ -4716,8 +4728,7 @@ class Component extends DCLogic {
           'Your '+d.label.toLowerCase()+' exposure is led by ',h('strong',{style:{color:'#fff'}},heavy.n),' ('+heavy.you+'% of NAV)',topF?[', with ',h('strong',{key:'t',style:{color:'#fff'}},topF.name),' your largest single fund']:null,'. ',
           empty.length? ['You have ',h('strong',{key:'e',style:{color:'#fff'}},'no direct fund'),' in '+empty.map(r=>r.n).join(', ')+' — clear places to add if you want the exposure.'] : 'You hold direct funds across every bucket — a well-rounded book.'),
         this.kpiTiles([['Funds held',allFunds.length+''],['NAV in this book','€'+totNav.toFixed(1)+'m'],['Buckets covered',fundRows.length+' of '+rows.length],['Largest holding',topF?topF.name:'—']]),
-        h('button',{onClick:()=>this.setState({homeDrill:null,homeFocusCat:null,simSuggest:(key==='strategy'?'strategy':key)}),
-          style:{border:'none',background:'#fff',color:'var(--brand-ink)',borderRadius:10,padding:'11px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'✦ Suggest funds to fill the gaps  →')),
+        this.gapCTA(key,true)),
       caption:'A plain-language read of your '+d.label.toLowerCase()+' book and where the gaps are.'});
 
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
