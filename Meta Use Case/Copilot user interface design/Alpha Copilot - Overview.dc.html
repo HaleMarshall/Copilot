@@ -3669,6 +3669,21 @@ class Component extends DCLogic {
       vals.map((v,ci)=>h('div',{key:ci,title:name+' '+years[ci]+': '+v,style:{flex:1,height:22,borderRadius:3,background:'var(--data-1)',opacity:Math.min(1,0.06+v/55)}}))));
     return h('div',null, header, grid);
   }
+  /* item 49 — intermediate teaser always leads with the positive: Your Top Five Performing Investments + See full breakdown */
+  topFivePerformers(key){ const h=this.h; const SF=this.SF;
+    const top=this.HELD_FUNDS().slice().sort((a,b)=>this.metricNum(b,'IRR')-this.metricNum(a,'IRR')).slice(0,5);
+    return h('div',{style:{background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:11,padding:'12px 13px'}},
+      h('div',{style:{display:'flex',alignItems:'baseline',justifyContent:'space-between',gap:8,marginBottom:9}},
+        h('div',{style:{fontFamily:SF,fontSize:13.5,fontWeight:600}},'Your Top Five Performing Investments'),
+        h('span',{style:{fontSize:10.5,fontWeight:700,color:'var(--over)',background:'var(--over-wash)',border:'1px solid var(--over)',borderRadius:999,padding:'2px 8px'}},'▲ by IRR')),
+      h('div',{style:{display:'flex',flexDirection:'column',gap:6}}, top.map((f,i)=>h('div',{key:f.id,onClick:()=>this.openFund(f.id),
+        style:{display:'flex',alignItems:'center',gap:9,fontSize:12.5,cursor:'pointer',padding:'3px 0'}},
+        h('span',{style:{flex:'0 0 18px',fontFamily:SF,fontWeight:700,color:'var(--muted)'}},(i+1)+'.'),
+        h('span',{style:{flex:1,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},f.name),
+        h('span',{style:{fontFamily:SF,fontWeight:700,color:'var(--over)'}},f.irr)))),
+      key? h('button',{onClick:()=>this.setState({homePop:null,homeDrill:key}),
+        style:{marginTop:10,border:'none',background:'transparent',color:'var(--brand-ink)',fontSize:12,fontWeight:700,cursor:'pointer',padding:0,fontFamily:'Inter,system-ui,sans-serif'}},'See full breakdown  →') : null);
+  }
   homeDetailPanel(){
     const h=this.h; const SF=this.SF; const key=this.state.homePop;
     if(!key || this.curPage().view!=='home') return null;
@@ -3691,6 +3706,7 @@ class Component extends DCLogic {
       const fundRows=rows.filter(r=>byCat[r.k]&&byCat[r.k].length).sort((a,b)=>(a.k===focus?-1:b.k===focus?1:0));
       eyebrow='Your portfolio · '+d.label; title= focusName? 'Your '+focusName+' exposure' : 'Where you’re invested — '+d.label.toLowerCase();
       body=[
+        h('div',{key:'top5'}, this.topFivePerformers(key)),
         focusName? h('div',{key:'fn',style:{fontSize:12,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:9,padding:'9px 12px',fontWeight:600}}, '◧ Highlighting your '+focusName+' position — '+(d.actual[focus]||0)+'% of NAV.') : null,
         h('div',{key:'d',style:{display:'flex',gap:16,alignItems:'center'}},
           this.donutNamed(aSl,128,d.label,'your mix'),
@@ -3722,6 +3738,7 @@ class Component extends DCLogic {
       const vPct=[5,8,11,7,26,22,11,7,3]; const bunch=vPct[4]+vPct[5];
       eyebrow='Your portfolio · Vintage'; title='Your vintage exposure';
       body=[
+        h('div',{key:'top5'}, this.topFivePerformers('vintage')),
         h('div',{key:'cbv'}, this.panelSection('Commitments by vintage','% of committed capital'),
           this.fAxisBars(vYears,[{name:'% committed',color:'--data-1',vals:vPct}],{fmt:v=>v+'%',H:210}),
           h('div',{style:{display:'flex',alignItems:'center',gap:8,margin:'8px 0 4px'}},

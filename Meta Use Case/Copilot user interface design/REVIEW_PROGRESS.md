@@ -71,8 +71,8 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 ## 46–55 Breakdown views (blue Alpha panel, gap CTA, region/currency parity, fund modal/page)
 - ☑ 46 Alpha's read panel blue — `card()` gained `tone:'alpha'` (brand→brand-ink gradient, white title/text/caption, matches Set-target brand blue per item 72); strategy/region/currency detail `summaryCard` now `tone:'alpha'` with white-recolored inner text + white gap-CTA button. Verified live: alphaBg gradient, white title; plain cards unchanged; logicError null.
 - ☑ 47 Always show 'Suggest funds to fill the gaps' — extracted reusable `gapCTA(key,white)`; strategy/region/currency summaryCard uses it; added a blue Alpha's-read panel + gapCTA to the vintage breakdown (which previously had none). Verified live: vintage drill now has gap CTA + Alpha panel; logicError null.
-- ☐ 48 Keep intermediate teaser page
-- ☐ 49 Teaser leads with 'Your Top Five Performing Investments' + See full breakdown
+- ⊘ 48 Keep intermediate teaser page — confirmed: `homeDetailPanel` (homePop) is the intermediate teaser (opens on chart click, footer 'See full breakdown →' → sets homeDrill). Kept.
+- ☑ 49 Teaser leads with 'Your Top Five Performing Investments' — new `topFivePerformers(key)` (top 5 by IRR, all positive, '▲ by IRR' badge, 'See full breakdown →') prepended to the teaser body for both dimension and vintage teasers. Verified live: EQT IX 19.4%→Ares 8.4%, losers excluded; logicError null.
 - ☐ 50 Region breakdown parity (toggles/sort/blue Alpha panel)
 - ☐ 51 'All details' link per individual investment
 - ⊘ 52 Keep fund mini-modal (confirm)
