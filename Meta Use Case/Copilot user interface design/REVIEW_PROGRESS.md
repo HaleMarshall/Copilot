@@ -74,7 +74,7 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ⊘ 48 Keep intermediate teaser page — confirmed: `homeDetailPanel` (homePop) is the intermediate teaser (opens on chart click, footer 'See full breakdown →' → sets homeDrill). Kept.
 - ☑ 49 Teaser leads with 'Your Top Five Performing Investments' — new `topFivePerformers(key)` (top 5 by IRR, all positive, '▲ by IRR' badge, 'See full breakdown →') prepended to the teaser body for both dimension and vintage teasers. Verified live: EQT IX 19.4%→Ares 8.4%, losers excluded; logicError null.
 - ☑ 50 Region breakdown parity — region uses the shared `homeDrillBody` path (same holdings table, metric/sort toggles, drillBigBlock, blue Alpha panel, gap CTA as strategy). Fixed fund→region mapping: JS fallback HELD_META regions DACH/RoW → Europe/APAC to match the region buckets (seed already aligned). Verified live: region buckets Europe(4)/USA(3)/APAC(1) populate; logicError null.
-- ☐ 51 'All details' link per individual investment
+- ☑ 51 'All details' link per individual investment — added an 'All details →' action in each holdingsTable row's action column (opens the fund quick-view modal via openFund), widened action column. Verified live: 2 rows → 2 links; logicError null.
 - ⊘ 52 Keep fund mini-modal (confirm)
 - ⊘ 53 Keep full fund page + add DVPI to KPI row (DVPI added in 37 — confirm)
 - ☐ 54 Full-fund-page 'Take action' → 'Suggest similar funds' (held) — pre-wired via fundActions (38); confirm on full page

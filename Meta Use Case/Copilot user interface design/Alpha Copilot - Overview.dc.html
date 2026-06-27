@@ -3588,7 +3588,7 @@ class Component extends DCLogic {
       h('div',{style:{display:'flex',alignItems:'center',gap:8}}, h('span',{style:{fontSize:11.5,color:'var(--muted)',fontWeight:600}},'Sort'),
         this.seg([{label:'Best first',value:'perf'},{label:'Newest',value:'newest'},{label:'Oldest',value:'oldest'}], this.drillSort(), v=>this.setDtog('drillSort',v), {sm:true}))); }
   holdingsTable(funds){ const h=this.h; const SF=this.SF; const m=this.drillMetric(); funds=this.sortHoldings(funds);
-    const COLS='1.6fr 0.95fr 0.85fr 0.85fr 1fr';
+    const COLS='1.5fr 0.9fr 0.8fr 0.8fr 1.4fr';
     const head=h('div',{style:{display:'grid',gridTemplateColumns:COLS,gap:10,alignItems:'center',padding:'6px 11px',fontSize:10.5,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--muted)',fontWeight:700,borderBottom:'1px solid var(--line)'}},
       h('span',null,'Investment'), h('span',null,'Invested'), h('span',{style:{textAlign:'right'}},m), h('span',{style:{textAlign:'right'}},'NAV'), h('span',{style:{textAlign:'right'}},''));
     const rows=funds.map((f,i)=>h('div',{key:f.id,style:{display:'grid',gridTemplateColumns:COLS,gap:10,alignItems:'center',padding:'9px 11px',borderBottom:i<funds.length-1?'1px solid var(--line)':'none',cursor:'pointer'},
@@ -3599,7 +3599,10 @@ class Component extends DCLogic {
       h('div',{style:{fontSize:12,color:'var(--ink)',fontFamily:SF,fontWeight:600}}, f.month||(f.vintage+'')),
       h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:14,fontWeight:700,color:'var(--brand-ink)'}}, this.metricVal(f,m)),
       h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:13,fontWeight:600}}, f.nav),
-      h('div',{style:{display:'flex',justifyContent:'flex-end'}}, this.shopBtn(f.name,f.strat,true))));
+      h('div',{style:{display:'flex',justifyContent:'flex-end',alignItems:'center',gap:9}},
+        h('button',{onClick:ev=>{ev.stopPropagation();this.openFund(f.id);},title:'Open a quick overview of this fund',
+          style:{border:'none',background:'transparent',color:'var(--brand-ink)',fontSize:11.5,fontWeight:700,cursor:'pointer',padding:0,whiteSpace:'nowrap',fontFamily:'Inter,system-ui,sans-serif'}},'All details →'),
+        this.shopBtn(f.name,f.strat,true))));
     return h('div',{style:{border:'1px solid var(--line)',borderRadius:10,background:'var(--surface)',overflow:'hidden'}}, head, rows);
   }
   /* item 45 — spacious, expandable middle-row overview: where you hold the most funds. 'Go bigger' toggles a larger, more readable layout. */
