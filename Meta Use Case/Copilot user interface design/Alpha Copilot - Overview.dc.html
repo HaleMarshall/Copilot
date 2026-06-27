@@ -3662,7 +3662,7 @@ class Component extends DCLogic {
         h('div',{key:'i',style:{fontSize:12.5,lineHeight:1.55,color:'var(--muted)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:10,padding:'11px 13px'}},
           'You’re most heavily weighted to ',h('strong',{style:{color:'var(--ink)'}},heavy.n+' ('+heavy.you+'%)'),' and lightest in ',h('strong',{style:{color:'var(--ink)'}},light.n+' ('+light.you+'%)'),'.'),
         h('div',{key:'f'},
-          this.panelSection('Funds you hold, by '+d.label.toLowerCase(), roster.filter(f=>catOf(f)!=null).length+' of '+roster.length+' funds'),
+          this.panelSection('Funds you hold by '+d.label.toLowerCase(), roster.filter(f=>catOf(f)!=null).length+' of '+roster.length+' funds'),
           fundRows.map((r,i)=>{ const on=r.k===focus;
             return h('div',{key:i,style:{marginBottom:11,padding:on?'10px 11px':'0',borderRadius:on?11:0,background:on?'var(--brand-wash)':'transparent',border:on?'1px solid var(--brand-tint-3)':'1px solid transparent'}},
             h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:7}},
@@ -4608,7 +4608,7 @@ class Component extends DCLogic {
           h('span',{style:{fontFamily:SF,fontWeight:600,flex:'0 0 56px'}},'€'+x.v+'m'),
           h('span',{style:{fontSize:11,color:'var(--muted)'}}, (byYr[x.y]&&byYr[x.y].length)? (byYr[x.y].length+' fund'+(byYr[x.y].length>1?'s':'')) : 'no fund'))))),
       caption:'Your newest vintages (2024) are early in their J-curve; the 2019–21 funds are now distributing.'});
-    const fundsCard=this.card({title:'Funds you hold, by vintage',badge:this.badge('your portfolio','conf'),
+    const fundsCard=this.card({title:'Funds you hold by vintage',badge:this.badge('your portfolio','conf'),
       children:h('div',{style:{display:'flex',flexDirection:'column',gap:16}}, years.map((x,i)=>h('div',{key:i},
         h('div',{style:{display:'flex',alignItems:'center',gap:9,marginBottom:9}},
           h('span',{style:{fontFamily:SF,fontWeight:600,fontSize:15}},x.y),
@@ -4652,7 +4652,7 @@ class Component extends DCLogic {
 
     // funds grouped, focused bucket first + highlighted
     const fundRows=rows.filter(r=>byCat[r.k]&&byCat[r.k].length).sort((a,b)=>(a.k===focus?-1:b.k===focus?1:0));
-    const fundsCard=this.card({title:'Funds you hold, by '+d.label.toLowerCase(),badge:this.badge('your portfolio','conf'),style:{height:'100%'},
+    const fundsCard=this.card({title:'Funds you hold by '+d.label.toLowerCase(),badge:this.badge('your portfolio','conf'),style:{height:'100%'},
       children:h('div',{style:{display:'flex',flexDirection:'column',gap:14}},
         h('div',{style:{display:'flex',justifyContent:'flex-end'}}, this.holdingsMetricToggle()),
         fundRows.map((r,i)=>{ const on=r.k===focus;

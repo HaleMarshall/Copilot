@@ -64,8 +64,8 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 40 Month & Year per holding — added 'Invested' column to `holdingsTable` showing `f.month` (e.g. 'Mar 2019'). Verified live: EQT IX Mar 2019, Thrive Jul 2021.
 - ☑ 41 Sort by Month/Year — `holdingsMetricToggle` now has a Sort control (Best first / Newest / Oldest); `sortHoldings` + `monthNum` parser. Verified live: Newest = Aug 2024→Mar 2019; Oldest = Mar 2019→Aug 2024.
 - ☑ 42 Default-sort best-performing first — `drillSort` defaults to 'perf' (selected metric descending). Verified live: default order 19.4%→16.1%→14.2%→…→losers (−4.0%, −1.2%) at bottom. (41+42 share one sort control.)
-- ⊘ 43 Reject 'What works well in your portfolio?' chip (keep view as-is) — confirm none present
-- ☐ 44 Header 'Funds you hold by strategy'
+- ⊘ 43 Reject 'What works well in your portfolio?' chip — confirmed: grep found no such string anywhere (Overview kept clean, as-is).
+- ☑ 44 Header 'Funds you hold by strategy' — dropped the comma on all 3 fund-card titles → "Funds you hold by {strategy/region/currency/vintage}"; metric functions (DPI/IRR/TVPI/MOIC/DVPI) + sort already on this detail view (39–42). Syntax OK.
 - ☐ 45 Larger middle-row overview block
 
 **NEXT: item 39** — strategy-detail individual-investments table.
