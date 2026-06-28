@@ -3561,10 +3561,29 @@ class Component extends DCLogic {
       h('div',{style:{display:'flex',alignItems:'center',gap:11,minWidth:0}}, h('span',{style:{fontSize:18,flex:'0 0 auto'}},'📄'),
         h('div',{style:{minWidth:0}}, h('div',{style:{fontSize:13,fontWeight:600}},d.n), h('div',{style:{fontSize:11,color:'var(--muted)'}},d.meta))),
       h('span',{style:{fontSize:11.5,color:'var(--brand-ink)',fontWeight:700,flex:'0 0 auto',border:'1px solid var(--brand-tint-3)',borderRadius:8,padding:'5px 10px'}},'Download'));
+    /* item 139 — Why this / Why not / Compare scoped to THIS fund, at the fund-detail level */
+    const wt=this.dtog('fundWhyTab','why'); const sname=(f.strat||'this strategy');
+    const wlist=(items,warn)=>h('div',{style:{display:'flex',flexDirection:'column',gap:9}}, items.map((t,i)=>h('div',{key:i,style:{display:'flex',gap:9,alignItems:'flex-start',fontSize:12.5,lineHeight:1.5}}, h('span',{style:{flex:'0 0 16px',color:warn?'var(--under)':'var(--over)',fontWeight:700}},warn?'!':'✓'), h('span',null,t))));
+    const whyBody = wt==='why'? wlist([
+        f.name+' is a top-quartile '+sname.toLowerCase()+' manager with the deal team intact.',
+        'It fits inside your liquidity headroom at the suggested ticket — no overcommitment.',
+        'The current vintage is actively deploying into a favourable entry environment.',
+        'It closes a real gap in your portfolio rather than doubling an over-weight.',
+        'Best target-fit per euro versus the comparable funds on the platform.'])
+      : wt==='whynot'? wlist([
+        'Investors needing liquidity inside 7 years — this extends your illiquidity.',
+        'Anyone already over-weight '+sname+'.',
+        'Below the '+(f.min||'€50,000')+' minimum comfort for this fund.'],true)
+      : h('div',{style:{border:'1px solid var(--line)',borderRadius:10,overflow:'hidden'}},
+          [['Net IRR (target)','18%','14%'],['Net MOIC (target)',(f.tgt||'2.0x'),'1.7x'],['Mgmt fee','1.5%','2.0%'],['Team stability','Intact','1 partner left']].map((r,i)=>h('div',{key:i,style:{display:'grid',gridTemplateColumns:'1.3fr 1fr 1fr',padding:'9px 12px',borderBottom:i<3?'1px solid var(--line)':'none',fontSize:12.5}}, h('span',{style:{color:'var(--muted)'}},r[0]), h('span',{style:{textAlign:'right',fontWeight:700,color:'var(--brand-ink)'}},r[1]), h('span',{style:{textAlign:'right'}},r[2]))));
+    const fundWhyCard=card('Why this · Why not · Compare', h('div',null,
+      this.seg([{label:'Why this',value:'why'},{label:'Why not',value:'whynot'},{label:'Compare',value:'compare'}], wt, v=>this.setDtog('fundWhyTab',v),{sm:true}),
+      h('div',{style:{marginTop:12}}, whyBody)), this.badge('AI','synth'));
     const main=h('div',null,
       card('About this fund', h('div',{style:{fontSize:13,lineHeight:1.6,color:'var(--ink)'}},
         prospect? (f.by&&(f.by[this.state.following]||f.by.top10)||'') : (f.name+' is one of your '+(f.strat||'').toLowerCase()+' holdings, vintage '+(m.vintage||f.vintage)+', currently '+(f.stage||'').toLowerCase()+'. It has called '+f.called+' of its commitment and is marked at '+f.nav+' NAV — a net MOIC of '+f.moic+' and net IRR of '+f.irr+'. Look-through is primarily '+(m.sector||'diversified')+' companies, '+(m.region||'global')+', '+(m.currency||'multi-currency')+'-denominated.'),
         f.note?h('div',{style:{marginTop:12,background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:10,padding:'11px 13px',fontSize:12.5,lineHeight:1.5}}, h('b',null,'Alpha’s note: '), f.note):null)),
+      fundWhyCard,
       prospect? null : card('Value growth (net MOIC path)', perfBars(), this.badge('illustrative','synth')),
       card('Fund documents', h('div',null, this.FUND_DOCS().map((d,i)=>h('div',{key:i},docRow(d))),
         h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:4}},'Demo — document links are illustrative.'))));

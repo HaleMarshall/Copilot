@@ -177,7 +177,7 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 136 Add greyed-out 'Upcoming' preview section — 'Upcoming — preview' section renders UPCOMING_FUNDS at opacity 0.55 with 'Coming soon' badges. Verified live.
 - ☑ 137 Greyed upcoming funds still drillable — faded tiles keep `onClick:openFundPage(f.id)`; fundById resolves UPCOMING_FUNDS. Verified live: up-kkr-credit → KKR Asset-Based Finance II.
 - ⊘ 138 Allow same fund to appear multiple times — confirmed: opportunity/sequence lists (seq funds, Current Opps, Upcoming, missed) have no fund-level dedupe, so a fund can appear at multiple relevant points.
-- ☐ 139 Move Why-this/Why-not/Compare to fund level
+- ☑ 139 Move Why-this/Why-not/Compare to fund level — added a fund-scoped 'Why this · Why not · Compare' card (3-tab seg, `fundWhyTab`) to the fund detail page main column. Verified live: card + 3 tabs render on EQT IX page.
 - ☐ 140 Open Baseline first, then Simulator case
 - ☐ 141 Highlight best-matching fund as 'Target fit'
 - ☐ 142 Remove 'Expected Return' from fund card (keep fit only)
