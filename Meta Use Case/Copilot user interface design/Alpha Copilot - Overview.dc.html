@@ -4927,9 +4927,23 @@ class Component extends DCLogic {
       children: zRows.length? this.miniZ(zRows) : h('div',{style:{fontSize:12.5,color:'var(--muted)'}},'No deviation to show.'),
       caption:'Deviation between how you’re invested today (NAV) and your committed exposure. Positive = more current value than committed weight. Actual data — not simulated.'});
     /* Alpha's executive-summary strip removed from the portfolio overview per request */
+    /* item 47 — portfolio-header KPI strip: total value, # funds, # GPs, # companies, # countries */
+    const _P=(this.DB&&this.DB.portfolio)||{}; const _roster=this.HELD_FUNDS();
+    const _nGPs=new Set(_roster.map(f=>f.mgr)).size; const _nFunds=_roster.length;
+    const _hdrKpis=[
+      {v:_P.navText||'€16.6m', l:'Total value'},
+      {v:String(_nFunds||_P.fundsHeld||8), l:'Funds'},
+      {v:String(_nGPs||_P.managers||6), l:'GPs'},
+      {v:String(_P.companies||'—'), l:'Companies'},
+      {v:String(_P.countries||'—'), l:'Countries'}];
+    const portfolioHeaderKPIs=h('div',{style:{display:'flex',alignItems:'center',gap:0,flexWrap:'wrap',background:'var(--surface)',border:'1px solid var(--line)',borderRadius:14,padding:'14px 4px'}},
+      _hdrKpis.map((k,i)=>h('div',{key:i,style:{flex:'1 1 0',minWidth:120,padding:'0 18px',textAlign:'left',borderLeft:i?'1px solid var(--line)':'none'}},
+        h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:700,color:'var(--ink)',lineHeight:1.1}},k.v),
+        h('div',{style:{fontSize:11.5,color:'var(--muted)',marginTop:3,letterSpacing:'.02em'}},k.l))));
     const col=(children)=>h('div',{style:{display:'flex',flexDirection:'column',gap:16,minWidth:0}}, children);
     /* items 5/6 — 'Where you're concentrated' + 'Allocated vs committed' removed; Alpha's read on your strategy moved to the top */
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16,minHeight:'100%'}},
+      portfolioHeaderKPIs,
       nudge,
       alphaReadCard,
       h('div',{style:{display:'grid',gridTemplateColumns:'minmax(0,1.3fr) minmax(0,0.85fr) minmax(0,1.3fr)',gap:16,alignItems:'start'}},

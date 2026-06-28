@@ -1,6 +1,8 @@
 # Review 2 — 77 items + PDF (overnight, LIVE meta view)
 Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 
+- [x] 46 GP-concentration card in Strategy drill (NAV/Committed toggle, % per fund manager)
+- NEXT: item 47
 - [x] 1 nudge new-investor guard + liquidity CTA→opportunities
 - [x] 2 TVPI mini-chart in performance (+tvpi seeded)
 - [x] 3 cash-flow: 'Net distributions' not 'Net cash position'
