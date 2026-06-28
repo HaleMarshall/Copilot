@@ -3564,7 +3564,7 @@ class Component extends DCLogic {
   /* per-fund look-through tags so a dimension click can show which funds drive each bucket */
   HELD_META(){ if(this.DB) return this.DB.empty?{}:(this.DB.heldMeta||{}); return {
     eqtix:{currency:'EUR',region:'Europe',sector:'Industrials',strat:'buyout',vintage:2019,nav:4.6},
-    thrive8:{currency:'USD',region:'USA',sector:'Tech',strat:'ai',vintage:2021,nav:3.1},
+    thrive8:{currency:'USD',region:'USA',sector:'AI',strat:'ai',vintage:2021,nav:3.1},
     ga:{currency:'USD',region:'USA',sector:'Tech',strat:'growth',vintage:2020,nav:2.4},
     cvc9:{currency:'EUR',region:'Europe',sector:'Industrials',strat:'buyout',vintage:2022,nav:2.0},
     arespcs:{currency:'USD',region:'USA',sector:'Financials',strat:'credit',vintage:2023,nav:1.5},
@@ -4660,7 +4660,7 @@ class Component extends DCLogic {
     const FB={
       region:{actual:{USA:42,Europe:34,APAC:18,MEA:6},target:{USA:38,Europe:32,APAC:24,MEA:6},colors:{USA:'--data-1',Europe:'--data-5',APAC:'--data-8',MEA:'--data-9'}},
       currency:{actual:{USD:40,EUR:38,GBP:9,CHF:6,JPY:4,Other:3},target:{USD:36,EUR:40,GBP:9,CHF:7,JPY:5,Other:3},colors:{USD:'--data-1',EUR:'--data-5',GBP:'--data-2',CHF:'--data-6',JPY:'--data-3',Other:'--data-9'}},
-      sector:{actual:{Tech:34,Healthcare:16,Financials:14,Industrials:18,Consumer:12,Energy:6},target:{Tech:22,Healthcare:18,Financials:16,Industrials:20,Consumer:16,Energy:8},colors:{Tech:'--data-9',Healthcare:'--data-2',Financials:'--data-4',Industrials:'--data-5',Consumer:'--data-7',Energy:'--data-6'}}
+      sector:{actual:{Tech:20,AI:14,Healthcare:16,Financials:14,Industrials:18,Consumer:12,Energy:6},target:{Tech:14,AI:8,Healthcare:18,Financials:16,Industrials:20,Consumer:16,Energy:8},colors:{Tech:'--data-9',AI:'--data-8',Healthcare:'--data-2',Financials:'--data-4',Industrials:'--data-5',Consumer:'--data-7',Energy:'--data-6'}}
     };
     const dim=(key,label)=>{ const src= D&&D[key]? D[key] : (empty? {actual:{},target:{},colors:FB[key].colors} : FB[key]); return {key,label,actual:src.actual,target:src.target,colors:src.colors}; };
     return [

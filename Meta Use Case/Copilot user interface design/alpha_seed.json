@@ -173,7 +173,8 @@
     },
     "sector": {
       "actual": {
-        "Tech": 34,
+        "Tech": 20,
+        "AI": 14,
         "Healthcare": 16,
         "Financials": 14,
         "Industrials": 18,
@@ -181,7 +182,8 @@
         "Energy": 6
       },
       "target": {
-        "Tech": 22,
+        "Tech": 14,
+        "AI": 8,
         "Healthcare": 18,
         "Financials": 16,
         "Industrials": 20,
@@ -190,6 +192,7 @@
       },
       "colors": {
         "Tech": "--data-9",
+        "AI": "--data-8",
         "Healthcare": "--data-2",
         "Financials": "--data-4",
         "Industrials": "--data-5",
@@ -401,7 +404,7 @@
     "thrive8": {
       "currency": "USD",
       "region": "USA",
-      "sector": "Tech",
+      "sector": "AI",
       "strat": "ai",
       "vintage": 2021,
       "nav": 3.1
