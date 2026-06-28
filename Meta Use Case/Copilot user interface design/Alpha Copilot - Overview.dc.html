@@ -4680,7 +4680,9 @@ class Component extends DCLogic {
       allocToggle);
     const strategyCard=allocBlock('Strategy','strategy', this.gridBars(stratRows,{max:40,ticks:[0,10,20,30,40],unit:'%',labelW:96,barH:24,gap:10,fmt:fmtUnit}));
     const regionCard=allocBlock('Region','region', this.gridBars(regionRows,{max:50,ticks:[0,25,50],unit:'%',labelW:96,barH:24,gap:10,fmt:fmtUnit}));
-    const currencyCard=allocBlock('Currency','currency', donutRow(ccySlices,'FX'));
+    /* item 101 — clarify what the currency figures represent (unit/meaning) */
+    const ccyNote=h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:8,lineHeight:1.4}}, 'Each figure = that currency’s share of your portfolio'+(allocUnit==='%'?' (% of '+basis+')':' (€m of '+basis+')')+', by fund currency of denomination.');
+    const currencyCard=allocBlock('Currency','currency', h('div',null, donutRow(ccySlices,'FX'), ccyNote));
     const sectorCard=allocBlock('Sector','sector', donutRow(secSlices,'Sector'));
     const vintageCard=allocBlock('Vintage','vintage', h('div',null, vintChart, h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:3,textAlign:'center'}},'NAV by commitment year (€m)')));
 
