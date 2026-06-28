@@ -103,8 +103,8 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 73 Small Alpha insights at top, Alpha's read below — added slim 'Alpha's executive summary' strip (5 positive bullets) at the very top; Alpha's-read panel stays lower down (stacked full-width, not 3 side-by-side). Verified live: exec strip before read panel, 5 ▲ bullets, overview renders. (Pre-satisfies 75/82/83 structure.)
 - ⊘ 74 Ask Alpha companion docked left on every page — confirmed: `{{ askAlpha }}` bound unconditionally at top of body (line 99, left-docked), outside the showRail sc-if. askAlpha() renders the 'Ask Alpha' rail in both min & open states (never null). Persistent on every page.
 - ☑ 75 Exec-summary strip at top, 5 bullets — slim 'Alpha's executive summary' strip with exactly 5 bullets at the very top (built item 73). Verified live: 5 bullets, top placement.
-- ☐ 76 AI Overview at top of Detail page + Suggest More Funds beneath
-- ☐ 77 Detail page portfolio summary (funds held, NAV, buckets, largest)
+- ☑ 76 AI Overview at top of Detail page + Suggest More Funds beneath — moved summaryCard (Alpha's read, blue, with gap/Suggest CTA) to the very top of homeDrillBody; mix/insight/funds pushed down. Verified live: AI panel index 0 (before mix/funds), Suggest-funds CTA present.
+- ☑ 77 Detail page portfolio summary (funds held, NAV, buckets, largest) — the 4 metric tiles (Funds held / NAV in this book / Buckets covered / Largest holding) sit in the top AI panel. Verified live: all 4 present at top.
 - ☐ 78 Keep sell/Buy-now in Detail summary
 - ☐ 79 Deviation Z-charts on every breakdown page
 - ☐ 80 Sticky breakdown panel while rest scrolls

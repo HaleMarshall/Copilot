@@ -4831,9 +4831,10 @@ class Component extends DCLogic {
 
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
       focusName? h('div',{style:{fontSize:12.5,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:10,padding:'10px 14px',fontWeight:600}},'◧ Highlighting your '+focusName+' position across the charts and funds below.'):null,
+      summaryCard, /* item 76 — AI Overview (Alpha's read) + Suggest-funds CTA at the very top; item 77 — 4-tile portfolio summary lives in it */
       this.twoCol(mixCard,insightCard,'1.3fr 1fr'),
       this.drillBigBlock(rows,byCat,d.label),
-      this.twoCol(fundsCard,summaryCard,'1.7fr 1fr'));
+      fundsCard);
   }
 
   /* ====================== SIMULATOR ====================== */
