@@ -4661,11 +4661,11 @@ class Component extends DCLogic {
     const stratGaps=(()=>{ const sdd=this.basisPct('strategy'); const meta=this.HELD_META(); const roster=this.HELD_FUNDS();
       const held=new Set(roster.map(f=>(meta[f.id]||{}).strat));
       return Object.keys(sdd).filter(k=>!held.has(k)).map(k=>{ const s=this.STRATS.find(x=>x[0]===k); return s?s[1]:k; }); })();
-    const alphaReadCard=this.card({title:'Alpha’s read on your strategy funds',badge:this.badge('AI','synth'),
+    const alphaReadCard=this.card({title:'Alpha’s read on your strategy funds',badge:this.badge('AI','synth'),tone:'alpha',
       children:h('div',{style:{display:'flex',flexDirection:'column',gap:12}},
-        h('div',{style:{fontSize:13,lineHeight:1.6,color:'var(--ink)'}},
-          stratGaps.length? ['You hold ',h('strong',{key:'g'},'no direct fund'),' in '+stratGaps.join(', ')+' — clear places to add if you want the exposure.'] : 'You hold direct funds across every strategy bucket — a well-rounded book.'),
-        this.gapCTA('strategy',false)),
+        h('div',{style:{fontSize:13,lineHeight:1.6,color:'rgba(255,255,255,.92)'}},
+          stratGaps.length? ['You hold ',h('strong',{key:'g',style:{color:'#fff'}},'no direct fund'),' in '+stratGaps.join(', ')+' — clear places to add if you want the exposure.'] : 'You hold direct funds across every strategy bucket — a well-rounded book.'),
+        this.gapCTA('strategy',true)),
       caption:'Alpha acts as your advisor — fill the gaps to round out your strategy exposure.'});
     // item 71 — 'Where you're concentrated' box + allocated-vs-committed Z-chart (real deviation data), moved down the page
     const concRows=this.basisPct('strategy'); // for the concentration ranking (current basis)
