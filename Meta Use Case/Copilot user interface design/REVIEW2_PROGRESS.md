@@ -42,4 +42,8 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 39 cashflow detailed view: each investment on the J-curve by NAV (net positive/in J-curve)
 - [x] 40 peer reassurance for bad vintages + diversify suggestion (conditional branch)
 - [x] 41 encouragement when ahead of peers; silent when behind w/o vintage excuse
-NEXT: item 42 (commitments per year: % and € views)
+- [x] 42 commitments-per-year €m/% toggle
+- [x] 43 Planned commitments per year + Planned cumulative committed
+- [x] 44 consistent millions
+- [x] 45 cashflow investments: committed + called(€) + IRR (not just %)
+NEXT: item 46 (GP concentration under See full breakdown, NAV/committed toggle)
