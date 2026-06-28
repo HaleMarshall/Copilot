@@ -1623,9 +1623,13 @@ class Component extends DCLogic {
         h('span',{style:{fontSize:11.5,color:'var(--topbar-soft)'}},'m')));
   }
   /* ---------- top-right: notifications + profile (A29/A30, D15) ---------- */
+  /* item 90 — once the bell has been open ~5s, mark notifications seen and clear the badge */
+  toggleNotif(){ const open=!this.state.showNotif; this.setState({showNotif:open,showProfile:false});
+    clearTimeout(this._notifT);
+    if(open && !this.state.notifsSeen){ this._notifT=setTimeout(()=>{ if(this.state.showNotif) this.setState({notifsSeen:true}); }, 5000); } }
   notifBell(){
-    const h=this.h; const n=this.NOTIFS().filter(x=>x.unread).length;
-    return h('button',{onClick:()=>this.setState({showNotif:!this.state.showNotif,showProfile:false}),title:'Notifications',
+    const h=this.h; const n=this.state.notifsSeen?0:this.NOTIFS().filter(x=>x.unread).length;
+    return h('button',{onClick:()=>this.toggleNotif(),title:'Notifications',
       style:{position:'relative',border:'1px solid var(--topbar-line)',background:'var(--topbar-chip)',color:'var(--topbar-ink)',width:30,height:30,borderRadius:8,cursor:'pointer',fontSize:14,flex:'0 0 auto'}},'🔔',
       n?h('span',{style:{position:'absolute',top:-5,right:-5,minWidth:16,height:16,padding:'0 3px',borderRadius:999,background:'#C8392F',color:'#fff',fontSize:9.5,fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',boxSizing:'border-box'}},String(n)):null);
   }
@@ -1651,17 +1655,17 @@ class Component extends DCLogic {
     ]); }
   goOppFromNotif(){ this.setState({showNotif:false, showToast:false, ws:'act', uc:'opp', page:'opp', homeLaunched:true, deepLink:null, homePop:null, homeDrill:null, ask:{...this.state.ask,state:'min'}}); }
   notifPanelBody(){
-    const h=this.h; const SF=this.SF; const items=this.NOTIFS();
+    const h=this.h; const SF=this.SF; const items=this.NOTIFS(); const seen=this.state.notifsSeen; /* item 90 */
     return h('div',null,
       h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,padding:'14px 16px',borderBottom:'1px solid var(--line)',position:'sticky',top:0,background:'var(--surface)',zIndex:1}},
         h('div',null, h('div',{style:{fontFamily:SF,fontSize:15.5,fontWeight:700}},'Notifications'), h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:1}},'Since you last logged in · 14 Jun 2026')),
         h('button',{onClick:()=>this.setState({showNotif:false}),style:{border:'none',background:'transparent',color:'var(--muted)',cursor:'pointer',fontSize:16}},'✕')),
-      h('div',{style:{display:'flex',flexDirection:'column'}}, items.map((it,i)=>h('div',{key:i,style:{display:'flex',gap:11,padding:'13px 16px',borderBottom:'1px solid var(--line)',background:it.unread?'var(--brand-wash)':'var(--surface)'}},
+      h('div',{style:{display:'flex',flexDirection:'column'}}, items.map((it,i)=>h('div',{key:i,style:{display:'flex',gap:11,padding:'13px 16px',borderBottom:'1px solid var(--line)',background:(it.unread&&!seen)?'var(--brand-wash)':'var(--surface)'}},
         it.logo
           ? h('img',{src:'assets/logos/'+it.logo+'.png',alt:'',style:{flex:'0 0 32px',width:32,height:32,borderRadius:9,background:'#fff',border:'1px solid var(--line)',padding:4,objectFit:'contain'}})
           : h('div',{style:{flex:'0 0 32px',width:32,height:32,borderRadius:9,background:'var(--surface-2)',border:'1px solid var(--line)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:15}}, it.icon),
         h('div',{style:{minWidth:0,flex:1}},
-          h('div',{style:{fontSize:13,fontWeight:700,marginBottom:2,display:'flex',alignItems:'center',gap:7}}, h('span',null,it.title), it.unread?h('span',{style:{width:6,height:6,borderRadius:999,background:'#C8392F',flex:'0 0 6px'}}):null),
+          h('div',{style:{fontSize:13,fontWeight:700,marginBottom:2,display:'flex',alignItems:'center',gap:7}}, h('span',null,it.title), (it.unread&&!seen)?h('span',{style:{width:6,height:6,borderRadius:999,background:'#C8392F',flex:'0 0 6px'}}):null),
           it.fund? h('div',{style:{display:'inline-flex',alignItems:'center',gap:5,margin:'1px 0 3px',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:999,padding:'1px 8px',fontSize:10.5,fontWeight:700,color:'var(--brand-ink)'}}, it.logo?h('img',{src:'assets/logos/'+it.logo+'.png',alt:'',style:{width:12,height:12,objectFit:'contain'}}):null, it.fund):null,
           h('div',{style:{fontSize:12,color:'var(--muted)',lineHeight:1.45}}, it.body),
           it.cta?h('button',{onClick:it.act,style:{marginTop:8,border:'1px solid var(--brand-tint-3)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:8,padding:'5px 11px',fontSize:11.5,fontWeight:600,cursor:'pointer'}}, it.cta+' →'):null)))));
