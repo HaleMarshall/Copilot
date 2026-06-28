@@ -87,7 +87,7 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 59 Rename UNDERSTAND 'Home' → 'Overview' — workspace `label:'Home'`→'Overview' (line 2149); used by both the nav sub-label and the `stageEyebrow` breadcrumb (`${w.label} · ${w.verb} · idx of N`), so both now read 'Overview'. Verified live: nav shows Overview, no 'Home' label; logicError null.
 - ☑ 60 Clicking UNDERSTAND always lands on Overview first — `selectWS`/`launchWS` now also clear `homeDrill/homePop/homeFocusCat` (root cause: page reset to 'home' but stale drill state made homeOverviewBody render the last drill). Verified live: from a drilled state, selectWS('understand') → uc/page 'home', all drill state null.
 - ☑ 61 Split AI out of Tech in Sector donut — sector dim now Tech 20 + AI 14 (was Tech 34); AI color `--data-8` (matches AI strategy, cross-chart consistency); Thrive reclassified to AI sector so the breakdown bucket has a holding. Updated FB.sector + alpha_seed.json dims.sector + heldMeta + reseeded DB. Verified live: /api/state sector has AI:14; donut & breakdown use dim('sector'); logicError null.
-- ⊘ 62 Cart icon = 'already held' marker on top holdings — done via shopBtn held marker (38); confirm on Top-holdings list
+- ☑ 62 Cart icon = 'already held' marker on top holdings — topHoldingsModule rows call shopBtn → static mint 'Already in your portfolio' cart marker for held funds. Verified live: 4 held markers, 0 buy buttons.
 - ⊘ 63 Held fund pop-up CTA → suggest similar — done via fundActions (38)
 - ⊘ 64 Not-held pop-up CTA → Buy now — done via fundActions (38)
 - ☐ 65 Performance KPIs NAV-based by default
