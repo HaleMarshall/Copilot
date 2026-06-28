@@ -9,4 +9,7 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 6 Alpha's read on strategy moved to top of overview
 - [x] 7 top-five funds at bottom of strategy detail panel
 - [x] 8 NAV-based note at top of detail panel
-NEXT: item 9 (only show comparison if above public)
+- [x] 9 public-market comparison shown only when above it
+- [x] 10 holdings table shows all 5 metrics (IRR/DPI/TVPI/MOIC/DVPI)
+- [x] 11 Show all-or-filter + sort (best/newest/oldest, by metric)
+NEXT: item 12 (fund page: Ask Alpha + back, keep top)

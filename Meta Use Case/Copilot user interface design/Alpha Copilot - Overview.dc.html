@@ -3720,33 +3720,44 @@ class Component extends DCLogic {
   monthNum(f){ const MO={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
     const s=(f&&f.month)||''; const mm=s.slice(0,3); const yr=parseInt(s.slice(-4),10); if(!yr) return (f&&f.vintage||0)*12;
     return yr*12+(MO[mm]||0); }
-  sortHoldings(funds){ const s=this.drillSort(); const m=this.drillMetric(); const a=funds.slice();
+  drillShow(){ return this.dtog('drillShow','all'); } /* item 11 — default show ALL metrics; can filter to one */
+  // the metric used to rank when 'Best first' — the focused metric if filtered, else the chosen sort metric
+  sortMetric(){ const sh=this.drillShow(); return sh!=='all'? sh : this.drillMetric(); }
+  sortHoldings(funds){ const s=this.drillSort(); const m=this.sortMetric(); const a=funds.slice();
     if(s==='newest') return a.sort((x,y)=>this.monthNum(y)-this.monthNum(x));
     if(s==='oldest') return a.sort((x,y)=>this.monthNum(x)-this.monthNum(y));
-    return a.sort((x,y)=>this.metricNum(y,m)-this.metricNum(x,m)); /* 'perf' — best by the selected metric first */ }
-  holdingsMetricToggle(){ const h=this.h;
+    return a.sort((x,y)=>this.metricNum(y,m)-this.metricNum(x,m)); /* 'perf' — best by the sort metric first */ }
+  holdingsMetricToggle(){ const h=this.h; const sh=this.drillShow();
     return h('div',{style:{display:'flex',alignItems:'center',gap:14,flexWrap:'wrap'}},
-      h('div',{style:{display:'flex',alignItems:'center',gap:8}}, h('span',{style:{fontSize:11.5,color:'var(--muted)',fontWeight:600}},'Metric'),
-        this.seg(this.METRICS().map(m=>({label:m,value:m})), this.drillMetric(), v=>this.setDtog('drillMetric',v), {sm:true})),
+      /* item 11 — show all (default) or filter to a single metric */
+      h('div',{style:{display:'flex',alignItems:'center',gap:8}}, h('span',{style:{fontSize:11.5,color:'var(--muted)',fontWeight:600}},'Show'),
+        this.seg([{label:'All',value:'all'}].concat(this.METRICS().map(m=>({label:m,value:m}))), sh, v=>this.setDtog('drillShow',v), {sm:true})),
       h('div',{style:{display:'flex',alignItems:'center',gap:8}}, h('span',{style:{fontSize:11.5,color:'var(--muted)',fontWeight:600}},'Sort'),
-        this.seg([{label:'Best first',value:'perf'},{label:'Newest',value:'newest'},{label:'Oldest',value:'oldest'}], this.drillSort(), v=>this.setDtog('drillSort',v), {sm:true}))); }
-  holdingsTable(funds){ const h=this.h; const SF=this.SF; const m=this.drillMetric(); funds=this.sortHoldings(funds);
-    const COLS='1.5fr 0.9fr 0.8fr 0.8fr 1.4fr';
-    const head=h('div',{style:{display:'grid',gridTemplateColumns:COLS,gap:10,alignItems:'center',padding:'6px 11px',fontSize:10.5,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--muted)',fontWeight:700,borderBottom:'1px solid var(--line)'}},
-      h('span',null,'Investment'), h('span',null,'Invested'), h('span',{style:{textAlign:'right'}},m), h('span',{style:{textAlign:'right'}},'NAV'), h('span',{style:{textAlign:'right'}},''));
-    const rows=funds.map((f,i)=>h('div',{key:f.id,style:{display:'grid',gridTemplateColumns:COLS,gap:10,alignItems:'center',padding:'9px 11px',borderBottom:i<funds.length-1?'1px solid var(--line)':'none',cursor:'pointer'},
+        this.seg([{label:'Best first',value:'perf'},{label:'Newest',value:'newest'},{label:'Oldest',value:'oldest'}], this.drillSort(), v=>this.setDtog('drillSort',v), {sm:true})),
+      /* when sorting Best-first and showing all, pick which metric ranks */
+      (sh==='all'&&this.drillSort()==='perf')? h('div',{style:{display:'flex',alignItems:'center',gap:8}}, h('span',{style:{fontSize:11.5,color:'var(--muted)',fontWeight:600}},'by'),
+        this.seg(this.METRICS().map(m=>({label:m,value:m})), this.drillMetric(), v=>this.setDtog('drillMetric',v), {sm:true})) : null); }
+  holdingsTable(funds){ const h=this.h; const SF=this.SF; funds=this.sortHoldings(funds);
+    /* item 10 — show all metric columns (DPI, IRR, TVPI, MOIC, DVPI) by default; or a single one when filtered */
+    const sh=this.drillShow(); const mets = sh==='all'? this.METRICS() : [sh]; const sortM=this.sortMetric();
+    const COLS='1.5fr 0.9fr '+mets.map(()=>'0.7fr').join(' ')+' 0.8fr 1.2fr';
+    const head=h('div',{style:{display:'grid',gridTemplateColumns:COLS,gap:9,alignItems:'center',padding:'6px 11px',fontSize:10,letterSpacing:'.03em',textTransform:'uppercase',color:'var(--muted)',fontWeight:700,borderBottom:'1px solid var(--line)'}},
+      h('span',null,'Investment'), h('span',null,'Invested'),
+      mets.map(mm=>h('span',{key:mm,style:{textAlign:'right',color: mm===sortM&&this.drillSort()==='perf'?'var(--brand-ink)':'var(--muted)'}},mm)),
+      h('span',{style:{textAlign:'right'}},'NAV'), h('span',{style:{textAlign:'right'}},''));
+    const rows=funds.map((f,i)=>h('div',{key:f.id,style:{display:'grid',gridTemplateColumns:COLS,gap:9,alignItems:'center',padding:'9px 11px',borderBottom:i<funds.length-1?'1px solid var(--line)':'none',cursor:'pointer'},
         onClick:()=>this.openFund(f.id),
         onMouseEnter:e=>{e.currentTarget.style.background='var(--surface-2)';},
         onMouseLeave:e=>{e.currentTarget.style.background='transparent';}},
       h('div',{style:{minWidth:0}}, h('div',{style:{fontFamily:SF,fontSize:13,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},f.name), h('div',{style:{fontSize:11,color:'var(--muted)'}}, f.strat)),
       h('div',{style:{fontSize:12,color:'var(--ink)',fontFamily:SF,fontWeight:600}}, f.month||(f.vintage+'')),
-      h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:14,fontWeight:700,color:'var(--brand-ink)'}}, this.metricVal(f,m)),
+      mets.map(mm=>h('div',{key:mm,style:{textAlign:'right',fontFamily:SF,fontSize:13,fontWeight:700,color: mm===sortM&&this.drillSort()==='perf'?'var(--brand-ink)':'var(--ink)'}}, this.metricVal(f,mm))),
       h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:13,fontWeight:600}}, f.nav),
       h('div',{style:{display:'flex',justifyContent:'flex-end',alignItems:'center',gap:9}},
         h('button',{onClick:ev=>{ev.stopPropagation();this.openFund(f.id);},title:'Open a quick overview of this fund',
           style:{border:'none',background:'transparent',color:'var(--brand-ink)',fontSize:11.5,fontWeight:700,cursor:'pointer',padding:0,whiteSpace:'nowrap',fontFamily:'Inter,system-ui,sans-serif'}},'All details →'),
         this.shopBtn(f.name,f.strat,true))));
-    return h('div',{style:{border:'1px solid var(--line)',borderRadius:10,background:'var(--surface)',overflow:'hidden'}}, head, rows);
+    return h('div',{style:{border:'1px solid var(--line)',borderRadius:10,background:'var(--surface)',overflow:'auto'}}, h('div',{style:{minWidth: sh==='all'?640:0}}, head, rows));
   }
   /* item 45 — spacious, expandable middle-row overview: where you hold the most funds. 'Go bigger' toggles a larger, more readable layout. */
   drillBigBlock(rows, byCat, label){ const h=this.h; const SF=this.SF;
@@ -3903,6 +3914,7 @@ class Component extends DCLogic {
         this.kpiTiles([['Net IRR','11.0%','since inception'],['MOIC','1.80x','net of fees'],['TVPI','2.10x',''],['DPI','2.10x','realised'],['Portfolio value','€16.6m','current NAV'],['Distributions','€2.1m','returned to date']]),
         /* item 220 — benchmark the personal IRR against a public index (S&P 500, PME basis) so the figure has context; MOIC & peer benchmarks deliberately omitted */
         (()=>{ const you=11.0, spx=8.7, spread=+(you-spx).toFixed(1); const max=Math.max(you,spx)*1.15;
+          if(you<=spx) return null; /* item 9 — only show the public-market comparison when you're above it */
           const bar=(label,val,col,sub)=>h('div',{style:{display:'grid',gridTemplateColumns:'150px 1fr 58px',gap:12,alignItems:'center'}},
             h('div',{style:{minWidth:0}}, h('div',{style:{fontSize:12.5,fontWeight:600}},label), sub?h('div',{style:{fontSize:10,color:'var(--muted)'}},sub):null),
             h('div',{style:{background:'var(--surface-2)',borderRadius:6,height:20,position:'relative',overflow:'hidden'}}, h('div',{style:{position:'absolute',left:0,top:0,bottom:0,width:(val/max*100)+'%',background:col,borderRadius:6}})),
