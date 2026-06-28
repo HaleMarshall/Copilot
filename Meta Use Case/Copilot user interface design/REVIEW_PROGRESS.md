@@ -191,12 +191,12 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 148 Ask Alpha summary: target status + exposure deltas — '✦ Alpha — what changes' lists before→after deltas per affected bucket. Verified live.
 - ☑ 149 Impact view shows only dimensions the action changes — deltas filtered to buckets changing ≥0.5pp + 'Only the dimensions this action changes are shown'. Verified live.
 - ☑ 150 'Close the Gap' overview (now vs if-you-do-this) — new 'Close the gap' tab in the recommendation detail. Verified live: tab + pies + summary present.
-- ☐ 151 Rename 'What you passed on' → 'What you missed out on'
-- ☐ 152 Make 'Missed out on' its own dedicated page
-- ☐ 153 Distinguish 'Pass' (decided) from missed-out
-- ☐ 154 Group missed by asset class, then performance
-- ☐ 155 Prominent asset-class/strategy label on each item
-- ☐ 156 'Similar Alternative' beside each missed item
+- ☑ 151 Rename → 'What you missed out on' — page title + section heading. Verified live.
+- ☑ 152 Own dedicated page — new `missedBody()` + 'Missed out on' page tab on the Act/opp use case + surfaceBody dispatch; removed from opportunitiesBody. Verified live: renders standalone.
+- ☑ 153 Distinguish 'Pass' from missed-out — two sections: 'Missed out on' (engine-surfaced) + 'Passed — your decision' (measured outcome). Verified live.
+- ☑ 154 Group by asset class then performance — items grouped by `cls`, sorted by `perf` desc within. Verified live.
+- ☑ 155 Prominent asset-class/strategy label — each item leads with uppercase brand-ink '{class} · {sub}'. Verified live.
+- ☑ 156 'Similar Alternative' beside each — 'Similar alternative' button → openFundPage(altId) + Add, on every item (5). Verified live.
 - ☐ 157 Clarify 'SHAPE · 1 OF 11' label
 - ☐ 158 Label Gap Chart updates live
 - ☐ 159 Clarify 'Current Portfolio' = committed capital
