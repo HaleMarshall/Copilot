@@ -4701,10 +4701,11 @@ class Component extends DCLogic {
       h('div',{style:{flex:1,display:'flex',flexDirection:'column',minWidth:0}},
         h('div',{style:{flex:1,display:'flex',alignItems:'flex-end',gap:9,padding:'0 2px'}}, cfCats.map(barCol)),
         h('div',{style:{textAlign:'center',fontSize:10,color:'var(--muted)',marginTop:4}},'Commitment year')));
+    /* item 97 — net-cash J-curve now uses fAxisLine: real labelled numeric y-axis (€m) with gridlines */
     const cfJcurve=h('div',{style:{flex:1,minHeight:160,display:'flex'}},
       yAxis('€ millions · cumulative'),
       h('div',{style:{flex:1,display:'flex',flexDirection:'column',minWidth:0,justifyContent:'center'}},
-        cfCats.length? this.scenarioSvg([{name:'Cumulative net',color:'--data-1',main:true,vals:cumNet}],cfCats) : null,
+        cfCats.length? this.fAxisLine([{name:'Cumulative net',color:'--data-1',main:true,vals:cumNet}],cfCats,{H:210,fmt:v=>'€'+v+'m'}) : null,
         h('div',{style:{textAlign:'center',fontSize:10,color:'var(--muted)',marginTop:4}},'Commitment year')));
     const cfToggle=h('div',{onClick:e=>e.stopPropagation(),style:{display:'flex',justifyContent:'flex-end',marginBottom:4}}, this.seg([{label:'Bars',value:'Bars'},{label:'J-curve',value:'J-curve'}], cfView, v=>this.setDtog('cfView',v),{sm:true}));
     const cfLegend=h('div',{style:{display:'flex',gap:18,justifyContent:'center',marginTop:10,flexWrap:'wrap'}}, cfSeries.map((s,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',gap:7,fontSize:12.5}},h('span',{style:{width:10,height:10,borderRadius:2,background:`var(${s.color})`}}),s.name)));

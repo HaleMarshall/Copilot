@@ -128,7 +128,7 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 
 ## 96–104 PDF export + asset-allocation bar labels
 - ☑ 96 Fix broken PDF export — replaced `window.print()` (rendered the dark app chrome = black box) with a dedicated white PDF preview modal (`pdfModalBody`, `showPdf` state) + print CSS (#sc-pdf-layer static, .sc-pdf-noprint hidden, .sc-pdf-page breaks). Verified live: clean rendered overview document, not a black box.
-- ☐ 97 Add y-axis to net-cash J-curve chart
+- ☑ 97 Add y-axis to net-cash J-curve chart — swapped the axis-less `scenarioSvg` for `fAxisLine` (real labelled numeric y-axis + gridlines, €m fmt). Verified live: y-axis ticks €-3m…€2m render.
 - ☐ 98 Move clipped bar values outside the bar (Strategy/Region/Currency)
 - ☐ 99 Color broken-out (outside) bar value labels black
 - ☐ 100 Fix unreadable MEA value label
