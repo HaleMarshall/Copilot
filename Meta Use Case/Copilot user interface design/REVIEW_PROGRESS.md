@@ -185,7 +185,7 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 
 ## 144–159 Simulator distance/impact + Passed-Missed page + labels
 - ⊘ 144 Consistent nomenclature across Distance-from-Target dims — confirmed: toggle labels Strategy/Region/Currency/Sector + bucket names all come from HOME_DIMS, same as every allocation view.
-- ☐ 145 Render the 4 Distance-from-Target dims as pie/donut charts (toggle)
+- ☑ 145 Render the 4 Distance-from-Target dims as pie/donut charts (toggle) — Distance card now shows a donut (C-chart) of the selected dimension's current mix beside the gap bars; the 4-dim toggle switches it. Verified live: distSlices donut wired.
 - ☐ 146 Show Distance from Target reducing after an action
 - ☐ 147 Two pie charts: current vs after-action
 - ☐ 148 Ask Alpha summary: target status + exposure deltas

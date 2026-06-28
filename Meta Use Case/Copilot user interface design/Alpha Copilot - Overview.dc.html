@@ -5357,9 +5357,15 @@ class Component extends DCLogic {
       const d=this.HOME_DIMS().find(x=>x.key===distDim); if(!d||!d.target) return [];
       return Object.keys(d.actual).map(k=>{ const dl=+(((d.target[k]||0)-(d.actual[k]||0))).toFixed(1); return {name:k,color:d.colors[k],delta:dl,sig:Math.abs(dl)>=1}; }).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta)); })();
     const distToggle=this.seg([{label:'Strategy',value:'strategy'},{label:'Region',value:'region'},{label:'Currency',value:'currency'},{label:'Sector',value:'sector'}], distDim, v=>this.setDtog('oppDistDim',v),{sm:true});
-    const gapCard=this.card({title:'Distance from target (pp)',badge:this.badge('vs your target','synth'),right:distToggle,
-      children:h('div',{style:{padding:'6px 0'}}, distZ.length? this.miniZ(distZ) : h('div',{style:{fontSize:12.5,color:'var(--muted)',padding:'14px 0',textAlign:'center'}},'On target across this dimension.')),
-      caption:'Bars right = below target (do more); left = above target (do less). Toggle the dimension — Strategy, Region, Currency or Sector.'});
+    /* item 145 — represent the selected Distance-from-Target dimension as a donut (C-chart) beside the gap bars */
+    const distSlices=(()=>{ if(distDim==='strategy'){ const mx=this.MIX&&this.MIX.you||{}; return this.STRATS.filter(([k])=>mx[k]>0).map(([k,n,c])=>({n,color:c,p:mx[k]})); }
+      const d=this.HOME_DIMS().find(x=>x.key===distDim); return d? Object.keys(d.actual).filter(k=>d.actual[k]>0).map(k=>({n:k,color:d.colors[k],p:d.actual[k]})):[]; })();
+    const distDimLabel={strategy:'Strategy',region:'Region',currency:'Currency',sector:'Sector'}[distDim];
+    const gapCard=this.card({title:'Distance from target',badge:this.badge('vs your target','synth'),right:distToggle,
+      children:h('div',{style:{display:'flex',gap:18,alignItems:'center',flexWrap:'wrap',padding:'6px 0'}},
+        distSlices.length? h('div',{style:{flex:'0 0 auto'}}, this.donutNamed(distSlices,150,distDimLabel,'your mix')):null,
+        h('div',{style:{flex:'1 1 260px',minWidth:240}}, distZ.length? this.miniZ(distZ) : h('div',{style:{fontSize:12.5,color:'var(--muted)',padding:'14px 0',textAlign:'center'}},'On target across this dimension.'))),
+      caption:'Donut = your current '+distDimLabel.toLowerCase()+' mix; bars = distance to target (right = below target, do more). Toggle the dimension.'});
 
     // weighting card
     const wCard=this.card({title:'What matters most to you',
