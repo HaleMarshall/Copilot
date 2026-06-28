@@ -4926,7 +4926,7 @@ class Component extends DCLogic {
       style:white
         ? {border:'none',background:'#fff',color:'var(--brand-ink)',borderRadius:10,padding:'11px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}
         : {border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:10,padding:'11px 16px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},
-      '✦ Suggest funds to fill the gaps  →'); }
+      '✦ Suggest opportunities to fill the gaps  →'); } /* item 30 — opportunities, not funds */
   vintageDrillBody(){
     const h=this.h; const SF=this.SF; const vint=this.VINTAGES().slice(-5); /* item 86 — last five years of commitments only */ const meta=this.HELD_META(); const roster=this.HELD_FUNDS();
     const byYr={}; roster.forEach(f=>{ const y=(meta[f.id]||{}).vintage; (byYr[y]=byYr[y]||[]).push(f); });

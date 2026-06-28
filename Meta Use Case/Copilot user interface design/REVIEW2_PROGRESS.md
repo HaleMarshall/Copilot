@@ -25,4 +25,11 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 22 held terminology = investments (drill Alpha-read title + KPI)
 - [x] 23 go-bigger buckets clickable → focus that bucket in the table below
 - [x] 24 Alpha read CTA: View the opportunities (not Buy now)
-NEXT: item 25 (region/dimension pages: all-metrics + sort, same as strategy)
+- [x] 25 region/all dims: all-metrics table + sort (generic holdingsTable) — verified
+- [x] 26 funds-you-hold table on region/all dims (generic homeDrillBody) — verified
+- [x] 27 investments terminology on all dims — verified
+- [x] 28 readable Alpha tiles on all dims (generic) — verified
+- [x] 29 View the opportunities on all dims — verified
+- [x] 30 gapCTA: Suggest opportunities to fill the gaps (not funds)
+- [x] 31 currency parity — verified
+NEXT: item 32 (suggest new complementary funds at the bottom)
