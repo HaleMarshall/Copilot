@@ -122,8 +122,8 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 90 Mark notifications seen after ~5s — `toggleNotif()` arms a 5s timer on open → sets `notifsSeen`; badge count zeroes and panel unread dots/wash clear when seen. Verified live: badge 5 → cleared after notifsSeen.
 - ☑ 91 Rename 'Net Cash Flow' → 'Net Distributions', below top row — added a 'Net Distributions' row (distributions − capital calls, +€0.9m) below the top KPI row, separate from Cash Position; old 'Net cash flow' tile removed. Verified live: Net Distributions present, no Net Cash Flow, positioned after Cash Position.
 - ☑ 92 Cashflow Alpha summary (J-curve, reassuring) — replaced the plain narrative with a blue Alpha read card: 'You've crossed the J-curve…' + 'very typical for your investment behaviour and risk profile', non-technical. Verified live: J-curve + 'very typical' present.
-- ☐ 93 Investable-capital prompt with cash position
-- ☐ 94 Only show investable-capital prompt when cash>0
+- ☑ 93 Investable-capital prompt with cash position — 'You have investable capital of €1.1m (your cash position) to choose funds' + 'Choose funds →' on the cashflow page. Verified live.
+- ☑ 94 Only show investable-capital prompt when cash>0 — gated `cashNum>0 ? prompt : null` (eurNum of cash position). Verified: eurNum('€1.1m')=1.1>0 → shows; would be null at 0.
 - ☐ 95 Cashflow pop-up: funds-to-invest first, add-cash below
 
 **NEXT: item 84** — enlarge Vintage value labels.
