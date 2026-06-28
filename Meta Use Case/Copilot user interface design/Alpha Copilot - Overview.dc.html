@@ -538,6 +538,8 @@ class Component extends DCLogic {
   dbEmpty(){ return this.DB && this.DB.empty; }
   /* save investor profile / simulation to the database */
   wealthText(){ const m=+this.state.investWealthM||0; if(m<=0) return '€0'; if(m>=1000) return '€'+(m/1000).toFixed(m%1000?1:0)+'bn'; if(m>=1) return '€'+(Number.isInteger(m)?m:m.toFixed(1))+'m'; return '€'+Math.round(m*1000)+'k'; }
+  /* item 115 — show absolute € alongside any %-of-investable-wealth figure */
+  eurOfWealth(pct){ const m=(+this.state.investWealthM||0)*(pct/100); return m>=1? ('€'+(Number.isInteger(m)?m:m.toFixed(1))+'m') : ('€'+Math.round(m*1000)+'k'); }
   saveProfileToDB(){
     const p={risk:this.state.riskId, horizon:this.state.horizon2, wealth:this.wealthText(), wealthM:this.state.investWealthM, targetPct:this.state.targetPct,
       theme:this.state.theme, goal:this.state.goal, liquidity:this.state.liquidity, strategyPref:this.state.strategyPref, consent:!!this.state.obConsent,
@@ -727,7 +729,7 @@ class Component extends DCLogic {
   }
   benchTable(){ if(this.DB) return this.DB.empty?null:(this.DB.benchTable||this._benchFallback()); return this._benchFallback(); }
   _benchFallback(){ return { rows:[
-    {l:'PM allocation',you:'15.7%',peers:'8.9%',model:'12%',top10:'14.3%'},
+    {l:'PM allocation',you:'15.7% · '+this.eurOfWealth(15.7),peers:'8.9%',model:'12%',top10:'14.3%'}, /* item 115 — % and € */
     {l:'Net IRR',you:'11.0%',peers:'9.4%',model:'10.5%',top10:'14.2%'},
     {l:'Funds held',you:'8',peers:'6',model:'—',top10:'11'},
     {l:'Avg ticket',you:'€150k',peers:'€128k',model:'—',top10:'€210k'},
@@ -829,8 +831,8 @@ class Component extends DCLogic {
   tlChart(){
     const cold=this.state.demoState==='cold'; const pd=this.peerData();
     const rows=[
-      {label:'You',sub:'actual',v:cold?0:this.PM.you,color:'--brand',
-        onClick:e=>this.openPop(e,{title:'You · PM allocation',value:`${this.PM.you}% of investable wealth in private markets`,method:'%wealth in PM',cohort:'Peers',n:pd.c.n})},
+      {label:'You',sub:'actual · '+this.eurOfWealth(this.PM.you),v:cold?0:this.PM.you,color:'--brand',
+        onClick:e=>this.openPop(e,{title:'You · PM allocation',value:`${this.PM.you}% of investable wealth (${this.eurOfWealth(this.PM.you)}) in private markets`,method:'%wealth in PM',cohort:'Peers',n:pd.c.n})},
       {label:'Peers',sub:'actual',v:cold?0:pd.median,color:'--data-4',
         onClick:e=>this.openPop(e,{title:'Peers · PM allocation',value:`${pd.median}% peer median`,method:'median %wealth in PM across cohort',cohort:'Peers',n:pd.c.n})},
       {label:'Platform',sub:'actual',v:cold?0:this.PM.platform,color:'--data-9',
