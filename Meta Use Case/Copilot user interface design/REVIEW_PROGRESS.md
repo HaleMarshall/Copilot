@@ -219,6 +219,8 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 ## 173+ Comparison/Simulator (target world)
 - ☑ 173 Peers benchmark info/tooltip — ⓘ on Peer-group lever (title: matched on age group, risk class & profession; Custom = any profile e.g. €100m/US/tech/20–35) + rewritten help line. Verified (leverRow renders title + help).
 
-**NEXT: item 174** — hide target-adjustment dials by default behind a bottom toggle (show large target pie prominently). Note: item 172 already gates the pro full-allocation dims; 174 asks the *primary* dials also collapse, with the toggle at the page bottom and the pie hero. Read review.md ~1639.
+- ☑ 174 Hide adjustment dials by default behind a bottom toggle — simShowDials:false; default shows pies + '⚙ Adjust your target'; expanding reveals sliders/risk-toggle/Detail/Save. Verified (collapsed has toggle only, expanded has all).
+
+**NEXT: item 175** — restructure Simulator into the 'Target world': large Portfolio/Target pie as hero, compare vs Peers/Model/Custom/Top 10%, open adjustment. (Items 175/178/179/180/184 are an interdependent benchmark-selector redesign — do one-by-one.) Read review.md ~1649.
 
 **NEXT: item 145** — render the 4 Distance-from-Target dimensions as donut/C-charts via the toggle.

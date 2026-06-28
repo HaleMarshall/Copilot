@@ -500,6 +500,7 @@ class Component extends DCLogic {
       fCommitYears:10, fRecycleYear:8, fRecycleRate:100, fExecution:'topq', /* items 106-109 — Programme Inputs (Michael Blome) */
       fProducts:{buyout:34,growth:14,credit:12,infra:10,secondaries:14,semiliquid:8,venture:4,directs:4},
       simMode:'adjust', simPreset:'like-you', simDetail:false, /* item 172 — pro full-allocation view collapsed by default */
+      simShowDials:false, /* item 174 — target-adjustment dials hidden by default; pie is the hero, dials open via a bottom toggle */
       simDials:{pm:20, growth:0, secondaries:6, us:38},
       simTargets:null, simFocus:null, simSuggest:null,
       savedSims:[], simCompare:false, watchlist:[], portfolioAdds:[],
@@ -5213,7 +5214,7 @@ class Component extends DCLogic {
         right:h('button',{onClick:()=>this.setState({simSuggest:d.key}),style:{border:'1px solid var(--line)',background:'var(--surface)',borderRadius:8,padding:'6px 12px',fontSize:12,fontWeight:600,color:'var(--brand)',cursor:'pointer'}},'✦ Suggest funds'),
         style:focus===d.key?{boxShadow:'0 0 0 2px var(--brand)',borderColor:'var(--brand)'}:{},
         children:h('div',{style:{display:'flex',gap:24,flexWrap:'wrap',alignItems:'flex-start',paddingTop:2}},
-          h('div',{style:{flex:'1 1 300px',minWidth:260}}, pieCol(curSlices,'Current Commitment','You','your invested/committed capital'), sliders),
+          h('div',{style:{flex:'1 1 300px',minWidth:260}}, pieCol(curSlices,'Current Commitment','You','your invested/committed capital'), (s.simShowDials?sliders:null)),
           h('div',{style:{flex:'0 0 auto'}},
             pieCol(tgtSlices,'Current Target','Target','based on the source below'),
             /* items 162/163/164/167 — name where this target comes from + grayed mini breakdown */
@@ -5233,14 +5234,20 @@ class Component extends DCLogic {
     /* item 172 — the pro pure-asset-allocation view (all dimensions) is hidden by default behind a 'Detail' toggle; casual users see only the primary dimension */
     const visible = s.simDetail ? ordered : ordered.slice(0,1);
     const hiddenN = ordered.length - visible.length;
-    const detailToggle = h('div',{style:{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}},
+    const detailToggle = s.simShowDials ? h('div',{style:{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}},
       h('button',{onClick:()=>this.setState({simDetail:!s.simDetail}),
         style:{display:'inline-flex',alignItems:'center',gap:7,border:'1px solid '+(s.simDetail?'var(--brand)':'var(--line)'),background:s.simDetail?'var(--brand-wash)':'var(--surface)',color:s.simDetail?'var(--brand-ink)':'var(--ink)',borderRadius:9,padding:'8px 14px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},
         (s.simDetail?'▾':'▸')+' Detail — full asset allocation'),
-      h('span',{style:{fontSize:11,color:'var(--muted)'}}, s.simDetail? 'Showing every dimension — the pro asset-allocation view.' : (hiddenN>0? hiddenN+' more dimension'+(hiddenN>1?'s':'')+' (region, currency, sector) hidden — open Detail to fine-tune.' : '')));
+      h('span',{style:{fontSize:11,color:'var(--muted)'}}, s.simDetail? 'Showing every dimension — the pro asset-allocation view.' : (hiddenN>0? hiddenN+' more dimension'+(hiddenN>1?'s':'')+' (region, currency, sector) hidden — open Detail to fine-tune.' : ''))) : null;
+    /* item 174 — the adjustment dials live behind a bottom toggle; by default the pies are the hero ('here you are vs your target') and the controls stay out of the way */
+    const dialsToggle = h('div',{style:{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap',borderTop:'1px solid var(--line)',paddingTop:16}},
+      h('button',{onClick:()=>this.setState({simShowDials:!s.simShowDials}),
+        style:{display:'inline-flex',alignItems:'center',gap:8,border:'none',background:s.simShowDials?'var(--surface-2)':'var(--brand)',color:s.simShowDials?'var(--ink)':'#fff',borderRadius:11,padding:'12px 18px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},
+        (s.simShowDials?'▾ Hide adjustment':'⚙ Adjust your target')),
+      h('span',{style:{fontSize:11.5,color:'var(--muted)'}}, s.simShowDials? 'Drag the sliders to reshape your target — the pies above update live.' : 'Open the dials to move your target — your portfolio and target pies stay in view.'));
     const grid=h('div',{style:{display:'flex',flexDirection:'column',gap:18}},
       visible.map(d=>h('div',{key:d.key}, dimCard(d))),
-      detailToggle);
+      detailToggle, dialsToggle);
 
     const actions=h('div',{style:{display:'flex',gap:12,flexWrap:'wrap',alignItems:'center'}},
       h('button',{onClick:()=>this.saveTargetSim(),disabled:s.savedSims.length>=5,
@@ -5288,7 +5295,7 @@ class Component extends DCLogic {
         deeperBtn('Stress-test it','How the target holds up across macro regimes & resilience.','t3-3','score')),
       h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:9,lineHeight:1.5}},'Comparisons vs peers, the model or best performers are on the levers (right). Ask Alpha for anything else.'));
 
-    return h('div',{style:{display:'flex',flexDirection:'column',gap:18}}, header, grid, actions, deeper, compareCard);
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:18}}, header, grid, (s.simShowDials?actions:null), deeper, compareCard);
   }
 
   /* ====================== OPPORTUNITIES (Act) ====================== */
