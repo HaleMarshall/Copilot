@@ -21,4 +21,6 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 18 removed Real Estate from strategy graph (seed strats+mix + code STRATS; reseeded)
 - [x] 19 readable Alpha-read KPI tiles (white on translucent, not white-on-beige)
 - [x] 20 heading → Where you hold the most investments
-NEXT: item 21 (show all funds table at bottom: View the investments you hold by strategy)
+- [x] 21 investments table inline at bottom of drill (no separate page)
+- [x] 22 held terminology = investments (drill Alpha-read title + KPI)
+NEXT: item 23 (click go-bigger section → open detailed bucket view)

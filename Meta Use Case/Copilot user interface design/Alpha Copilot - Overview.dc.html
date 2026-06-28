@@ -5039,7 +5039,7 @@ class Component extends DCLogic {
 
     // funds grouped, focused bucket first + highlighted
     const fundRows=rows.filter(r=>byCat[r.k]&&byCat[r.k].length).sort((a,b)=>(a.k===focus?-1:b.k===focus?1:0));
-    const fundsCard=this.card({title:'Funds you hold by '+d.label.toLowerCase(),badge:this.badge('your portfolio','conf'),style:{height:'100%'},
+    const fundsCard=this.card({title:'View the investments you hold by '+d.label.toLowerCase(),badge:this.badge('your portfolio','conf'), /* items 21/22 — table at the bottom, 'investments' */
       children:h('div',{style:{display:'flex',flexDirection:'column',gap:14}},
         h('div',{style:{display:'flex',justifyContent:'flex-end'}}, this.holdingsMetricToggle()),
         fundRows.map((r,i)=>{ const on=r.k===focus;
@@ -5057,13 +5057,13 @@ class Component extends DCLogic {
     const allFunds=roster.filter(f=>catOf(f)!=null);
     const totNav=allFunds.reduce((a,f)=>a+((meta[f.id]||{}).nav||0),0);
     const topF=allFunds.slice().sort((a,b)=>((meta[b.id]||{}).nav||0)-((meta[a.id]||{}).nav||0))[0];
-    const summaryCard=this.card({title:'Alpha’s read on your '+d.label.toLowerCase()+' funds',badge:this.badge('AI','synth'),tone:'alpha',style:{height:'100%'},
+    const summaryCard=this.card({title:'Alpha’s read on your '+d.label.toLowerCase()+' investments',badge:this.badge('AI','synth'),tone:'alpha',style:{height:'100%'}, /* item 22 — investments, not funds */
       children:h('div',{style:{display:'flex',flexDirection:'column',gap:14}},
         h('div',{style:{fontSize:13,lineHeight:1.6,color:'rgba(255,255,255,.92)'}},
           'Your '+d.label.toLowerCase()+' exposure is led by ',h('strong',{style:{color:'#fff'}},heavy.n),' ('+heavy.you+'% of '+basis+')',topF?[', with ',h('strong',{key:'t',style:{color:'#fff'}},topF.name),' your largest single fund']:null,'. ',
           empty.length? ['You have ',h('strong',{key:'e',style:{color:'#fff'}},'no direct fund'),' in '+empty.map(r=>r.n).join(', ')+' — clear places to add if you want the exposure.'] : 'You hold direct funds across every bucket — a well-rounded book.'),
         /* item 19 — readable KPI tiles on the dark Alpha card (white text on translucent panels, not white-on-beige) */
-        h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}, [['Funds held',allFunds.length+''],['NAV in this book','€'+totNav.toFixed(1)+'m'],['Buckets covered',fundRows.length+' of '+rows.length],['Largest holding',topF?topF.name:'—']].map((t,i)=>
+        h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}, [['Investments held',allFunds.length+''],['NAV in this book','€'+totNav.toFixed(1)+'m'],['Buckets covered',fundRows.length+' of '+rows.length],['Largest holding',topF?topF.name:'—']].map((t,i)=>
           h('div',{key:i,style:{background:'rgba(255,255,255,.14)',borderRadius:10,padding:'10px 12px',minWidth:0}},
             h('div',{style:{fontSize:10.5,color:'rgba(255,255,255,.78)'}},t[0]),
             h('div',{style:{fontFamily:SF,fontSize:17,fontWeight:700,color:'#fff',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},t[1])))),
@@ -5074,9 +5074,7 @@ class Component extends DCLogic {
             style:{border:'1px solid rgba(255,255,255,.55)',background:'transparent',color:'#fff',borderRadius:10,padding:'11px 14px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'💼 Buy now →'))),
       caption:'A plain-language read of your '+d.label.toLowerCase()+' book and where the gaps are.'});
 
-    /* funds moved to a dedicated all-funds detail page; 'Where you’re concentrated' and 'Allocated vs committed' removed; Alpha’s read sits top-right beside the graph */
-    const fundsLink=h('button',{onClick:()=>this.setState({homeFundsList:key}),
-      style:{alignSelf:'flex-start',border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:10,padding:'12px 18px',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'View the funds you hold by '+d.label.toLowerCase()+' — full detail  →');
+    /* item 21 — the investments table sits inline at the bottom (no separate 'see by strategy' page) */
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
       focusName? h('div',{style:{fontSize:12.5,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:10,padding:'10px 14px',fontWeight:600}},'◧ Highlighting your '+focusName+' position across the charts below.'):null,
       this.twoCol(
@@ -5084,7 +5082,7 @@ class Component extends DCLogic {
         summaryCard,    // Alpha's read — top-right
         '1.2fr 1fr'),
       this.drillBigBlock(rows,byCat,d.label),
-      fundsLink);
+      fundsCard);
   }
 
   /* ====================== SIMULATOR ====================== */
