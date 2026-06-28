@@ -204,18 +204,18 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 ## 160–172 Simulator labels/target figures + controls
 - ☑ 160 Rename 'Current Portfolio' (clearer) — superseded by 161's specific wording; pie now 'Current Commitment' + sub 'your invested/committed capital'. Verified.
 - ☑ 161 Rename pie label to 'Current Commitment' — done. Verified live.
-- ☐ 162 'Current target based on…' caption under target pie
-- ☐ 163 Caption explains 3 target sources (past / risk class / Alpha)
-- ☐ 164 Grayed mini allocation breakdown beside Current Target number
-- ☐ 165 Show concrete Target % per bucket (20% Buyout…)
-- ☐ 166 Show concrete Current Portfolio % per bucket
-- ☐ 167 Current Target as explicit numeric value
-- ☐ 168 Remove 'Window State' element
+- ☑ 162 'Current target based on…' caption under target pie — pieCol title 'Current Target' + sub + source box. Verified live (logicError null).
+- ☑ 163 Caption explains 3 sources (a target you set / risk class Innovation & AI Alpha / Alpha-suggested). Verified.
+- ☑ 164 Grayed mini allocation breakdown (per-bucket %) beside Current Target number in source box. Verified.
+- ☑ 165 Concrete Target % per bucket — slider right column now 'cur%→tgt%' + grayed breakdown list. Verified.
+- ☑ 166 Concrete Current Portfolio % per bucket — 'cur%' shown left of arrow in slider row. Verified.
+- ☑ 167 Current Target as explicit numeric value — per-bucket figures + 'Current Target' titled pie. Verified.
+- ☑ 168 Remove 'Window State' — deleted unused stateSwitcher() (Happy/Cold/Thin/Gated/Error). Confirmed absent from sim (no Cold-start/Gated text).
 - ⊘ 169 Keep Vintage excluded from Simulator comparison
 - ⊘ 170 Keep Currency dimension included
-- ☐ 171 Risk Class toggle at top of Adjust-your-target
-- ☐ 172 Pro asset-allocation behind hidden 'Detail' toggle
+- ☑ 171 Risk Class toggle at top of Adjust-your-target — chip row on strategy row, re-derives target (simTargets:null). Verified ('Risk class — feeds your target').
+- ☑ 172 Pro asset-allocation behind hidden 'Detail' toggle — simDetail:false default shows 1 dim; toggle expands to 4. Verified (collapsed dimCount 1, expanded 4).
 
-**NEXT: item 162** — 'Current target based on…' caption under the target pie.
+**NEXT: item 173** — Peers benchmark info/tooltip (Peer = matched on age group, risk class, profession; distinct from Custom). Read review.md from line ~1629.
 
 **NEXT: item 145** — render the 4 Distance-from-Target dimensions as donut/C-charts via the toggle.

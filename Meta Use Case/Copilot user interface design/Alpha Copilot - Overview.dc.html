@@ -499,7 +499,7 @@ class Component extends DCLogic {
       fCmp:'peers', fPace:'5-year', fScenario:'base', fCommit:2.0, fNavCase:'Base', futureDetail:null, futureAct:false,
       fCommitYears:10, fRecycleYear:8, fRecycleRate:100, fExecution:'topq', /* items 106-109 — Programme Inputs (Michael Blome) */
       fProducts:{buyout:34,growth:14,credit:12,infra:10,secondaries:14,semiliquid:8,venture:4,directs:4},
-      simMode:'adjust', simPreset:'like-you',
+      simMode:'adjust', simPreset:'like-you', simDetail:false, /* item 172 — pro full-allocation view collapsed by default */
       simDials:{pm:20, growth:0, secondaries:6, us:38},
       simTargets:null, simFocus:null, simSuggest:null,
       savedSims:[], simCompare:false, watchlist:[], portfolioAdds:[],
@@ -1877,11 +1877,7 @@ class Component extends DCLogic {
     this.saveProfileToDB();
     this.setState({ showOnboardForm:false, seenOnboard:true });
   }
-  stateSwitcher(){
-    return this.seg([
-      {label:'Happy',value:'happy'},{label:'Cold-start',value:'cold'},{label:'Thin',value:'thin'},{label:'Gated',value:'gated'},{label:'Error',value:'error'}
-    ], this.state.demoState, v=>this.setState({demoState:v}), {sm:true});
-  }
+  /* item 168 — 'Window State' (demo Happy/Cold/Thin/Gated/Error state switcher) removed; it must not appear in the Adjust-your-target / Simulator view */
 
   /* ---------- view-data tables ---------- */
   dataTable(){
@@ -5189,30 +5185,59 @@ class Component extends DCLogic {
         h('div',{style:{textAlign:'center'}}, h('div',{style:{fontSize:10.5,fontWeight:700,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.05em'}},label),
           sub?h('div',{style:{fontSize:9.5,color:'var(--muted)',marginTop:1}},sub):null), /* item 159 */
         this.donutNamed(slices,150,center,d.label.toLowerCase()));
+      /* item 171 — Risk Class toggle at the top of Adjust-your-target: switching risk class re-feeds the target (defaultTargets derives from riskId); only on the strategy row, where risk class drives the mix */
+      const riskToggle = d.key==='strategy' ? h('div',{style:{marginBottom:4}},
+        h('div',{style:{fontSize:10.5,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)',marginBottom:6}},'Risk class — feeds your target'),
+        h('div',{style:{display:'flex',flexWrap:'wrap',gap:6}},
+          this.RISKS.map(r=>{ const on=s.riskId===r.id;
+            return h('button',{key:r.id,onClick:()=>this.setState({riskId:r.id,simTargets:null}),title:'PM target '+r.pmTarget+'%',
+              style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 11px',fontSize:11,fontWeight:on?700:500,cursor:'pointer',whiteSpace:'nowrap'}}, r.short); })),
+        h('div',{style:{fontSize:10,color:'var(--muted)',marginTop:5,lineHeight:1.4}},'Pick a class to re-derive the target, or move the sliders below to adjust it locally.')) : null;
       const sliders=h('div',{style:{display:'flex',flexDirection:'column',gap:10,marginTop:16}},
+        riskToggle,
         h('div',{style:{fontSize:10.5,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)'}},'Adjust your target'),
-        cats.map(k=>{ const val=(tObj[k]!=null?tObj[k]:d.actual[k]); const dv=Math.round(((tObj[k]||0)/tot*100)-d.actual[k]);
-          return h('div',{key:k,style:{display:'grid',gridTemplateColumns:'92px 1fr 42px',alignItems:'center',gap:9}},
+        cats.map(k=>{ const val=(tObj[k]!=null?tObj[k]:d.actual[k]); const cur=Math.round(d.actual[k]||0); const tgt=Math.round((tObj[k]||0)/tot*100); const dv=tgt-cur;
+          /* items 165/166 — show concrete current% → target% per bucket */
+          return h('div',{key:k,style:{display:'grid',gridTemplateColumns:'92px 1fr 76px',alignItems:'center',gap:9}},
             h('div',{style:{display:'flex',alignItems:'center',gap:7,minWidth:0}},
               h('span',{style:{width:9,height:9,borderRadius:2,background:`var(${d.colors[k]})`,flex:'0 0 9px'}}),
               h('span',{style:{fontSize:11.5,color:'var(--ink)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},nm(d.key,k))),
             h('input',{type:'range',min:0,max:60,step:1,value:val,onChange:e=>this.setSimTarget(d.key,k,e.target.value),
               style:{width:'100%',accentColor:`var(${d.colors[k]})`,cursor:'pointer'}}),
-            h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:12.5,fontWeight:600,color: dv===0?'var(--muted)':(dv>0?'var(--over)':'var(--under)')}}, (dv>0?'+':'')+dv));
+            h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:11.5,fontWeight:600}}, h('span',{style:{color:'var(--muted)'}},cur+'%'), h('span',{style:{color:'var(--muted)'}},'→'), h('span',{style:{color: dv===0?'var(--ink)':(dv>0?'var(--over)':'var(--under)')}},tgt+'%')));
         }));
       return this.card({title:d.label,info:true,
         right:h('button',{onClick:()=>this.setState({simSuggest:d.key}),style:{border:'1px solid var(--line)',background:'var(--surface)',borderRadius:8,padding:'6px 12px',fontSize:12,fontWeight:600,color:'var(--brand)',cursor:'pointer'}},'✦ Suggest funds'),
         style:focus===d.key?{boxShadow:'0 0 0 2px var(--brand)',borderColor:'var(--brand)'}:{},
         children:h('div',{style:{display:'flex',gap:24,flexWrap:'wrap',alignItems:'flex-start',paddingTop:2}},
           h('div',{style:{flex:'1 1 300px',minWidth:260}}, pieCol(curSlices,'Current Commitment','You','your invested/committed capital'), sliders),
-          pieCol(tgtSlices,'Your target','Target'),
+          h('div',{style:{flex:'0 0 auto'}},
+            pieCol(tgtSlices,'Current Target','Target','based on the source below'),
+            /* items 162/163/164/167 — name where this target comes from + grayed mini breakdown */
+            h('div',{style:{maxWidth:200,margin:'10px auto 0',padding:'9px 11px',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:8}},
+              h('div',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)',marginBottom:5}},'Current target based on'),
+              h('div',{style:{fontSize:10.5,color:'var(--muted)',lineHeight:1.5}},
+                h('div',null,'• a target you set previously'),
+                h('div',null,'• your risk class ',h('span',{style:{color:'var(--ink)',fontWeight:600}},'Innovation & AI Alpha')),
+                h('div',null,'• an allocation Alpha suggested')),
+              h('div',{style:{marginTop:7,paddingTop:7,borderTop:'1px solid var(--line)'}},
+                cats.map(k=>{ const tgt=Math.round((tObj[k]||0)/tot*100); return h('div',{key:k,style:{display:'flex',justifyContent:'space-between',fontSize:10,color:'var(--muted)',padding:'1px 0'}}, h('span',null,nm(d.key,k)), h('span',{style:{fontFamily:SF,fontWeight:600}},tgt+'%')); })))),
           h('div',{style:{flex:'1 1 260px',minWidth:240}},
             h('div',{style:{fontSize:10.5,fontWeight:700,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:4}},'Target vs current (pp) · updates live'), /* item 158 */
             h('div',{style:{fontSize:10.5,color:'var(--muted)',marginBottom:8,textTransform:'none',letterSpacing:0}},'Recomputes as you move the sliders.'),
             z.some(x=>Math.abs(x.delta)>=0.5)? this.miniZ(z) : h('div',{style:{fontSize:12,color:'var(--muted)',padding:'20px 0',textAlign:'center'}},'Move a slider to open a gap vs your current mix.')))});
     };
+    /* item 172 — the pro pure-asset-allocation view (all dimensions) is hidden by default behind a 'Detail' toggle; casual users see only the primary dimension */
+    const visible = s.simDetail ? ordered : ordered.slice(0,1);
+    const hiddenN = ordered.length - visible.length;
+    const detailToggle = h('div',{style:{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}},
+      h('button',{onClick:()=>this.setState({simDetail:!s.simDetail}),
+        style:{display:'inline-flex',alignItems:'center',gap:7,border:'1px solid '+(s.simDetail?'var(--brand)':'var(--line)'),background:s.simDetail?'var(--brand-wash)':'var(--surface)',color:s.simDetail?'var(--brand-ink)':'var(--ink)',borderRadius:9,padding:'8px 14px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},
+        (s.simDetail?'▾':'▸')+' Detail — full asset allocation'),
+      h('span',{style:{fontSize:11,color:'var(--muted)'}}, s.simDetail? 'Showing every dimension — the pro asset-allocation view.' : (hiddenN>0? hiddenN+' more dimension'+(hiddenN>1?'s':'')+' (region, currency, sector) hidden — open Detail to fine-tune.' : '')));
     const grid=h('div',{style:{display:'flex',flexDirection:'column',gap:18}},
-      ordered.map(d=>h('div',{key:d.key}, dimCard(d))));
+      visible.map(d=>h('div',{key:d.key}, dimCard(d))),
+      detailToggle);
 
     const actions=h('div',{style:{display:'flex',gap:12,flexWrap:'wrap',alignItems:'center'}},
       h('button',{onClick:()=>this.saveTargetSim(),disabled:s.savedSims.length>=5,
