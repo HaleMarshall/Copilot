@@ -38,4 +38,6 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 35 top three performing investments (was five)
 - [x] 36 click into IRR/DPI/TVPI/MOIC/DVPI to rank top performers
 - [x] 37 click a fund → fund modal with larger graph (existing openFund) — verified
-NEXT: item 38 (drop funds-by-commitment, keep only top positions)
+- [x] 38 vintage panel: top positions only (no funds-by-commitment)
+- [x] 39 cashflow detailed view: each investment on the J-curve by NAV (net positive/in J-curve)
+NEXT: item 40 (peer reassurance for bad vintages + diversification suggestion)
