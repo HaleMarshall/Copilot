@@ -494,7 +494,7 @@ class Component extends DCLogic {
       deepLink:null,
       dataModal:null,
       fundDetail:null, fundPageId:null, simFund:null, homePop:null, homeFocusCat:null,
-      homeDrill:null, targetSet:true,
+      homeDrill:null, homeFundsList:null, targetSet:true,
       // Future-page filters (pacing / projection)
       fCmp:'peers', fPace:'5-year', fScenario:'base', fCommit:2.0, fNavCase:'Base', futureDetail:null, futureAct:false,
       fCommitYears:10, fRecycleYear:8, fRecycleRate:100, fExecution:'topq', /* items 106-109 — Programme Inputs (Michael Blome) */
@@ -2230,7 +2230,7 @@ class Component extends DCLogic {
   curWS(){ return this.WS().find(w=>w.id===this.state.ws)||this.WS()[1]; }
   wsOf(ucId){ const w=this.WS().find(w=>w.ids.includes(ucId)); return w?w.id:'shape'; }
   wsUCs(wsId){ const ids=this.WS().find(w=>w.id===wsId).ids; return ids.map(id=>this.allUC().find(u=>u.id===id)).filter(Boolean); }
-  selectWS(id){ const ucs=this.wsUCs(id); const first=ucs[0]; this.setState({ws:id, uc:first.id, page:first.pages[0].id, deepLink:null, homeDrill:null, homePop:null, homeFocusCat:null}); } /* item 60 — always land on the clean Overview, never the last drill-down */
+  selectWS(id){ const ucs=this.wsUCs(id); const first=ucs[0]; this.setState({ws:id, uc:first.id, page:first.pages[0].id, deepLink:null, homeDrill:null, homeFundsList:null, homePop:null, homeFocusCat:null}); } /* item 60 — always land on the clean Overview, never the last drill-down */
   // levers persistent on Shape & Act; collapse to summary on Understand & Research
   controlIsLeverPanel(){ return this.state.ws==='shape' || this.state.ws==='act'; }
 
@@ -3843,8 +3843,12 @@ class Component extends DCLogic {
       // focused category first, so the clicked bucket pops to the top
       const fundRows=rows.filter(r=>byCat[r.k]&&byCat[r.k].length).sort((a,b)=>(a.k===focus?-1:b.k===focus?1:0));
       eyebrow='Your portfolio · '+d.label; title= focusName? 'Your '+focusName+' exposure' : 'Where you’re invested — '+d.label.toLowerCase();
+      /* Alpha's read (AI summary) shown directly below the first graph in the detail panel — for every asset-allocation dimension */
+      const panelAiRead=this.card({title:'Alpha’s read on your '+d.label.toLowerCase(),badge:this.badge('AI','synth'),tone:'alpha',
+        children:h('div',{style:{fontSize:12.5,lineHeight:1.6,color:'rgba(255,255,255,.92)'}},
+          'You’re most heavily weighted to ',h('strong',{style:{color:'#fff'}},heavy.n+' ('+heavy.you+'%)'),' and lightest in ',h('strong',{style:{color:'#fff'}},light.n+' ('+light.you+'%)'),'.',
+          empty.length? [' You have ',h('strong',{key:'e',style:{color:'#fff'}},'no direct fund'),' in '+empty.map(r=>r.n).join(', ')+' — clear places to add the exposure.']:' A well-rounded '+d.label.toLowerCase()+' book.')});
       body=[
-        h('div',{key:'top5'}, this.topFivePerformers(key)),
         focusName? h('div',{key:'fn',style:{fontSize:12,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:9,padding:'9px 12px',fontWeight:600}}, '◧ Highlighting your '+focusName+' position — '+(d.actual[focus]||0)+'% of NAV.') : null,
         h('div',{key:'d',style:{display:'flex',gap:16,alignItems:'center'}},
           this.donutNamed(aSl,128,d.label,'your mix'),
@@ -3853,19 +3857,9 @@ class Component extends DCLogic {
               h('span',{style:{width:10,height:10,borderRadius:2,background:`var(${sl.color})`,flex:'0 0 10px'}}),
               h('span',{style:{flex:1,color:'var(--ink)',fontWeight:on?700:400,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},sl.n),
               h('span',{style:{fontFamily:SF,fontWeight:600,color:on?'var(--brand-ink)':'var(--muted)'}},sl.p+'%')); }))),
+        panelAiRead,
         h('div',{key:'i',style:{fontSize:12.5,lineHeight:1.55,color:'var(--muted)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:10,padding:'11px 13px'}},
-          'You’re most heavily weighted to ',h('strong',{style:{color:'var(--ink)'}},heavy.n+' ('+heavy.you+'%)'),' and lightest in ',h('strong',{style:{color:'var(--ink)'}},light.n+' ('+light.you+'%)'),'.'),
-        h('div',{key:'f'},
-          this.panelSection('Funds you hold by '+d.label.toLowerCase(), roster.filter(f=>catOf(f)!=null).length+' of '+roster.length+' funds'),
-          fundRows.map((r,i)=>{ const on=r.k===focus;
-            return h('div',{key:i,style:{marginBottom:11,padding:on?'10px 11px':'0',borderRadius:on?11:0,background:on?'var(--brand-wash)':'transparent',border:on?'1px solid var(--brand-tint-3)':'1px solid transparent'}},
-            h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:7}},
-              h('span',{style:{width:11,height:11,borderRadius:3,background:`var(${r.color})`,flex:'0 0 11px'}}),
-              h('span',{style:{fontFamily:SF,fontWeight:on?700:600,fontSize:13.5}},r.n),
-              h('span',{style:{fontSize:11.5,color:'var(--muted)'}}, byCat[r.k].length+' fund'+(byCat[r.k].length>1?'s':'')+' · '+r.you+'%'),
-              on? h('span',{style:{marginLeft:'auto',fontSize:10.5,fontWeight:700,color:'var(--brand)'}},'SELECTED'):null),
-            h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, byCat[r.k].map(f=>this.heldFundRow(f)))); }),
-          empty.length? h('div',{style:{fontSize:11.5,color:'var(--muted)',fontStyle:'italic',marginTop:2,lineHeight:1.5}}, 'No direct holdings in '+empty.map(r=>r.n).join(', ')+'.'):null)
+          'You’re most heavily weighted to ',h('strong',{style:{color:'var(--ink)'}},heavy.n+' ('+heavy.you+'%)'),' and lightest in ',h('strong',{style:{color:'var(--ink)'}},light.n+' ('+light.you+'%)'),'.')
       ];
       footer=h('div',{style:{display:'flex',flexDirection:'column',gap:9}},
         h('button',{onClick:()=>this.setState({homePop:null,homeDrill:key}),style:{width:'100%',background:'var(--brand)',color:'#fff',border:'none',borderRadius:10,padding:'12px',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'See full breakdown  →'),
@@ -3913,7 +3907,9 @@ class Component extends DCLogic {
             caption:'Public-market-equivalent (PME): what the same cash flows would have earned in the S&P 500 total-return index. Your PE programme returned +'+spread+'pp a year above the index. MOIC and peer benchmarks aren’t shown here — too few comparable data points.'}); })(),
         h('div',{key:'b',style:{fontSize:12.5,lineHeight:1.55,color:'var(--muted)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:10,padding:'11px 13px'}},
           h('strong',{style:{color:'var(--ink)'}},ranked[0].name),' is your biggest contributor; ',h('strong',{style:{color:'var(--ink)'}},ranked[ranked.length-1].name),' is the largest drag this period.'),
-        h('div',{key:'f'}, this.panelSection('Funds by contribution'), h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, ranked.map(f=>this.heldFundRow(f))))
+        /* funds moved off the performance summary to a dedicated all-funds detail page */
+        h('div',{key:'f'}, h('button',{onClick:()=>this.setState({homePop:null,homeFundsList:'performance'}),
+          style:{width:'100%',border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:10,padding:'12px',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'View all '+roster.length+' funds — full detail  →'))
       ];
     } else if(key==='cashflow'){
       const ranked=roster.slice().sort((a,b)=>parseFloat(b.called)-parseFloat(a.called));
@@ -4676,6 +4672,7 @@ class Component extends DCLogic {
     const h=this.h; const SF=this.SF;
     if(!this.state.dbLoaded) return this.dbLoadingView();
     if(this.dbEmpty()) return this.dbEmptyView();
+    if(this.state.homeFundsList) return this.fundsListBody(this.state.homeFundsList);
     if(this.state.homeDrill) return this.homeDrillBody(this.state.homeDrill);
     const P=(this.DB&&this.DB.portfolio)||{};
     const dims=this.HOME_DIMS(); const dim=(k)=>dims.find(d=>d.key===k);
@@ -4924,6 +4921,32 @@ class Component extends DCLogic {
       children:this.miniZ(vZr), caption:'Deviation between NAV and committed exposure by vintage year. Actual data — not simulated.'}):null;
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}}, this.twoCol(mixCard,insightCard,'1.3fr 1fr'), vZCard, this.twoCol(fundsCard,gapCard,'1.7fr 1fr'));
   }
+  /* dedicated all-funds detail page (reached from the detail panels / breakdown) — lists every fund you hold, grouped by the chosen dimension */
+  fundsListBody(scope){
+    const h=this.h; const SF=this.SF; const meta=this.HELD_META(); const roster=this.HELD_FUNDS();
+    const back=h('button',{onClick:()=>this.setState({homeFundsList:null}),style:{alignSelf:'flex-start',display:'inline-flex',alignItems:'center',gap:6,border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:9,padding:'7px 13px',fontSize:12,fontWeight:600,cursor:'pointer'}},'‹ Back to overview');
+    const dimKeys=['strategy','region','currency','sector'];
+    let title='All funds you hold', sub='Every fund in your portfolio · '+roster.length+' funds', content;
+    if(dimKeys.includes(scope)){
+      const d=this.HOME_DIMS().find(x=>x.key===scope);
+      const nm=(k)=>scope==='strategy'?(this.STRATS.find(s=>s[0]===k)||[null,k])[1]:k;
+      const catOf=(f)=> scope==='strategy'? (meta[f.id]||{}).strat : (meta[f.id]||{})[scope];
+      const byCat={}; roster.forEach(f=>{ const c=catOf(f); if(c==null)return; (byCat[c]=byCat[c]||[]).push(f); });
+      title='Funds you hold by '+d.label.toLowerCase(); sub=roster.filter(f=>catOf(f)!=null).length+' of '+roster.length+' funds resolve to a '+d.label.toLowerCase();
+      content=h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
+        h('div',{style:{display:'flex',justifyContent:'flex-end'}}, this.holdingsMetricToggle()),
+        Object.keys(byCat).map(c=>this.card({key:c,title:nm(c)+' · '+byCat[c].length+' fund'+(byCat[c].length>1?'s':''),badge:this.badge('your portfolio','conf'),children:this.holdingsTable(byCat[c])})));
+    } else {
+      content=this.card({title:'All funds',right:this.holdingsMetricToggle(),badge:this.badge('your portfolio','conf'),children:this.holdingsTable(roster)});
+    }
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
+      back,
+      h('div',null,
+        h('div',{style:{fontSize:10.5,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Your portfolio · Funds'),
+        h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:600,margin:'3px 0 2px'}},title),
+        h('div',{style:{fontSize:12.5,color:'var(--muted)'}},sub)),
+      content);
+  }
   homeDrillBody(key){
     const h=this.h; const SF=this.SF;
     if(key==='vintage') return this.vintageDrillBody();
@@ -5001,18 +5024,17 @@ class Component extends DCLogic {
             style:{border:'1px solid rgba(255,255,255,.55)',background:'transparent',color:'#fff',borderRadius:10,padding:'11px 14px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'💼 Buy now →'))),
       caption:'A plain-language read of your '+d.label.toLowerCase()+' book and where the gaps are.'});
 
+    /* funds moved to a dedicated all-funds detail page; 'Where you’re concentrated' and 'Allocated vs committed' removed; Alpha’s read sits top-right beside the graph */
+    const fundsLink=h('button',{onClick:()=>this.setState({homeFundsList:key}),
+      style:{alignSelf:'flex-start',border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:10,padding:'12px 18px',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'View the funds you hold by '+d.label.toLowerCase()+' — full detail  →');
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
-      focusName? h('div',{style:{fontSize:12.5,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:10,padding:'10px 14px',fontWeight:600}},'◧ Highlighting your '+focusName+' position across the charts and funds below.'):null,
-      summaryCard, /* item 76 — AI Overview (Alpha's read) + Suggest-funds CTA at the very top; item 77 — 4-tile portfolio summary lives in it */
-      /* item 80 — breakdown panel (mix chart + concentration) sticky on the left while the rest (Z-chart, funds) scrolls */
+      focusName? h('div',{style:{fontSize:12.5,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:10,padding:'10px 14px',fontWeight:600}},'◧ Highlighting your '+focusName+' position across the charts below.'):null,
       this.twoCol(
-        h('div',{style:{position:'sticky',top:'12px',alignSelf:'start',display:'flex',flexDirection:'column',gap:16,minWidth:0}}, mixCard, insightCard),
-        h('div',{style:{display:'flex',flexDirection:'column',gap:16,minWidth:0}},
-          this.drillBigBlock(rows,byCat,d.label),
-          (()=>{ const zr=this.navVsCommittedDeltas(key); return zr.length? this.card({title:'Allocated vs committed — '+d.label,badge:this.badge('your portfolio','conf'), /* item 79 — deviation Z-chart on every breakdown page */
-            children:this.miniZ(zr), caption:'Deviation between how you’re invested today (NAV) and your committed exposure, per '+d.label.toLowerCase()+'. Positive = more current value than committed weight. Actual data — not simulated.'}):null; })(),
-          fundsCard),
-        '0.95fr 1.5fr'));
+        mixCard,        // the first graph (your mix)
+        summaryCard,    // Alpha's read — top-right
+        '1.2fr 1fr'),
+      this.drillBigBlock(rows,byCat,d.label),
+      fundsLink);
   }
 
   /* ====================== SIMULATOR ====================== */
