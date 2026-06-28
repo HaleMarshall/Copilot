@@ -118,7 +118,7 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 86 Vintage last 5 years only — `vintageDrillBody` vint = VINTAGES().slice(-5). Verified live: shows 2020–2024 (5 years).
 - ⊘ 87 Vintage teaser/intermediate step — confirmed: homeDetailPanel has a `key==='vintage'` teaser branch (line 3765), reached via openHomePop('vintage') before the full breakdown — same flow as other dimensions.
 - ☑ 88 Vintage Alpha summary (over-vintaged) — gapCard now leads with a blunt callout: 'You are over-vintaged in {year} — X% of your book in one vintage' (when topShare≥35%), else 'heaviest vintage … reasonable spread'. Verified live: summary present.
-- ☐ 89 Cashflow top KPIs: Committed/Called/Uncalled/Cash Position
+- ☑ 89 Cashflow top KPIs: Committed/Called/Uncalled/Cash Position — replaced the 6-tile crowded row with exactly these 4 in order (€20.5m/€16.6m/€3.9m/€1.1m, internally consistent). Verified live: all 4 present, in order.
 - ☐ 90 Mark notifications seen after ~5s
 - ☐ 91 Rename 'Net Cash Flow' → 'Net Distributions', below top row
 - ☐ 92 Cashflow Alpha summary (J-curve, reassuring)

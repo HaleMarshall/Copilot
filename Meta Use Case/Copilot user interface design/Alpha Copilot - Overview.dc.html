@@ -3797,7 +3797,8 @@ class Component extends DCLogic {
       const ranked=roster.slice().sort((a,b)=>parseFloat(b.called)-parseFloat(a.called));
       eyebrow='Your portfolio · Cash flows'; title='Your cash-flow position';
       body=[
-        this.kpiTiles([['Cash position','€1.1m','available now'],['Uncalled','€3.9m','committed, not drawn'],['Committable','€4.3m','headroom'],['Net cash flow','+€0.9m','distributions − calls'],['Distributions','€2.1m','to date'],['Avg ticket','€130k','per commitment']]),
+        /* item 89 — top KPI row: Committed · Called · Uncalled · Cash Position (uncrowded) */
+        this.kpiTiles([['Committed','€20.5m','total commitment'],['Called','€16.6m','drawn to date'],['Uncalled','€3.9m','committed, not drawn'],['Cash Position','€1.1m','in your cash account']]),
         h('div',{key:'b',style:{fontSize:12.5,lineHeight:1.55,color:'var(--muted)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:10,padding:'11px 13px'}},
           'You turned cash-flow positive around 2023 as distributions overtook calls. €3.9m remains uncalled across younger funds.'),
         h('div',{key:'f'}, this.panelSection('Funds by capital called'), h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, ranked.map(f=>h('div',{key:f.id,style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,border:'1px solid var(--line)',borderRadius:10,padding:'9px 12px'}},
