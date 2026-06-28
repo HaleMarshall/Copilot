@@ -157,7 +157,7 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 118 Performance table sort: Vintage default + Strategy — `perfSort` dtog (default 'vintage'); Strategy option groups buy-outs. Verified live: sort toggle present, default vintage.
 - ☑ 119 Strip Fund Detail to just the table — the per-fund table is performance-only (Age/Committed/Called/Distributed/DPI); no investor-due / 'what I paid' fields. Verified.
 - ☑ 120 'Upcoming Opportunities' preview + coming-soon — added an 'Upcoming Opportunities' card (twoCol beside the secondary-market card) with 'coming soon' badges, generically phrased (Private Credit / North America Buyout / Secondaries — no named unsigned deals; auditable). Verified: wired into opportunitiesBody return; logicError null.
-- ☐ 121 Build out Internal/Platform view
+- ☑ 121 Build out Internal/Platform view — expanded internalBody from 2 graphics to a 4-tile KPI strip (AUM €4.2bn / 2,140 investors / €310m net new / 71% fill) + 5 deck-ready charts (AUM growth, net-new commitments by strategy, cohort allocation trend, manager-pattern, fill rate by strategy). Verified live: KPI strip + 5 chart cards render.
 - ☐ 122 Remove 'Performance' from weighting panel
 - ☐ 123 Add 'Currency' weighting factor
 - ⊘ 124 Keep weighting at aggregate Target-Fit level (no per-item)
