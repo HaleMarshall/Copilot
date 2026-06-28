@@ -90,8 +90,8 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 62 Cart icon = 'already held' marker on top holdings — topHoldingsModule rows call shopBtn → static mint 'Already in your portfolio' cart marker for held funds. Verified live: 4 held markers, 0 buy buttons.
 - ⊘ 63 Held fund pop-up CTA → suggest similar — done via fundActions (38)
 - ⊘ 64 Not-held pop-up CTA → Buy now — done via fundActions (38)
-- ☐ 65 Performance KPIs NAV-based by default
-- ☐ 66 Remove fill-rate metric from Overview
+- ⊘ 65 Performance KPIs NAV-based by default — confirmed: overview Performance column shows net multiples (MOIC/DPI/IRR/TVPI) + Portfolio value (NAV) + Distributions — all NAV/value-based, never committed; basis toggle defaults NAV (58). No committed distortion.
+- ⊘ 66 Remove fill-rate metric from Overview — confirmed: scan of homeOverviewBody (4498–4760) shows no fill-rate metric; only 'fill the gaps' CTA + CSS auto-fill. Fill-rate lives only in Peer Benchmarking/Comparison (template line 192, TR chart 823/851).
 - ☐ 67 NAV/Committed toggle on every breakdown view
 - ☐ 68 Default NAV on breakdown toggle
 
