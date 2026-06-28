@@ -233,6 +233,14 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 183 Rename page title → 'Compare yourself' with two modes in the subtitle (actual / target). Verified (mk('sim',...,'Compare yourself')).
 - ☑ 184 'Your current / Your target' mode toggle — simCmpMode drives benchmark resolution (cmpMix actual ↔ benchTargetMix). Verified (target→'Peers Target', current→'Peers today'/'Your actual').
 
-**NEXT: item 185** — read review.md ~1749 onward.
+## 185–198 Simulator/Comparison confirms + Manager research
+- ☑ 185 Keep 'Build my target with Alpha' (builds all 4 dims — verified) + added '✦ Alpha' Suggested benchmark option (benchTargetMix/cmpMix→modelMix). Verified.
+- ⊘ 186 Target adjustment across all dims — confirmed: dimCards iterate HOME_DIMS (strategy/region/currency/sector).
+- ⊘ 187 'Save Target' action — confirmed: saveTargetSim button in actions (shown when dials open).
+- ⊘ 188 Keep Plan/Project/Stress secondary actions — confirmed: in `deeper` block (out of scope to redesign).
+- ⊘ 189 Follow function at bottom of Comparison — confirmed: comparisonBody returns followCard() last.
+- ⊘ 190 Notifications box on right — confirmed: notifBell + notifPanelBody.
+
+**NEXT: item 191** — Manager comparison needs a manager-selection input (Research/Funds & Managers). Then 192 (asset-class toggle +All), 193 (pick specific case), 194 (manager-level not fund-level), 195 (sort by asset class), 196 (Manager Overview landing), 197 (manager search), 198 (compare by all-time perf). Read review.md ~1809.
 
 **NEXT: item 145** — render the 4 Distance-from-Target dimensions as donut/C-charts via the toggle.

@@ -676,14 +676,16 @@ class Component extends DCLogic {
   /* the strategy TARGET allocation of a benchmark group (their model/representative forward mix) */
   benchTargetMix(key){
     if(key==='custom'||key==='you') { const t=(this.state.simTargets||this.defaultTargets()).strategy; return t||this.MIX.you; }
+    if(key==='suggested') return this.modelMix(); /* item 185 — Alpha-suggested target = the house-view model that 'Build my target' uses */
     if(key==='model')    return this.modelMix();
     if(key==='top10')    return this.topMix();
     if(key==='platform') return this.MIX.platform;
     return this.peerData().mix; // peers
   }
-  benchLabel(key){ return {model:'Model',peers:'Peers',platform:'Platform',top10:'Top 10%',custom:'Custom',you:'You'}[key]||'Model'; }
+  benchLabel(key){ return {model:'Model',peers:'Peers',platform:'Platform',top10:'Top 10%',custom:'Custom',suggested:'Alpha',you:'You'}[key]||'Model'; }
   cmpMix(cmp){
     if(cmp==='you') return this.MIX.you;
+    if(cmp==='suggested') return this.modelMix(); /* item 185 — Alpha suggestion resolves to the house-view model */
     if(cmp==='platform') return this.MIX.platform;
     if(cmp==='model') return this.modelMix();
     if(cmp==='top10') return this.topMix();
@@ -5333,7 +5335,7 @@ class Component extends DCLogic {
         [['actual','Actual'],['target','Target']].map(([v,l])=>{ const on=s.simYouMode===v;
           return h('button',{key:v,onClick:()=>this.setState({simYouMode:v}),style:{border:'none',background:on?'var(--brand)':'transparent',color:on?'#fff':'var(--muted)',padding:'5px 14px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}},l); }));
       /* item 178 — benchmark selector: each option is that group's allocation (target by default; actual when in 'current' mode per item 184) */
-      const benchOpts=[['model','Model'],['peers','Peers'],['platform','Platform'],['top10','Top 10%'],['custom','Custom']];
+      const benchOpts=[['suggested','✦ Alpha'],['model','Model'],['peers','Peers'],['platform','Platform'],['top10','Top 10%'],['custom','Custom']];
       const benchSel=h('div',{style:{display:'flex',flexWrap:'wrap',gap:6,justifyContent:'center',marginTop:4}},
         benchOpts.map(([v,l])=>{ const on=s.simBench===v;
           return h('button',{key:v,onClick:()=>this.setState({simBench:v, simShowDials: v==='custom'?true:s.simShowDials}),/* item 180 — Custom Target opens the manual dials */
