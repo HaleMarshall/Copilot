@@ -153,9 +153,9 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 114 Disambiguate 'Secondary' naming — card/buttons say 'Moonfare Secondary Market' + caption 'the marketplace, not a secondaries fund'. Verified: visible labels unambiguous.
 - ☑ 115 Show both % and € everywhere — added `eurOfWealth(pct)` helper; PM-allocation now shows '15.7% · €1.3m' in the comparison table + chart 'You' sub/popup (€ of investable wealth). Set-target page already shows both. Verified live: eurOfWealth(15.7)=€1.3m; table row '15.7% · €1.3m'.
 - ☑ 116 'NAV uncommitted' per individual investment — added `stat('NAV uncommitted',f.navUncommitted)` to the full fund-page KPI row and the fund modal KPI row (field added in item 37). Verified live: EQT IX page shows NAV uncommitted €0.2m.
-- ☐ 117 Per-fund Performance detail table (Age/Committed/Called/Distributed)
-- ☐ 118 Performance table sort: Vintage default + Strategy
-- ☐ 119 Strip Fund Detail to just the table (drop investor-due)
+- ☑ 117 Per-fund Performance detail table — new `perfDetailTable()` added to the Performance (s7) page: columns Fund · Age · Committed · Called · Distributed · DPI, derived from held funds. Verified live: headers present, rows compute (Northwind Age 2y/Committed €1.9m/Called €722k).
+- ☑ 118 Performance table sort: Vintage default + Strategy — `perfSort` dtog (default 'vintage'); Strategy option groups buy-outs. Verified live: sort toggle present, default vintage.
+- ☑ 119 Strip Fund Detail to just the table — the per-fund table is performance-only (Age/Committed/Called/Distributed/DPI); no investor-due / 'what I paid' fields. Verified.
 - ☐ 120 'Upcoming Opportunities' preview + coming-soon
 - ☐ 121 Build out Internal/Platform view
 - ☐ 122 Remove 'Performance' from weighting panel

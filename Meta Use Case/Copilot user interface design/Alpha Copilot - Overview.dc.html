@@ -4330,7 +4330,33 @@ class Component extends DCLogic {
       // KPI grid below the charts
       this.card({title:'Key figures vs '+cmpName,children:h('div',{style:{display:'flex',flexWrap:'wrap',gap:12}}, kpis.map(kpiCard)),caption:'A fuller read on the portfolio than the three headline multiples — coverage, concentration, realisation and quality, each against your '+cmpName.toLowerCase()+'.'}),
       // vertical best/worst Z-chart
-      this.card({title:'Best & worst fund in each strategy (pp of NAV)',badge:this.badge('your portfolio','conf'),children:h('div',{style:{paddingTop:10}},this.vZChart(sections,{yLabel:'Contribution to NAV (pp)'})),caption:'Within every strategy, the single fund that contributed most (up, mint) and least (down, indigo) this quarter. Click any bar to open that fund. Buyout shows the widest spread — EQT IX carried it while Cinven 8 dragged.'}));
+      this.card({title:'Best & worst fund in each strategy (pp of NAV)',badge:this.badge('your portfolio','conf'),children:h('div',{style:{paddingTop:10}},this.vZChart(sections,{yLabel:'Contribution to NAV (pp)'})),caption:'Within every strategy, the single fund that contributed most (up, mint) and least (down, indigo) this quarter. Click any bar to open that fund. Buyout shows the widest spread — EQT IX carried it while Cinven 8 dragged.'}),
+      // items 117/118/119 — per-fund performance detail table (Age/Committed/Called/Distributed; sort vintage default + strategy; table only)
+      this.perfDetailTable());
+  }
+  /* items 117-119 — per-fund Performance detail table: Age · Committed · Called · Distributed, sortable (Vintage default / Strategy), performance-only (no investor-due) */
+  perfDetailTable(){ const h=this.h; const SF=this.SF; const NOW=2026;
+    const sort=this.dtog('perfSort','vintage');
+    const rows=this.HELD_FUNDS().map(f=>{ const committed=this.fundCommitted(f); const calledPct=parseFloat(f.called)||0; const calledEur=committed*calledPct/100; const dist=(parseFloat(f.dpi)||0)*calledEur;
+      return {f, age:NOW-(f.vintage||NOW), committed, called:calledEur, dist, strat:f.strat, vintage:f.vintage}; });
+    rows.sort((a,b)=> sort==='strategy'? (a.strat<b.strat?-1:a.strat>b.strat?1:(b.vintage-a.vintage)) : (b.vintage-a.vintage));
+    const eur=(m)=> m>=1? '€'+(Math.round(m*10)/10)+'m' : '€'+Math.round(m*1000)+'k';
+    const COLS='1.7fr 0.7fr 0.9fr 0.9fr 0.9fr 0.7fr';
+    const head=h('div',{style:{display:'grid',gridTemplateColumns:COLS,gap:10,padding:'7px 12px',fontSize:10.5,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--muted)',fontWeight:700,borderBottom:'1px solid var(--line)'}},
+      h('span',null,'Fund'),h('span',{style:{textAlign:'right'}},'Age'),h('span',{style:{textAlign:'right'}},'Committed'),h('span',{style:{textAlign:'right'}},'Called'),h('span',{style:{textAlign:'right'}},'Distributed'),h('span',{style:{textAlign:'right'}},'DPI'));
+    const body=rows.map((r,i)=>h('div',{key:r.f.id,onClick:()=>this.openFund(r.f.id),style:{display:'grid',gridTemplateColumns:COLS,gap:10,alignItems:'center',padding:'9px 12px',borderBottom:i<rows.length-1?'1px solid var(--line)':'none',cursor:'pointer'},
+        onMouseEnter:e=>{e.currentTarget.style.background='var(--surface-2)';},onMouseLeave:e=>{e.currentTarget.style.background='transparent';}},
+      h('div',{style:{minWidth:0}}, h('div',{style:{fontFamily:SF,fontSize:13,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},r.f.name), h('div',{style:{fontSize:11,color:'var(--muted)'}}, r.strat+' · '+r.vintage)),
+      h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:13}}, r.age+'y'),
+      h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:13,fontWeight:600}}, eur(r.committed)),
+      h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:13}}, eur(r.called)),
+      h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:13,color:'var(--over)',fontWeight:600}}, eur(r.dist)),
+      h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:13,fontWeight:700,color:'var(--brand-ink)'}}, r.f.dpi)));
+    const sortToggle=h('div',{style:{display:'flex',alignItems:'center',gap:7}}, h('span',{style:{fontSize:11,color:'var(--muted)',fontWeight:600}},'Sort'),
+      this.seg([{label:'Vintage',value:'vintage'},{label:'Strategy',value:'strategy'}], sort, v=>this.setDtog('perfSort',v),{sm:true}));
+    return this.card({title:'Performance detail — by fund',badge:this.badge('your portfolio','conf'),right:sortToggle,
+      children:h('div',{style:{border:'1px solid var(--line)',borderRadius:10,overflow:'hidden'}}, head, body),
+      caption:'Age, committed, called and distributed for every fund you hold. Default sort by vintage; switch to strategy to group buy-outs together. Click a fund for its full page.'});
   }
 
   /* ---- S13 Funds ---- */
