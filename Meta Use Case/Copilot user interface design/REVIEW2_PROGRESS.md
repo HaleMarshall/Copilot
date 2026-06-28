@@ -15,4 +15,7 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 12 fund page not full-screen (keeps top + Ask Alpha rail; Back+Ask Alpha)
 - [x] 13 fund logos in holdings table (fund page already had logo)
 - [x] 14 top-3 positions by performance (was top-4)
-NEXT: item 15 (include direct deals + strategy/region/currency/sector next to it)
+- [x] 15 category descriptors next to each dimension item (direct deals included)
+- [x] 16 Alpha read on strategy: gap-to-target + concentration intelligence
+- [x] 17 actionable suggestion in Alpha read (not just a summary)
+NEXT: item 18 (remove real estate from the graph)

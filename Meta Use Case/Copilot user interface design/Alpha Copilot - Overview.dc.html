@@ -3531,6 +3531,14 @@ class Component extends DCLogic {
   /* metric set used by holdings/strategy toggles + KPI rows (item 37 — DVPI added) */
   METRICS(){ return ['IRR','DPI','TVPI','MOIC','DVPI']; }
   metricVal(f,m){ const k={IRR:'irr',DPI:'dpi',TVPI:'tvpi',MOIC:'moic',DVPI:'dvpi'}[m]||'irr'; return (f&&f[k])||'—'; }
+  /* item 15 — a short descriptor for each dimension category so the user is told what it is (direct deals included) */
+  catDesc(dimKey,k){
+    const S={buyout:'Control buyouts',growth:'Growth equity',venture:'Early-stage venture',credit:'Private credit',infra:'Infrastructure',realestate:'Real estate',secondaries:'Secondary stakes',ai:'AI & technology',directs:'Direct deals & co-investments',other:'Other'};
+    const R={USA:'North America',Europe:'Europe',APAC:'Asia-Pacific',MEA:'Middle East & Africa',DACH:'DE / AT / CH',UK:'United Kingdom',Asia:'Asia',RoW:'Rest of world'};
+    const C={USD:'US dollar',EUR:'Euro',GBP:'Sterling',CHF:'Swiss franc',JPY:'Japanese yen',Other:'Other currencies'};
+    const SE={Tech:'Technology',Healthcare:'Healthcare',Financials:'Financial services',Industrials:'Industrials',Consumer:'Consumer',Energy:'Energy',AI:'AI & technology'};
+    const map = dimKey==='strategy'?S : dimKey==='region'?R : dimKey==='currency'?C : SE;
+    return map[k]||''; }
   metricNum(f,m){ return parseFloat(this.metricVal(f,m))||0; }
   /* ---- Follow function (A32): prospective funds your followed group just committed to ---- */
   FOLLOW_FUNDS(){ if(this.DB) return this.DB.empty?[]:(this.DB.followFunds||[]); return [
@@ -3879,7 +3887,7 @@ class Component extends DCLogic {
           h('div',{style:{flex:1,display:'flex',flexDirection:'column',gap:5,minWidth:0}}, aSl.map((sl,i)=>{ const on=sl.k===focus;
             return h('div',{key:i,style:{display:'flex',alignItems:'center',gap:8,fontSize:12.5,padding:on?'4px 7px':'4px 0',borderRadius:7,background:on?'var(--brand-wash)':'transparent',border:on?'1px solid var(--brand-tint-3)':'1px solid transparent'}},
               h('span',{style:{width:10,height:10,borderRadius:2,background:`var(${sl.color})`,flex:'0 0 10px'}}),
-              h('span',{style:{flex:1,color:'var(--ink)',fontWeight:on?700:400,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},sl.n),
+              h('div',{style:{flex:1,minWidth:0}}, h('div',{style:{color:'var(--ink)',fontWeight:on?700:400,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},sl.n), (()=>{ const dsc=this.catDesc(key,sl.k); return dsc? h('div',{style:{fontSize:9.5,color:'var(--muted)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},dsc):null; })()),
               h('span',{style:{fontFamily:SF,fontWeight:600,color:on?'var(--brand-ink)':'var(--muted)'}},sl.p+'%')); }))),
         panelAiRead,
         h('div',{key:'i',style:{fontSize:12.5,lineHeight:1.55,color:'var(--muted)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:10,padding:'11px 13px'}},
@@ -4853,12 +4861,23 @@ class Component extends DCLogic {
     const stratGaps=(()=>{ const sdd=this.basisPct('strategy'); const meta=this.HELD_META(); const roster=this.HELD_FUNDS();
       const held=new Set(roster.map(f=>(meta[f.id]||{}).strat));
       return Object.keys(sdd).filter(k=>!held.has(k)).map(k=>{ const s=this.STRATS.find(x=>x[0]===k); return s?s[1]:k; }); })();
-    const alphaReadCard=this.card({title:'Alpha’s read on your strategy funds',badge:this.badge('AI','synth'),tone:'alpha',
-      children:h('div',{style:{display:'flex',flexDirection:'column',gap:12}},
+    /* items 16/17 — Alpha's read carries real intelligence (gap-to-target + concentration) AND an actionable suggestion, not just a summary */
+    const _mx=(this.MIX&&this.MIX.you)||{}; const _tg=this.modelMix()||{};
+    const _deltas=this.STRATS.map(kv=>({n:kv[1],k:kv[0],d:+(((_tg[kv[0]]||0)-(_mx[kv[0]]||0))).toFixed(1)}));
+    const _under=_deltas.slice().sort((a,b)=>b.d-a.d)[0]||{n:'',d:0};
+    const _over=_deltas.slice().sort((a,b)=>a.d-b.d)[0]||{n:'',d:0};
+    const _topHold=this.STRATS.map(kv=>({n:kv[1],p:_mx[kv[0]]||0})).sort((a,b)=>b.p-a.p)[0]||{n:'',p:0};
+    const alphaReadCard=this.card({title:'Alpha’s read on your strategy',badge:this.badge('AI','synth'),tone:'alpha',
+      children:h('div',{style:{display:'flex',flexDirection:'column',gap:11}},
+        /* item 16 — intelligence: gap-to-target + concentration */
         h('div',{style:{fontSize:13,lineHeight:1.6,color:'rgba(255,255,255,.92)'}},
-          stratGaps.length? ['You hold ',h('strong',{key:'g',style:{color:'#fff'}},'no direct fund'),' in '+stratGaps.join(', ')+' — clear places to add if you want the exposure.'] : 'You hold direct funds across every strategy bucket — a well-rounded book.'),
+          'You’re ',h('strong',{key:'u',style:{color:'#fff'}}, Math.abs(_under.d)+'pp under target'),' in '+_under.n+' and ',h('strong',{key:'o',style:{color:'#fff'}},Math.abs(_over.d)+'pp over'),' in '+_over.n+'. ',_topHold.n+' is your single largest book at '+_topHold.p+'% — the main concentration to watch.',
+          stratGaps.length? [' You hold ',h('strong',{key:'g',style:{color:'#fff'}},'no direct fund'),' in '+stratGaps.join(', ')+'.'] : null),
+        /* item 17 — an actionable suggestion (intelligence, not a summary) */
+        h('div',{style:{fontSize:12.5,lineHeight:1.55,color:'#fff',background:'rgba(255,255,255,.14)',borderRadius:10,padding:'10px 12px'}},
+          h('span',{style:{fontWeight:700}},'✦ Suggestion: '),'a new commitment to ',h('strong',null,_under.n),' would close your largest gap to target and dilute the '+_topHold.n+' concentration — the highest-impact next move. Pair it with a smaller '+(stratGaps[0]||_over.n)+' position to round out the book.'),
         this.gapCTA('strategy',true)),
-      caption:'Alpha acts as your advisor — fill the gaps to round out your strategy exposure.'});
+      caption:'Alpha acts as your advisor — intelligence plus a concrete next move, not just a summary.'});
     // item 71 — 'Where you're concentrated' box + allocated-vs-committed Z-chart (real deviation data), moved down the page
     const concRows=this.basisPct('strategy'); // for the concentration ranking (current basis)
     const concRanked=Object.keys(concRows).map(k=>{ const s=this.STRATS.find(x=>x[0]===k); return {n:s?s[1]:k, color:s?s[2]:'--data-9', p:concRows[k]||0}; }).filter(r=>r.p>0).sort((a,b)=>b.p-a.p);
