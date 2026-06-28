@@ -171,8 +171,8 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ⊘ 130 Keep 5 'Why this' reasons + 'Show detailed reasoning' — confirmed present in oppDetail 'why' tab (5-item checklist + expandable detail).
 - ☑ 131 Replace shopping-cart 'add' icon (not a plus) — swapped 🛒 → 💼 (briefcase = 'add to your commitments') on rec rows, shopBtn, fundActions buy, top-nav button, empty state; reworded 'cart' → 'commitments' in labels/tooltips. Verified live: shopBtn '💼 Buy', cart button briefcase, 0 cart glyphs.
 - ☑ 132 Split Act layout: Recommended Sequence (left) + concrete Funds (right) — new seqCard (ordered steps + fit-lift + Why-this) and fundsInSeqCard (concrete funds, View-fund-opportunity, 💼 Add) shown as a 1fr/1fr split; weighting/distance moved below. Verified live: both cards in return.
-- ☐ 133 Short 'Why Private Credit' rationale at overview/asset-class level (target terms only)
-- ☐ 134 Recommendation copy = concrete 'Add €X to …' actions
+- ☑ 133 Short 'Why {strategy}' rationale at asset-class level (target terms only) — each seq step shows 'You're Xpp under/over target in {strategy} — add ~1:1 to converge over 3–4 years'. Verified live.
+- ☑ 134 Recommendation copy = concrete 'Add €X to …' actions — action head = 'Add ~€{x}m to {strategy}' (oppNextActions). Verified live.
 - ☐ 135 Add 'Current Opportunities' section
 - ☐ 136 Add greyed-out 'Upcoming' preview section
 - ☐ 137 Greyed upcoming funds still drillable

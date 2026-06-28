@@ -5383,7 +5383,10 @@ class Component extends DCLogic {
         onMouseEnter:e=>{e.currentTarget.style.background='var(--surface-2)';},onMouseLeave:e=>{e.currentTarget.style.background='transparent';},
         style:{display:'flex',gap:11,alignItems:'center',padding:'11px 12px',border:'1px solid var(--line)',borderRadius:11,cursor:'pointer'}},
         h('div',{style:{flex:'0 0 24px',width:24,height:24,borderRadius:7,background:a.kind==='add'?'var(--brand-wash)':'var(--surface-2)',color:a.kind==='add'?'var(--brand)':'var(--muted)',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:12,fontFamily:'Inter,system-ui,sans-serif'}},a.rank),
-        h('div',{style:{flex:1,minWidth:0}}, h('div',{style:{fontSize:13.5,fontWeight:700,color:'var(--ink)'}},a.head), h('div',{style:{fontSize:11,color:'var(--brand)',fontWeight:600,marginTop:2}},'Why this · why not · compare →')),
+        h('div',{style:{flex:1,minWidth:0}}, h('div',{style:{fontSize:13.5,fontWeight:700,color:'var(--ink)'}},a.head),
+          /* item 133 — brief target-terms rationale at the asset-class level (over/under target only) */
+          h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:2,lineHeight:1.4}}, a.kind==='add'? ('You’re '+Math.abs(a.gap)+'pp under target in '+a.strat+' — add ~1:1 to converge over 3–4 years.') : ('You’re '+Math.abs(a.gap)+'pp over target in '+a.strat+' — let it run off to converge.')),
+          h('div',{style:{fontSize:11,color:'var(--brand)',fontWeight:600,marginTop:3}},'Why this · why not · compare →')),
         h('div',{style:{flex:'0 0 auto',textAlign:'right'}}, h('div',{style:{fontSize:9.5,color:'var(--muted)',textTransform:'uppercase'}},'fit +'), h('div',{style:{fontSize:14,fontWeight:800,color:'var(--over)'}},'+'+a.lift))))
         : h('div',{style:{padding:'24px',textAlign:'center',color:'var(--muted)',fontSize:13,border:'1px dashed var(--line)',borderRadius:12}},'No material gaps — your selected simulation is already on target.'));
     const seqCard=this.card({title:'Recommended sequence',
