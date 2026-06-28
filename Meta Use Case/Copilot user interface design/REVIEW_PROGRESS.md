@@ -152,7 +152,7 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 113 'Buy on Moonfare secondary market' buy-side action — added a 'Moonfare Secondary Market' card to Opportunities with a buy-side action ('Buy on the Moonfare Secondary Market' → acquire stakes at a discount) alongside the sell-side. Verified: wired into opportunitiesBody return; logicError null.
 - ☑ 114 Disambiguate 'Secondary' naming — card/buttons say 'Moonfare Secondary Market' + caption 'the marketplace, not a secondaries fund'. Verified: visible labels unambiguous.
 - ☑ 115 Show both % and € everywhere — added `eurOfWealth(pct)` helper; PM-allocation now shows '15.7% · €1.3m' in the comparison table + chart 'You' sub/popup (€ of investable wealth). Set-target page already shows both. Verified live: eurOfWealth(15.7)=€1.3m; table row '15.7% · €1.3m'.
-- ☐ 116 'NAV uncommitted' per individual investment
+- ☑ 116 'NAV uncommitted' per individual investment — added `stat('NAV uncommitted',f.navUncommitted)` to the full fund-page KPI row and the fund modal KPI row (field added in item 37). Verified live: EQT IX page shows NAV uncommitted €0.2m.
 - ☐ 117 Per-fund Performance detail table (Age/Committed/Called/Distributed)
 - ☐ 118 Performance table sort: Vintage default + Strategy
 - ☐ 119 Strip Fund Detail to just the table (drop investor-due)

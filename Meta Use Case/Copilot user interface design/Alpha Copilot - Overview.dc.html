@@ -3586,7 +3586,7 @@ class Component extends DCLogic {
           h('div',{style:{fontSize:12,color:'var(--muted)'}}, prospect?('Open · closes '+(f.close||'soon')):('Vintage '+(f.vintage||m.vintage)+' · '+f.stage))),
         h('button',{onClick:close,title:'Close',style:{border:'1px solid var(--line)',background:'var(--surface-2)',color:'var(--muted)',width:30,height:30,borderRadius:8,cursor:'pointer',fontSize:15,flex:'0 0 auto'}},'✕')),
       prospect?null:h('div',{style:{flex:'0 0 auto',display:'flex',gap:10,flexWrap:'wrap',padding:'14px 22px',borderBottom:'1px solid var(--line)',background:'var(--surface-2)'}},
-        stat('This-qtr contribution',(pos?'+':'')+f.contrib+'pp',pos?'var(--over)':'var(--under)'), stat('Net MOIC',f.moic), stat('TVPI',f.tvpi), stat('DVPI',f.dvpi), stat('DPI',f.dpi), stat('Net IRR',f.irr), stat('Your NAV',f.nav), stat('Called',f.called)),
+        stat('This-qtr contribution',(pos?'+':'')+f.contrib+'pp',pos?'var(--over)':'var(--under)'), stat('Net MOIC',f.moic), stat('TVPI',f.tvpi), stat('DVPI',f.dvpi), stat('DPI',f.dpi), stat('Net IRR',f.irr), stat('Your NAV',f.nav), stat('NAV uncommitted',f.navUncommitted||'—'), stat('Called',f.called)), /* item 116 — NAV uncommitted per investment */
       h('div',{style:{flex:1,overflowY:'auto',padding:'18px 22px'}},
         h('div',{style:{display:'grid',gridTemplateColumns:'1.6fr 1fr',gap:18,maxWidth:1100,margin:'0 auto',alignItems:'start'}}, main, side)));
   }
@@ -4005,7 +4005,7 @@ class Component extends DCLogic {
         h('div',{style:{display:'flex',gap:8,padding:'14px 16px',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:12,marginBottom:12,flexWrap:'wrap'}},
           stat('This-qtr contribution',(pos?'+':'')+f.contrib+'pp',pos?'var(--over)':'var(--under)'), stat('Net MOIC',f.moic), stat('TVPI',f.tvpi), stat('DVPI',f.dvpi), stat('DPI',f.dpi), stat('Net IRR',f.irr)),
         h('div',{style:{display:'flex',gap:8,padding:'12px 16px',border:'1px solid var(--line)',borderRadius:12,marginBottom:12,flexWrap:'wrap'}},
-          stat('Your NAV',f.nav), stat('Called',f.called), stat('Uncalled',(Math.max(0,100-calledNum))+'%'), stat('Vintage',(m.vintage||f.vintage)+'')),
+          stat('Your NAV',f.nav), stat('NAV uncommitted',f.navUncommitted||'—'), stat('Called',f.called), stat('Uncalled',(Math.max(0,100-calledNum))+'%'), stat('Vintage',(m.vintage||f.vintage)+'')), /* item 116 — NAV uncommitted per investment */
         h('div',{style:{display:'flex',gap:8,flexWrap:'wrap',marginBottom:14}}, chip('Strategy',f.strat), chip('Region',m.region||'—'), chip('Sector',m.sector||'—'), chip('Currency',m.currency||'—'), chip('Stage',f.stage)),
         h('div',{style:{fontFamily:SF,fontSize:13.5,fontWeight:600,margin:'2px 0 9px'}},'About this fund'),
         checkList(reasons,'ok'),
