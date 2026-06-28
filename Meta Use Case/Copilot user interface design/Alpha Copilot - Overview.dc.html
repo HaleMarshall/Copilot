@@ -502,6 +502,7 @@ class Component extends DCLogic {
       simMode:'adjust', simPreset:'like-you', simDetail:false, /* item 172 — pro full-allocation view collapsed by default */
       simShowDials:false, /* item 174 — target-adjustment dials hidden by default; pie is the hero, dials open via a bottom toggle */
       simBench:'model', simYouMode:'target', simCmpMode:'target', /* items 175/178/179/184 — Simulator 'Target world': compare Your Target vs a benchmark group's target; Your row toggles Actual/Target; simCmpMode switches benchmarks current↔target */
+      mgrAC:'All', mgrSort:'irr', mgrSel:[], mgrQuery:'', mgrCase:{}, /* items 191-198 — Manager Overview: asset-class filter, sort, multi-select compare, search, per-manager chosen fund */
       simDials:{pm:20, growth:0, secondaries:6, us:38},
       simTargets:null, simFocus:null, simSuggest:null,
       savedSims:[], simCompare:false, watchlist:[], portfolioAdds:[],
@@ -2137,7 +2138,8 @@ class Component extends DCLogic {
         ['Which funds delivered returns most consistently?','Which managers are reliable rather than just high-return?','How do Fund X and Y compare on delivery?'],
         ['Fund consistency score','Distribution stability','Mark-up quality','Return plus delivery quality'],
         ['Quarterly performance histories','NAV paths','Distributions','Multi-vintage manager histories'],
-        [{id:'score',label:'Consistency score',view:'scaffold',viz:'consistency',title:'Fund consistency score'},
+        [{id:'mgrover',label:'Manager Overview',view:'mgrover',title:'Manager Overview'}, /* item 196 — Overview landing ahead of the metric detail pages */
+         {id:'score',label:'Consistency score',view:'scaffold',viz:'consistency',title:'Fund consistency score'},
          {id:'stability',label:'Distribution stability',view:'scaffold',viz:'callfc',title:'Distribution stability over years'},
          {id:'calldist',label:'Call distribution',view:'scaffold',viz:'callfc',title:'Capital-call distribution across years'},
          {id:'markup',label:'Mark-up quality',view:'scaffold',viz:'scorecard',title:'Mark-up quality — do marks mirror outcomes?'},
@@ -5948,8 +5950,160 @@ class Component extends DCLogic {
           style:{border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:9,padding:'7px 13px',fontSize:12,fontWeight:600,cursor:'pointer'}},'✦ Ask Alpha about this')),
       h('div',{style:{display:'flex',gap:12,flexWrap:'wrap'}}, related.map(tile)));
   }
+  /* ====================== MANAGER RESEARCH (items 191-198) ====================== */
+  /* manager-level dataset — each manager spans one or more asset classes, with all-time (since-inception) net IRR,
+     a consistency score and the concrete funds behind it (so a specific case can be picked for a comparison) */
+  MANAGERS(){ return [
+    {id:'eqt',name:'EQT',hq:'Stockholm',classes:[
+      {ac:'Buyout',irr:19.2,cons:88,funds:[{id:'eqt-ix',name:'EQT IX',irr:21.0,vintage:2021},{id:'eqt-x',name:'EQT X',irr:18.4,vintage:2023}]},
+      {ac:'Infrastructure',irr:15.1,cons:82,funds:[{id:'eqt-infra-v',name:'EQT Infrastructure V',irr:15.1,vintage:2021}]}]},
+    {id:'kkr',name:'KKR',hq:'New York',classes:[
+      {ac:'Buyout',irr:17.8,cons:85,funds:[{id:'kkr-na-xiii',name:'KKR North America XIII',irr:18.2,vintage:2021},{id:'kkr-eu-vi',name:'KKR Europe VI',irr:17.1,vintage:2022}]},
+      {ac:'Private Credit',irr:11.2,cons:79,funds:[{id:'kkr-credit-iv',name:'KKR Private Credit IV',irr:11.2,vintage:2022}]},
+      {ac:'Infrastructure',irr:13.9,cons:80,funds:[{id:'kkr-infra-v',name:'KKR Global Infra V',irr:13.9,vintage:2022}]}]},
+    {id:'blackstone',name:'Blackstone',hq:'New York',classes:[
+      {ac:'Buyout',irr:18.5,cons:84,funds:[{id:'bx-cap-ix',name:'Blackstone Capital IX',irr:18.5,vintage:2022}]},
+      {ac:'Real Estate',irr:16.2,cons:86,funds:[{id:'bx-re-xi',name:'Blackstone Real Estate XI',irr:16.2,vintage:2023}]},
+      {ac:'Secondaries',irr:14.0,cons:83,funds:[{id:'bx-strat-ix',name:'Strategic Partners IX',irr:14.0,vintage:2022}]}]},
+    {id:'carlyle',name:'Carlyle',hq:'Washington',classes:[
+      {ac:'Buyout',irr:15.4,cons:76,funds:[{id:'cg-viii',name:'Carlyle Partners VIII',irr:15.4,vintage:2022}]},
+      {ac:'Private Credit',irr:10.1,cons:72,funds:[{id:'cg-credit-iii',name:'Carlyle Credit III',irr:10.1,vintage:2021}]}]},
+    {id:'ares',name:'Ares',hq:'Los Angeles',classes:[
+      {ac:'Private Credit',irr:12.6,cons:87,funds:[{id:'ares-pc-iv',name:'Ares Private Credit IV',irr:12.6,vintage:2022}]},
+      {ac:'Secondaries',irr:13.3,cons:81,funds:[{id:'ares-sec-ii',name:'Ares Secondaries II',irr:13.3,vintage:2021}]}]},
+    {id:'cvc',name:'CVC',hq:'Luxembourg',classes:[
+      {ac:'Buyout',irr:18.9,cons:83,funds:[{id:'cvc-ix',name:'CVC Capital IX',irr:18.9,vintage:2023}]}]},
+    {id:'cinven',name:'Cinven',hq:'London',classes:[
+      {ac:'Buyout',irr:16.1,cons:80,funds:[{id:'cinven-viii',name:'Cinven VIII',irr:16.1,vintage:2022}]}]},
+    {id:'genatl',name:'General Atlantic',hq:'New York',classes:[
+      {ac:'Growth',irr:20.4,cons:82,funds:[{id:'ga-growth-xii',name:'General Catalyst Growth XII',irr:20.4,vintage:2022}]}]},
+    {id:'thomabravo',name:'Thoma Bravo',hq:'Chicago',classes:[
+      {ac:'Buyout',irr:24.1,cons:89,funds:[{id:'tb-xvi',name:'Thoma Bravo XVI',irr:24.1,vintage:2023}]}]},
+    {id:'hg',name:'Hg',hq:'London',classes:[
+      {ac:'Buyout',irr:22.7,cons:90,funds:[{id:'hg-saturn-4',name:'Hg Saturn 4',irr:22.7,vintage:2023}]}]},
+    {id:'antin',name:'Antin',hq:'Paris',classes:[
+      {ac:'Infrastructure',irr:14.8,cons:85,funds:[{id:'antin-v',name:'Antin Infrastructure V',irr:14.8,vintage:2022}]}]},
+    {id:'lexington',name:'Lexington',hq:'New York',classes:[
+      {ac:'Secondaries',irr:13.7,cons:88,funds:[{id:'lex-xi',name:'Lexington Capital XI',irr:13.7,vintage:2022}]}]},
+    {id:'insight',name:'Insight Partners',hq:'New York',classes:[
+      {ac:'Growth',irr:18.0,cons:78,funds:[{id:'insight-xiii',name:'Insight Partners XIII',irr:18.0,vintage:2022}]}]},
+    {id:'thrive',name:'Thrive Capital',hq:'New York',classes:[
+      {ac:'Venture',irr:26.5,cons:74,funds:[{id:'thrive-ix',name:'Thrive Capital IX',irr:26.5,vintage:2023}]}]},
+    {id:'index',name:'Index Ventures',hq:'London',classes:[
+      {ac:'Venture',irr:23.1,cons:80,funds:[{id:'index-xii',name:'Index Ventures XII',irr:23.1,vintage:2022}]}]}
+  ]; }
+  mgrAllTimeIrr(m){ const a=m.classes; return +(a.reduce((s,c)=>s+c.irr,0)/a.length).toFixed(1); }
+  mgrCons(m){ const a=m.classes; return Math.round(a.reduce((s,c)=>s+c.cons,0)/a.length); }
+  mgrNFunds(m){ return m.classes.reduce((s,c)=>s+c.funds.length,0); }
+  mgrAssetClasses(){ const set=[]; this.MANAGERS().forEach(m=>m.classes.forEach(c=>{ if(!set.includes(c.ac)) set.push(c.ac); })); return set.sort(); }
+  // a manager's IRR within a given asset class (for sort-by-asset-class), or all-time when 'All'
+  mgrIrrFor(m,ac){ if(ac==='All') return this.mgrAllTimeIrr(m); const c=m.classes.find(x=>x.ac===ac); return c?c.irr:null; }
+  mgrConsFor(m,ac){ if(ac==='All') return this.mgrCons(m); const c=m.classes.find(x=>x.ac===ac); return c?c.cons:null; }
+  // chosen specific fund for a manager (item 193) — defaults to the first fund in the active asset class
+  mgrChosenFund(m){ const ac=this.state.mgrAC; const pool = ac==='All'? m.classes.flatMap(c=>c.funds) : (m.classes.find(c=>c.ac===ac)||{funds:[]}).funds;
+    const chosen=this.state.mgrCase[m.id]; return pool.find(f=>f.id===chosen) || pool[0] || null; }
+  toggleMgrSel(id){ const sel=this.state.mgrSel.slice(); const i=sel.indexOf(id); if(i>=0) sel.splice(i,1); else sel.push(id); this.setState({mgrSel:sel}); }
+  managerOverviewBody(){
+    const h=this.h; const SF=this.SF; const s=this.state;
+    const ACs=['All'].concat(this.mgrAssetClasses());
+    const q=(s.mgrQuery||'').trim().toLowerCase();
+    // item 197 — natural-language search: match manager name, HQ, or any asset-class keyword in the query
+    const qAC=this.mgrAssetClasses().find(ac=>q.includes(ac.toLowerCase()));
+    let list=this.MANAGERS().filter(m=>{
+      if(s.mgrAC!=='All' && !m.classes.some(c=>c.ac===s.mgrAC)) return false;     // item 192 — asset-class filter
+      if(qAC && !m.classes.some(c=>c.ac===qAC)) return false;                       // query names an asset class
+      if(q && !qAC && !(m.name.toLowerCase().includes(q)||m.hq.toLowerCase().includes(q)||m.classes.some(c=>c.ac.toLowerCase().includes(q)))) return false;
+      return true;
+    });
+    // item 195 — sort, including by the selected asset class's score
+    const sortAC = s.mgrAC; // when an asset class is active, IRR/consistency sort uses that class
+    list=list.slice().sort((a,b)=>{
+      if(s.mgrSort==='name') return a.name.localeCompare(b.name);
+      if(s.mgrSort==='cons') return (this.mgrConsFor(b,sortAC)||0)-(this.mgrConsFor(a,sortAC)||0);
+      return (this.mgrIrrFor(b,sortAC)||0)-(this.mgrIrrFor(a,sortAC)||0); // 'irr' default — item 198 ranks by all-time / per-class performance
+    });
+
+    // ---- search + controls ----
+    const searchBar=h('div',{style:{display:'flex',gap:10,flexWrap:'wrap',alignItems:'center'}},
+      h('div',{style:{flex:'1 1 320px',minWidth:260,display:'flex',alignItems:'center',gap:8,border:'1px solid var(--line)',borderRadius:11,padding:'10px 13px',background:'var(--surface)'}},
+        h('span',{style:{color:'var(--muted)',fontSize:14}},'🔍'),
+        h('input',{type:'text',value:s.mgrQuery,placeholder:'Search managers — e.g. “all Buyout managers on the platform”',
+          onChange:e=>this.setState({mgrQuery:e.target.value}),
+          style:{flex:1,border:'none',outline:'none',background:'transparent',fontSize:13,color:'var(--ink)',fontFamily:'Inter,system-ui,sans-serif'}}),
+        s.mgrQuery? h('button',{onClick:()=>this.setState({mgrQuery:''}),style:{border:'none',background:'none',color:'var(--muted)',cursor:'pointer',fontSize:14}},'×'):null),
+      h('div',{style:{fontSize:11.5,color:'var(--muted)'}}, list.length+' of '+this.MANAGERS().length+' managers'));
+    // item 192 — asset-class toggle incl. All
+    const acRow=h('div',{style:{display:'flex',gap:7,flexWrap:'wrap',alignItems:'center'}},
+      h('span',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)',marginRight:2}},'Asset class'),
+      ACs.map(ac=>{ const on=s.mgrAC===ac;
+        return h('button',{key:ac,onClick:()=>this.setState({mgrAC:ac}),
+          style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 12px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}},ac); }));
+    const sortRow=h('div',{style:{display:'flex',gap:8,alignItems:'center'}},
+      h('span',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)'}},'Sort'),
+      this.seg([{label: s.mgrAC==='All'?'All-time IRR':s.mgrAC+' IRR',value:'irr'},{label:'Consistency',value:'cons'},{label:'Name',value:'name'}], s.mgrSort, v=>this.setState({mgrSort:v}),{sm:true}));
+
+    // ---- manager-level rows (item 194) ----
+    const row=(m)=>{ const sel=s.mgrSel.includes(m.id); const irr=this.mgrIrrFor(m,s.mgrAC); const cons=this.mgrConsFor(m,s.mgrAC);
+      const chosen=this.mgrChosenFund(m);
+      const acPool = s.mgrAC==='All'? m.classes : m.classes.filter(c=>c.ac===s.mgrAC);
+      const fundPool = acPool.flatMap(c=>c.funds);
+      return h('div',{key:m.id,style:{display:'grid',gridTemplateColumns:'30px 1.5fr 1.4fr .8fr .8fr 1.4fr',gap:12,alignItems:'center',padding:'12px 14px',borderRadius:12,border:'1px solid '+(sel?'var(--brand)':'var(--line)'),background:sel?'var(--brand-wash)':'var(--surface)',marginBottom:8}},
+        // item 191 — select managers to compare
+        h('input',{type:'checkbox',checked:sel,onChange:()=>this.toggleMgrSel(m.id),style:{width:16,height:16,accentColor:'var(--brand)',cursor:'pointer'}}),
+        h('div',{style:{minWidth:0}},
+          h('div',{style:{fontFamily:SF,fontSize:15,fontWeight:600,color:'var(--ink)'}},m.name),
+          h('div',{style:{fontSize:10.5,color:'var(--muted)'}},m.hq+' · '+this.mgrNFunds(m)+' funds')),
+        h('div',{style:{display:'flex',flexWrap:'wrap',gap:5}}, m.classes.map(c=>h('span',{key:c.ac,style:{fontSize:10,fontWeight:600,color: (s.mgrAC===c.ac?'#fff':'var(--muted)'),background:(s.mgrAC===c.ac?'var(--brand)':'var(--surface-2)'),border:'1px solid var(--line)',borderRadius:999,padding:'2px 8px'}},c.ac))),
+        h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:16,fontWeight:700,color:'var(--ink)'}}, irr!=null?irr+'%':'—'), h('div',{style:{fontSize:9.5,color:'var(--muted)'}}, s.mgrAC==='All'?'all-time IRR':s.mgrAC+' IRR')),
+        h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:15,fontWeight:700,color: cons>=85?'var(--over)':'var(--ink)'}}, cons!=null?cons:'—'), h('div',{style:{fontSize:9.5,color:'var(--muted)'}},'consistency')),
+        h('div',{style:{display:'flex',flexDirection:'column',gap:6}},
+          // item 193 — pick the specific fund/case for the comparison
+          fundPool.length>1? h('select',{value:chosen?chosen.id:'',onChange:e=>this.setState({mgrCase:{...s.mgrCase,[m.id]:e.target.value}}),
+            style:{border:'1px solid var(--line)',borderRadius:8,padding:'5px 7px',fontSize:11,background:'var(--surface)',color:'var(--ink)',cursor:'pointer'}},
+            fundPool.map(f=>h('option',{key:f.id,value:f.id},f.name+' · '+f.irr+'%'))) : h('div',{style:{fontSize:11,color:'var(--muted)'}},chosen?chosen.name:'—'),
+          h('div',{style:{display:'flex',gap:6}},
+            // item 194 — buy & simulate into the portfolio; open the real fund page when the case is in the catalogue, else hand off to Alpha
+            h('button',{onClick:()=>{ if(!chosen) return; if(this.fundById && this.fundById(chosen.id)) this.openFundPage(chosen.id); else this.askFromPage('I want to commit to '+chosen.name+' from '+m.name+'. Walk me through it.'); },style:{flex:1,border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:8,padding:'6px',fontSize:11,fontWeight:600,cursor:'pointer'}},'💼 Buy'),
+            h('button',{onClick:()=>{ if(this.fundById && chosen && this.fundById(chosen.id)) this.addFundToSim(chosen.id); else this.setState({ws:'shape',uc:'sim',page:'sim',simShowDials:true,deepLink:null,ask:{...s.ask,state:'min'}}); },style:{flex:1,border:'1px solid var(--line)',background:'var(--surface)',color:'var(--ink)',borderRadius:8,padding:'6px',fontSize:11,fontWeight:600,cursor:'pointer'}},'✦ Simulate'))));
+    };
+    const listCard=this.card({title: s.mgrAC==='All'?'Managers on the Moonfare platform':s.mgrAC+' managers on the platform', info:true,
+      children: list.length? h('div',null,
+        h('div',{style:{display:'grid',gridTemplateColumns:'30px 1.5fr 1.4fr .8fr .8fr 1.4fr',gap:12,padding:'0 14px 8px',fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)'}},
+          h('span',null,''),h('span',null,'Manager'),h('span',null,'Asset classes'),h('span',{style:{textAlign:'right'}},'IRR'),h('span',{style:{textAlign:'right'}},'Score'),h('span',null,'Case & actions')),
+        list.map(row))
+        : h('div',{style:{padding:'24px',textAlign:'center',color:'var(--muted)',fontSize:13}},'No managers match — broaden the asset class or clear the search.'),
+      caption:'Manager-level view (a manager like KKR spans several asset classes). Pick an asset class to rank within it, choose a specific fund as the case, then Buy or Simulate it into your portfolio.'});
+
+    // ---- comparison panel (items 191/198) — selected managers ranked by all-time / per-class performance ----
+    let compareCard=null;
+    if(s.mgrSel.length){
+      const sel=this.MANAGERS().filter(m=>s.mgrSel.includes(m.id));
+      const ranked=sel.map(m=>({m, irr:this.mgrIrrFor(m,s.mgrAC)!=null?this.mgrIrrFor(m,s.mgrAC):this.mgrAllTimeIrr(m), cons:this.mgrCons(m), fund:this.mgrChosenFund(m)})).sort((a,b)=>b.irr-a.irr);
+      const max=Math.max(...ranked.map(r=>r.irr),1);
+      compareCard=this.card({title:'Compare selected managers — by all-time performance',
+        right:h('button',{onClick:()=>this.setState({mgrSel:[]}),style:{border:'1px solid var(--line)',background:'var(--surface)',borderRadius:8,padding:'6px 12px',fontSize:12,fontWeight:600,color:'var(--brand)',cursor:'pointer'}},'Clear'),
+        children:h('div',{style:{display:'flex',flexDirection:'column',gap:10}},
+          ranked.map((r,i)=>h('div',{key:r.m.id,style:{display:'grid',gridTemplateColumns:'150px 1fr 64px',gap:12,alignItems:'center'}},
+            h('div',{style:{minWidth:0}}, h('div',{style:{fontWeight:600,fontSize:13}}, (i===0?'🏆 ':'')+r.m.name), h('div',{style:{fontSize:10,color:'var(--muted)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}, r.fund?r.fund.name:'')),
+            h('div',{style:{background:'var(--surface-2)',borderRadius:6,height:18,position:'relative',overflow:'hidden'}},
+              h('div',{style:{position:'absolute',left:0,top:0,bottom:0,width:(r.irr/max*100)+'%',background:i===0?'var(--over)':'var(--brand)',borderRadius:6}})),
+            h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:15,fontWeight:700}}, r.irr+'%'))) ),
+        caption:'Selected managers ranked by '+(s.mgrAC==='All'?'all-time (since-inception)':s.mgrAC)+' net IRR — the leader is flagged. Tick more managers above to add them; switch the asset class to compare within a single class.'});
+    }
+
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
+      h('div',null,
+        h('div',{style:{fontSize:10.5,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Research · Funds & Managers'),
+        h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:600,margin:'3px 0 2px'}},'Manager Overview'),
+        h('div',{style:{fontSize:13,color:'var(--muted)',lineHeight:1.5,maxWidth:640}},'Every manager on the platform in one place. Search, filter by asset class, rank them, then drill into a manager’s delivery, consistency and mark-up detail below.')),
+      searchBar,
+      h('div',{style:{display:'flex',gap:16,justifyContent:'space-between',flexWrap:'wrap',alignItems:'center'}}, acRow, sortRow),
+      listCard,
+      compareCard);
+  }
   surfaceBody(){
     const v=this.curPage().view; const h=this.h;
+    if(v==='mgrover') { return h('div',{style:{display:'flex',flexDirection:'column',gap:16,minHeight:'100%'}}, this.managerOverviewBody(), this.deepFooter()); } /* item 196 — Manager Overview landing */
     // full-bleed canvases keep their own layout; everything else (deep + sub-use-case views) gets framed
     if(v==='home') return this.homeOverviewBody();
     if(v==='sim') return this.simulatorBody();

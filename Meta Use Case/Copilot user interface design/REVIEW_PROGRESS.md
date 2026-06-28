@@ -241,6 +241,17 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ⊘ 189 Follow function at bottom of Comparison — confirmed: comparisonBody returns followCard() last.
 - ⊘ 190 Notifications box on right — confirmed: notifBell + notifPanelBody.
 
-**NEXT: item 191** — Manager comparison needs a manager-selection input (Research/Funds & Managers). Then 192 (asset-class toggle +All), 193 (pick specific case), 194 (manager-level not fund-level), 195 (sort by asset class), 196 (Manager Overview landing), 197 (manager search), 198 (compare by all-time perf). Read review.md ~1809.
+- ☑ 191 Manager-selection input — row checkboxes feed the compare panel. Verified.
+- ☑ 192 Asset-class toggle incl. All — acRow chips filter the list. Verified (Venture filter).
+- ☑ 193 Pick specific case — per-manager fund <select> (mgrCase). Verified (in row).
+- ☑ 194 Manager-level list (not fund-level) — MANAGERS() rows with classes/IRR/consistency + Buy/Simulate (catalogue-aware, else Ask Alpha / Simulator). Verified.
+- ☑ 195 Sort by asset class — mgrSort + active-AC IRR/consistency sorting. Verified.
+- ☑ 196 Manager Overview landing — new 'mgrover' page first in t2-7, detail pages below. Verified.
+- ☑ 197 Manager search — searchBar parses asset-class keywords ('all Buyout managers'). Verified.
+- ☑ 198 Compare by all-time performance — ranked bar panel, leader flagged. Verified.
+
+Built: MANAGERS() dataset (15 managers, multi-asset-class, since-inception IRR + consistency + funds), managerOverviewBody(), helpers (mgrAllTimeIrr/mgrCons/mgrIrrFor/mgrChosenFund/toggleMgrSel).
+
+**NEXT: item 199** — read review.md ~1879 onward.
 
 **NEXT: item 145** — render the 4 Distance-from-Target dimensions as donut/C-charts via the toggle.
