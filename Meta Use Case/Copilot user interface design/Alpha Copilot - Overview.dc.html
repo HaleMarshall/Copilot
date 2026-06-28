@@ -5109,6 +5109,17 @@ class Component extends DCLogic {
             style:{border:'1px solid rgba(255,255,255,.55)',background:'transparent',color:'#fff',borderRadius:10,padding:'11px 14px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'View the opportunities →'))), /* item 24 — 'view the opportunities', not buy now */
       caption:'A plain-language read of your '+d.label.toLowerCase()+' book and where the gaps are.'});
 
+    /* item 46 — GP concentration (under See full breakdown): % of NAV / committed per fund manager, with a toggle */
+    const gpBasis=this.dtog('gpBasis','NAV'); const gnum=(s)=>parseFloat(String(s||'').replace(/[^0-9.]/g,''))||0;
+    const gpMap={}; roster.forEach(f=>{ const navN=gnum(f.nav); const moicN=parseFloat(f.moic)||1; const calledPct=parseFloat(f.called)||0; const calledEur=moicN>0?navN/moicN:0; const committedEur=calledPct>0?calledEur/(calledPct/100):calledEur; const val=gpBasis==='Committed'?committedEur:navN; const g=f.mgr||'Other'; gpMap[g]=(gpMap[g]||0)+val; });
+    const gpTot=Object.values(gpMap).reduce((a,b)=>a+b,0)||1; const gpRows=Object.keys(gpMap).map(g=>({g,p:+(gpMap[g]/gpTot*100).toFixed(1)})).sort((a,b)=>b.p-a.p);
+    const gpToggle=h('div',{onClick:e=>e.stopPropagation()}, this.seg([{label:'NAV',value:'NAV'},{label:'Committed',value:'Committed'}], gpBasis, v=>this.setDtog('gpBasis',v),{sm:true}));
+    const gpCard=this.card({title:'GP concentration',badge:this.badge('your portfolio','conf'),right:gpToggle,
+      children:h('div',{style:{display:'flex',flexDirection:'column',gap:8}}, gpRows.map((r,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',gap:12}},
+        h('span',{style:{flex:'0 0 160px',fontSize:13,fontWeight:600,fontFamily:SF,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},r.g),
+        h('div',{style:{flex:1,height:14,background:'var(--surface-2)',borderRadius:7,overflow:'hidden'}}, h('div',{style:{width:r.p+'%',height:'100%',background:'var(--data-1)',borderRadius:7}})),
+        h('span',{style:{flex:'0 0 auto',fontFamily:SF,fontWeight:700,fontSize:13,width:52,textAlign:'right'}},r.p+'%')))),
+      caption:'How much of your '+gpBasis+' sits with each manager (GP) — your single-manager concentration. Toggle NAV / committed.'});
     /* item 32 — at the bottom, suggest new opportunities that fit or complement the portfolio */
     const complement=(this.OPP_FUNDS_LIST?this.OPP_FUNDS_LIST():[]).slice(0,4);
     const complementCard= complement.length? this.card({title:'New opportunities that complement your '+d.label.toLowerCase(),badge:this.badge('opportunities','synth'),
@@ -5125,6 +5136,7 @@ class Component extends DCLogic {
         '1.2fr 1fr'),
       this.drillBigBlock(rows,byCat,d.label),
       fundsCard,
+      (key==='strategy'? gpCard : null), /* item 46 — GP concentration inside Strategy */
       complementCard);
   }
 
