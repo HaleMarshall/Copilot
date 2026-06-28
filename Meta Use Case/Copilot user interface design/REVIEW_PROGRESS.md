@@ -100,7 +100,7 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 70 Concentration pie syncs NAV↔Committed (never zero) — donut/bars data source tied to the toggle via `basisPct` (item 57); on Committed every dimension still sums to ~100 (sector 100.1, currency 100, strategy 100) — never an empty chart. Verified live.
 - ☑ 71 Move concentration box down + Z-chart beside it — added `navVsCommittedDeltas(key)` (NAV%−Committed% per bucket from held funds, real data) + a 'Where you're concentrated' box and 'Allocated vs committed' miniZ Z-chart as a twoCol row below the 3-col grid. Verified live: deltas Buyout +7.6pp/Infra −3.6pp/…; overview renders, both cards present, logicError null.
 - ☑ 72 Style Alpha's read panel in brand dark-blue — Overview alphaReadCard now `tone:'alpha'` (brand→brand-ink gradient, white text, white gap button), matches Set-target blue. Verified live: panel bg = brand→brand-ink gradient.
-- ☐ 73 Small Alpha insights at top, Alpha's read below (stacked, not 3 side-by-side)
+- ☑ 73 Small Alpha insights at top, Alpha's read below — added slim 'Alpha's executive summary' strip (5 positive bullets) at the very top; Alpha's-read panel stays lower down (stacked full-width, not 3 side-by-side). Verified live: exec strip before read panel, 5 ▲ bullets, overview renders. (Pre-satisfies 75/82/83 structure.)
 - ☐ 74 Ask Alpha companion docked left on every page (confirm)
 - ☐ 75 Exec-summary strip at top, 5 bullets
 - ☐ 76 AI Overview at top of Detail page + Suggest More Funds beneath
