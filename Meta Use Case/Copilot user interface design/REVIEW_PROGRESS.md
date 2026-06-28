@@ -280,6 +280,10 @@ Built: MGR_META() (domicile/listed/est/since/avgDpi/nFunds/topQ/scores/offering)
 
 Built: managerCompareBody() (Apple-style, drill-in), cmpEntryInfo() (GP/GP-in-strategy/fund/strategy), MGR_METRIC_EXPL(), new t2-7 'Comparison' page.
 
-**NEXT: item 220** — S&P 500 benchmark on personal performance page (IRR/DPI). Read review.md ~2049.
+## 220–225 Performance benchmark · Settings · Advisor flow
+- ☑ 220 S&P 500 benchmark on performance page — 'Your return vs the public market' card (PME basis, +2.3pp outperformance; MOIC/peer omitted). Verified.
+- ☑ 221 Settings trimmed to theme toggle + Quick Target Overview; My-funds & Documents tabs removed. Verified.
+
+**NEXT: item 222** — Advisor view shows investor's name (not code). Then 223 (Open Co-Pilot → investor Home), 224 (advisor flow rework), 225 (3 sub-flows + Entry Trigger + left Goals/Targets panel). Read review.md ~2065.
 
 **NEXT: item 145** — render the 4 Distance-from-Target dimensions as donut/C-charts via the toggle.

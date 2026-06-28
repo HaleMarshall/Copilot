@@ -1784,16 +1784,8 @@ class Component extends DCLogic {
     const field=(label,node)=>h('div',null, h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--muted)',marginBottom:6}},label), node);
     const FN=this.MODEL_PORTFOLIOS_FINE(); const fine=FN[this.state.riskId]||FN.balanced_compounding||[];
     const rows=fine.map(([label,v,color])=>({label,v,color}));
-    const tab=this.dtog('profTab','settings');
-    const tabBtn=(id,label)=>{ const on=tab===id; return h('button',{key:id,onClick:()=>this.setDtog('profTab',id),
-      style:{border:'none',background:'transparent',cursor:'pointer',padding:'9px 2px',marginRight:18,fontSize:13,fontWeight:on?700:500,color:on?'var(--brand-ink)':'var(--muted)',borderBottom:'2px solid '+(on?'var(--brand)':'transparent'),marginBottom:-1}}, label); };
-    const secLabel=(t,n)=>h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',margin:'16px 0 9px'}}, t+(n!=null?(' · '+n):''));
-    const fundRow=(name,sub,onClick)=>h('button',{key:name+sub,onClick:onClick||null,
-      style:{display:'flex',width:'100%',alignItems:'center',justifyContent:'space-between',gap:10,textAlign:'left',border:'1px solid var(--line)',background:'var(--surface)',borderRadius:10,padding:'10px 12px',cursor:onClick?'pointer':'default',marginBottom:7}},
-      h('div',{style:{minWidth:0}}, h('div',{style:{fontFamily:SF,fontSize:13,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},name), sub?h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:1}},sub):null),
-      onClick?h('span',{style:{color:'var(--brand)',fontWeight:700,flex:'0 0 auto'}},'→'):null);
-    const empty=(t)=>h('div',{style:{fontSize:12,color:'var(--muted)',lineHeight:1.5,padding:'4px 2px'}},t);
-    // ---- Settings tab ----
+    /* item 221 — settings reduced to the theme toggle + Quick Target Overview; My-funds & Documents removed (they live on the platform) */
+    // ---- Settings ----
     const settings=h('div',null,
       h('div',{style:{marginBottom:18}},
         h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}},'Appearance'),
@@ -1816,34 +1808,14 @@ class Component extends DCLogic {
         this.gridBars(rows,{max:40,ticks:[0,10,20,30,40],unit:'%',labelW:148,barH:20,gap:8}),
         h('div',{style:{fontSize:11.5,color:'var(--muted)',marginTop:10,lineHeight:1.5}},'The Moonfare model portfolio for your risk class. Use “Set target” in the top bar to fine-tune the granular splits.')),
       h('div',{style:{marginTop:16}}, h('button',{onClick:()=>{this.saveProfileToDB(); this.setState({showProfile:false});},style:{width:'100%',border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'12px',fontSize:13,fontWeight:700,cursor:'pointer'}},'Save settings')));
-    // ---- My funds tab ----
-    const held=this.HELD_FUNDS(); const plan=this.state.portfolioAdds||[]; const watch=this.state.watchlist||[];
-    const myfunds=h('div',null,
-      secLabel('Funds you hold', held.length),
-      held.length? held.map(f=>fundRow(f.name, (f.strat||'')+' · '+(f.nav||'')+' · '+(f.stage||''), ()=>this.setState({showProfile:false,fundDetail:f.id,fundTab:'overview'}))) : empty('No holdings on record yet.'),
-      secLabel('In your portfolio plan', plan.length),
-      plan.length? plan.map(nm=>fundRow(nm,'Added to your plan',()=>this.addToCart(nm))) : empty('Nothing added yet — add funds from any opportunity or fund page.'),
-      secLabel('Watchlist', watch.length),
-      watch.length? watch.map(nm=>fundRow(nm,'On your watchlist',()=>this.addToCart(nm))) : empty('Your watchlist is empty.'));
-    // ---- Documents tab (illustrative) ----
-    const docRow=(name,meta)=>h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,border:'1px solid var(--line)',borderRadius:10,padding:'11px 13px',marginBottom:8}},
-      h('div',{style:{display:'flex',alignItems:'center',gap:10,minWidth:0}}, h('span',{style:{fontSize:16}},'📄'), h('div',{style:{minWidth:0}}, h('div',{style:{fontSize:13,fontWeight:600}},name), h('div',{style:{fontSize:11,color:'var(--muted)'}},meta))),
-      h('span',{style:{fontSize:11.5,color:'var(--brand-ink)',fontWeight:600,flex:'0 0 auto'}},'Download'));
-    const docs=h('div',null,
-      h('div',{style:{fontSize:12,color:'var(--muted)',lineHeight:1.5,marginBottom:6}},'Your account documents.'),
-      docRow('Capital account statement — Q1 2026','PDF · updated 14 Jun 2026'),
-      docRow('Subscription agreements','5 documents'),
-      docRow('Tax documents (K-1 / Steuerreporting)','2025 tax year'),
-      docRow('Quarterly investor letters','EQT IX · CVC IX · Ares PCS'));
     return h('div',null,
-      h('div',{style:{display:'flex',alignItems:'center',gap:12,marginBottom:14}},
+      h('div',{style:{display:'flex',alignItems:'center',gap:12,marginBottom:16}},
         h('div',{style:{width:42,height:42,borderRadius:999,background:'var(--brand)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:700,fontSize:15,flex:'0 0 42px'}},'SP'),
         h('div',{style:{minWidth:0}},
-          h('div',{style:{fontSize:10.5,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Your account'),
+          h('div',{style:{fontSize:10.5,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Your account · Settings'),
           h('div',{style:{fontFamily:SF,fontSize:22,fontWeight:700}},'Steffen Pauls'),
           h('div',{style:{fontSize:11.5,color:'var(--muted)'}},'Moonfare client · '+risk.short))),
-      h('div',{style:{display:'flex',borderBottom:'1px solid var(--line)',marginBottom:4}}, tabBtn('settings','Settings'), tabBtn('funds','My funds'), tabBtn('docs','Documents')),
-      h('div',{style:{marginTop:12}}, tab==='settings'?settings : (tab==='funds'?myfunds : docs)));
+      settings);
   }
   /* ---------- In-chat onboarding (first-time investors only, typed live) ---------- */
   // first-time = data is loaded, no investor profile has ever been saved, and not already shown this session
@@ -3913,6 +3885,20 @@ class Component extends DCLogic {
       eyebrow='Your portfolio · Performance'; title='How your portfolio is performing';
       body=[
         this.kpiTiles([['Net IRR','11.0%','since inception'],['MOIC','1.80x','net of fees'],['TVPI','2.10x',''],['DPI','2.10x','realised'],['Portfolio value','€16.6m','current NAV'],['Distributions','€2.1m','returned to date']]),
+        /* item 220 — benchmark the personal IRR against a public index (S&P 500, PME basis) so the figure has context; MOIC & peer benchmarks deliberately omitted */
+        (()=>{ const you=11.0, spx=8.7, spread=+(you-spx).toFixed(1); const max=Math.max(you,spx)*1.15;
+          const bar=(label,val,col,sub)=>h('div',{style:{display:'grid',gridTemplateColumns:'150px 1fr 58px',gap:12,alignItems:'center'}},
+            h('div',{style:{minWidth:0}}, h('div',{style:{fontSize:12.5,fontWeight:600}},label), sub?h('div',{style:{fontSize:10,color:'var(--muted)'}},sub):null),
+            h('div',{style:{background:'var(--surface-2)',borderRadius:6,height:20,position:'relative',overflow:'hidden'}}, h('div',{style:{position:'absolute',left:0,top:0,bottom:0,width:(val/max*100)+'%',background:col,borderRadius:6}})),
+            h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:15,fontWeight:700}}, val+'%'));
+          return this.card({key:'spx',title:'Your return vs the public market',badge:this.badge('vs S&P 500','synth'),
+            children:h('div',{style:{display:'flex',flexDirection:'column',gap:10}},
+              bar('Your portfolio · Net IRR',you,'var(--over)','private markets, since inception'),
+              bar('S&P 500 · PME equivalent',spx,'var(--data-7)','same cashflows in the index'),
+              h('div',{style:{display:'flex',alignItems:'center',gap:8,marginTop:2,paddingTop:10,borderTop:'1px solid var(--line)'}},
+                h('span',{style:{fontSize:13,fontWeight:700,color:'var(--over)'}},'▲ +'+spread+'pp'),
+                h('span',{style:{fontSize:12,color:'var(--muted)'}},'your private-markets outperformance vs the S&P 500'))),
+            caption:'Public-market-equivalent (PME): what the same cash flows would have earned in the S&P 500 total-return index. Your PE programme returned +'+spread+'pp a year above the index. MOIC and peer benchmarks aren’t shown here — too few comparable data points.'}); })(),
         h('div',{key:'b',style:{fontSize:12.5,lineHeight:1.55,color:'var(--muted)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:10,padding:'11px 13px'}},
           h('strong',{style:{color:'var(--ink)'}},ranked[0].name),' is your biggest contributor; ',h('strong',{style:{color:'var(--ink)'}},ranked[ranked.length-1].name),' is the largest drag this period.'),
         h('div',{key:'f'}, this.panelSection('Funds by contribution'), h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, ranked.map(f=>this.heldFundRow(f))))
