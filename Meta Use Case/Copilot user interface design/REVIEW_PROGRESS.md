@@ -252,6 +252,19 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 
 Built: MANAGERS() dataset (15 managers, multi-asset-class, since-inception IRR + consistency + funds), managerOverviewBody(), helpers (mgrAllTimeIrr/mgrCons/mgrIrrFor/mgrChosenFund/toggleMgrSel).
 
-**NEXT: item 199** — read review.md ~1879 onward.
+## 199–219 Manager profile + comparison builder
+- ☑ 199 Clickable manager → profile (domicile demonym+city, Listed/Private badge, strategies). Verified (KKR).
+- ☑ 204 GP since-inception KPIs + established year + firm history. Verified.
+- ☑ 205 'Should you follow this manager' decision output (mgrFollowVerdict). Verified.
+- ☑ 206 'Notify me on next platform offering' action (dtog mgrFollow_). Verified.
+- ☑ 207 'Buy now' (where offering exists) + best/weakest fund comparison. Verified.
+- ☑ 215 Domicile, fund count, avg DPI headline KPIs. Verified (KKR American/22/1.85x).
+- ☑ 216 Quick-KPI strip + 'Add to comparison list' button. Verified.
+- ☑ 217 Ask Alpha manager recommendation hook. Verified.
+- ☑ 219 Top-quartile fund count (Preqin). Verified (of 22).
+
+Built: MGR_META() (domicile/listed/est/since/avgDpi/nFunds/topQ/scores/offering), mgrMeta/mgrById/mgrBestWorst/mgrFollowVerdict, comparison-list builder (cmpList: GPs/funds/strategies), managerProfileBody().
+
+**NEXT: item 200** — comparison-list builder + 201 Apple-style side-by-side + 202 drill-in detail + 203 GP-level entity + 208 scorecards + 209 weighting + 214 header + 218 select-in. Then 210 filters, 211 scope, 212/213 fund-vs-fund.
 
 **NEXT: item 145** — render the 4 Distance-from-Target dimensions as donut/C-charts via the toggle.
