@@ -4729,7 +4729,7 @@ class Component extends DCLogic {
         : {border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:10,padding:'11px 16px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},
       '✦ Suggest funds to fill the gaps  →'); }
   vintageDrillBody(){
-    const h=this.h; const SF=this.SF; const vint=this.VINTAGES(); const meta=this.HELD_META(); const roster=this.HELD_FUNDS();
+    const h=this.h; const SF=this.SF; const vint=this.VINTAGES().slice(-5); /* item 86 — last five years of commitments only */ const meta=this.HELD_META(); const roster=this.HELD_FUNDS();
     const byYr={}; roster.forEach(f=>{ const y=(meta[f.id]||{}).vintage; (byYr[y]=byYr[y]||[]).push(f); });
     const top=vint.slice().sort((a,b)=>b.v-a.v)[0]; const vmax=Math.max(...vint.map(x=>x.v),1)*1.2;
     const years=vint.filter(x=>byYr[x.y]&&byYr[x.y].length);
@@ -4756,9 +4756,13 @@ class Component extends DCLogic {
           h('span',{style:{fontSize:12,color:'var(--muted)'}},'€'+x.v+'m · '+byYr[x.y].length+' fund'+(byYr[x.y].length>1?'s':''))),
         h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))',gap:9}}, byYr[x.y].map(f=>this.heldFundRow(f)))))),
       caption:'A pure reporting view of which funds sit in each vintage year. Click any fund for detail.'});
+    const totV=vint.reduce((a,x)=>a+x.v,0)||1; const topShare=Math.round(top.v/totV*100); /* item 88 — blunt over-vintaged callout */
     const gapCard=this.card({title:'Alpha’s read on your vintage spread',badge:this.badge('AI','synth'),tone:'alpha',
       children:h('div',{style:{display:'flex',flexDirection:'column',gap:12}},
-        h('div',{style:{fontSize:13,lineHeight:1.6,color:'rgba(255,255,255,.92)'}},'You have committed across ',h('strong',{style:{color:'#fff'}},years.length+' of '+vint.length+' years'),'. Spreading new commitments into under-weighted vintages smooths your J-curve.'),
+        h('div',{style:{fontSize:13.5,lineHeight:1.6,color:'#fff',fontWeight:600}},
+          topShare>=35? ['You are over-vintaged in ',h('strong',{key:'y',style:{color:'#fff'}},top.y),' — '+topShare+'% of your book sits in one vintage. You leaned in hard that year; spread new commitments to avoid timing the market.']
+                      : ['Your heaviest vintage is ',h('strong',{key:'y',style:{color:'#fff'}},top.y),' at '+topShare+'% — a reasonable spread, no single-year bunching.']),
+        h('div',{style:{fontSize:12.5,lineHeight:1.55,color:'rgba(255,255,255,.85)'}},'You have committed across ',h('strong',{style:{color:'#fff'}},years.length+' of '+vint.length+' years'),'. Spreading new commitments into under-weighted vintages smooths your J-curve.'),
         this.gapCTA('vintage',true)),
       caption:'Vintage diversification is the simplest lever on cash-flow timing.'});
     const vZr=this.navVsCommittedDeltas('vintage'); /* item 79 — vintage deviation Z-chart */

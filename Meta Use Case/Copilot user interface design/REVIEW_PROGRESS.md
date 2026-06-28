@@ -115,9 +115,9 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 83 Executive summary positives-only — all 5 bullets are positive (▲, NAV/top-performer/distributions/largest-book/diversification); no negatives. Verified.
 - ☑ 84 Enlarge Vintage figures — vintage chart value labels 12→18px (bold ink), year labels 11→13px, chart height 200→240px. Verified live: €m labels now 18px.
 - ⊘ 85 'Ask Alpha about this' on every page — confirmed: scaffold pages have the 'Ask Alpha about this' footer; fund pages have 'Ask Alpha about this fund'; the persistent left Ask Alpha rail (item 74) is the per-page ask entry point on every page; overview/drill carry Alpha panels with ask buttons.
-- ☐ 86 Vintage last 5 years only
-- ☐ 87 Vintage teaser/intermediate step
-- ☐ 88 Vintage Alpha summary (over-vintaged)
+- ☑ 86 Vintage last 5 years only — `vintageDrillBody` vint = VINTAGES().slice(-5). Verified live: shows 2020–2024 (5 years).
+- ⊘ 87 Vintage teaser/intermediate step — confirmed: homeDetailPanel has a `key==='vintage'` teaser branch (line 3765), reached via openHomePop('vintage') before the full breakdown — same flow as other dimensions.
+- ☑ 88 Vintage Alpha summary (over-vintaged) — gapCard now leads with a blunt callout: 'You are over-vintaged in {year} — X% of your book in one vintage' (when topShare≥35%), else 'heaviest vintage … reasonable spread'. Verified live: summary present.
 - ☐ 89 Cashflow top KPIs: Committed/Called/Uncalled/Cash Position
 - ☐ 90 Mark notifications seen after ~5s
 - ☐ 91 Rename 'Net Cash Flow' → 'Net Distributions', below top row
