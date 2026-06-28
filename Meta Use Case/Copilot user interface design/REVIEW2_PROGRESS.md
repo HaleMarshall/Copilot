@@ -32,4 +32,6 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 29 View the opportunities on all dims — verified
 - [x] 30 gapCTA: Suggest opportunities to fill the gaps (not funds)
 - [x] 31 currency parity — verified
-NEXT: item 32 (suggest new complementary funds at the bottom)
+- [x] 32 complementary new-opportunities card at bottom of drill (all dims)
+- [x] 33 Alpha read on performance: top contributor + additional insight
+NEXT: item 34 (sector detailed overview parity — verify)

@@ -3941,8 +3941,12 @@ class Component extends DCLogic {
                 h('span',{style:{fontSize:13,fontWeight:700,color:'var(--over)'}},'▲ +'+spread+'pp'),
                 h('span',{style:{fontSize:12,color:'var(--muted)'}},'your private-markets outperformance vs the S&P 500'))),
             caption:'Public-market-equivalent (PME): what the same cash flows would have earned in the S&P 500 total-return index. Your PE programme returned +'+spread+'pp a year above the index. MOIC and peer benchmarks aren’t shown here — too few comparable data points.'}); })(),
-        h('div',{key:'b',style:{fontSize:12.5,lineHeight:1.55,color:'var(--muted)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:10,padding:'11px 13px'}},
-          h('strong',{style:{color:'var(--ink)'}},ranked[0].name),' is your biggest contributor; ',h('strong',{style:{color:'var(--ink)'}},ranked[ranked.length-1].name),' is the largest drag this period.'),
+        /* item 33 — Alpha's read: top contributor to the largest metric + an additional insight */
+        this.card({key:'b',title:'Alpha’s read',badge:this.badge('AI','synth'),tone:'alpha',
+          children:h('div',{style:{display:'flex',flexDirection:'column',gap:9}},
+            h('div',{style:{fontSize:13,lineHeight:1.6,color:'rgba(255,255,255,.95)'}}, h('strong',{style:{color:'#fff'}},ranked[0].name),' is your top contributor this period (',h('strong',{style:{color:'#fff'}},(ranked[0].contrib>=0?'+':'')+ranked[0].contrib+'pp'),') and leads on IRR at ',h('strong',{style:{color:'#fff'}},this.metricVal(ranked[0],'IRR')),'.'),
+            h('div',{style:{fontSize:12.5,lineHeight:1.55,color:'rgba(255,255,255,.85)'}}, 'Additional insight: your top three positions drive most of the return — strong, but keep an eye on single-name concentration. ',h('strong',{style:{color:'#fff'}},ranked[ranked.length-1].name),' is the main laggard to review.')),
+          caption:'Who’s driving your return — and what to watch.'}),
         /* funds moved off the performance summary to a dedicated all-funds detail page */
         h('div',{key:'f'}, h('button',{onClick:()=>this.setState({homePop:null,homeFundsList:'performance'}),
           style:{width:'100%',border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:10,padding:'12px',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'View all '+roster.length+' funds — full detail  →'))
@@ -5076,6 +5080,13 @@ class Component extends DCLogic {
             style:{border:'1px solid rgba(255,255,255,.55)',background:'transparent',color:'#fff',borderRadius:10,padding:'11px 14px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'View the opportunities →'))), /* item 24 — 'view the opportunities', not buy now */
       caption:'A plain-language read of your '+d.label.toLowerCase()+' book and where the gaps are.'});
 
+    /* item 32 — at the bottom, suggest new opportunities that fit or complement the portfolio */
+    const complement=(this.OPP_FUNDS_LIST?this.OPP_FUNDS_LIST():[]).slice(0,4);
+    const complementCard= complement.length? this.card({title:'New opportunities that complement your '+d.label.toLowerCase(),badge:this.badge('opportunities','synth'),
+      children:h('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}}, complement.map(f=>h('div',{key:f.id,onClick:()=>this.openFundPage(f.id),style:{flex:'1 1 200px',minWidth:190,border:'1px solid var(--line)',borderRadius:12,padding:'12px 13px',background:'var(--surface)',cursor:'pointer',display:'flex',gap:10,alignItems:'center'}},
+        f.logo? h('img',{src:'assets/logos/'+f.logo+'.png',alt:'',style:{width:30,height:30,borderRadius:7,background:'#fff',border:'1px solid var(--line)',padding:3,objectFit:'contain',flex:'0 0 30px'},onError:e=>{e.currentTarget.style.display='none';}}):null,
+        h('div',{style:{minWidth:0}}, h('div',{style:{fontFamily:SF,fontSize:13,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},f.fund||f.name), h('div',{style:{fontSize:10.5,color:'var(--muted)'}},f.strat+' · open now'), h('div',{style:{fontSize:11,color:'var(--brand)',fontWeight:600,marginTop:2}},'View opportunity →'))))),
+      caption:'Funds currently on the platform that would round out or complement your portfolio.'}) : null;
     /* item 21 — the investments table sits inline at the bottom (no separate 'see by strategy' page) */
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
       focusName? h('div',{style:{fontSize:12.5,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:10,padding:'10px 14px',fontWeight:600}},'◧ Highlighting your '+focusName+' position across the charts below.'):null,
@@ -5084,7 +5095,8 @@ class Component extends DCLogic {
         summaryCard,    // Alpha's read — top-right
         '1.2fr 1fr'),
       this.drillBigBlock(rows,byCat,d.label),
-      fundsCard);
+      fundsCard,
+      complementCard);
   }
 
   /* ====================== SIMULATOR ====================== */
