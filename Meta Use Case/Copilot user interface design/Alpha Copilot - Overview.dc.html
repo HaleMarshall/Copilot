@@ -475,7 +475,7 @@ class Component extends DCLogic {
       theme: props.theme || 'light',
       fc:{age:[],wealth:[],risk:[],region:[],prof:[],marital:[],kids:[]},
       perf:'all', follow:'peer',
-      targetPct:35, riskId:'innovation_ai_alpha', horizon2:'5–10y',
+      targetPct:35, riskId:'innovation_ai_alpha', horizon2:'7–10 Jahre',
       demoState: this.investorToState(props.investor),
       cmp:'peers', cmp2:'peers',
       ws:'understand', uc:'t1-12', page:'review', dtog:{}, homeLaunched:false,
@@ -512,7 +512,7 @@ class Component extends DCLogic {
       mode:'Investor',
       risk:'Balanced', horizon:'7y', investWealthM:8,
       showProfile:false, showNotif:false, showToast:true, cart:[], showCart:false, cartCommitted:false, showOnboard:false, seenOnboard:false, onboardStep:0, obActive:false, obStep:0, showThemePicker:false, showTarget:false, following:'top10', showPdf:false, pdfMode:'summary',
-      showOnboardForm:false, goal:'Build personal wealth', liquidity:'Medium', strategyPref:'Diversified', obConsent:false,
+      showOnboardForm:false, goal:'Capital Growth', liquidity:'Teilweise Liquidität gewünscht', strategyPref:'Diversified Portfolio', obConsent:false,
       ask:{ state: props.askAlphaOpen===true?'open':'min', x:null, y:null, register:'plain',
             msgs:[ {who:'alpha', segs:[
               {t:'Hi — I read your portfolio against your cohort. Ask me anything, or tap a prompt below. Every number I give is clickable to show how it was computed.'} ] } ] },
@@ -1562,7 +1562,7 @@ class Component extends DCLogic {
     const riskField=field('Risk classification','Sets your Moonfare house-view model.',
       h('select',{value:s.riskId,onChange:e=>this.setState({riskId:e.target.value}),style:selStyle}, this.RISKS.map(r=>h('option',{key:r.id,value:r.id},r.short))));
     const horizonField=field('Investment horizon',null,
-      h('select',{value:s.horizon2,onChange:e=>this.setState({horizon2:e.target.value}),style:selStyle}, ['1–3y','3–5y','5–10y','10y+'].map(o=>h('option',{key:o,value:o},o))));
+      h('select',{value:s.horizon2,onChange:e=>this.setState({horizon2:e.target.value}),style:selStyle}, this.HORIZONS().map(o=>h('option',{key:o,value:o},o))));
     // item 15/16 — Main goal · Investment Target on the core card (same concept per item 7)
     const goalField=field('Main goal · Investment Target','The high-level objective the advisor re-confirms with you.',
       h('select',{value:s.goal,onChange:e=>this.setState({goal:e.target.value}),style:selStyle}, this.GOALS().map(o=>h('option',{key:o,value:o},o))));
@@ -1655,7 +1655,7 @@ class Component extends DCLogic {
         this.RISKS.map(r=>h('option',{key:r.id,value:r.id,style:{color:'#15162C'}}, r.short))),
       h('span',{style:{fontSize:11,color:'var(--topbar-soft)',marginLeft:4}},'Horizon'),
       h('select',{value:this.state.horizon2,onChange:e=>this.setState({horizon2:e.target.value}),style:selStyle},
-        ['1–3y','3–5y','5–10y','10y+'].map(o=>h('option',{key:o,value:o,style:{color:'#15162C'}}, o))),
+        this.HORIZONS().map(o=>h('option',{key:o,value:o,style:{color:'#15162C'}}, o))),
       h('span',{style:{fontSize:11,color:'var(--topbar-soft)',marginLeft:4}},'Wealth'),
       h('div',{style:{display:'inline-flex',alignItems:'center',gap:3,border:'1px solid var(--topbar-line)',background:'var(--topbar-chip)',borderRadius:7,padding:'3px 7px'}},
         h('span',{style:{fontSize:11.5,color:'var(--topbar-ink)'}},'€'),
@@ -1793,7 +1793,7 @@ class Component extends DCLogic {
         h('div',{style:{fontSize:11.5,color:'var(--muted)',marginTop:8}},'Stored to your profile — this is the only place to change it.')),
       h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:18}},
         field('Risk class', h('select',{value:this.state.riskId,onChange:e=>this.setState({riskId:e.target.value}),style:selStyle}, this.RISKS.map(r=>h('option',{key:r.id,value:r.id},r.short)))),
-        field('Investment horizon', h('select',{value:this.state.horizon2,onChange:e=>this.setState({horizon2:e.target.value}),style:selStyle}, ['1–3y','3–5y','5–10y','10y+'].map(o=>h('option',{key:o,value:o},o)))),
+        field('Investment horizon', h('select',{value:this.state.horizon2,onChange:e=>this.setState({horizon2:e.target.value}),style:selStyle}, this.HORIZONS().map(o=>h('option',{key:o,value:o},o)))),
         field('Investable wealth', h('div',{style:{display:'flex',alignItems:'center',gap:6,border:'1px solid var(--line)',background:'var(--surface)',borderRadius:8,padding:'7px 10px'}},
           h('span',{style:{fontSize:13,color:'var(--muted)'}},'€'),
           h('input',{type:'number',min:0,step:0.5,value:this.state.investWealthM,onChange:e=>this.setState({investWealthM:Math.max(0,+e.target.value||0)}),style:{flex:1,border:'none',background:'transparent',outline:'none',fontSize:13,color:'var(--ink)',fontFamily:'Inter,system-ui,sans-serif'}}),
@@ -1820,9 +1820,19 @@ class Component extends DCLogic {
   /* ---------- In-chat onboarding (first-time investors only, typed live) ---------- */
   // first-time = data is loaded, no investor profile has ever been saved, and not already shown this session
   obFirstTime(){ return this.state.dbLoaded && !this.dbEmpty() && (((this.DB&&this.DB.profiles)||[]).length===0) && !this.state.seenOnboard; }
-  GOALS(){ return ['Retirement / pension','Wealth for my children','Build personal wealth','Preserve & grow capital','Diversify beyond public markets']; }
-  LIQUIDITY_OPTS(){ return ['Low — happy to lock up long-term','Medium','High — I may need access']; }
-  STRAT_PREF_OPTS(){ return ['Diversified','Buyout-led','Growth & venture','Income / yield']; }
+  /* onboarding option sets (Benjamin & Steffen — exact lists) */
+  GOALS(){ return ['Capital Growth','Diversification','Access to Institutional Managers','Income / Distributions','Thematic Exposure','Long-term Family Wealth Planning']; }
+  LIQUIDITY_OPTS(){ return ['Kapital wird nicht benötigt','Teilweise Liquidität gewünscht','Regelmäßige Liquidität erforderlich']; }
+  STRAT_PREF_OPTS(){ return ['Buyout','Growth','Venture','Secondaries','Private Credit','Infrastructure','Diversified Portfolio']; }
+  HORIZONS(){ return ['5–7 Jahre','7–10 Jahre','10+ Jahre']; }
+  // four risk profiles for the initial questions, mapped to the underlying risk-class ids that drive the model
+  ONBOARD_RISKS(){ return [
+    {value:'income_resilience',     label:'Conservative Private Markets'},
+    {value:'balanced_compounding',  label:'Balanced Private Equity'},
+    {value:'equity_growth',         label:'Growth-Oriented'},
+    {value:'opportunistic_advanced',label:'Opportunistic / High Risk'}
+  ]; }
+  obRiskValue(){ const ids=this.ONBOARD_RISKS().map(r=>r.value); return ids.includes(this.state.riskId)?this.state.riskId:'balanced_compounding'; }
   /* one-time new-customer onboarding — a single fill-in form (replaces the old chat flow) */
   onboardFormBody(){
     const h=this.h; const SF=this.SF; const s=this.state;
@@ -1842,8 +1852,8 @@ class Component extends DCLogic {
       // field set — items 7, 9, 12 (no Experience)
       h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:14}},
         sel('Main goal · Investment Target', s.goal, this.GOALS(), v=>this.setState({goal:v})),
-        sel('Risk profile', s.riskId, this.RISKS.map(r=>({value:r.id,label:r.short})), v=>this.setState({riskId:v})),
-        sel('Investment horizon', s.horizon2, ['1–3y','3–5y','5–10y','10y+'], v=>this.setState({horizon2:v})),
+        sel('Risk profile', this.obRiskValue(), this.ONBOARD_RISKS(), v=>this.setState({riskId:v})),
+        sel('Investment horizon', s.horizon2, this.HORIZONS(), v=>this.setState({horizon2:v})),
         sel('Liquidity', s.liquidity, this.LIQUIDITY_OPTS(), v=>this.setState({liquidity:v})),
         sel('Strategy preference', s.strategyPref, this.STRAT_PREF_OPTS(), v=>this.setState({strategyPref:v}))),
       // free-text — item 11 (advisor-style examples; no regions/currencies, no theme/book)
@@ -1864,6 +1874,8 @@ class Component extends DCLogic {
   submitOnboardForm(){
     const ctx=this.dtog('obContext','').trim();
     if(ctx) this.saveChat('user', ctx);            // feed RM memory
+    // normalise risk to the chosen onboarding profile (the four-option list maps to a model risk-class id)
+    if(this.state.riskId!==this.obRiskValue()) this.setState({riskId:this.obRiskValue()});
     this.saveProfileToDB();
     this.setState({ showOnboardForm:false, seenOnboard:true });
   }
