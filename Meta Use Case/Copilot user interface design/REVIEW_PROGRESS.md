@@ -85,7 +85,7 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 57 NAV vs Committed toggle on allocation views — added Basis (NAV/Committed) toggle to the Asset-allocation header; `basisPct(key)` recomputes strategy/region/currency/sector % from held funds' committed weight (nav+navUncommitted) on Committed basis; € total switches NAV↔Committed (`committedTotal`). Verified live: Committed strategy buyout 43/growth 20.5/…; € total €16.6m→€24.4m; logicError null.
 - ☑ 58 Default the NAV/Committed toggle to NAV — `allocBasis()` defaults 'NAV'. Verified live: defaultBasis='NAV'.
 - ☑ 59 Rename UNDERSTAND 'Home' → 'Overview' — workspace `label:'Home'`→'Overview' (line 2149); used by both the nav sub-label and the `stageEyebrow` breadcrumb (`${w.label} · ${w.verb} · idx of N`), so both now read 'Overview'. Verified live: nav shows Overview, no 'Home' label; logicError null.
-- ☐ 60 Clicking UNDERSTAND always lands on Overview first
+- ☑ 60 Clicking UNDERSTAND always lands on Overview first — `selectWS`/`launchWS` now also clear `homeDrill/homePop/homeFocusCat` (root cause: page reset to 'home' but stale drill state made homeOverviewBody render the last drill). Verified live: from a drilled state, selectWS('understand') → uc/page 'home', all drill state null.
 - ☐ 61 Split AI out of Tech in Sector donut
 - ⊘ 62 Cart icon = 'already held' marker on top holdings — done via shopBtn held marker (38); confirm on Top-holdings list
 - ⊘ 63 Held fund pop-up CTA → suggest similar — done via fundActions (38)

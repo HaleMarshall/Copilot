@@ -1322,7 +1322,7 @@ class Component extends DCLogic {
     this.setState({ws:it.ws,uc:it.uc,page:it.page,homeLaunched:true,deepLink:null,
       ask:{...this.state.ask,state:'open',input:''}});
   }
-  launchWS(id){ const ucs=this.wsUCs(id); const first=ucs[0]; this.setState({ws:id, uc:first.id, page:first.pages[0].id, homeLaunched:true, deepLink:null, ask:{...this.state.ask,state:'min'}}); }
+  launchWS(id){ const ucs=this.wsUCs(id); const first=ucs[0]; this.setState({ws:id, uc:first.id, page:first.pages[0].id, homeLaunched:true, deepLink:null, homeDrill:null, homePop:null, homeFocusCat:null, ask:{...this.state.ask,state:'min'}}); }
   homeAsk(q,it){
     const ans=this.ANSWERS(q);
     const msgs=this.state.ask.msgs.concat([{who:'user',text:q},{who:'alpha',segs:ans.segs,detail:ans.detail,nav:it}]);
@@ -2155,7 +2155,7 @@ class Component extends DCLogic {
   curWS(){ return this.WS().find(w=>w.id===this.state.ws)||this.WS()[1]; }
   wsOf(ucId){ const w=this.WS().find(w=>w.ids.includes(ucId)); return w?w.id:'shape'; }
   wsUCs(wsId){ const ids=this.WS().find(w=>w.id===wsId).ids; return ids.map(id=>this.allUC().find(u=>u.id===id)).filter(Boolean); }
-  selectWS(id){ const ucs=this.wsUCs(id); const first=ucs[0]; this.setState({ws:id, uc:first.id, page:first.pages[0].id, deepLink:null}); }
+  selectWS(id){ const ucs=this.wsUCs(id); const first=ucs[0]; this.setState({ws:id, uc:first.id, page:first.pages[0].id, deepLink:null, homeDrill:null, homePop:null, homeFocusCat:null}); } /* item 60 — always land on the clean Overview, never the last drill-down */
   // levers persistent on Shape & Act; collapse to summary on Understand & Research
   controlIsLeverPanel(){ return this.state.ws==='shape' || this.state.ws==='act'; }
 
