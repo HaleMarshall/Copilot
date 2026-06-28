@@ -4733,11 +4733,12 @@ class Component extends DCLogic {
     const byYr={}; roster.forEach(f=>{ const y=(meta[f.id]||{}).vintage; (byYr[y]=byYr[y]||[]).push(f); });
     const top=vint.slice().sort((a,b)=>b.v-a.v)[0]; const vmax=Math.max(...vint.map(x=>x.v),1)*1.2;
     const years=vint.filter(x=>byYr[x.y]&&byYr[x.y].length);
-    const chart=h('div',{style:{display:'flex',alignItems:'flex-end',gap:14,height:200,padding:'8px 4px 0'}}, vint.map((x,i)=>
+    /* item 84 — enlarge Vintage value & year labels so figures are legible */
+    const chart=h('div',{style:{display:'flex',alignItems:'flex-end',gap:16,height:240,padding:'8px 4px 0'}}, vint.map((x,i)=>
       h('div',{key:i,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-end',height:'100%'}},
-        h('div',{style:{fontSize:12,fontFamily:SF,fontWeight:600,marginBottom:4}}, '€'+x.v+'m'),
-        h('div',{title:x.y,style:{width:'58%',maxWidth:46,height:(x.v/vmax*100)+'%',background:'var(--data-3)',borderRadius:'5px 5px 0 0',minHeight:3}}),
-        h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:6}}, x.y))));
+        h('div',{style:{fontSize:18,fontFamily:SF,fontWeight:700,marginBottom:6,color:'var(--ink)'}}, '€'+x.v+'m'),
+        h('div',{title:x.y,style:{width:'62%',maxWidth:52,height:(x.v/vmax*100)+'%',background:'var(--data-3)',borderRadius:'6px 6px 0 0',minHeight:3}}),
+        h('div',{style:{fontSize:13,fontWeight:600,color:'var(--ink)',marginTop:8}}, x.y))));
     const mixCard=this.card({title:'Your vintage exposure (NAV by commitment year)',badge:this.badge('your portfolio','conf'),style:{height:'100%'},
       children:chart, caption:'How your committed capital is spread across vintage years — diversification here is what smooths your cash-flow J-curve.'});
     const insightCard=this.card({title:'Where your capital sits',style:{height:'100%'},

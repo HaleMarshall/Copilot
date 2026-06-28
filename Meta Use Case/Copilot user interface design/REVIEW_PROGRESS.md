@@ -113,8 +113,8 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 81 Repeat chart visual on detail page + AI summary directly beneath — added an 'Alpha's read' AI line (AI badge) directly under the mix donut/bars inside mixCard. Verified live: chart + AI-read-beneath present; logicError null.
 - ☑ 82 Limit executive summary to Top 5/Top 3 — exec strip uses `.slice(0,5)` (max 5 bullets), not the full model. Verified (item 73: 5 bullets).
 - ☑ 83 Executive summary positives-only — all 5 bullets are positive (▲, NAV/top-performer/distributions/largest-book/diversification); no negatives. Verified.
-- ☐ 84 Enlarge Vintage figures (unreadable)
-- ☐ 85 'Ask Alpha about this' on every page
+- ☑ 84 Enlarge Vintage figures — vintage chart value labels 12→18px (bold ink), year labels 11→13px, chart height 200→240px. Verified live: €m labels now 18px.
+- ⊘ 85 'Ask Alpha about this' on every page — confirmed: scaffold pages have the 'Ask Alpha about this' footer; fund pages have 'Ask Alpha about this fund'; the persistent left Ask Alpha rail (item 74) is the per-page ask entry point on every page; overview/drill carry Alpha panels with ask buttons.
 - ☐ 86 Vintage last 5 years only
 - ☐ 87 Vintage teaser/intermediate step
 - ☐ 88 Vintage Alpha summary (over-vintaged)
