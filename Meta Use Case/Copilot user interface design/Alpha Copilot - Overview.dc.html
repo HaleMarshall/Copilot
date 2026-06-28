@@ -4714,27 +4714,32 @@ class Component extends DCLogic {
     const h=this.h; const SF=this.SF;
     if(key==='vintage') return this.vintageDrillBody();
     const d=this.HOME_DIMS().find(x=>x.key===key); if(!d) return this.homeOverviewBody();
+    const basis=this.allocBasis(); const pct=this.basisPct(key); // items 67/68 — NAV (default) vs Committed on the breakdown view
     const nm=(k)=>key==='strategy'?(this.STRATS.find(s=>s[0]===k)||[null,k])[1]:k;
-    const aSl=Object.keys(d.actual).map(k=>({color:d.colors[k],p:d.actual[k],n:nm(k)}));
-    const rows=Object.keys(d.actual).map(k=>({k,n:nm(k),color:d.colors[k],you:d.actual[k]})).sort((a,b)=>b.you-a.you);
+    const keys=Object.keys(pct).length?Object.keys(pct):Object.keys(d.actual);
+    const aSl=keys.map(k=>({color:d.colors[k]||'--data-9',p:pct[k]||0,n:nm(k)}));
+    const rows=keys.map(k=>({k,n:nm(k),color:d.colors[k]||'--data-9',you:pct[k]||0})).sort((a,b)=>b.you-a.you);
     const heavy=rows[0], light=rows[rows.length-1];
     const meta=this.HELD_META(); const roster=this.HELD_FUNDS();
     const catOf=(f)=> key==='strategy'? (meta[f.id]||{}).strat : (meta[f.id]||{})[key];
     const byCat={}; roster.forEach(f=>{ const c=catOf(f); if(c==null) return; (byCat[c]=byCat[c]||[]).push(f); });
     const empty=rows.filter(r=>!(byCat[r.k]&&byCat[r.k].length));
+    const basisToggle=h('div',{style:{display:'flex',alignItems:'center',gap:6}},
+      h('span',{style:{fontSize:10.5,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em',fontWeight:600}},'Basis'),
+      this.seg([{label:'NAV',value:'NAV'},{label:'Committed',value:'Committed'}], basis, v=>this.setDtog('allocBasis',v),{sm:true}));
 
     // your-mix donut + composition bars (about you only — no target, no peers, no z-chart)
-    const mixCard=this.card({title:'Your '+d.label.toLowerCase()+' mix',badge:this.badge('your portfolio','conf'),
+    const mixCard=this.card({title:'Your '+d.label.toLowerCase()+' mix',badge:this.badge('your portfolio','conf'),right:basisToggle,
       children:h('div',{style:{display:'flex',gap:28,alignItems:'center',flexWrap:'wrap'}},
-        h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:8}}, this.donutNamed(aSl,168,d.label,'100% NAV')),
+        h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:8}}, this.donutNamed(aSl,168,d.label,'100% '+basis)),
         h('div',{style:{flex:'1 1 300px',minWidth:260}}, this.gridBars(rows.map(r=>({label:r.n,v:r.you,color:r.color})),{max:Math.ceil(Math.max(...rows.map(r=>r.you))/10)*10,ticks:[0,10,20,30,40].filter(t=>t<=Math.ceil(Math.max(...rows.map(r=>r.you))/10)*10),unit:'%',labelW:110,barH:26,gap:10}))),
-      caption:'Your real underlying '+d.label.toLowerCase()+' exposure after look-through. This is your portfolio today — just you.'});
+      caption:'Your real underlying '+d.label.toLowerCase()+' exposure after look-through, on a '+basis+' basis — '+(basis==='Committed'?'including capital still to be called.':'how you’re invested today.')});
 
     const focus=this.state.homeFocusCat; const focusName=focus?nm(focus):null;
     const insightCard=this.card({title:'Where you’re concentrated',style:{height:'100%'},
       children:h('div',{style:{display:'flex',flexDirection:'column',gap:12}},
         h('div',{style:{fontSize:13.5,lineHeight:1.6,color:'var(--ink)'}},
-          'You are most heavily invested in ',h('strong',null,heavy.n),' at ',h('strong',{style:{color:'var(--ink)'}},heavy.you+'% of NAV'),', and lightest in ',h('strong',null,light.n),' at ',h('strong',null,light.you+'%'),'.'),
+          'You are most heavily invested in ',h('strong',null,heavy.n),' at ',h('strong',{style:{color:'var(--ink)'}},heavy.you+'% of '+basis),', and lightest in ',h('strong',null,light.n),' at ',h('strong',null,light.you+'%'),'.'),
         h('div',{style:{display:'flex',flexDirection:'column',gap:6}}, rows.map((r,i)=>{ const on=r.k===focus;
           return h('div',{key:i,style:{display:'flex',alignItems:'center',gap:10,fontSize:13,padding:on?'5px 8px':'5px 0',borderRadius:8,background:on?'var(--brand-wash)':'transparent',border:on?'1px solid var(--brand-tint-3)':'1px solid transparent'}},
           h('span',{style:{width:11,height:11,borderRadius:3,background:`var(${r.color})`,flex:'0 0 11px'}}),
@@ -4753,7 +4758,7 @@ class Component extends DCLogic {
           h('div',{style:{display:'flex',alignItems:'center',gap:9,marginBottom:9}},
             h('span',{style:{width:12,height:12,borderRadius:3,background:`var(${r.color})`}}),
             h('span',{style:{fontFamily:SF,fontWeight:on?700:600,fontSize:15}},r.n),
-            h('span',{style:{fontSize:12,color:'var(--muted)'}},r.you+'% of NAV · '+byCat[r.k].length+' fund'+(byCat[r.k].length>1?'s':'')),
+            h('span',{style:{fontSize:12,color:'var(--muted)'}},r.you+'% of '+basis+' · '+byCat[r.k].length+' fund'+(byCat[r.k].length>1?'s':'')),
             on?h('span',{style:{marginLeft:'auto',fontSize:10.5,fontWeight:700,color:'var(--brand)'}},'SELECTED'):null),
           this.holdingsTable(byCat[r.k])); }),
         empty.length? h('div',{style:{fontSize:12.5,color:'var(--muted)',fontStyle:'italic',lineHeight:1.5}}, 'No direct holdings in '+empty.map(r=>r.n).join(', ')+'.'):null),
@@ -4766,7 +4771,7 @@ class Component extends DCLogic {
     const summaryCard=this.card({title:'Alpha’s read on your '+d.label.toLowerCase()+' funds',badge:this.badge('AI','synth'),tone:'alpha',style:{height:'100%'},
       children:h('div',{style:{display:'flex',flexDirection:'column',gap:14}},
         h('div',{style:{fontSize:13,lineHeight:1.6,color:'rgba(255,255,255,.92)'}},
-          'Your '+d.label.toLowerCase()+' exposure is led by ',h('strong',{style:{color:'#fff'}},heavy.n),' ('+heavy.you+'% of NAV)',topF?[', with ',h('strong',{key:'t',style:{color:'#fff'}},topF.name),' your largest single fund']:null,'. ',
+          'Your '+d.label.toLowerCase()+' exposure is led by ',h('strong',{style:{color:'#fff'}},heavy.n),' ('+heavy.you+'% of '+basis+')',topF?[', with ',h('strong',{key:'t',style:{color:'#fff'}},topF.name),' your largest single fund']:null,'. ',
           empty.length? ['You have ',h('strong',{key:'e',style:{color:'#fff'}},'no direct fund'),' in '+empty.map(r=>r.n).join(', ')+' — clear places to add if you want the exposure.'] : 'You hold direct funds across every bucket — a well-rounded book.'),
         this.kpiTiles([['Funds held',allFunds.length+''],['NAV in this book','€'+totNav.toFixed(1)+'m'],['Buckets covered',fundRows.length+' of '+rows.length],['Largest holding',topF?topF.name:'—']]),
         this.gapCTA(key,true)),
