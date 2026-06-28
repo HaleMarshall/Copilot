@@ -503,7 +503,7 @@ class Component extends DCLogic {
       simDials:{pm:20, growth:0, secondaries:6, us:38},
       simTargets:null, simFocus:null, simSuggest:null,
       savedSims:[], simCompare:false, watchlist:[], portfolioAdds:[],
-      oppSource:'active', oppMode:'weighted', oppWeights:{perf:60, strategy:25, region:5, sector:10},
+      oppSource:'active', oppMode:'weighted', oppWeights:{strategy:40, region:20, currency:20, sector:20}, /* items 122/123 — no Performance; Currency added */
       oppDetail:null, oppDetailTab:'why',
       mode:'Investor',
       risk:'Balanced', horizon:'7y', investWealthM:8,
@@ -5264,13 +5264,13 @@ class Component extends DCLogic {
     const funds=this.OPP_FUNDS();
     // per-strategy gap to target (target - current); positive => add, negative => trim
     const gaps=this.STRATS.map(([k,name,color])=>({k,name,color,gap:+((tgt[k]||0)-(src.mix[k]||0)).toFixed(1)}));
-    // weight emphasis: in single-objective mode only the chosen dimension drives; in weighted mode the perf weight tilts return-additive strategies
+    // item 122 — weighted mode now ranks purely by target-fit gap × strategy emphasis (no Performance tilt; we can't predict returns)
     const single=this.state.oppMode==='single';
     const retAdd={growth:1,ai:1,secondaries:0.4,buyout:0.5,credit:0.2,infra:0.2,venture:0.8,realestate:0.1,other:0};
     const scored=gaps.map(g=>{
       let imp=Math.abs(g.gap);
       if(single){ imp*= (this.state.oppSingle==='perf'? (retAdd[g.k]||0.2) : 1); }
-      else { imp*= 1 + (w.perf/100)*(retAdd[g.k]||0.2)*1.4; }
+      else { imp*= 1 + ((w.strategy||0)/100)*0.6; }
       return {...g, imp:+imp.toFixed(2)};
     }).sort((a,b)=>b.imp-a.imp);
     const adds=scored.filter(g=>g.gap>0.6).slice(0,3);
@@ -5333,13 +5333,14 @@ class Component extends DCLogic {
       children:h('div',{style:{paddingTop:6}},
         s.oppMode==='weighted'
           ? h('div',null,
-              h('div',{style:{fontSize:12,color:'var(--muted)',marginBottom:12,lineHeight:1.5}},'Tell the engine how much each objective counts. It optimises the blend that moves your target-fit score up the most.'),
-              this.oppWeightRow('perf','Performance'), this.oppWeightRow('strategy','Strategy mix'),
-              this.oppWeightRow('region','Region'), this.oppWeightRow('sector','Sector'))
+              /* items 122/123 — removed 'Performance' (no target / can't predict); added 'Currency' (a genuine decision dimension, distinct from Region) */
+              h('div',{style:{fontSize:12,color:'var(--muted)',marginBottom:12,lineHeight:1.5}},'Tell the engine how much each target dimension counts. It optimises the blend that moves your target-fit score up the most.'),
+              this.oppWeightRow('strategy','Strategy mix'), this.oppWeightRow('region','Region'),
+              this.oppWeightRow('currency','Currency'), this.oppWeightRow('sector','Sector'))
           : h('div',null,
               h('div',{style:{fontSize:12,color:'var(--muted)',marginBottom:12,lineHeight:1.5}},'Optimise for one objective only — the engine ignores the rest.'),
               this.seg([{label:'Maximise return',value:'perf'},{label:'Hit target mix',value:'mix'},{label:'Smooth cash-flow',value:'cash'}], s.oppSingle||'perf', v=>this.setState({oppSingle:v})))),
-      caption: s.oppMode==='weighted'?'Performance-weighted blends favour return-additive strategies (growth, AI, secondaries).':'A single-objective run produces a more concentrated set of moves.'});
+      caption: s.oppMode==='weighted'?'Weights are target-fit dimensions only — Strategy, Region, Currency, Sector. We don’t weight by performance (no target, can’t predict). Currency is separate from Region: a European fund can be USD-denominated.':'A single-objective run produces a more concentrated set of moves.'});
 
     // ranked actions
     const actionList=h('div',{style:{display:'flex',flexDirection:'column',gap:10}},
