@@ -156,7 +156,7 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 117 Per-fund Performance detail table — new `perfDetailTable()` added to the Performance (s7) page: columns Fund · Age · Committed · Called · Distributed · DPI, derived from held funds. Verified live: headers present, rows compute (Northwind Age 2y/Committed €1.9m/Called €722k).
 - ☑ 118 Performance table sort: Vintage default + Strategy — `perfSort` dtog (default 'vintage'); Strategy option groups buy-outs. Verified live: sort toggle present, default vintage.
 - ☑ 119 Strip Fund Detail to just the table — the per-fund table is performance-only (Age/Committed/Called/Distributed/DPI); no investor-due / 'what I paid' fields. Verified.
-- ☐ 120 'Upcoming Opportunities' preview + coming-soon
+- ☑ 120 'Upcoming Opportunities' preview + coming-soon — added an 'Upcoming Opportunities' card (twoCol beside the secondary-market card) with 'coming soon' badges, generically phrased (Private Credit / North America Buyout / Secondaries — no named unsigned deals; auditable). Verified: wired into opportunitiesBody return; logicError null.
 - ☐ 121 Build out Internal/Platform view
 - ☐ 122 Remove 'Performance' from weighting panel
 - ☐ 123 Add 'Currency' weighting factor
