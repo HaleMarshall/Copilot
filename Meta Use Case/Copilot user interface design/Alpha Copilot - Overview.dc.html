@@ -3607,7 +3607,8 @@ class Component extends DCLogic {
       card('Take action', h('div',null,
         h('div',{style:{marginBottom:10}}, this.fundActions(f.name,false,f.strat)),
         h('button',{onClick:()=>{this.closeFundPage(); this.askFromPage('Tell me more about '+f.name+' — does it fit my portfolio?');},style:{width:'100%',border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:10,padding:'10px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},'Ask Alpha about this fund →'))));
-    return h('div',{style:{position:'fixed',inset:0,zIndex:90,background:'var(--bg)',display:'flex',flexDirection:'column'}},
+    /* item 12 — the full fund page no longer covers the whole screen: the top chrome (nav) and the Ask Alpha rail stay visible */
+    return h('div',{style:{position:'fixed',top:109,left:52,right:0,bottom:0,zIndex:90,background:'var(--bg)',display:'flex',flexDirection:'column',borderTop:'1px solid var(--line)',borderLeft:'1px solid var(--line)'}},
       h('div',{style:{flex:'0 0 auto',display:'flex',alignItems:'center',gap:14,padding:'16px 22px',borderBottom:'1px solid var(--line)',background:'var(--surface)'}},
         h('button',{onClick:close,style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--ink)',borderRadius:9,padding:'7px 12px',fontSize:12.5,fontWeight:600,cursor:'pointer',flex:'0 0 auto'}},'‹ Back'),
         h('img',{src:'assets/logos/'+(f.logo||'eqt')+'.png',alt:'',style:{width:46,height:46,borderRadius:11,background:'#fff',border:'1px solid var(--line)',padding:6,objectFit:'contain',flex:'0 0 auto'}}),
@@ -3749,7 +3750,10 @@ class Component extends DCLogic {
         onClick:()=>this.openFund(f.id),
         onMouseEnter:e=>{e.currentTarget.style.background='var(--surface-2)';},
         onMouseLeave:e=>{e.currentTarget.style.background='transparent';}},
-      h('div',{style:{minWidth:0}}, h('div',{style:{fontFamily:SF,fontSize:13,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},f.name), h('div',{style:{fontSize:11,color:'var(--muted)'}}, f.strat)),
+      h('div',{style:{display:'flex',alignItems:'center',gap:8,minWidth:0}},
+        /* item 13 — show the fund's logo (fall back to a strategy-coloured dot if the asset is missing) */
+        f.logo? h('img',{src:'assets/logos/'+f.logo+'.png',alt:'',style:{width:22,height:22,borderRadius:5,background:'#fff',border:'1px solid var(--line)',padding:2,objectFit:'contain',flex:'0 0 22px'},onError:e=>{e.currentTarget.style.display='none';}}) : null,
+        h('div',{style:{minWidth:0}}, h('div',{style:{fontFamily:SF,fontSize:13,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},f.name), h('div',{style:{fontSize:11,color:'var(--muted)'}}, f.strat))),
       h('div',{style:{fontSize:12,color:'var(--ink)',fontFamily:SF,fontWeight:600}}, f.month||(f.vintage+'')),
       mets.map(mm=>h('div',{key:mm,style:{textAlign:'right',fontFamily:SF,fontSize:13,fontWeight:700,color: mm===sortM&&this.drillSort()==='perf'?'var(--brand-ink)':'var(--ink)'}}, this.metricVal(f,mm))),
       h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:13,fontWeight:600}}, f.nav),
@@ -4656,11 +4660,11 @@ class Component extends DCLogic {
     const metric=this.dtog('topHoldMetric','IRR');
     const num=(f)=> this.metricNum(f,metric);
     const fmt=(f)=> this.metricVal(f,metric);
-    const ranked=this.HELD_FUNDS().slice().sort((a,b)=>num(b)-num(a)).slice(0,4);
+    const ranked=this.HELD_FUNDS().slice().sort((a,b)=>num(b)-num(a)).slice(0,3); /* item 14 — top three positions by performance */
     const max=Math.max(...ranked.map(num),0.0001);
     return h('div',{style:{marginTop:16}},
       h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,marginBottom:10}},
-        h('div',{style:{fontFamily:SF,fontSize:13.5,fontWeight:700}},'Top holdings by '+metric),
+        h('div',{style:{fontFamily:SF,fontSize:13.5,fontWeight:700}},'Top 3 positions by '+metric),
         this.seg(this.METRICS().map(m=>({label:m,value:m})), metric, v=>this.setDtog('topHoldMetric',v), {sm:true})),
       h('div',{style:{display:'flex',flexDirection:'column',gap:8}}, ranked.map((f,i)=>h('div',{key:f.id,style:{display:'flex',alignItems:'center',gap:8}},
         h('button',{onClick:()=>this.openFund(f.id),

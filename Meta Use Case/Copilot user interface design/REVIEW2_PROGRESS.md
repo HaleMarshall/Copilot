@@ -12,4 +12,7 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 9 public-market comparison shown only when above it
 - [x] 10 holdings table shows all 5 metrics (IRR/DPI/TVPI/MOIC/DVPI)
 - [x] 11 Show all-or-filter + sort (best/newest/oldest, by metric)
-NEXT: item 12 (fund page: Ask Alpha + back, keep top)
+- [x] 12 fund page not full-screen (keeps top + Ask Alpha rail; Back+Ask Alpha)
+- [x] 13 fund logos in holdings table (fund page already had logo)
+- [x] 14 top-3 positions by performance (was top-4)
+NEXT: item 15 (include direct deals + strategy/region/currency/sector next to it)
