@@ -3510,7 +3510,7 @@ class Component extends DCLogic {
     {id:'northwind',name:'Northwind Infra III',mgr:'Northwind',logo:'ares',strat:'Infrastructure',vintage:2024,month:'Jan 2024',contrib:-0.2,moic:'0.9x',tvpi:'0.9x',dvpi:'0.9x',dpi:'0.0x',irr:'−4.0%',nav:'€0.7m',navUncommitted:'€1.2m',called:'38%',stage:'J-curve',note:'Young infra fund — J-curve trough, expected.'},
     {id:'meridian',name:'Meridian Growth IV',mgr:'Meridian',logo:'general-atlantic',strat:'Growth',vintage:2024,month:'Aug 2024',contrib:-0.1,moic:'1.0x',tvpi:'1.0x',dvpi:'1.0x',dpi:'0.0x',irr:'−1.2%',nav:'€0.5m',navUncommitted:'€1.5m',called:'22%',stage:'J-curve',note:'Recently called; too early to mark.'}
   ]; }
-  fundById(id){ return this.HELD_FUNDS().find(f=>f.id===id) || this.FOLLOW_FUNDS().find(f=>f.id===id); }
+  fundById(id){ return this.HELD_FUNDS().find(f=>f.id===id) || this.FOLLOW_FUNDS().find(f=>f.id===id) || this.OPP_FUNDS_LIST().find(f=>f.id===id); }
   /* items 38/54/63/64 — holding status drives the fund CTA: held → "Suggest similar funds"; not-held → "Buy now" */
   isHeld(name){ return this.HELD_FUNDS().some(f=>f.name===name); }
   suggestSimilar(name,strat){ const f=this.HELD_FUNDS().find(x=>x.name===name); const s=strat||(f&&f.strat)||'';
@@ -5254,13 +5254,15 @@ class Component extends DCLogic {
   }
   // named action library keyed by the strategy that is under-target
   OPP_FUNDS(){ return {
-    credit:{fund:'Ares Private Credit IV', note:'Senior direct lending, floating-rate income', strat:'Private Credit', color:'--data-4'},
-    infra:{fund:'Antin Infrastructure V', note:'Core-plus European infrastructure', strat:'Infrastructure', color:'--data-5'},
-    secondaries:{fund:'Lexington Capital XI', note:'Diversified secondaries — pulls the J-curve forward', strat:'Secondaries', color:'--data-7'},
-    realestate:{fund:'Blackstone Real Estate XI', note:'Income-led real assets', strat:'Real Estate', color:'--data-6'},
-    growth:{fund:'General Catalyst Growth XII', note:'Late-stage growth equity', strat:'Growth', color:'--data-2'},
-    buyout:{fund:'EQT X', note:'Large-cap European buyout', strat:'Buyout', color:'--data-1'}
+    /* item 127 — opportunity funds carry id/prospect data so a recommendation opens the concrete fund opportunity → full fund page */
+    credit:{id:'ares4',fund:'Ares Private Credit IV', note:'Senior direct lending, floating-rate income', strat:'Private Credit', color:'--data-4', mgr:'Ares Management', logo:'ares', region:'USA', tgt:'1.5–1.7x', close:'Dec 2026', min:'€50,000', prospect:true},
+    infra:{id:'antin5',fund:'Antin Infrastructure V', note:'Core-plus European infrastructure', strat:'Infrastructure', color:'--data-5', mgr:'Antin', logo:'ares', region:'Europe', tgt:'1.8–2.0x', close:'Mar 2027', min:'€50,000', prospect:true},
+    secondaries:{id:'lex11',fund:'Lexington Capital XI', note:'Diversified secondaries — pulls the J-curve forward', strat:'Secondaries', color:'--data-7', mgr:'Lexington Partners', logo:'lexington-partners', region:'Global', tgt:'1.7–1.8x', close:'Jan 2027', min:'€100,000', prospect:true},
+    realestate:{id:'bx-re11',fund:'Blackstone Real Estate XI', note:'Income-led real assets', strat:'Real Estate', color:'--data-6', mgr:'Blackstone', logo:'ares', region:'Global', tgt:'1.6–1.8x', close:'Apr 2027', min:'€100,000', prospect:true},
+    growth:{id:'gc-g12',fund:'General Catalyst Growth XII', note:'Late-stage growth equity', strat:'Growth', color:'--data-2', mgr:'General Catalyst', logo:'general-atlantic', region:'USA', tgt:'2.0–2.4x', close:'Feb 2027', min:'€50,000', prospect:true},
+    buyout:{id:'eqt-x',fund:'EQT X', note:'Large-cap European buyout', strat:'Buyout', color:'--data-1', mgr:'EQT Partners', logo:'eqt', region:'Europe', tgt:'2.0–2.2x', close:'Nov 2026', min:'€50,000', prospect:true}
   }; }
+  OPP_FUNDS_LIST(){ const o=this.OPP_FUNDS(); return Object.keys(o).map(k=>({...o[k],name:o[k].fund})); }
   oppNextActions(){
     const src=this.oppSourceModel(); const tgt=this.oppTargetMix(); const w=this.state.oppWeights;
     const funds=this.OPP_FUNDS();
@@ -5279,7 +5281,7 @@ class Component extends DCLogic {
     const trims=scored.filter(g=>g.gap<-0.6).slice(0,2);
     const actions=[];
     adds.forEach((g,i)=>{ const f=funds[g.k]; const eur=Math.round(Math.abs(g.gap)*0.11*10)/10;
-      actions.push({rank:actions.length+1, kind:'add', strat:g.name, color:g.color, gap:g.gap,
+      actions.push({rank:actions.length+1, kind:'add', strat:g.name, color:g.color, gap:g.gap, fundKey:g.k, fundId:f?f.id:null, /* item 127 */
         fund:f?f.fund:('Add to '+g.name), note:f?f.note:'Closes your largest under-weight',
         head:'Add ~\u20ac'+eur+'m to '+g.name, sub:f?f.fund+' · '+f.note:'', lift:+(Math.abs(g.gap)*0.7).toFixed(1)}); });
     trims.forEach(g=>{ actions.push({rank:actions.length+1, kind:'trim', strat:g.name, color:g.color, gap:g.gap,
@@ -5649,7 +5651,9 @@ class Component extends DCLogic {
         h('div',{style:{marginTop:14,fontSize:11.5,color:'var(--synthetic)',background:'var(--synthetic-wash)',border:'1px solid var(--synthetic)',borderRadius:9,padding:'10px 12px',lineHeight:1.5}},'Illustrative — live platform-demand signals light up when the demand feed is connected.'));
     }
     const footer=h('div',{style:{display:'flex',gap:10,flexWrap:'wrap',marginTop:18,paddingTop:16,borderTop:'1px solid var(--line)'}},
-      h('button',{onClick:()=>{this.closeOppDetail();this.askFromPage('Walk me through '+fund+' and whether it fits my portfolio.');},style:{background:'var(--brand)',color:'#fff',border:'none',borderRadius:10,padding:'11px 18px',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'Ask Alpha about this  →'),
+      /* item 127 — primary path: recommendation → the concrete fund opportunity → dedicated fund page */
+      (add&&a.fundId)? h('button',{onClick:()=>{this.setState({oppDetail:null});this.openFundPage(a.fundId);},style:{background:'var(--brand)',color:'#fff',border:'none',borderRadius:10,padding:'11px 18px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'View '+fund+' →'):null,
+      h('button',{onClick:()=>{this.closeOppDetail();this.askFromPage('Walk me through '+fund+' and whether it fits my portfolio.');},style:{background:(add&&a.fundId)?'var(--surface)':'var(--brand)',color:(add&&a.fundId)?'var(--brand-ink)':'#fff',border:(add&&a.fundId)?'1px solid var(--line)':'none',borderRadius:10,padding:'11px 18px',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'Ask Alpha about this  →'),
       h('button',{onClick:()=>this.setState({oppDetail:null,ws:'shape',uc:'sim',page:'sim'}),style:{background:'var(--surface)',color:'var(--brand-ink)',border:'1px solid var(--line)',borderRadius:10,padding:'11px 16px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},'Adjust in Simulator'));
     return h('div',null,
       h('div',{style:{display:'flex',alignItems:'flex-start',gap:12,marginBottom:4}},

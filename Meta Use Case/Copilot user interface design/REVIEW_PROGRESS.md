@@ -162,9 +162,9 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 123 Add 'Currency' weighting factor — added Currency row (distinct from Region, per caption). Verified live: oppWeightRow('currency').
 - ⊘ 124 Keep weighting at aggregate Target-Fit level — confirmed: weights are 4 aggregate dimensions vs target, not per-strategy/per-region toggles.
 - ☑ 125 Make 'Baseline' comparison do something — Baseline now derived from the real current profile ('Baseline (today)', pm=PM.you, return from portfolio IRR) and each saved sim shows a live 'vs Baseline' delta (perf − baseline). Verified: baselineDerived + vsBaseline row present.
-- ⊘ 126 Keep 'Why not' view but positive
-- ☐ 127 Fix flow: recommendation → concrete fund opportunity → fund page
-- ⊘ 128 Keep asset-allocation-driven recommendation
-- ⊘ 129 Keep Fit-Score on recommendations
+- ⊘ 126 Keep 'Why not' view but positive — confirmed: oppDetail 'Why not' tab frames suitability ('who should not act') + 'what would change the call' — constructive, not 'yes but'.
+- ☑ 127 Fix flow: recommendation → concrete fund opportunity → fund page — OPP_FUNDS now carry id/prospect data; `fundById` resolves them; add-recommendations carry `fundId`; oppDetail footer gets a primary 'View {fund} →' CTA → openFundPage. Verified live: ares4 resolves, fund page renders, footer CTA present.
+- ⊘ 128 Keep asset-allocation-driven recommendation — confirmed: oppNextActions ranks by gap-to-target ('Add €Xm to {strategy}'), fund selection secondary.
+- ⊘ 129 Keep Fit-Score on recommendations — confirmed: header Target fit / After top move stats; each action row shows 'fit +{lift}'.
 
 **NEXT: item 115** — show both % and € everywhere committed/allocation figures appear.
