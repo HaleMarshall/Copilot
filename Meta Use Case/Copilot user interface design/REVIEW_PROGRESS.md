@@ -120,7 +120,7 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 88 Vintage Alpha summary (over-vintaged) — gapCard now leads with a blunt callout: 'You are over-vintaged in {year} — X% of your book in one vintage' (when topShare≥35%), else 'heaviest vintage … reasonable spread'. Verified live: summary present.
 - ☑ 89 Cashflow top KPIs: Committed/Called/Uncalled/Cash Position — replaced the 6-tile crowded row with exactly these 4 in order (€20.5m/€16.6m/€3.9m/€1.1m, internally consistent). Verified live: all 4 present, in order.
 - ☑ 90 Mark notifications seen after ~5s — `toggleNotif()` arms a 5s timer on open → sets `notifsSeen`; badge count zeroes and panel unread dots/wash clear when seen. Verified live: badge 5 → cleared after notifsSeen.
-- ☐ 91 Rename 'Net Cash Flow' → 'Net Distributions', below top row
+- ☑ 91 Rename 'Net Cash Flow' → 'Net Distributions', below top row — added a 'Net Distributions' row (distributions − capital calls, +€0.9m) below the top KPI row, separate from Cash Position; old 'Net cash flow' tile removed. Verified live: Net Distributions present, no Net Cash Flow, positioned after Cash Position.
 - ☐ 92 Cashflow Alpha summary (J-curve, reassuring)
 - ☐ 93 Investable-capital prompt with cash position
 - ☐ 94 Only show investable-capital prompt when cash>0
