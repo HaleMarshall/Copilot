@@ -173,9 +173,9 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 132 Split Act layout: Recommended Sequence (left) + concrete Funds (right) — new seqCard (ordered steps + fit-lift + Why-this) and fundsInSeqCard (concrete funds, View-fund-opportunity, 💼 Add) shown as a 1fr/1fr split; weighting/distance moved below. Verified live: both cards in return.
 - ☑ 133 Short 'Why {strategy}' rationale at asset-class level (target terms only) — each seq step shows 'You're Xpp under/over target in {strategy} — add ~1:1 to converge over 3–4 years'. Verified live.
 - ☑ 134 Recommendation copy = concrete 'Add €X to …' actions — action head = 'Add ~€{x}m to {strategy}' (oppNextActions). Verified live.
-- ☐ 135 Add 'Current Opportunities' section
-- ☐ 136 Add greyed-out 'Upcoming' preview section
-- ☐ 137 Greyed upcoming funds still drillable
+- ☑ 135 Add 'Current Opportunities' section — 'Opportunities' card now has a 'Current — available now' section: OPP funds at full opacity, each → openFundPage. Verified live.
+- ☑ 136 Add greyed-out 'Upcoming' preview section — 'Upcoming — preview' section renders UPCOMING_FUNDS at opacity 0.55 with 'Coming soon' badges. Verified live.
+- ☑ 137 Greyed upcoming funds still drillable — faded tiles keep `onClick:openFundPage(f.id)`; fundById resolves UPCOMING_FUNDS. Verified live: up-kkr-credit → KKR Asset-Based Finance II.
 - ☐ 138 Allow same fund to appear multiple times in sequence
 - ☐ 139 Move Why-this/Why-not/Compare to fund level
 - ☐ 140 Open Baseline first, then Simulator case

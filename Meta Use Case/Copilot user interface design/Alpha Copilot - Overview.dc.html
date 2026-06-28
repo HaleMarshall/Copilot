@@ -3510,7 +3510,7 @@ class Component extends DCLogic {
     {id:'northwind',name:'Northwind Infra III',mgr:'Northwind',logo:'ares',strat:'Infrastructure',vintage:2024,month:'Jan 2024',contrib:-0.2,moic:'0.9x',tvpi:'0.9x',dvpi:'0.9x',dpi:'0.0x',irr:'−4.0%',nav:'€0.7m',navUncommitted:'€1.2m',called:'38%',stage:'J-curve',note:'Young infra fund — J-curve trough, expected.'},
     {id:'meridian',name:'Meridian Growth IV',mgr:'Meridian',logo:'general-atlantic',strat:'Growth',vintage:2024,month:'Aug 2024',contrib:-0.1,moic:'1.0x',tvpi:'1.0x',dvpi:'1.0x',dpi:'0.0x',irr:'−1.2%',nav:'€0.5m',navUncommitted:'€1.5m',called:'22%',stage:'J-curve',note:'Recently called; too early to mark.'}
   ]; }
-  fundById(id){ return this.HELD_FUNDS().find(f=>f.id===id) || this.FOLLOW_FUNDS().find(f=>f.id===id) || this.OPP_FUNDS_LIST().find(f=>f.id===id); }
+  fundById(id){ return this.HELD_FUNDS().find(f=>f.id===id) || this.FOLLOW_FUNDS().find(f=>f.id===id) || this.OPP_FUNDS_LIST().find(f=>f.id===id) || this.UPCOMING_FUNDS().find(f=>f.id===id); }
   /* items 38/54/63/64 — holding status drives the fund CTA: held → "Suggest similar funds"; not-held → "Buy now" */
   isHeld(name){ return this.HELD_FUNDS().some(f=>f.name===name); }
   suggestSimilar(name,strat){ const f=this.HELD_FUNDS().find(x=>x.name===name); const s=strat||(f&&f.strat)||'';
@@ -5263,6 +5263,12 @@ class Component extends DCLogic {
     buyout:{id:'eqt-x',fund:'EQT X', note:'Large-cap European buyout', strat:'Buyout', color:'--data-1', mgr:'EQT Partners', logo:'eqt', region:'Europe', tgt:'2.0–2.2x', close:'Nov 2026', min:'€50,000', prospect:true}
   }; }
   OPP_FUNDS_LIST(){ const o=this.OPP_FUNDS(); return Object.keys(o).map(k=>({...o[k],name:o[k].fund})); }
+  /* items 135/136/137 — upcoming (preview) funds: greyed in the UI but still drillable into detail */
+  UPCOMING_FUNDS(){ return [
+    {id:'up-kkr-credit',name:'KKR Asset-Based Finance II',fund:'KKR Asset-Based Finance II',mgr:'KKR',logo:'kkr',strat:'Private Credit',region:'Global',tgt:'1.4–1.6x',close:'Q3 2027',min:'€50,000',prospect:true,note:'Asset-backed credit — preview',upcoming:true},
+    {id:'up-cvc-sec',name:'CVC Secondary Partners VII',fund:'CVC Secondary Partners VII',mgr:'CVC',logo:'eqt',strat:'Secondaries',region:'Europe',tgt:'1.6–1.8x',close:'Q4 2027',min:'€100,000',prospect:true,note:'LP-led secondaries — preview',upcoming:true},
+    {id:'up-bx-infra',name:'Brookfield Infrastructure VI',fund:'Brookfield Infrastructure VI',mgr:'Brookfield',logo:'ares',strat:'Infrastructure',region:'Global',tgt:'1.7–1.9x',close:'Q1 2028',min:'€50,000',prospect:true,note:'Core infrastructure — preview',upcoming:true}
+  ]; }
   oppNextActions(){
     const src=this.oppSourceModel(); const tgt=this.oppTargetMix(); const w=this.state.oppWeights;
     const funds=this.OPP_FUNDS();
@@ -5440,23 +5446,28 @@ class Component extends DCLogic {
         secMktAction('Buy-side · new','Buy on the Moonfare Secondary Market','Acquire stakes in top funds and top investors at a discount — diversify back in time or grab a bargain. (The marketplace, not a secondaries fund.)','Browse stakes to buy  →',()=>this.askFromPage('Show me stakes available to buy on the Moonfare Secondary Market — top funds and top investors, ideally at a discount.')),
         secMktAction('Sell-side','Sell on the Moonfare Secondary Market','List a holding for liquidity ahead of a known cash need.','Explore selling  →',()=>this.setState({ws:'act',uc:'t2-6',page:'sell',homeLaunched:true,deepLink:null,homePop:null,homeDrill:null}))),
       caption:'Moonfare’s secondary marketplace — buy or sell existing stakes. Distinct from a secondaries fund.'});
-    // item 120 — 'Upcoming Opportunities' preview, coming-soon, generically phrased (no naming un-signed deals; auditable platform)
-    const upcoming=[
-      {strat:'Private Credit', note:'A next opportunity that fits your largest gap (private credit).'},
-      {strat:'North America · Buyout', note:'A region-balancing large-cap buyout to offset your Europe tilt.'},
-      {strat:'Secondaries', note:'A shorter-J-curve secondaries vehicle to smooth your 2021–22 vintages.'}];
-    const upcomingCard=this.card({title:'Upcoming Opportunities',badge:this.badge('coming soon','synth'),
-      children:h('div',{style:{display:'flex',flexDirection:'column',gap:9}},
-        upcoming.map((u,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',gap:11,padding:'11px 13px',border:'1px dashed var(--line)',borderRadius:11,background:'var(--surface-2)'}},
-          h('span',{style:{flex:'0 0 auto',fontSize:10,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--synthetic)',background:'var(--synthetic-wash)',border:'1px solid var(--synthetic)',borderRadius:999,padding:'3px 9px'}},'Coming soon'),
-          h('div',{style:{minWidth:0}}, h('div',{style:{fontSize:13,fontWeight:700,color:'var(--ink)'}},u.strat), h('div',{style:{fontSize:12,color:'var(--muted)',marginTop:2,lineHeight:1.4}},u.note))))),
-      caption:'A preview of what’s likely next for your portfolio. Specific funds appear only once the deal is signed — the platform is auditable, so nothing un-public is named.'});
+    // items 135/136/137 — Current Opportunities (full opacity) + greyed-out Upcoming preview (still drillable)
+    const oppTile=(f,faded)=>h('div',{key:f.id,onClick:()=>this.openFundPage(f.id),
+      onMouseEnter:e=>{e.currentTarget.style.borderColor='var(--brand-tint-3)';},onMouseLeave:e=>{e.currentTarget.style.borderColor=faded?'var(--line)':'var(--line)';},
+      style:{flex:'1 1 200px',minWidth:190,border:'1px solid var(--line)',borderRadius:12,padding:'13px 14px',background:'var(--surface)',cursor:'pointer',opacity:faded?0.55:1}},
+      h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:5}}, h('span',{style:{width:9,height:9,borderRadius:3,background:'var('+(f.color||'--data-1')+')',flex:'0 0 9px'}}), h('span',{style:{fontFamily:SF,fontSize:13.5,fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},f.fund||f.name)),
+      h('div',{style:{fontSize:11.5,color:'var(--muted)'}}, f.strat+' · target '+(f.tgt||'—')),
+      faded? h('div',{style:{marginTop:7,display:'inline-block',fontSize:9.5,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--synthetic)',background:'var(--synthetic-wash)',border:'1px solid var(--synthetic)',borderRadius:999,padding:'2px 8px'}},'Coming soon · '+(f.close||'')) : h('div',{style:{marginTop:7,fontSize:11.5,color:'var(--brand-ink)',fontWeight:700}},'Open now · closes '+(f.close||'')),
+      h('div',{style:{marginTop:8,fontSize:11.5,color:'var(--brand)',fontWeight:600}},'View detail →'));
+    const upcomingCard=this.card({title:'Opportunities',badge:this.badge('live + preview','synth'),
+      children:h('div',null,
+        h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',margin:'2px 0 9px'}},'Current — available now'),
+        h('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}}, this.OPP_FUNDS_LIST().map(f=>oppTile(f,false))),
+        h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',margin:'16px 0 9px'}},'Upcoming — preview'),
+        h('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}}, this.UPCOMING_FUNDS().map(f=>oppTile(f,true)))),
+      caption:'Current funds are open now; upcoming funds are greyed previews of what’s likely next — still click any to open its detail.'});
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
       srcRow, head,
       /* item 132 — Recommended Sequence (left) + concrete Funds (right) side by side */
       h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,alignItems:'start'}}, seqCard, fundsInSeqCard),
       h('div',{style:{display:'grid',gridTemplateColumns:'minmax(300px,360px) 1fr',gap:16,alignItems:'start'}}, wCard, gapCard),
-      this.twoCol(secondaryCard, upcomingCard, '1fr 1fr'),
+      upcomingCard,
+      secondaryCard,
       missedCard);
   }
   comparisonBody(){
