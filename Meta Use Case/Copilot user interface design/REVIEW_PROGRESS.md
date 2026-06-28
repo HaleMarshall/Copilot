@@ -284,6 +284,15 @@ Built: managerCompareBody() (Apple-style, drill-in), cmpEntryInfo() (GP/GP-in-st
 - ☑ 220 S&P 500 benchmark on performance page — 'Your return vs the public market' card (PME basis, +2.3pp outperformance; MOIC/peer omitted). Verified.
 - ☑ 221 Settings trimmed to theme toggle + Quick Target Overview; My-funds & Documents tabs removed. Verified.
 
-**NEXT: item 222** — Advisor view shows investor's name (not code). Then 223 (Open Co-Pilot → investor Home), 224 (advisor flow rework), 225 (3 sub-flows + Entry Trigger + left Goals/Targets panel). Read review.md ~2065.
+- ☑ 222 Advisor shows real investor name (Anna Krause…) instead of code; impersonation banner reads the name. Verified.
+- ☑ 223 Open Co-Pilot routes to the investor's Home (understand/home/home), not peer benchmarking. Verified.
+- ☑ 224 Advisor flow reworked end-to-end — Entry Trigger + Goals panel + three flows. Verified.
+- ☑ 225 Three advisor sub-flows (Proactive/Meeting-prep/Inbound) + Entry Trigger + left Goals & Targets panel. Verified.
+
+Built: advFlow state, reworked advisorBody() (entryTrigger, goalsPanel, prep/inbound cards), enriched CLIENTS() with names/codes/goals/signals/meetings, impersonate→Home.
+
+═══════════════════════════════════════════════
+ALL 225 ITEMS COMPLETE — Benjamin & Steffen Alpha Copilot review fully implemented, verified live (logicError null throughout) and pushed to HaleMarshall/Copilot main.
+═══════════════════════════════════════════════
 
 **NEXT: item 145** — render the 4 Distance-from-Target dimensions as donut/C-charts via the toggle.

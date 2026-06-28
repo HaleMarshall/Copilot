@@ -481,7 +481,7 @@ class Component extends DCLogic {
       ws:'understand', uc:'t1-12', page:'review', dtog:{}, homeLaunched:false,
       persona2:'pro', controlOpen:true, navExpanded:false,
       targetMode:'model', optimiseFor:'TVPI', macro:'none',
-      welcome:true, actingAs:null, fb:{},
+      welcome:true, actingAs:null, fb:{}, advFlow:'proactive', /* item 225 — advisor Entry Trigger: which of the three flows the advisor is in */
       s2strat:'buyout', s2cmp:'peers',
       s3cmp:'peers', s4cmp:'peers', s6cmp:'peers', s7cmp:'peers',
       fvfSel:['eqtx','arespcs'], fvfSearch:'', fvfDensity:'detailed', fvfImpact:'eqtx', fvfPickerOpen:false,
@@ -6362,18 +6362,20 @@ class Component extends DCLogic {
   }
 
   /* ====================== ADVISOR & INTERNAL ====================== */
+  /* items 222/225 — real investor names (shown instead of the code) + per-client goal/target, an inbound signal, and a scheduled meeting to drive the three advisor flows */
   CLIENTS(){ return [
-    {id:'c1',name:'Investor · DE-4471',init:'A',prof:'Family Office',region:'DACH',gap:18,liq:'€2.4m',last:'42d',churn:'high',priority:true,trigger:'Sitting on €2.4m uncalled liquidity with an 18pp gap to model — and not contacted in 6 weeks.'},
-    {id:'c2',name:'Investor · UK-1182',init:'B',prof:'Investor / PE',region:'UK',gap:11,liq:'€0.9m',last:'9d',churn:'low',priority:true,trigger:'Viewed two private-credit funds this week — matches their largest under-weight. Warm.'},
-    {id:'c3',name:'Investor · US-7733',init:'C',prof:'Exec / Owner',region:'US / CA',gap:24,liq:'€5.1m',last:'88d',churn:'high',priority:true,trigger:'Largest gap-to-model in the book and a distribution just landed — strong re-up candidate.'},
-    {id:'c4',name:'Investor · CH-3098',init:'D',prof:'Financial Services',region:'DACH',gap:7,liq:'€0.6m',last:'21d',churn:'med',priority:true,trigger:'Vintage bunching flagged; a secondaries allocation would smooth their J-curve.'},
-    {id:'c5',name:'Investor · FR-5521',init:'E',prof:'Medical',region:'S-Europe',gap:5,liq:'€0.3m',last:'15d',churn:'low',trigger:'On track; no action needed this week.'},
-    {id:'c6',name:'Investor · SG-2240',init:'F',prof:'Consulting',region:'Asia',gap:14,liq:'€1.2m',last:'63d',churn:'med',trigger:'Under-allocated to Asia growth; due a check-in.'},
-    {id:'c7',name:'Investor · DE-8810',init:'G',prof:'Legal',region:'DACH',gap:9,liq:'€0.7m',last:'30d',churn:'low',trigger:'Balanced; monitor.'},
-    {id:'c8',name:'Investor · UK-6627',init:'H',prof:'Eng / Tech',region:'UK',gap:16,liq:'€1.8m',last:'51d',churn:'med',trigger:'Heavy single-manager concentration; suggest diversifying.'}
+    {id:'c1',name:'Anna Krause',     code:'DE-4471',init:'AK',prof:'Family Office',region:'DACH',gap:18,liq:'€2.4m',last:'42d',churn:'high',priority:true,goal:'Wealth for the next generation',target:'35% private markets',meeting:'Thu 14:00',signal:null,trigger:'Sitting on €2.4m uncalled liquidity with an 18pp gap to model — and not contacted in 6 weeks.'},
+    {id:'c2',name:'James Whitmore',  code:'UK-1182',init:'JW',prof:'Investor / PE',region:'UK',gap:11,liq:'€0.9m',last:'9d',churn:'low',priority:true,goal:'Diversify beyond listed equities',target:'30% private markets',meeting:null,signal:'Viewed two private-credit funds this week',trigger:'Viewed two private-credit funds this week — matches their largest under-weight. Warm.'},
+    {id:'c3',name:'Robert Hayes',    code:'US-7733',init:'RH',prof:'Exec / Owner',region:'US / CA',gap:24,liq:'€5.1m',last:'88d',churn:'high',priority:true,goal:'Grow capital aggressively',target:'40% private markets',meeting:null,signal:'A distribution just landed (€1.2m)',trigger:'Largest gap-to-model in the book and a distribution just landed — strong re-up candidate.'},
+    {id:'c4',name:'Niklas Brunner',  code:'CH-3098',init:'NB',prof:'Financial Services',region:'DACH',gap:7,liq:'€0.6m',last:'21d',churn:'med',priority:true,goal:'Smooth, predictable cash flow',target:'25% private markets',meeting:'Tue 10:30',signal:null,trigger:'Vintage bunching flagged; a secondaries allocation would smooth their J-curve.'},
+    {id:'c5',name:'Camille Laurent', code:'FR-5521',init:'CL',prof:'Medical',region:'S-Europe',gap:5,liq:'€0.3m',last:'15d',churn:'low',goal:'Preserve & grow capital',target:'20% private markets',meeting:null,signal:null,trigger:'On track; no action needed this week.'},
+    {id:'c6',name:'Wei Chen',        code:'SG-2240',init:'WC',prof:'Consulting',region:'Asia',gap:14,liq:'€1.2m',last:'63d',churn:'med',goal:'Build personal wealth',target:'30% private markets',meeting:null,signal:'Asked about Asia growth funds',trigger:'Under-allocated to Asia growth; due a check-in.'},
+    {id:'c7',name:'Markus Vogel',    code:'DE-8810',init:'MV',prof:'Legal',region:'DACH',gap:9,liq:'€0.7m',last:'30d',churn:'low',goal:'Retirement / pension',target:'25% private markets',meeting:'Fri 09:00',signal:null,trigger:'Balanced; monitor.'},
+    {id:'c8',name:'Sophie Bennett',  code:'UK-6627',init:'SB',prof:'Eng / Tech',region:'UK',gap:16,liq:'€1.8m',last:'51d',churn:'med',goal:'Diversify beyond company stock',target:'30% private markets',meeting:null,signal:'Heavy single-manager concentration flagged',trigger:'Heavy single-manager concentration; suggest diversifying.'}
   ]; }
   setFb(id,v){ this.setState({fb:{...this.state.fb,[id]:v}}); }
-  impersonate(c){ this.setState({actingAs:c.name, uc:'t1-5', page:'overview'}); }
+  /* items 222/223 — impersonate carries the real name and lands on the investor's Home/portfolio (not peer benchmarking) */
+  impersonate(c){ this.setState({actingAs:c.name, ws:'understand', uc:'home', page:'home', homeLaunched:true, deepLink:null, homeDrill:null, homePop:null}); }
   fbBtns(id){ const h=this.h; const opts=['Helpful','Wrong product','Wrong timing','Wrong context','Client not ready','Compliance','Better action']; const sel=this.state.fb[id];
     return h('div',{style:{display:'flex',gap:6,flexWrap:'wrap',marginTop:11}}, opts.map(o=>{ const on=sel===o;
       return h('button',{key:o,onClick:()=>this.setFb(id,o),style:{fontSize:11,padding:'4px 10px',borderRadius:999,border:`1px solid ${on?'var(--brand)':'var(--line)'}`,background:on?'var(--brand)':'var(--surface)',color:on?'#fff':'var(--muted)',cursor:'pointer'}}, (o==='Helpful'&&on?'✓ ':'')+o); })); }
@@ -6405,14 +6407,79 @@ class Component extends DCLogic {
         td(c.last+' ago'),
         td(this.churnPill(c.churn)),
         td(h('span',{style:{color:'var(--brand)',fontWeight:600}},'Open →'))))));
-    return h('div',{style:{maxWidth:1080,margin:'0 auto',padding:'22px 24px 40px'}},
-      h('div',{style:{marginBottom:18}},
+    const SF=this.SF; const flow=this.state.advFlow||'proactive';
+    // ---- item 225 — Entry Trigger: which of the three advisor flows ----
+    const FLOWS=[
+      {id:'proactive',label:'Proactive outreach',sub:'Who to call this week'},
+      {id:'prep',label:'Meeting prep',sub:'Clients you’re meeting'},
+      {id:'inbound',label:'Inbound · react',sub:'Client-initiated signals'}];
+    const entryTrigger=h('div',{style:{display:'flex',gap:8,flexWrap:'wrap',marginBottom:18}}, FLOWS.map(f=>{ const on=flow===f.id;
+      return h('button',{key:f.id,onClick:()=>this.setState({advFlow:f.id}),
+        style:{flex:'1 1 200px',minWidth:180,textAlign:'left',border:'1.5px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',borderRadius:12,padding:'12px 14px',cursor:'pointer'}},
+        h('div',{style:{fontFamily:SF,fontSize:14,fontWeight:600,color:on?'var(--brand-ink)':'var(--ink)'}},f.label),
+        h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:2}},f.sub)); }));
+    // ---- item 225 — left Goals & Targets panel (advisor book-level goals & targets) ----
+    const contacted=CL.filter(c=>parseInt(c.last)<=14).length; const toCall=queue.length; const atRisk=CL.filter(c=>c.churn==='high').length;
+    const goalRow=(l,v,sub,col)=>h('div',{style:{padding:'10px 0',borderBottom:'1px solid var(--line)'}},
+      h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'baseline',gap:8}}, h('span',{style:{fontSize:12,color:'var(--muted)'}},l), h('span',{style:{fontFamily:SF,fontSize:15,fontWeight:700,color:col||'var(--ink)'}},v)),
+      sub?h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:2}},sub):null);
+    const goalsPanel=h('div',{style:{flex:'0 0 270px',position:'sticky',top:12,alignSelf:'flex-start',background:'var(--surface)',border:'1px solid var(--line)',borderRadius:14,padding:'16px'}},
+      h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)',marginBottom:4}},'Your book — goals & targets'),
+      h('div',{style:{fontSize:11.5,color:'var(--muted)',marginBottom:8,lineHeight:1.45}},'Quarter to date, across your 8 clients.'),
+      goalRow('Net-new commitments','€12m','target €30m · 40% there','var(--brand-ink)'),
+      goalRow('Clients to contact',toCall+' of '+CL.length,'flagged this week','var(--under)'),
+      goalRow('Contacted (last 14d)',contacted+' of '+CL.length,'coverage',contacted>=4?'var(--over)':'var(--ink)'),
+      goalRow('At-risk clients',atRisk+'','high churn risk',atRisk?'var(--under)':'var(--over)'),
+      h('div',{style:{marginTop:12,padding:'10px 12px',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:10,fontSize:11,color:'var(--brand-ink)',lineHeight:1.45}},'The Entry Trigger on the right picks which flow you’re working — outreach, prep, or inbound.'));
+    // ---- per-flow content ----
+    let flowTitle, flowSub, flowContent;
+    if(flow==='prep'){
+      const meetings=CL.filter(c=>c.meeting);
+      flowTitle='Meeting prep'; flowSub='Walk in ready — each client’s goal, their gap and what to put in front of them.';
+      const prepCard=(c)=>h('div',{key:c.id,style:{display:'flex',gap:14,alignItems:'flex-start',background:'var(--surface)',border:'1px solid var(--line)',borderRadius:12,padding:'15px 16px'}},
+        initAv(c),
+        h('div',{style:{flex:1,minWidth:0}},
+          h('div',{style:{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap',marginBottom:4}},
+            h('span',{style:{fontFamily:SF,fontSize:15,fontWeight:600}},c.name),
+            h('span',{style:{fontSize:11,color:'var(--muted)'}},c.code),
+            h('span',{style:{fontSize:11,fontWeight:700,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:999,padding:'2px 9px'}},'📅 '+c.meeting)),
+          h('div',{style:{fontSize:12.5,color:'var(--ink)',lineHeight:1.5,marginBottom:8}}, h('b',{style:{color:'var(--brand)'}},'Their goal: '),c.goal,' · ',h('b',null,'target '),c.target),
+          h('div',{style:{fontSize:12.5,color:'var(--ink)',lineHeight:1.5}}, h('b',{style:{color:'var(--brand)'}},'Talking points: '),'Close the '+c.gap+'pp gap to model; deploy '+c.liq+' of headroom; '+c.trigger.toLowerCase())),
+        h('button',{onClick:()=>this.impersonate(c),style:{flex:'0 0 auto',alignSelf:'center',background:'var(--brand)',color:'#fff',border:'none',borderRadius:9,padding:'9px 15px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},'Open copilot →'));
+      flowContent= meetings.length? h('div',{style:{display:'flex',flexDirection:'column',gap:12}}, meetings.map(prepCard)) : h('div',{style:{fontSize:13,color:'var(--muted)',padding:'20px'}},'No meetings scheduled. Switch to Proactive outreach to plan your week.');
+    } else if(flow==='inbound'){
+      const signals=CL.filter(c=>c.signal);
+      flowTitle='Inbound — react'; flowSub='Clients made the first move. Respond while it’s warm.';
+      const inCard=(c)=>h('div',{key:c.id,style:{display:'flex',gap:14,alignItems:'flex-start',background:'var(--surface)',border:'1px solid var(--line)',borderRadius:12,padding:'15px 16px'}},
+        initAv(c),
+        h('div',{style:{flex:1,minWidth:0}},
+          h('div',{style:{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap',marginBottom:4}},
+            h('span',{style:{fontFamily:SF,fontSize:15,fontWeight:600}},c.name),
+            h('span',{style:{fontSize:11,color:'var(--muted)'}},c.code+' · '+c.prof)),
+          h('div',{style:{fontSize:13,color:'var(--ink)',lineHeight:1.5}}, h('b',{style:{color:'var(--brand)'}},'⚡ Signal: '),c.signal,'.'),
+          this.fbBtns(c.id)),
+        h('button',{onClick:()=>this.impersonate(c),style:{flex:'0 0 auto',alignSelf:'center',background:'var(--brand)',color:'#fff',border:'none',borderRadius:9,padding:'9px 15px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},'Open copilot →'));
+      flowContent= signals.length? h('div',{style:{display:'flex',flexDirection:'column',gap:12}}, signals.map(inCard)) : h('div',{style:{fontSize:13,color:'var(--muted)',padding:'20px'}},'No inbound signals right now.');
+    } else {
+      flowTitle='Who to call this week — and why'; flowSub='Prioritised by gap-to-model, liquidity headroom and churn risk. Click any client to open their copilot at their Home (impersonation is audit-logged).';
+      flowContent=h('div',null,
+        h('div',{style:{display:'flex',flexDirection:'column',gap:12,marginBottom:26}}, queue.map(qRow)),
+        h('div',{style:{fontFamily:SF,fontSize:18,fontWeight:600,marginBottom:10}},'Full book'),
+        book);
+    }
+    return h('div',{style:{maxWidth:1180,margin:'0 auto',padding:'22px 24px 40px'}},
+      h('div',{style:{marginBottom:16}},
         h('div',{style:{fontSize:10.5,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Advisor · Relationship Manager — 8 clients'),
-        h('div',{style:{fontFamily:this.SF,fontSize:26,fontWeight:600,margin:'3px 0 2px'}},'Who to call this week — and why'),
-        h('div',{style:{fontSize:12.5,color:'var(--muted)'}},'Prioritised by gap-to-model, liquidity headroom and churn risk. Click any client to open their copilot (impersonation is audit-logged).')),
-      h('div',{style:{display:'flex',flexDirection:'column',gap:12,marginBottom:26}}, queue.map(qRow)),
-      h('div',{style:{fontFamily:this.SF,fontSize:18,fontWeight:600,marginBottom:10}},'Full book'),
-      book);
+        h('div',{style:{fontFamily:SF,fontSize:26,fontWeight:600,margin:'3px 0 2px'}},'Advisor desk'),
+        h('div',{style:{fontSize:12.5,color:'var(--muted)'}},'Pick how you’re working today — then act on the right client.')),
+      entryTrigger,
+      h('div',{style:{display:'flex',gap:20,alignItems:'flex-start',flexWrap:'wrap'}},
+        goalsPanel,
+        h('div',{style:{flex:'1 1 560px',minWidth:320}},
+          h('div',{style:{marginBottom:14}},
+            h('div',{style:{fontFamily:SF,fontSize:20,fontWeight:600}},flowTitle),
+            h('div',{style:{fontSize:12.5,color:'var(--muted)',marginTop:2,lineHeight:1.5}},flowSub)),
+          flowContent)));
   }
   ncPanel(title,sub){ const h=this.h; return h('div',{style:{border:'2px dashed var(--line)',borderRadius:14,background:'var(--surface)',padding:'26px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',minHeight:200}},
     h('div',{style:{width:42,height:42,borderRadius:11,border:'2px dashed var(--muted)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--muted)',fontSize:18,marginBottom:12}},'⛌'),
