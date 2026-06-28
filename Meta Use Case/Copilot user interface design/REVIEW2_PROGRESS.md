@@ -7,4 +7,6 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 4 cash KPIs: Committed/Called/Uncalled/Cash position (not committable) (+committed seeded)
 - [x] 5 removed 'Where you're concentrated' + 'Allocated vs committed' from overview
 - [x] 6 Alpha's read on strategy moved to top of overview
-NEXT: item 7 (top five funds at bottom — check frame aitem_6_899.jpg)
+- [x] 7 top-five funds at bottom of strategy detail panel
+- [x] 8 NAV-based note at top of detail panel
+NEXT: item 9 (only show comparison if above public)
