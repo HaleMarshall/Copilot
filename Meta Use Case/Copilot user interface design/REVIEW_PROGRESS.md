@@ -221,6 +221,11 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 
 - ☑ 174 Hide adjustment dials by default behind a bottom toggle — simShowDials:false; default shows pies + '⚙ Adjust your target'; expanding reveals sliders/risk-toggle/Detail/Save. Verified (collapsed has toggle only, expanded has all).
 
-**NEXT: item 175** — restructure Simulator into the 'Target world': large Portfolio/Target pie as hero, compare vs Peers/Model/Custom/Top 10%, open adjustment. (Items 175/178/179/180/184 are an interdependent benchmark-selector redesign — do one-by-one.) Read review.md ~1649.
+- ☑ 175 Simulator = 'Target world' — new 'Your target world' hero card with large Your-Target pie + benchmark target pie + compare strip, above the dimCards. Verified.
+- ☑ 178 Benchmark Target selector — Model/Peers/Platform/Top 10%/Custom Target options on the benchmark pie. Verified (all 5 present).
+- ☑ 179 Your row Actual/Target double toggle — simYouMode; benchmark rows target-only. Verified ('Your actual' on actual).
+- ☑ 180 Custom Target opens manual dials — selecting Custom sets simShowDials:true. Verified (Save/Risk-toggle appear).
+
+**NEXT: item 176** — Comparison page stays actual-only ('Ist') benchmarking (confirm). Then 177 (benchmark options Model/Peers/Platform/Top 10%/Custom), 181/182 (keep nav + two pages — confirm), 183 (page title 'Compare yourself'), 184 (current/target toggle). Read review.md ~1659.
 
 **NEXT: item 145** — render the 4 Distance-from-Target dimensions as donut/C-charts via the toggle.

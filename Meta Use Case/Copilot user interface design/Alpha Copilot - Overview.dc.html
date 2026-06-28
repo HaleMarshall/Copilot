@@ -501,6 +501,7 @@ class Component extends DCLogic {
       fProducts:{buyout:34,growth:14,credit:12,infra:10,secondaries:14,semiliquid:8,venture:4,directs:4},
       simMode:'adjust', simPreset:'like-you', simDetail:false, /* item 172 — pro full-allocation view collapsed by default */
       simShowDials:false, /* item 174 — target-adjustment dials hidden by default; pie is the hero, dials open via a bottom toggle */
+      simBench:'model', simYouMode:'target', /* items 175/178/179 — Simulator is the 'Target world': compare Your Target against a benchmark group's target; Your row toggles Actual/Target */
       simDials:{pm:20, growth:0, secondaries:6, us:38},
       simTargets:null, simFocus:null, simSuggest:null,
       savedSims:[], simCompare:false, watchlist:[], portfolioAdds:[],
@@ -669,6 +670,18 @@ class Component extends DCLogic {
     if(sum>0) this.STRATS.forEach(([k])=>{ mix[k]=+(mix[k]/sum*100).toFixed(1); });
     return { median, target, mix, c };
   }
+  /* items 175/178 — strategy mix → donut slices using the fixed strategy→color map */
+  stratSlices(m){ m=m||{}; const tot=this.STRATS.reduce((a,kv)=>a+(+m[kv[0]]||0),0)||1;
+    return this.STRATS.filter(kv=>(+m[kv[0]]||0)>0).map(kv=>({color:kv[2],p:+((+m[kv[0]]||0)/tot*100).toFixed(1),n:kv[1]})); }
+  /* the strategy TARGET allocation of a benchmark group (their model/representative forward mix) */
+  benchTargetMix(key){
+    if(key==='custom'||key==='you') { const t=(this.state.simTargets||this.defaultTargets()).strategy; return t||this.MIX.you; }
+    if(key==='model')    return this.modelMix();
+    if(key==='top10')    return this.topMix();
+    if(key==='platform') return this.MIX.platform;
+    return this.peerData().mix; // peers
+  }
+  benchLabel(key){ return {model:'Model',peers:'Peers',platform:'Platform',top10:'Top 10%',custom:'Custom',you:'You'}[key]||'Model'; }
   cmpMix(cmp){
     if(cmp==='you') return this.MIX.you;
     if(cmp==='platform') return this.MIX.platform;
@@ -5295,7 +5308,46 @@ class Component extends DCLogic {
         deeperBtn('Stress-test it','How the target holds up across macro regimes & resilience.','t3-3','score')),
       h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:9,lineHeight:1.5}},'Comparisons vs peers, the model or best performers are on the levers (right). Ask Alpha for anything else.'));
 
-    return h('div',{style:{display:'flex',flexDirection:'column',gap:18}}, header, grid, (s.simShowDials?actions:null), deeper, compareCard);
+    /* ===== items 175/178/179/180 — Simulator as the 'Target world': a large hero comparing Your Target against a benchmark group's target ===== */
+    const tworld=(()=>{
+      const youMix = s.simYouMode==='actual' ? this.MIX.you : this.benchTargetMix('you');
+      const benchMix = this.benchTargetMix(s.simBench);
+      const youSlices = this.stratSlices(youMix);
+      const benchSlices = this.stratSlices(benchMix);
+      const youCenter = s.simYouMode==='actual' ? 'Your actual' : 'Your target';
+      const bigPie=(slices,label,center,sub,extra)=>h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:8,flex:'1 1 240px',minWidth:230}},
+        h('div',{style:{textAlign:'center',minHeight:34}}, h('div',{style:{fontFamily:SF,fontSize:16,fontWeight:600,color:'var(--ink)'}},label),
+          sub?h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:2}},sub):null),
+        this.donutNamed(slices,208,center,'strategy'), extra||null);
+      /* item 179 — Your row has an Actual/Target double toggle; benchmark rows are target-only */
+      const youToggle=h('div',{style:{display:'inline-flex',border:'1px solid var(--line)',borderRadius:999,overflow:'hidden',marginTop:4}},
+        [['actual','Actual'],['target','Target']].map(([v,l])=>{ const on=s.simYouMode===v;
+          return h('button',{key:v,onClick:()=>this.setState({simYouMode:v}),style:{border:'none',background:on?'var(--brand)':'transparent',color:on?'#fff':'var(--muted)',padding:'5px 14px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}},l); }));
+      /* item 178 — benchmark selector: each option is that group's TARGET allocation */
+      const benchOpts=[['model','Model Target'],['peers','Peers Target'],['platform','Platform Target'],['top10','Top 10% Target'],['custom','Custom Target']];
+      const benchSel=h('div',{style:{display:'flex',flexWrap:'wrap',gap:6,justifyContent:'center',marginTop:4}},
+        benchOpts.map(([v,l])=>{ const on=s.simBench===v;
+          return h('button',{key:v,onClick:()=>this.setState({simBench:v, simShowDials: v==='custom'?true:s.simShowDials}),/* item 180 — Custom Target opens the manual dials */
+            style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 12px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer',whiteSpace:'nowrap'}},l); }));
+      // compare strip — Your Target vs benchmark target, top strategy deltas
+      const tot=(m)=>this.STRATS.reduce((a,kv)=>a+(+m[kv[0]]||0),0)||1; const yT=tot(youMix), bT=tot(benchMix);
+      const deltas=this.STRATS.map(kv=>({n:kv[1],color:kv[2],d:+(((+youMix[kv[0]]||0)/yT*100)-((+benchMix[kv[0]]||0)/bT*100)).toFixed(1)})).filter(x=>Math.abs(x.d)>=1).sort((a,b)=>Math.abs(b.d)-Math.abs(a.d)).slice(0,3);
+      const strip=deltas.length? h('div',{style:{display:'flex',flexWrap:'wrap',gap:10,justifyContent:'center',marginTop:14,paddingTop:14,borderTop:'1px solid var(--line)'}},
+        h('span',{style:{fontSize:11,color:'var(--muted)',alignSelf:'center'}}, youCenter+' vs '+this.benchLabel(s.simBench)+' target:'),
+        deltas.map((x,i)=>h('span',{key:i,style:{display:'inline-flex',alignItems:'center',gap:5,fontSize:11.5}},
+          h('span',{style:{width:8,height:8,borderRadius:2,background:'var('+x.color+')'}}),
+          h('span',{style:{color:'var(--ink)'}},x.n),
+          h('span',{style:{fontFamily:SF,fontWeight:700,color:x.d>0?'var(--over)':'var(--under)'}},(x.d>0?'+':'')+x.d+'pp')))) : null;
+      return this.card({title:'Your target world',badge:this.badge('forward-looking','synth'),
+        caption:'Your target is a future asset allocation. Compare it against the target of any group — or switch your own pie to Actual to see where you are today. Open the dials below (or pick Custom Target) to reshape it.',
+        children:h('div',null,
+          h('div',{style:{display:'flex',gap:28,flexWrap:'wrap',justifyContent:'center',alignItems:'flex-start'}},
+            bigPie(youSlices,'You',youCenter,'your forward target',youToggle),
+            bigPie(benchSlices,this.benchLabel(s.simBench)+' Target',this.benchLabel(s.simBench),'target allocation of this group',benchSel)),
+          strip)});
+    })();
+
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:18}}, header, tworld, grid, (s.simShowDials?actions:null), deeper, compareCard);
   }
 
   /* ====================== OPPORTUNITIES (Act) ====================== */
