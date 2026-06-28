@@ -3807,8 +3807,12 @@ class Component extends DCLogic {
         h('div',{key:'nd',style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,border:'1px solid var(--line)',borderRadius:12,padding:'11px 14px',background:'var(--surface-2)'}},
           h('div',{style:{minWidth:0}}, h('div',{style:{fontSize:12,fontWeight:700,color:'var(--ink)'}},'Net Distributions'), h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:1}},'distributions − capital calls (what you’ve gotten back)')),
           h('div',{style:{fontFamily:SF,fontSize:20,fontWeight:700,color:'var(--over)',flex:'0 0 auto'}},'+€0.9m')),
-        h('div',{key:'b',style:{fontSize:12.5,lineHeight:1.55,color:'var(--muted)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:10,padding:'11px 13px'}},
-          'You turned cash-flow positive around 2023 as distributions overtook calls. €3.9m remains uncalled across younger funds.'),
+        /* item 92 — reassuring, non-technical Alpha cashflow summary (J-curve framing) */
+        this.card({title:'Alpha’s read on your cash flow',badge:this.badge('AI','synth'),tone:'alpha',
+          children:h('div',{style:{display:'flex',flexDirection:'column',gap:9}},
+            h('div',{style:{fontSize:13.5,lineHeight:1.6,color:'#fff',fontWeight:600}},'You’ve crossed the J-curve — distributions now outpace your capital calls. Everything looks healthy.'),
+            h('div',{style:{fontSize:12.5,lineHeight:1.55,color:'rgba(255,255,255,.88)'}},'Your cash-flow profile is very typical for someone with your investment behaviour and risk profile. €3.9m remains uncalled across your younger funds — that’s normal and your liquidity buffer covers it comfortably.')),
+          caption:'In plain terms: are you okay, and where you are on the J-curve.'}),
         h('div',{key:'f'}, this.panelSection('Funds by capital called'), h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, ranked.map(f=>h('div',{key:f.id,style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,border:'1px solid var(--line)',borderRadius:10,padding:'9px 12px'}},
           h('div',{style:{minWidth:0}}, h('div',{style:{fontFamily:SF,fontSize:13,fontWeight:600}},f.name), h('div',{style:{fontSize:11,color:'var(--muted)'}},f.stage)),
           h('div',{style:{display:'flex',alignItems:'center',gap:8,flex:'0 0 auto'}}, h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:13,fontWeight:600}},f.called), h('div',{style:{fontSize:10.5,color:'var(--muted)'}},'called')), this.shopBtn(f.name,f.strat,true))))))
