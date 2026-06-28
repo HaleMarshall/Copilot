@@ -124,6 +124,6 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 92 Cashflow Alpha summary (J-curve, reassuring) — replaced the plain narrative with a blue Alpha read card: 'You've crossed the J-curve…' + 'very typical for your investment behaviour and risk profile', non-technical. Verified live: J-curve + 'very typical' present.
 - ☑ 93 Investable-capital prompt with cash position — 'You have investable capital of €1.1m (your cash position) to choose funds' + 'Choose funds →' on the cashflow page. Verified live.
 - ☑ 94 Only show investable-capital prompt when cash>0 — gated `cashNum>0 ? prompt : null` (eurNum of cash position). Verified: eurNum('€1.1m')=1.1>0 → shows; would be null at 0.
-- ☐ 95 Cashflow pop-up: funds-to-invest first, add-cash below
+- ☑ 95 Cashflow pop-up: funds-to-invest first, add-cash below — investPrompt now leads with 'Do you want to invest?' + 'Choose funds →', then a secondary '＋ Or add more cash to your account' beneath. Verified live: invest/choose before add-cash.
 
-**NEXT: item 84** — enlarge Vintage value labels.
+**NEXT: item 96** — fix broken PDF export (96–104 cluster: PDF export, asset-allocation bar labels, currency unit sign).
