@@ -95,4 +95,18 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 67 NAV/Committed toggle on every breakdown view — homeDrillBody mix card now carries the Basis toggle; donut/bars + insight/Alpha text are basis-aware via `basisPct(key)`; '% of NAV' labels → '% of {basis}'. Verified live (region drill): toggle present, donut "100% NAV"↔"100% Committed".
 - ☑ 68 Default NAV on breakdown toggle — `allocBasis()` defaults NAV; drill view opens on NAV. Verified live.
 
-**NEXT: item 69** — 'Suggest funds to fill the gap' CTA in Alpha's-read (69–80 cluster).
+## 69–80 Overview Alpha panels + concentration/Z-chart + sticky
+- ☑ 69 'Suggest funds to fill the gap' CTA in Alpha's-read — added an 'Alpha's read on your strategy funds' panel to the Overview (lists strategy buckets with no direct fund) + `gapCTA('strategy')`, placed below the 3-col grid. Verified live: panel + gap CTA render in homeOverviewBody; logicError null.
+- ☐ 70 Concentration pie syncs NAV↔Committed with toggle (never zero)
+- ☐ 71 Move concentration box down + Z-chart (delta vs committed) beside it
+- ☐ 72 Style Alpha's read panel in brand dark-blue
+- ☐ 73 Small Alpha insights at top, Alpha's read below (stacked, not 3 side-by-side)
+- ☐ 74 Ask Alpha companion docked left on every page (confirm)
+- ☐ 75 Exec-summary strip at top, 5 bullets
+- ☐ 76 AI Overview at top of Detail page + Suggest More Funds beneath
+- ☐ 77 Detail page portfolio summary (funds held, NAV, buckets, largest)
+- ☐ 78 Keep sell/Buy-now in Detail summary
+- ☐ 79 Deviation Z-charts on every breakdown page
+- ☐ 80 Sticky breakdown panel while rest scrolls
+
+**NEXT: item 70** — concentration pie syncs NAV↔Committed via toggle (never zero).
