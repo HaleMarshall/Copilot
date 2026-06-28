@@ -503,6 +503,7 @@ class Component extends DCLogic {
       simShowDials:false, /* item 174 — target-adjustment dials hidden by default; pie is the hero, dials open via a bottom toggle */
       simBench:'model', simYouMode:'target', simCmpMode:'target', /* items 175/178/179/184 — Simulator 'Target world': compare Your Target vs a benchmark group's target; Your row toggles Actual/Target; simCmpMode switches benchmarks current↔target */
       mgrAC:'All', mgrSort:'irr', mgrSel:[], mgrQuery:'', mgrCase:{}, /* items 191-198 — Manager Overview: asset-class filter, sort, multi-select compare, search, per-manager chosen fund */
+      mgrView:'managers', mgrFund:null, /* Manager Overview: toggle managers↔funds; open a single fund research page */
       simCmp:{}, /* per-dimension comparison: which target to compare your target against (current/model/peers/platform/top10/custom) */
       mgrProfile:null, cmpList:[], cmpCrit:'since', cmpMetricDetail:null, mgrListed:'all', mgrHasOffering:false, /* items 199-219 — manager profile, comparison-list builder (GPs/funds/strategies), priority criterion, drill-in detail, list filters */
       simDials:{pm:20, growth:0, secondaries:6, us:38},
@@ -2131,13 +2132,9 @@ class Component extends DCLogic {
         ['Which funds delivered returns most consistently?','Which managers are reliable rather than just high-return?','How do Fund X and Y compare on delivery?'],
         ['Fund consistency score','Distribution stability','Mark-up quality','Return plus delivery quality'],
         ['Quarterly performance histories','NAV paths','Distributions','Multi-vintage manager histories'],
-        [{id:'mgrover',label:'Manager Overview',view:'mgrover',title:'Manager Overview'}, /* item 196 — Overview landing ahead of the metric detail pages */
-         {id:'mgrcompare',label:'Comparison',view:'mgrcompare',title:'Comparison'}, /* items 200-214 — side-by-side comparison */
-         {id:'score',label:'Consistency score',view:'scaffold',viz:'consistency',title:'Fund consistency score'},
-         {id:'stability',label:'Distribution stability',view:'scaffold',viz:'callfc',title:'Distribution stability over years'},
-         {id:'calldist',label:'Call distribution',view:'scaffold',viz:'callfc',title:'Capital-call distribution across years'},
-         {id:'markup',label:'Mark-up quality',view:'scaffold',viz:'scorecard',title:'Mark-up quality — do marks mirror outcomes?'},
-         {id:'compare',label:'Return + delivery',view:'scaffold',viz:'compare',title:'Compare named funds on return + delivery'}]),
+        /* metrics (consistency, distribution stability, call distribution, mark-up, returns & delivery) now live INSIDE each manager page, not as separate tabs */
+        [{id:'mgrover',label:'Manager Overview',view:'mgrover',title:'Manager Overview'},
+         {id:'mgrcompare',label:'Comparison',view:'mgrcompare',title:'Comparison'}]),
       mk('t2-8',2,'Fund Lifecycle & Activity Mode','Show where a fund or strategy stands in its lifecycle — buying or harvesting.',
         ['Is this fund still in buying mode?','Are funds in this strategy deploying faster than usual?','Is this theme investing or selling?'],
         ['Buying / selling mode score','Net deployment ratio','Under- vs ahead-of-schedule','Deployment vs fund size'],
@@ -2395,7 +2392,7 @@ class Component extends DCLogic {
     const h=this.h; const u=this.curUC(); const cur=this.state.page;
     return h('div',{style:{display:'flex',gap:4,flexWrap:'nowrap',flex:'0 0 auto'}}, u.pages.map(p=>{
       const on=p.id===cur;
-      return h('button',{key:p.id,onClick:()=>this.setState({page:p.id,deepLink:null,homeDrill:null,homePop:null}),
+      return h('button',{key:p.id,onClick:()=>this.setState({page:p.id,deepLink:null,homeDrill:null,homePop:null,mgrProfile:null,mgrFund:null}),
         style:{padding:'6px 13px',borderRadius:8,fontSize:12.5,fontWeight:on?600:500,cursor:'pointer',border:'none',whiteSpace:'nowrap',flex:'0 0 auto',
           background:on?'var(--brand)':'transparent',color:on?'#fff':'var(--ink)'},
         onMouseEnter:e=>{if(!on)e.currentTarget.style.background='var(--surface-2)';},
@@ -5974,10 +5971,10 @@ class Component extends DCLogic {
      a consistency score and the concrete funds behind it (so a specific case can be picked for a comparison) */
   MANAGERS(){ return [
     {id:'eqt',name:'EQT',hq:'Stockholm',classes:[
-      {ac:'Buyout',irr:19.2,cons:88,funds:[{id:'eqt-ix',name:'EQT IX',irr:21.0,vintage:2021},{id:'eqt-x',name:'EQT X',irr:18.4,vintage:2023}]},
+      {ac:'Buyout',irr:19.2,cons:88,funds:[{id:'eqt-ix',name:'EQT IX',irr:21.0,vintage:2021},{id:'eqt-x',name:'EQT X',irr:18.4,vintage:2023},{id:'eqt-xi',name:'EQT XI',irr:0,vintage:2025}]},
       {ac:'Infrastructure',irr:15.1,cons:82,funds:[{id:'eqt-infra-v',name:'EQT Infrastructure V',irr:15.1,vintage:2021}]}]},
     {id:'kkr',name:'KKR',hq:'New York',classes:[
-      {ac:'Buyout',irr:17.8,cons:85,funds:[{id:'kkr-na-xiii',name:'KKR North America XIII',irr:18.2,vintage:2021},{id:'kkr-eu-vi',name:'KKR Europe VI',irr:17.1,vintage:2022}]},
+      {ac:'Buyout',irr:17.8,cons:85,funds:[{id:'kkr-na-xiii',name:'KKR North America XIII',irr:18.2,vintage:2021},{id:'kkr-eu-vi',name:'KKR Europe VI',irr:17.1,vintage:2022},{id:'kkr-na-xiv',name:'KKR North America XIV',irr:0,vintage:2025}]},
       {ac:'Private Credit',irr:11.2,cons:79,funds:[{id:'kkr-credit-iv',name:'KKR Private Credit IV',irr:11.2,vintage:2022}]},
       {ac:'Infrastructure',irr:13.9,cons:80,funds:[{id:'kkr-infra-v',name:'KKR Global Infra V',irr:13.9,vintage:2022}]}]},
     {id:'blackstone',name:'Blackstone',hq:'New York',classes:[
@@ -6030,6 +6027,34 @@ class Component extends DCLogic {
     index:      {country:'UK',         demonym:'British',  listed:false, est:1996, since:23.1, avgDpi:2.0, nFunds:12, topQ:9,  scores:{consistency:80,delivery:81,markup:78}, offering:null}
   }; }
   mgrMeta(m){ const id=typeof m==='string'?m:m.id; return this.MGR_META()[id]||{}; }
+  /* brand assets from the first Copilot iteration — manager logos + hero backgrounds */
+  MGR_LOGO(){ return {eqt:'eqt',kkr:'kkr',blackstone:'blackstone',carlyle:'carlyle',ares:'ares',cvc:'cvc',genatl:'general-atlantic',lexington:'lexington-partners',insight:'insight-partners',hg:'silver-lake',thomabravo:'clearlake',index:'17capital',cinven:'permira'}; }
+  mgrLogo(m){ const id=typeof m==='string'?m:m.id; return this.MGR_LOGO()[id]||null; }
+  MGR_HEROES(){ return ['header_06','header_03','header_01','header_07','header_10','header_12']; }
+  mgrHero(m){ const ids=this.MANAGERS().map(x=>x.id); const i=Math.max(0,ids.indexOf(typeof m==='string'?m:m.id)); const H=this.MGR_HEROES(); return H[i%H.length]; }
+  // distribution-stability label derived from the consistency score
+  mgrDistStability(m){ const c=this.mgrCons(m); return c>=85?'High':c>=78?'Medium':'Fair'; }
+  // illustrative fund documents associated with a manager (kept from the Copilot document set)
+  mgrDocs(m){ const md=this.mgrMeta(m); return [
+    {name:m.name+' — Firm overview & track record', meta:'PDF · founded '+md.est},
+    {name:'Flagship fund — Private Placement Memorandum', meta:'PDF'},
+    {name:'Quarterly investor letter', meta:'PDF · Q1 2026'},
+    {name:'Capital-account statement', meta:'PDF · Q1 2026'},
+    {name:'ESG & responsible-investing policy', meta:'PDF'},
+    {name:'Audited financial statements', meta:'PDF · FY2025'}
+  ]; }
+  // per-fund detail synthesised deterministically from the fund's IRR + vintage (new/pipeline funds have no returns yet)
+  fundDetail(f){ const age=2026-(f.vintage||2022); const pipeline=age<=1;
+    const called= pipeline? Math.max(8,age*30+10) : Math.min(100, 42+age*9);
+    const dpi= pipeline? 0 : +Math.max(0,(f.irr-8)*0.11 + Math.max(0,age-2)*0.16).toFixed(2);
+    const moic= +(1 + (f.irr/100)*Math.max(1,age)*0.55).toFixed(2);
+    const tvpi= +(moic).toFixed(2);
+    return {age,pipeline,called:Math.round(called),dpi,moic,tvpi}; }
+  // flatten every fund across all managers (with manager + asset class attached)
+  ALL_FUNDS(){ return this.MANAGERS().flatMap(m=>m.classes.flatMap(c=>c.funds.map(f=>({...f,ac:c.ac,mgrId:m.id,mgr:m.name,logo:this.mgrLogo(m)})))); }
+  fundResearchById(id){ return this.ALL_FUNDS().find(f=>f.id===id)||null; }
+  openFundResearch(id){ this.setState({mgrFund:id}); }
+  closeFundResearch(){ this.setState({mgrFund:null}); }
   mgrById(id){ return this.MANAGERS().find(m=>m.id===id)||null; }
   // best & worst fund of a manager across all its classes (item 207)
   mgrBestWorst(m){ const fs=m.classes.flatMap(c=>c.funds.map(f=>({...f,ac:c.ac}))); if(!fs.length) return {best:null,worst:null};
@@ -6067,8 +6092,12 @@ class Component extends DCLogic {
     const verdict=this.mgrFollowVerdict(m);
     const inList=this.inCmp('gp',m.id);
     const back=h('button',{onClick:()=>this.closeManagerProfile(),style:{display:'inline-flex',alignItems:'center',gap:6,border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:9,padding:'7px 13px',fontSize:12,fontWeight:600,cursor:'pointer'}},'‹ All managers');
-    // ---- header: logo monogram, name, descriptive line (item 199/215), listed status, quick-KPI strip (item 216) ----
-    const monogram=h('div',{style:{width:54,height:54,borderRadius:13,background:'linear-gradient(135deg,var(--brand),var(--brand-ink))',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontSize:22,fontWeight:700,flex:'0 0 54px'}}, m.name.slice(0,2));
+    // ---- header: real logo (monogram fallback) over a hero background, name, descriptive line, listed status ----
+    const logoName=this.mgrLogo(m);
+    const monogram= logoName? h('img',{src:'assets/logos/'+logoName+'.png',alt:m.name,style:{width:54,height:54,borderRadius:13,background:'#fff',border:'1px solid var(--line)',padding:7,objectFit:'contain',flex:'0 0 54px'}})
+      : h('div',{style:{width:54,height:54,borderRadius:13,background:'linear-gradient(135deg,var(--brand),var(--brand-ink))',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontSize:22,fontWeight:700,flex:'0 0 54px'}}, m.name.slice(0,2));
+    const heroBanner=h('div',{style:{minHeight:96,borderRadius:14,backgroundImage:'linear-gradient(115deg, rgba(20,23,58,.8), rgba(20,23,58,.35)), url(assets/heroes/'+this.mgrHero(m)+'.jpg)',backgroundSize:'cover',backgroundPosition:'center',display:'flex',alignItems:'flex-end',padding:'14px 18px'}},
+      h('img',{src:'assets/moonfare_logo_white.png',alt:'Moonfare',style:{height:18,opacity:.92}}));
     const header=h('div',{style:{display:'flex',gap:16,alignItems:'flex-start',flexWrap:'wrap'}},
       monogram,
       h('div',{style:{flex:'1 1 280px',minWidth:0}},
@@ -6116,7 +6145,105 @@ class Component extends DCLogic {
     const bestWorst=this.card({title:m.name+' funds — best vs weakest since inception',
       children:h('div',{style:{display:'flex',gap:14,flexWrap:'wrap'}}, bw.best?fundRow(bw.best,true):null, bw.worst&&bw.worst.id!==(bw.best&&bw.best.id)?fundRow(bw.worst,false):null),
       caption:'Top performer vs weakest across the firm’s funds — dispersion matters as much as the headline.'});
-    return h('div',{style:{display:'flex',flexDirection:'column',gap:16}}, back, header, kpis, decision, actions, bestWorst);
+
+    // ---- all manager-level scores in ONE place (Consistency, Distribution stability, Call distribution, Mark-up, Returns & delivery) — not separate pages ----
+    const distStab=this.mgrDistStability(m); const distScore={High:88,Medium:78,Fair:68}[distStab]||78;
+    const scoreBar=(label,val,sub)=>h('div',{style:{display:'grid',gridTemplateColumns:'170px 1fr 44px',gap:12,alignItems:'center',padding:'9px 0',borderBottom:'1px solid var(--line)'}},
+      h('div',{style:{minWidth:0}}, h('div',{style:{fontSize:12.5,fontWeight:600}},label), sub?h('div',{style:{fontSize:10,color:'var(--muted)'}},sub):null),
+      h('div',{style:{background:'var(--surface-2)',borderRadius:6,height:16,position:'relative',overflow:'hidden'}}, h('div',{style:{position:'absolute',left:0,top:0,bottom:0,width:val+'%',background: val>=85?'var(--over)':'var(--brand)',borderRadius:6}})),
+      h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:14,fontWeight:700}},val));
+    const scoresCard=this.card({title:m.name+' — delivery & quality scores',badge:this.badge('manager-level','synth'),
+      children:h('div',null,
+        scoreBar('Consistency score',cons,'steadiness across the last 3–5 funds'),
+        scoreBar('Distribution stability',distScore,distStab+' — how reliably cash comes back'),
+        scoreBar('Mark-up quality',md.scores.markup,'do interim marks mirror realised outcomes'),
+        scoreBar('Returns & delivery',md.scores.delivery,'realised return vs what was marked')),
+      caption:'Every manager-level score in one place — firm aggregates across all '+md.nFunds+' funds. (A single fund has no consistency score — that lives only here, at the manager level.)'});
+    // call distribution across recent vintages (capital-call pace) + returns
+    const cdFunds=m.classes.flatMap(c=>c.funds).slice().sort((a,b)=>a.vintage-b.vintage);
+    const cdMax=Math.max(...cdFunds.map(f=>this.fundDetail(f).called),1);
+    const callDistCard=this.card({title:'Capital-call distribution',badge:this.badge('illustrative','synth'),
+      children:h('div',{style:{display:'flex',alignItems:'flex-end',gap:12,height:150,padding:'6px 2px 0'}}, cdFunds.map((f,i)=>{ const det=this.fundDetail(f);
+        return h('div',{key:i,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-end',height:'100%'}},
+          h('div',{style:{fontSize:11,fontFamily:SF,fontWeight:700,marginBottom:5}}, det.called+'%'),
+          h('div',{style:{width:'62%',maxWidth:46,height:(det.called/cdMax*100)+'%',background: det.pipeline?'var(--data-3)':'var(--data-1)',borderRadius:'5px 5px 0 0',minHeight:3}}),
+          h('div',{style:{fontSize:9.5,color:'var(--muted)',marginTop:5}},f.vintage)); })),
+      caption:'How quickly capital was called across '+m.name+'’s vintages. Lighter bars are newer funds still drawing down.'});
+
+    // ---- the manager's individual funds (each opens its own fund page) ----
+    const allFundsM=m.classes.flatMap(c=>c.funds.map(f=>({...f,ac:c.ac})));
+    const fundsListCard=this.card({title:m.name+' funds',info:true,
+      children:h('div',{style:{display:'flex',flexDirection:'column',gap:8}}, allFundsM.map(f=>{ const det=this.fundDetail(f);
+        return h('div',{key:f.id,style:{display:'grid',gridTemplateColumns:'1.6fr .9fr .7fr .7fr .8fr',gap:12,alignItems:'center',padding:'10px 12px',border:'1px solid var(--line)',borderRadius:10}},
+          h('button',{onClick:()=>this.openFundResearch(f.id),style:{textAlign:'left',border:'none',background:'none',padding:0,cursor:'pointer',fontFamily:SF,fontSize:14,fontWeight:600,color:'var(--brand-ink)'}}, f.name+' ›'),
+          h('span',{style:{fontSize:10.5,color:'var(--muted)'}},f.ac+' · '+f.vintage),
+          h('span',{style:{textAlign:'right',fontFamily:SF,fontWeight:700,fontSize:13,color:det.pipeline?'var(--muted)':'var(--ink)'}}, det.pipeline?'—':f.irr+'%'),
+          h('span',{style:{textAlign:'right',fontFamily:SF,fontWeight:600,fontSize:13,color:'var(--muted)'}}, det.pipeline?'pipeline':det.dpi+'x'),
+          h('button',{onClick:()=>this.toggleCmp({kind:'fund',id:f.id,label:f.name}),style:{justifySelf:'end',border:'1px solid '+(this.inCmp('fund',f.id)?'var(--brand)':'var(--line)'),background:this.inCmp('fund',f.id)?'var(--brand-wash)':'var(--surface)',color:this.inCmp('fund',f.id)?'var(--brand-ink)':'var(--muted)',borderRadius:8,padding:'5px 10px',fontSize:10.5,fontWeight:600,cursor:'pointer'}}, (this.inCmp('fund',f.id)?'✓':'＋'))); })),
+      caption:'A fund manager is an aggregate of its funds — open any fund (e.g. '+(allFundsM[0]?allFundsM[0].name:'a fund')+') for its own calls, distributions and returns.'});
+    // ---- fund documents (kept from the Copilot document set) ----
+    const docRow=(d)=>h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,border:'1px solid var(--line)',borderRadius:10,padding:'11px 13px',marginBottom:8}},
+      h('div',{style:{display:'flex',alignItems:'center',gap:10,minWidth:0}}, h('span',{style:{fontSize:16}},'📄'), h('div',{style:{minWidth:0}}, h('div',{style:{fontSize:13,fontWeight:600}},d.name), h('div',{style:{fontSize:11,color:'var(--muted)'}},d.meta))),
+      h('span',{style:{fontSize:11.5,color:'var(--brand-ink)',fontWeight:600,flex:'0 0 auto'}},'Download'));
+    const docsCard=this.card({title:'Documents',info:true,children:h('div',null, this.mgrDocs(m).map((d,i)=>h('div',{key:i},docRow(d)))),
+      caption:'Fund documents associated with '+m.name+'.'});
+    // ---- Ask Alpha: what's best for THIS investor ----
+    const bestFund=bw.best;
+    const aiBest=this.card({title:'Alpha’s read — best for you',badge:this.badge('AI','synth'),tone:'alpha',
+      children:h('div',{style:{display:'flex',flexDirection:'column',gap:11}},
+        h('div',{style:{fontSize:13.5,lineHeight:1.6,color:'rgba(255,255,255,.94)'}},
+          'For your '+this.riskLabel()+' profile, '+m.name+'’s '+strategies[0]+' is the most relevant sleeve — '+verdict.tag.toLowerCase()+'. ',
+          bestFund? ['Their strongest fund is ',h('strong',{key:'b',style:{color:'#fff'}},bestFund.name),' ('+bestFund.irr+'% net IRR).'] : null,
+          md.offering? [' Their ',h('strong',{key:'o',style:{color:'#fff'}},md.offering),' is open on the platform now.'] : ' Nothing is open from them right now — follow to be alerted.'),
+        h('div',{style:{display:'flex',gap:9,flexWrap:'wrap'}},
+          md.offering? h('button',{onClick:()=>this.askFromPage('Is '+md.offering+' from '+m.name+' a good fit for my portfolio?'),style:{border:'none',background:'#fff',color:'var(--brand-ink)',borderRadius:9,padding:'9px 14px',fontSize:12,fontWeight:700,cursor:'pointer'}},'💼 Assess '+md.offering):null,
+          h('button',{onClick:()=>this.askFromPage('How does '+m.name+' fit my goals and where are the risks for me?'),style:{border:'1px solid rgba(255,255,255,.55)',background:'transparent',color:'#fff',borderRadius:9,padding:'9px 14px',fontSize:12,fontWeight:600,cursor:'pointer'}},'Ask Alpha a follow-up →'))),
+      caption:'Tailored to your profile — not a generic fund pitch.'});
+
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:16}}, back, heroBanner, header, kpis, aiBest, decision, actions,
+      this.twoCol(scoresCard, callDistCard, '1.1fr .9fr'),
+      bestWorst, fundsListCard, docsCard);
+  }
+  /* individual FUND research page — fund-specific only (no consistency score; a single fund has no consistency) */
+  fundResearchBody(){
+    const h=this.h; const SF=this.SF; const s=this.state;
+    const f=this.fundResearchById(s.mgrFund); if(!f) return this.managerOverviewBody();
+    const m=this.mgrById(f.mgrId); const md=this.mgrMeta(m); const det=this.fundDetail(f);
+    const back=h('button',{onClick:()=>this.setState({mgrFund:null, mgrProfile:f.mgrId}),style:{alignSelf:'flex-start',display:'inline-flex',alignItems:'center',gap:6,border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:9,padding:'7px 13px',fontSize:12,fontWeight:600,cursor:'pointer'}},'‹ '+(m?m.name:'Manager'));
+    const logoName=f.logo;
+    const logo= logoName? h('img',{src:'assets/logos/'+logoName+'.png',alt:'',style:{width:50,height:50,borderRadius:12,background:'#fff',border:'1px solid var(--line)',padding:6,objectFit:'contain',flex:'0 0 50px'}})
+      : h('div',{style:{width:50,height:50,borderRadius:12,background:'var(--brand-wash)',color:'var(--brand)',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:700,flex:'0 0 50px'}},(m?m.name.slice(0,2):'F'));
+    const header=h('div',{style:{display:'flex',gap:14,alignItems:'flex-start',flexWrap:'wrap'}},
+      logo,
+      h('div',{style:{flex:'1 1 260px',minWidth:0}},
+        h('div',{style:{display:'flex',alignItems:'center',gap:9,flexWrap:'wrap'}},
+          h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:600}},f.name),
+          det.pipeline? h('span',{style:{fontSize:10.5,fontWeight:700,borderRadius:999,padding:'3px 10px',background:'var(--data-3-wash, var(--surface-2))',color:'var(--data-9)',border:'1px solid var(--line)'}},'In pipeline'):null),
+        h('div',{style:{fontSize:13,color:'var(--muted)',marginTop:4,lineHeight:1.5}}, 'A '+f.ac+' fund from ',h('button',{onClick:()=>this.setState({mgrFund:null,mgrProfile:f.mgrId}),style:{border:'none',background:'none',padding:0,cursor:'pointer',color:'var(--brand-ink)',fontWeight:600,fontFamily:'Inter,system-ui,sans-serif'}},m?m.name:'—'),' · vintage '+f.vintage+' · '+det.age+' year'+(det.age===1?'':'s')+' old.')),
+      h('button',{onClick:()=>this.toggleCmp({kind:'fund',id:f.id,label:f.name}),style:{flex:'0 0 auto',border:'1px solid '+(this.inCmp('fund',f.id)?'var(--brand)':'var(--brand-tint-3)'),background:this.inCmp('fund',f.id)?'var(--brand)':'var(--brand-wash)',color:this.inCmp('fund',f.id)?'#fff':'var(--brand-ink)',borderRadius:10,padding:'10px 16px',fontSize:12.5,fontWeight:700,cursor:'pointer'}}, this.inCmp('fund',f.id)?'✓ In comparison list':'＋ Add to comparison list'));
+    // fund-specific KPIs — NO consistency score (that is a manager-level metric)
+    const kpis= det.pipeline
+      ? this.kpiTiles([['Status','In pipeline','still calling capital'],['Vintage',f.vintage+'','recent fund'],['% called',det.called+'%','of commitment'],['Net IRR','—','too early'],['DPI','—','no distributions yet'],['Net MOIC',det.moic+'x','on marks']])
+      : this.kpiTiles([['Net IRR',f.irr+'%','since inception'],['DPI',det.dpi+'x','cash returned'],['Net MOIC',det.moic+'x','net of fees'],['TVPI',det.tvpi+'x','total value'],['% called',det.called+'%','of commitment'],['Vintage',f.vintage+'','']]);
+    // calls & distributions
+    const cdCard=this.card({title:'Calls & distributions',badge:this.badge('illustrative','synth'),
+      children: det.pipeline
+        ? h('div',{style:{fontSize:13,color:'var(--muted)',lineHeight:1.6,padding:'4px 0'}},'This fund is still in its drawdown phase — about ',h('strong',{style:{color:'var(--ink)'}},det.called+'% called'),' so far, with no distributions yet. Returns will only be meaningful once it begins harvesting.')
+        : h('div',{style:{display:'flex',flexDirection:'column',gap:10}},
+            h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}},
+              ['Capital called',det.called+'%','of commitment','Distributions returned',det.dpi+'x','DPI','Still to harvest',Math.max(0,100-det.called)+'%','uncalled / unrealised'].reduce((acc,_,i,arr)=>{ if(i%3===0){ acc.push(h('div',{key:i,style:{border:'1px solid var(--line)',borderRadius:10,padding:'11px 13px',background:'var(--surface-2)'}}, h('div',{style:{fontSize:11,color:'var(--muted)'}},arr[i]), h('div',{style:{fontFamily:SF,fontSize:18,fontWeight:700,marginTop:2}},arr[i+1]), h('div',{style:{fontSize:10,color:'var(--muted)'}},arr[i+2]))); } return acc; },[])),
+            h('div',{style:{fontSize:12,color:'var(--muted)',lineHeight:1.5}},'A '+f.vintage+'-vintage fund: roughly '+det.called+'% of commitments have been called and it has returned '+det.dpi+'x DPI so far.')),
+      caption: det.pipeline? 'New fund — capital is still being deployed.' : 'Fund-level cash flows. Consistency is intentionally not shown — it only exists at the manager level, across multiple funds.'});
+    // Ask Alpha — best for this investor
+    const aiBest=this.card({title:'Alpha’s read — is this fund right for you?',badge:this.badge('AI','synth'),tone:'alpha',
+      children:h('div',{style:{display:'flex',flexDirection:'column',gap:11}},
+        h('div',{style:{fontSize:13.5,lineHeight:1.6,color:'rgba(255,255,255,.94)'}},
+          det.pipeline
+            ? [f.name+' is a fresh '+f.ac+' vintage from '+(m?m.name:'the manager')+' — fits a '+this.riskLabel()+' profile if you want forward exposure, but there are no returns to judge yet. ']
+            : [f.name+' has delivered ',h('strong',{key:'i',style:{color:'#fff'}},f.irr+'% net IRR'),' ('+det.dpi+'x DPI). For your '+this.riskLabel()+' profile it adds '+f.ac+' exposure — assess it against your current '+f.ac+' weight before committing.']),
+        h('button',{onClick:()=>this.askFromPage('Is '+f.name+' a good fit for my portfolio and my '+f.ac+' exposure?'),style:{alignSelf:'flex-start',border:'1px solid rgba(255,255,255,.55)',background:'transparent',color:'#fff',borderRadius:9,padding:'9px 14px',fontSize:12,fontWeight:600,cursor:'pointer'}},'Ask Alpha a follow-up →')),
+      caption:'Tailored to your profile — what this single fund means for you.'});
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:16}}, back, header, kpis, aiBest, cdCard);
   }
   managerOverviewBody(){
     const h=this.h; const SF=this.SF; const s=this.state;
@@ -6189,10 +6316,13 @@ class Component extends DCLogic {
       return h('div',{key:m.id,style:{display:'grid',gridTemplateColumns:'30px 1.5fr 1.4fr .8fr .8fr 1.4fr',gap:12,alignItems:'center',padding:'12px 14px',borderRadius:12,border:'1px solid '+(sel?'var(--brand)':'var(--line)'),background:sel?'var(--brand-wash)':'var(--surface)',marginBottom:8}},
         // item 191 — select managers to compare
         h('input',{type:'checkbox',checked:sel,onChange:()=>this.toggleMgrSel(m.id),style:{width:16,height:16,accentColor:'var(--brand)',cursor:'pointer'}}),
-        h('div',{style:{minWidth:0}},
-          /* item 199 — clickable into the manager profile */
-          h('button',{onClick:()=>this.openManagerProfile(m.id),title:'Open '+m.name+' profile',style:{border:'none',background:'none',padding:0,cursor:'pointer',textAlign:'left',fontFamily:SF,fontSize:15,fontWeight:600,color:'var(--brand-ink)'}}, m.name+' ›'),
-          h('div',{style:{fontSize:10.5,color:'var(--muted)'}},m.hq+' · '+this.mgrNFunds(m)+' funds')),
+        h('div',{style:{display:'flex',alignItems:'center',gap:10,minWidth:0}},
+          this.mgrLogo(m)? h('img',{src:'assets/logos/'+this.mgrLogo(m)+'.png',alt:'',style:{width:30,height:30,borderRadius:7,background:'#fff',border:'1px solid var(--line)',padding:3,objectFit:'contain',flex:'0 0 30px'}})
+            : h('div',{style:{width:30,height:30,borderRadius:7,background:'var(--brand-wash)',color:'var(--brand)',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:700,fontSize:12,flex:'0 0 30px'}},m.name.slice(0,2)),
+          h('div',{style:{minWidth:0}},
+            /* item 199 — clickable into the manager profile */
+            h('button',{onClick:()=>this.openManagerProfile(m.id),title:'Open '+m.name+' profile',style:{border:'none',background:'none',padding:0,cursor:'pointer',textAlign:'left',fontFamily:SF,fontSize:15,fontWeight:600,color:'var(--brand-ink)'}}, m.name+' ›'),
+            h('div',{style:{fontSize:10.5,color:'var(--muted)'}},m.hq+' · '+this.mgrNFunds(m)+' funds'))),
         h('div',{style:{display:'flex',flexWrap:'wrap',gap:5}}, m.classes.map(c=>h('span',{key:c.ac,style:{fontSize:10,fontWeight:600,color: (s.mgrAC===c.ac?'#fff':'var(--muted)'),background:(s.mgrAC===c.ac?'var(--brand)':'var(--surface-2)'),border:'1px solid var(--line)',borderRadius:999,padding:'2px 8px'}},c.ac))),
         h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:16,fontWeight:700,color:'var(--ink)'}}, irr!=null?irr+'%':'—'), h('div',{style:{fontSize:9.5,color:'var(--muted)'}}, s.mgrAC==='All'?'all-time IRR':s.mgrAC+' IRR')),
         h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:15,fontWeight:700,color: cons>=85?'var(--over)':'var(--ink)'}}, cons!=null?cons:'—'), h('div',{style:{fontSize:9.5,color:'var(--muted)'}},'consistency')),
@@ -6237,19 +6367,54 @@ class Component extends DCLogic {
         caption:'Selected managers ranked by '+(s.mgrAC==='All'?'all-time (since-inception)':s.mgrAC)+' net IRR — the leader is flagged. Tick more managers above to add them; switch the asset class to compare within a single class.'});
     }
 
+    // ---- hero header: Moonfare logo over a background image (from the first Copilot iteration) ----
+    const hero=h('div',{style:{position:'relative',minHeight:150,borderRadius:16,overflow:'hidden',backgroundImage:'linear-gradient(115deg, rgba(20,23,58,.86), rgba(20,23,58,.42)), url(assets/heroes/header_10.jpg)',backgroundSize:'cover',backgroundPosition:'center',display:'flex',flexDirection:'column',justifyContent:'flex-end',padding:'18px 22px'}},
+      h('img',{src:'assets/moonfare_logo_white.png',alt:'Moonfare',style:{position:'absolute',top:16,left:20,height:21,opacity:.95}}),
+      h('div',{style:{fontSize:10.5,letterSpacing:'.14em',textTransform:'uppercase',color:'rgba(255,255,255,.82)',fontWeight:700}},'Research · Funds & Managers'),
+      h('div',{style:{fontFamily:SF,fontSize:28,fontWeight:600,color:'#fff',marginTop:3}},'Manager Overview'),
+      h('div',{style:{fontSize:13,color:'rgba(255,255,255,.86)',lineHeight:1.5,maxWidth:660,marginTop:4}},'Every manager and fund on the platform. Search, filter, rank — then drill into a manager (an aggregate of its funds) or a single fund for the full detail.'));
+    // ---- Fund managers ↔ Funds toggle (a manager like EQT is not sortable by asset class; its funds like EQT IX are) ----
+    const isFunds=(s.mgrView==='funds');
+    const viewToggle=h('div',{style:{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}},
+      h('div',{style:{display:'inline-flex',border:'1px solid var(--line)',borderRadius:999,overflow:'hidden'}},
+        [['managers','Fund managers'],['funds','Funds']].map(([v,l])=>{ const on=(s.mgrView||'managers')===v;
+          return h('button',{key:v,onClick:()=>this.setState({mgrView:v}),style:{border:'none',background:on?'var(--brand)':'transparent',color:on?'#fff':'var(--muted)',padding:'8px 18px',fontSize:12.5,fontWeight:on?700:500,cursor:'pointer'}},l); })),
+      h('span',{style:{fontSize:11,color:'var(--muted)'}}, isFunds?'Individual funds (e.g. EQT IX) — sortable by asset class.':'Whole firms (e.g. EQT) — an aggregate of all their funds.'));
+
+    // ---- funds list (flatten every fund; sortable by asset class) ----
+    let funds=this.ALL_FUNDS().filter(f=>{
+      if(s.mgrAC!=='All' && f.ac!==s.mgrAC) return false;
+      if(qAC && f.ac!==qAC) return false;
+      if(q && !qAC && !(f.name.toLowerCase().includes(q)||f.mgr.toLowerCase().includes(q)||f.ac.toLowerCase().includes(q))) return false;
+      return true;
+    }).sort((a,b)=> s.mgrSort==='name'? a.name.localeCompare(b.name) : s.mgrSort==='cons'? (b.vintage-a.vintage) : (b.irr-a.irr));
+    const fundRow=(f)=>{ const det=this.fundDetail(f);
+      return h('div',{key:f.id,style:{display:'grid',gridTemplateColumns:'38px 1.7fr 1fr .7fr .7fr 1fr',gap:12,alignItems:'center',padding:'11px 14px',borderRadius:12,border:'1px solid var(--line)',background:'var(--surface)',marginBottom:8}},
+        f.logo? h('img',{src:'assets/logos/'+f.logo+'.png',alt:'',style:{width:30,height:30,borderRadius:7,background:'#fff',border:'1px solid var(--line)',padding:3,objectFit:'contain'}}) : h('div',{style:{width:30,height:30,borderRadius:7,background:'var(--surface-2)',color:'var(--muted)',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:700,fontSize:11}},f.mgr.slice(0,2)),
+        h('div',{style:{minWidth:0}},
+          h('button',{onClick:()=>this.openFundResearch(f.id),title:'Open '+f.name,style:{border:'none',background:'none',padding:0,cursor:'pointer',textAlign:'left',fontFamily:SF,fontSize:14.5,fontWeight:600,color:'var(--brand-ink)'}}, f.name+' ›'),
+          h('div',{style:{fontSize:10.5,color:'var(--muted)'}}, f.mgr+' · vintage '+f.vintage)),
+        h('span',{style:{justifySelf:'start',fontSize:10.5,fontWeight:600,color:'var(--muted)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:999,padding:'2px 9px'}},f.ac),
+        h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:14,fontWeight:700,color: det.pipeline?'var(--muted)':'var(--ink)'}}, det.pipeline?'—':f.irr+'%'), h('div',{style:{fontSize:9,color:'var(--muted)'}}, det.pipeline?'in pipeline':'net IRR')),
+        h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:14,fontWeight:700}}, det.pipeline?'—':det.dpi+'x'), h('div',{style:{fontSize:9,color:'var(--muted)'}},'DPI')),
+        h('button',{onClick:()=>this.toggleCmp({kind:'fund',id:f.id,label:f.name}),style:{justifySelf:'end',border:'1px solid '+(this.inCmp('fund',f.id)?'var(--brand)':'var(--line)'),background:this.inCmp('fund',f.id)?'var(--brand-wash)':'var(--surface)',color:this.inCmp('fund',f.id)?'var(--brand-ink)':'var(--muted)',borderRadius:8,padding:'6px 11px',fontSize:11,fontWeight:600,cursor:'pointer'}}, (this.inCmp('fund',f.id)?'✓ ':'＋ ')+'compare'));
+    };
+    const fundsListCard=this.card({title: (s.mgrAC==='All'?'Funds on the Moonfare platform':s.mgrAC+' funds on the platform'), info:true,
+      children: funds.length? h('div',null,
+        h('div',{style:{display:'grid',gridTemplateColumns:'38px 1.7fr 1fr .7fr .7fr 1fr',gap:12,padding:'0 14px 8px',fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)'}},
+          h('span',null,''),h('span',null,'Fund'),h('span',null,'Asset class'),h('span',{style:{textAlign:'right'}},'IRR'),h('span',{style:{textAlign:'right'}},'DPI'),h('span',null,'')),
+        funds.map(fundRow))
+        : h('div',{style:{padding:'24px',textAlign:'center',color:'var(--muted)',fontSize:13}},'No funds match — broaden the asset class or clear the search.'),
+      caption:'Individual funds (e.g. EQT IX) — sortable by asset class. New funds still in the pipeline show no returns yet. Click any fund for its full detail.'});
+
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
-      h('div',null,
-        h('div',{style:{fontSize:10.5,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Research · Funds & Managers'),
-        h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:600,margin:'3px 0 2px'}},'Manager Overview'),
-        h('div',{style:{fontSize:13,color:'var(--muted)',lineHeight:1.5,maxWidth:640}},'Every manager on the platform in one place. Search, filter by asset class, rank them, then drill into a manager’s delivery, consistency and mark-up detail below.')),
+      hero,
       scopeNote,
       searchBar,
-      h('div',{style:{display:'flex',gap:16,justifyContent:'space-between',flexWrap:'wrap',alignItems:'center'}}, acRow, sortRow),
+      h('div',{style:{display:'flex',gap:16,justifyContent:'space-between',flexWrap:'wrap',alignItems:'center'}}, viewToggle, sortRow),
+      acRow,
       filterRow,
-      stratAdd,
-      cmpBanner,
-      listCard,
-      compareCard);
+      isFunds? fundsListCard : h('div',{style:{display:'flex',flexDirection:'column',gap:16}}, stratAdd, cmpBanner, listCard, compareCard));
   }
   /* ====================== APPLE-STYLE COMPARISON (items 200-214) ====================== */
   MGR_METRIC_EXPL(){ return {
@@ -6367,7 +6532,7 @@ class Component extends DCLogic {
   }
   surfaceBody(){
     const v=this.curPage().view; const h=this.h;
-    if(v==='mgrover') { const body=this.state.mgrProfile? this.managerProfileBody() : this.managerOverviewBody(); return h('div',{style:{display:'flex',flexDirection:'column',gap:16,minHeight:'100%'}}, body, this.deepFooter()); } /* items 196/199 — Manager Overview landing + clickable profile */
+    if(v==='mgrover') { const body=this.state.mgrFund? this.fundResearchBody() : (this.state.mgrProfile? this.managerProfileBody() : this.managerOverviewBody()); return h('div',{style:{display:'flex',flexDirection:'column',gap:16,minHeight:'100%'}}, body, this.deepFooter()); } /* Manager Overview → manager profile → single fund research */
     if(v==='mgrcompare') { return h('div',{style:{display:'flex',flexDirection:'column',gap:16,minHeight:'100%'}}, this.managerCompareBody(), this.deepFooter()); } /* items 200-214 — side-by-side comparison */
     // full-bleed canvases keep their own layout; everything else (deep + sub-use-case views) gets framed
     if(v==='home') return this.homeOverviewBody();
