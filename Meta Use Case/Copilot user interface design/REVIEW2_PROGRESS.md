@@ -34,4 +34,8 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 31 currency parity — verified
 - [x] 32 complementary new-opportunities card at bottom of drill (all dims)
 - [x] 33 Alpha read on performance: top contributor + additional insight
-NEXT: item 34 (sector detailed overview parity — verify)
+- [x] 34 sector detailed-overview parity (generic) — verified
+- [x] 35 top three performing investments (was five)
+- [x] 36 click into IRR/DPI/TVPI/MOIC/DVPI to rank top performers
+- [x] 37 click a fund → fund modal with larger graph (existing openFund) — verified
+NEXT: item 38 (drop funds-by-commitment, keep only top positions)

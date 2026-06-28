@@ -3840,18 +3840,20 @@ class Component extends DCLogic {
       vals.map((v,ci)=>h('div',{key:ci,title:name+' '+years[ci]+': '+v,style:{flex:1,height:22,borderRadius:3,background:'var(--data-1)',opacity:Math.min(1,0.06+v/55)}}))));
     return h('div',null, header, grid);
   }
-  /* item 49 — intermediate teaser always leads with the positive: Your Top Five Performing Investments + See full breakdown */
+  /* item 35 — top THREE performing investments; item 36 — click into IRR/DPI/TVPI/MOIC/DVPI to rank by it */
   topFivePerformers(key){ const h=this.h; const SF=this.SF;
-    const top=this.HELD_FUNDS().slice().sort((a,b)=>this.metricNum(b,'IRR')-this.metricNum(a,'IRR')).slice(0,5);
+    const metric=this.dtog('topPerfMetric','IRR');
+    const top=this.HELD_FUNDS().slice().sort((a,b)=>this.metricNum(b,metric)-this.metricNum(a,metric)).slice(0,3);
     return h('div',{style:{background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:11,padding:'12px 13px'}},
-      h('div',{style:{display:'flex',alignItems:'baseline',justifyContent:'space-between',gap:8,marginBottom:9}},
-        h('div',{style:{fontFamily:SF,fontSize:13.5,fontWeight:600}},'Your Top Five Performing Investments'),
-        h('span',{style:{fontSize:10.5,fontWeight:700,color:'var(--over)',background:'var(--over-wash)',border:'1px solid var(--over)',borderRadius:999,padding:'2px 8px'}},'▲ by IRR')),
+      h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,marginBottom:9,flexWrap:'wrap'}},
+        h('div',{style:{fontFamily:SF,fontSize:13.5,fontWeight:600}},'Your Top Three Performing Investments'),
+        h('div',{style:{display:'flex',gap:4,flexWrap:'wrap'}}, this.METRICS().map(mm=>{ const on=metric===mm;
+          return h('button',{key:mm,onClick:e=>{e.stopPropagation();this.setDtog('topPerfMetric',mm);},style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand)':'var(--surface)',color:on?'#fff':'var(--muted)',borderRadius:999,padding:'2px 8px',fontSize:10,fontWeight:on?700:500,cursor:'pointer'}},mm); }))),
       h('div',{style:{display:'flex',flexDirection:'column',gap:6}}, top.map((f,i)=>h('div',{key:f.id,onClick:()=>this.openFund(f.id),
         style:{display:'flex',alignItems:'center',gap:9,fontSize:12.5,cursor:'pointer',padding:'3px 0'}},
         h('span',{style:{flex:'0 0 18px',fontFamily:SF,fontWeight:700,color:'var(--muted)'}},(i+1)+'.'),
         h('span',{style:{flex:1,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},f.name),
-        h('span',{style:{fontFamily:SF,fontWeight:700,color:'var(--over)'}},f.irr)))),
+        h('span',{style:{fontFamily:SF,fontWeight:700,color:'var(--over)'}},this.metricVal(f,metric))))),
       key? h('button',{onClick:()=>this.setState({homePop:null,homeDrill:key}),
         style:{marginTop:10,border:'none',background:'transparent',color:'var(--brand-ink)',fontSize:12,fontWeight:700,cursor:'pointer',padding:0,fontFamily:'Inter,system-ui,sans-serif'}},'See full breakdown  →') : null);
   }
