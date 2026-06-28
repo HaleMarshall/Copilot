@@ -126,4 +126,15 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 94 Only show investable-capital prompt when cash>0 — gated `cashNum>0 ? prompt : null` (eurNum of cash position). Verified: eurNum('€1.1m')=1.1>0 → shows; would be null at 0.
 - ☑ 95 Cashflow pop-up: funds-to-invest first, add-cash below — investPrompt now leads with 'Do you want to invest?' + 'Choose funds →', then a secondary '＋ Or add more cash to your account' beneath. Verified live: invest/choose before add-cash.
 
-**NEXT: item 96** — fix broken PDF export (96–104 cluster: PDF export, asset-allocation bar labels, currency unit sign).
+## 96–104 PDF export + asset-allocation bar labels
+- ☑ 96 Fix broken PDF export — replaced `window.print()` (rendered the dark app chrome = black box) with a dedicated white PDF preview modal (`pdfModalBody`, `showPdf` state) + print CSS (#sc-pdf-layer static, .sc-pdf-noprint hidden, .sc-pdf-page breaks). Verified live: clean rendered overview document, not a black box.
+- ☐ 97 Add y-axis to net-cash J-curve chart
+- ☐ 98 Move clipped bar values outside the bar (Strategy/Region/Currency)
+- ☐ 99 Color broken-out (outside) bar value labels black
+- ☐ 100 Fix unreadable MEA value label
+- ☐ 101 Add unit sign to currency figures
+- ☑ 102 Polished overview PDF (all info points) — summary doc renders title + 6 KPIs + 4 allocation tables + cashflow, polished white layout. Verified live.
+- ☑ 103 Detailed-vs-summary PDF toggle — Summary/Detailed seg in the modal header (`pdfMode`). Verified live.
+- ☑ 104 Detailed PDF: one section per page — detailed mode wraps each section in `.sc-pdf-page` (page-break-after). Verified live: 6 pages (Performance + Strategy/Region/Currency/Sector + Cashflow).
+
+**NEXT: item 97** — add a labelled y-axis to the net-cash J-curve chart.

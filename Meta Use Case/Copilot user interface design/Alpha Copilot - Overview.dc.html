@@ -67,6 +67,15 @@
   @keyframes alphaIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
   @keyframes pushIn{0%{opacity:0;transform:translateY(-26px) scale(.96)}60%{opacity:1}100%{opacity:1;transform:translateY(0) scale(1)}}
   @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+  /* item 96/102/104 — PDF export: when printing, show only the rendered document, white, paged */
+  @media print {
+    @page { margin:14mm; }
+    body { background:#fff !important; }
+    #sc-pdf-layer { position:static !important; inset:auto !important; background:#fff !important; padding:0 !important; display:block !important; overflow:visible !important; z-index:auto !important; }
+    #sc-pdf-layer > div { box-shadow:none !important; max-width:none !important; border-radius:0 !important; }
+    .sc-pdf-noprint { display:none !important; }
+    .sc-pdf-page { page-break-after:always; }
+  }
 </style>
 </helmet>
 
@@ -334,6 +343,13 @@
     </div>
   </sc-if>
 
+  <!-- ============ PDF EXPORT PREVIEW (item 96/102/103/104) ============ -->
+  <sc-if value="{{ showPdf }}" hint-placeholder-val="{{ false }}">
+    <div id="sc-pdf-layer" onClick="{{ closePdf }}" style="position:fixed;inset:0;z-index:90;background:rgba(8,9,18,.55);display:flex;align-items:flex-start;justify-content:center;padding:28px;overflow:auto">
+      <div onClick="{{ stop }}" style="background:#fff;border-radius:12px;max-width:880px;width:100%;box-shadow:0 30px 80px -20px rgba(8,9,18,.55)">{{ pdfModalBody }}</div>
+    </div>
+  </sc-if>
+
   <!-- Onboarding now runs live inside the Ask Alpha home chat (first-time investors only) -->
 
   <!-- ============ NOTIFICATIONS PANEL ============ -->
@@ -490,7 +506,7 @@ class Component extends DCLogic {
       oppDetail:null, oppDetailTab:'why',
       mode:'Investor',
       risk:'Balanced', horizon:'7y', investWealthM:8,
-      showProfile:false, showNotif:false, showToast:true, cart:[], showCart:false, cartCommitted:false, showOnboard:false, seenOnboard:false, onboardStep:0, obActive:false, obStep:0, showThemePicker:false, showTarget:false, following:'top10',
+      showProfile:false, showNotif:false, showToast:true, cart:[], showCart:false, cartCommitted:false, showOnboard:false, seenOnboard:false, onboardStep:0, obActive:false, obStep:0, showThemePicker:false, showTarget:false, following:'top10', showPdf:false, pdfMode:'summary',
       showOnboardForm:false, goal:'Build personal wealth', liquidity:'Medium', strategyPref:'Diversified', obConsent:false,
       ask:{ state: props.askAlphaOpen===true?'open':'min', x:null, y:null, register:'plain',
             msgs:[ {who:'alpha', segs:[
@@ -1621,6 +1637,53 @@ class Component extends DCLogic {
         h('input',{type:'number',min:0,step:0.5,value:this.state.investWealthM,onChange:e=>this.setState({investWealthM:Math.max(0,+e.target.value||0)}),
           style:{width:46,border:'none',background:'transparent',outline:'none',color:'var(--topbar-ink)',fontSize:11.5,fontWeight:700,fontFamily:'Inter,system-ui,sans-serif'}}),
         h('span',{style:{fontSize:11.5,color:'var(--topbar-soft)'}},'m')));
+  }
+  /* item 96/102/103/104 — PDF export: rendered, polished, white overview document (summary | detailed one-section-per-page) */
+  openPdf(){ this.setState({showPdf:true}); }
+  pdfDimTable(key,label){ const h=this.h; const SF=this.SF;
+    const pct=this.basisPct(key); const stratNm=(k)=>(this.STRATS.find(s=>s[0]===k)||[null,k])[1];
+    const rows=Object.keys(pct).filter(k=>pct[k]>0).sort((a,b)=>pct[b]-pct[a]);
+    return h('div',null,
+      h('div',{style:{fontFamily:SF,fontSize:14,fontWeight:700,color:'#111',margin:'0 0 7px'}},label),
+      h('div',{style:{display:'flex',flexDirection:'column'}}, rows.map((k,i)=>h('div',{key:i,style:{display:'flex',justifyContent:'space-between',fontSize:12,color:'#222',borderBottom:'1px solid #eee',padding:'4px 0'}},
+        h('span',null,key==='strategy'?stratNm(k):k), h('span',{style:{fontWeight:700}},pct[k]+'%')))));
+  }
+  pdfModalBody(){
+    const h=this.h; const SF=this.SF; const P=(this.DB&&this.DB.portfolio)||{}; const detailed=this.state.pdfMode==='detailed';
+    const kpis=[['Net asset value',P.navText||'€16.6m'],['Distributions to date',P.distributionsText||'€2.1m'],['Committed','€20.5m'],['Uncalled','€3.9m'],['Net IRR',P.irr||'11.0%'],['Net MOIC',P.moic||'1.80x']];
+    const kpiGrid=h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10}}, kpis.map((t,i)=>h('div',{key:i,style:{border:'1px solid #e6e6e6',borderRadius:10,padding:'10px 12px',background:'#fafafa'}},
+      h('div',{style:{fontSize:10.5,color:'#777',marginBottom:2}},t[0]), h('div',{style:{fontFamily:SF,fontSize:18,fontWeight:700,color:'#111'}},t[1]))));
+    const docHead=h('div',{style:{borderBottom:'2px solid #111',paddingBottom:10,marginBottom:16}},
+      h('div',{style:{fontFamily:SF,fontSize:22,fontWeight:700,color:'#111'}},'Alpha — Portfolio Overview'),
+      h('div',{style:{fontSize:11.5,color:'#777',marginTop:3}},'Generated for your records · '+(detailed?'Detailed report':'Summary')+' · as of 14 Jun 2026'));
+    const sectionTitle=(t)=>h('div',{style:{fontFamily:SF,fontSize:16,fontWeight:700,color:'#111',margin:'0 0 10px'}},t);
+    const dims=[['strategy','Strategy'],['region','Region'],['currency','Currency'],['sector','Sector']];
+    let doc;
+    if(detailed){ // item 104 — one section per page
+      const page=(children)=>h('div',{className:'sc-pdf-page',style:{padding:'8px 0 18px',marginBottom:18,borderBottom:'1px dashed #ddd'}},children);
+      doc=h('div',null,
+        page(h('div',null, docHead, sectionTitle('Performance & key figures'), kpiGrid)),
+        dims.map(([k,l],i)=>page(h('div',{key:i}, sectionTitle(l+' allocation'), this.pdfDimTable(k,l+' — % of NAV')))),
+        page(h('div',null, sectionTitle('Cash flow'),
+          h('div',{style:{fontSize:12.5,color:'#222',lineHeight:1.6}},'Committed €20.5m · Called €16.6m · Uncalled €3.9m · Cash position €1.1m. Net distributions +€0.9m. You have crossed the J-curve — distributions now outpace capital calls.'))));
+    } else { // item 102 — polished single summary page, all key points
+      doc=h('div',null, docHead,
+        sectionTitle('Performance & key figures'), kpiGrid,
+        h('div',{style:{height:16}}),
+        sectionTitle('Allocation'),
+        h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'18px 28px'}}, dims.map(([k,l],i)=>h('div',{key:i}, this.pdfDimTable(k,l)))),
+        h('div',{style:{height:16}}),
+        sectionTitle('Cash flow'),
+        h('div',{style:{fontSize:12.5,color:'#222',lineHeight:1.6}},'Committed €20.5m · Called €16.6m · Uncalled €3.9m · Cash position €1.1m · Net distributions +€0.9m. You have crossed the J-curve.'));
+    }
+    const header=h('div',{className:'sc-pdf-noprint',style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,padding:'12px 18px',borderBottom:'1px solid #e6e6e6',position:'sticky',top:0,background:'#fff',borderRadius:'12px 12px 0 0'}},
+      h('div',{style:{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}},
+        h('span',{style:{fontWeight:700,fontSize:13,color:'#111'}},'PDF export preview'),
+        this.seg([{label:'Summary',value:'summary'},{label:'Detailed',value:'detailed'}], this.state.pdfMode, v=>this.setState({pdfMode:v}),{sm:true})),
+      h('div',{style:{display:'flex',gap:8}},
+        h('button',{onClick:()=>window.print(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'8px 14px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'⤓ Save as PDF'),
+        h('button',{onClick:()=>this.setState({showPdf:false}),style:{border:'1px solid #ccc',background:'#fff',color:'#444',borderRadius:8,padding:'8px 12px',fontSize:12.5,fontWeight:600,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'Close')));
+    return h('div',{style:{color:'#111'}}, header, h('div',{style:{padding:'22px 26px 30px',fontFamily:'Inter,system-ui,sans-serif'}}, doc));
   }
   /* ---------- top-right: notifications + profile (A29/A30, D15) ---------- */
   /* item 90 — once the bell has been open ~5s, mark notifications seen and clear the badge */
@@ -5756,7 +5819,7 @@ class Component extends DCLogic {
       brSelector:null,
       brChart:this.brChart(), brCaption:brCap, openBrData:()=>this.setState({dataModal:'br'}),
       snapshotId:this.snapshotId(),
-      exportPdf:()=>window.print(),
+      exportPdf:()=>this.openPdf(), showPdf:s.showPdf, closePdf:()=>this.setState({showPdf:false}), pdfModalBody:this.pdfModalBody(),
       toggleCohort:()=>this.setState({cohortOpen:!s.cohortOpen}),
       // ask alpha (left-docked) + home detail side panel
       askAlpha:this.askAlpha(),
