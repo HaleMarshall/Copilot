@@ -183,4 +183,22 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 142 Remove 'Expected Return' from fund card (keep fit only) — opportunity tile no longer shows the 'target {multiple}' return-target line; only strategy + open/close + Target-fit highlight. Verified live.
 - ☑ 143 Distance-from-Target toggle across 4 dimensions — gapCard now has a Strategy/Region/Currency/Sector seg (`oppDistDim`); non-strategy dims compute target−actual per bucket. Verified live: 4-dim toggle wired.
 
-**NEXT: item 144** — (review items 144+ unread; read the review section then continue one-by-one).
+## 144–159 Simulator distance/impact + Passed-Missed page + labels
+- ⊘ 144 Consistent nomenclature across Distance-from-Target dims — confirmed: toggle labels Strategy/Region/Currency/Sector + bucket names all come from HOME_DIMS, same as every allocation view.
+- ☐ 145 Render the 4 Distance-from-Target dims as pie/donut charts (toggle)
+- ☐ 146 Show Distance from Target reducing after an action
+- ☐ 147 Two pie charts: current vs after-action
+- ☐ 148 Ask Alpha summary: target status + exposure deltas
+- ☐ 149 Impact view shows only dimensions the action changes
+- ☐ 150 'Close the Gap' overview (now vs if-you-do-this)
+- ☐ 151 Rename 'What you passed on' → 'What you missed out on'
+- ☐ 152 Make 'Missed out on' its own dedicated page
+- ☐ 153 Distinguish 'Pass' (decided) from missed-out
+- ☐ 154 Group missed by asset class, then performance
+- ☐ 155 Prominent asset-class/strategy label on each item
+- ☐ 156 'Similar Alternative' beside each missed item
+- ☐ 157 Clarify 'SHAPE · 1 OF 11' label
+- ☐ 158 Label Gap Chart updates live
+- ☐ 159 Clarify 'Current Portfolio' = committed capital
+
+**NEXT: item 145** — render the 4 Distance-from-Target dimensions as donut/C-charts via the toggle.
