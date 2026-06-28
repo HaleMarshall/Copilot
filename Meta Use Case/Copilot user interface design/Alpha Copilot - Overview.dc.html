@@ -503,7 +503,7 @@ class Component extends DCLogic {
       simDials:{pm:20, growth:0, secondaries:6, us:38},
       simTargets:null, simFocus:null, simSuggest:null,
       savedSims:[], simCompare:false, watchlist:[], portfolioAdds:[],
-      oppSource:'active', oppMode:'weighted', oppWeights:{strategy:40, region:20, currency:20, sector:20}, /* items 122/123 — no Performance; Currency added */
+      oppSource:'baseline', oppMode:'weighted', oppWeights:{strategy:40, region:20, currency:20, sector:20}, /* item 140 Baseline first; items 122/123 — no Performance; Currency added */
       oppDetail:null, oppDetailTab:'why',
       mode:'Investor',
       risk:'Balanced', horizon:'7y', investWealthM:8,
@@ -5330,7 +5330,7 @@ class Component extends DCLogic {
   opportunitiesBody(){
     const h=this.h; const SF=this.SF; const o=this.oppNextActions(); const s=this.state;
     // source picker
-    const srcOpts=[{id:'active',label:'Active sim'},{id:'baseline',label:'Baseline'}].concat(s.savedSims.map(x=>({id:x.id,label:x.name})));
+    const srcOpts=[{id:'baseline',label:'Baseline'},{id:'active',label:'Active sim'}].concat(s.savedSims.map(x=>({id:x.id,label:x.name}))); /* item 140 — Baseline first */
     const srcRow=h('div',{style:{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}},
       h('span',{style:{fontSize:11,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)'}},'Driven by'),
       h('div',{style:{display:'flex',gap:6,flexWrap:'wrap'}}, srcOpts.map(op=>{ const on=s.oppSource===op.id;
