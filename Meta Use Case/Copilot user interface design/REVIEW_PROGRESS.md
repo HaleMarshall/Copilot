@@ -161,7 +161,7 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 122 Remove 'Performance' from weighting panel — dropped the Performance weight row; oppWeights default redistributed to {strategy:40,region:20,currency:20,sector:20}; weighted scoring no longer uses w.perf. Verified live: no perf row, scoring perf-free.
 - ☑ 123 Add 'Currency' weighting factor — added Currency row (distinct from Region, per caption). Verified live: oppWeightRow('currency').
 - ⊘ 124 Keep weighting at aggregate Target-Fit level — confirmed: weights are 4 aggregate dimensions vs target, not per-strategy/per-region toggles.
-- ☐ 125 Make 'Baseline' comparison do something
+- ☑ 125 Make 'Baseline' comparison do something — Baseline now derived from the real current profile ('Baseline (today)', pm=PM.you, return from portfolio IRR) and each saved sim shows a live 'vs Baseline' delta (perf − baseline). Verified: baselineDerived + vsBaseline row present.
 - ⊘ 126 Keep 'Why not' view but positive
 - ☐ 127 Fix flow: recommendation → concrete fund opportunity → fund page
 - ⊘ 128 Keep asset-allocation-driven recommendation
