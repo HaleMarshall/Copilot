@@ -5377,6 +5377,30 @@ class Component extends DCLogic {
       children:h('div',null, actionList, planSummary),
       caption:'Concrete, sized and ordered — the output of your weighted simulation. Each row shows the lift to your target-fit score.'});
 
+    // item 132 — split: LEFT = Recommended Sequence (order to act); RIGHT = the concrete underlying funds
+    const seqRows=h('div',{style:{display:'flex',flexDirection:'column',gap:9}},
+      o.actions.length? o.actions.map(a=>h('div',{key:a.rank,onClick:()=>this.setState({oppDetail:a,oppDetailTab:'why'}),
+        onMouseEnter:e=>{e.currentTarget.style.background='var(--surface-2)';},onMouseLeave:e=>{e.currentTarget.style.background='transparent';},
+        style:{display:'flex',gap:11,alignItems:'center',padding:'11px 12px',border:'1px solid var(--line)',borderRadius:11,cursor:'pointer'}},
+        h('div',{style:{flex:'0 0 24px',width:24,height:24,borderRadius:7,background:a.kind==='add'?'var(--brand-wash)':'var(--surface-2)',color:a.kind==='add'?'var(--brand)':'var(--muted)',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:12,fontFamily:'Inter,system-ui,sans-serif'}},a.rank),
+        h('div',{style:{flex:1,minWidth:0}}, h('div',{style:{fontSize:13.5,fontWeight:700,color:'var(--ink)'}},a.head), h('div',{style:{fontSize:11,color:'var(--brand)',fontWeight:600,marginTop:2}},'Why this · why not · compare →')),
+        h('div',{style:{flex:'0 0 auto',textAlign:'right'}}, h('div',{style:{fontSize:9.5,color:'var(--muted)',textTransform:'uppercase'}},'fit +'), h('div',{style:{fontSize:14,fontWeight:800,color:'var(--over)'}},'+'+a.lift))))
+        : h('div',{style:{padding:'24px',textAlign:'center',color:'var(--muted)',fontSize:13,border:'1px dashed var(--line)',borderRadius:12}},'No material gaps — your selected simulation is already on target.'));
+    const seqCard=this.card({title:'Recommended sequence',
+      right:h('button',{onClick:()=>this.setState({ws:'shape',uc:'sim',page:'sim'}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:8,padding:'6px 11px',fontSize:11.5,fontWeight:600,cursor:'pointer'}},'← Back to Simulator'),
+      children:h('div',null, seqRows, planSummary),
+      caption:'The order to act — closes your biggest gaps first. Tap a step for the rationale.'});
+    const addActs=o.actions.filter(a=>a.kind==='add'&&a.fund);
+    const fundRow2=(a)=>h('div',{key:a.rank,style:{display:'flex',gap:12,alignItems:'flex-start',padding:'13px 14px',border:'1px solid var(--line)',borderRadius:12,background:'var(--surface)'}},
+      h('div',{style:{flex:1,minWidth:0}},
+        h('div',{style:{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}}, h('span',{style:{width:9,height:9,borderRadius:3,background:'var('+a.color+')',flex:'0 0 9px'}}), h('span',{style:{fontFamily:SF,fontSize:14,fontWeight:700}},a.fund)),
+        h('div',{style:{fontSize:11.5,color:'var(--muted)',marginTop:3}},a.strat+(a.note?' · '+a.note:'')),
+        a.fundId?h('button',{onClick:()=>this.openFundPage(a.fundId),style:{marginTop:8,border:'none',background:'transparent',color:'var(--brand-ink)',fontSize:12,fontWeight:700,cursor:'pointer',padding:0}},'View fund opportunity →'):null),
+      h('div',{style:{flex:'0 0 auto'}}, this.shopBtn(a.fund,a.strat,true)));
+    const fundsInSeqCard=this.card({title:'Funds in this sequence',badge:this.badge('concrete','synth'),
+      children: addActs.length? h('div',{style:{display:'flex',flexDirection:'column',gap:10}}, addActs.map(fundRow2)) : h('div',{style:{padding:'20px',textAlign:'center',color:'var(--muted)',fontSize:12.5,border:'1px dashed var(--line)',borderRadius:12}},'The sequence is run-offs only — no new fund to buy.'),
+      caption:'The concrete funds your recommended sequence resolves into. Open one for its full opportunity page.'});
+
     // ---- Missed-opportunity / passed-on lane (t1-11) ----
     const missed=[
       {fund:'Hg Saturn 2',strat:'Buyout · Software',year:2021,since:'+1.9x since close',why:'Matched your software tilt and risk class — you viewed it twice, then passed.',now:'EQT X',nowNote:'resembles it on the platform now'},
@@ -5426,9 +5450,9 @@ class Component extends DCLogic {
       caption:'A preview of what’s likely next for your portfolio. Specific funds appear only once the deal is signed — the platform is auditable, so nothing un-public is named.'});
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
       srcRow, head,
-      h('div',{style:{display:'grid',gridTemplateColumns:'minmax(300px,360px) 1fr',gap:16,alignItems:'start'}},
-        h('div',{style:{display:'flex',flexDirection:'column',gap:16}}, wCard, gapCard),
-        actionsCard),
+      /* item 132 — Recommended Sequence (left) + concrete Funds (right) side by side */
+      h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,alignItems:'start'}}, seqCard, fundsInSeqCard),
+      h('div',{style:{display:'grid',gridTemplateColumns:'minmax(300px,360px) 1fr',gap:16,alignItems:'start'}}, wCard, gapCard),
       this.twoCol(secondaryCard, upcomingCard, '1fr 1fr'),
       missedCard);
   }
