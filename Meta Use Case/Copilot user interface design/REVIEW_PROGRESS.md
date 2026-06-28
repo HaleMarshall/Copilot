@@ -106,7 +106,7 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 76 AI Overview at top of Detail page + Suggest More Funds beneath — moved summaryCard (Alpha's read, blue, with gap/Suggest CTA) to the very top of homeDrillBody; mix/insight/funds pushed down. Verified live: AI panel index 0 (before mix/funds), Suggest-funds CTA present.
 - ☑ 77 Detail page portfolio summary (funds held, NAV, buckets, largest) — the 4 metric tiles (Funds held / NAV in this book / Buckets covered / Largest holding) sit in the top AI panel. Verified live: all 4 present at top.
 - ☑ 78 Keep sell/Buy-now in Detail summary — added a '🛒 Buy now →' invest action (routes to Opportunities) alongside the Suggest-funds CTA in the top portfolio-summary panel. Verified live: both buttons present.
-- ☐ 79 Deviation Z-charts on every breakdown page
+- ☑ 79 Deviation Z-charts on every breakdown page — added an 'Allocated vs committed — {dim}' miniZ card to homeDrillBody (strategy/region/currency/sector) + vintageDrillBody, all driven by navVsCommittedDeltas. Verified live: Region/Currency/Vintage Z-charts present; logicError null.
 - ☐ 80 Sticky breakdown panel while rest scrolls
 
 **NEXT: item 70** — concentration pie syncs NAV↔Committed via toggle (never zero).

@@ -4760,7 +4760,10 @@ class Component extends DCLogic {
         h('div',{style:{fontSize:13,lineHeight:1.6,color:'rgba(255,255,255,.92)'}},'You have committed across ',h('strong',{style:{color:'#fff'}},years.length+' of '+vint.length+' years'),'. Spreading new commitments into under-weighted vintages smooths your J-curve.'),
         this.gapCTA('vintage',true)),
       caption:'Vintage diversification is the simplest lever on cash-flow timing.'});
-    return h('div',{style:{display:'flex',flexDirection:'column',gap:16}}, this.twoCol(mixCard,insightCard,'1.3fr 1fr'), this.twoCol(fundsCard,gapCard,'1.7fr 1fr'));
+    const vZr=this.navVsCommittedDeltas('vintage'); /* item 79 — vintage deviation Z-chart */
+    const vZCard= vZr.length? this.card({title:'Allocated vs committed — vintage',badge:this.badge('your portfolio','conf'),
+      children:this.miniZ(vZr), caption:'Deviation between NAV and committed exposure by vintage year. Actual data — not simulated.'}):null;
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:16}}, this.twoCol(mixCard,insightCard,'1.3fr 1fr'), vZCard, this.twoCol(fundsCard,gapCard,'1.7fr 1fr'));
   }
   homeDrillBody(key){
     const h=this.h; const SF=this.SF;
@@ -4838,6 +4841,8 @@ class Component extends DCLogic {
       summaryCard, /* item 76 — AI Overview (Alpha's read) + Suggest-funds CTA at the very top; item 77 — 4-tile portfolio summary lives in it */
       this.twoCol(mixCard,insightCard,'1.3fr 1fr'),
       this.drillBigBlock(rows,byCat,d.label),
+      (()=>{ const zr=this.navVsCommittedDeltas(key); return zr.length? this.card({title:'Allocated vs committed — '+d.label,badge:this.badge('your portfolio','conf'), /* item 79 — deviation Z-chart on every breakdown page */
+        children:this.miniZ(zr), caption:'Deviation between how you’re invested today (NAV) and your committed exposure, per '+d.label.toLowerCase()+'. Positive = more current value than committed weight. Actual data — not simulated.'}):null; })(),
       fundsCard);
   }
 
