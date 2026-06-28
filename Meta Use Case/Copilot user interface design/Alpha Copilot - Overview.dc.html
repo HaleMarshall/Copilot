@@ -2617,6 +2617,18 @@ class Component extends DCLogic {
     const out={}; Object.keys(actual).forEach(k=>{ out[k]= raw[k]? Math.round(raw[k]/tot*1000)/10 : 0; });
     Object.keys(raw).forEach(k=>{ if(out[k]===undefined) out[k]=Math.round(raw[k]/tot*1000)/10; });
     return out; }
+  /* item 71 — actual allocation (NAV) vs committed deviation per bucket, computed from held funds (real data, not simulated) */
+  navVsCommittedDeltas(key){ const meta=this.HELD_META(); const roster=this.HELD_FUNDS();
+    const catOf=(f)=> key==='strategy'? (meta[f.id]||{}).strat : (meta[f.id]||{})[key];
+    let navTot=0, comTot=0; const navRaw={}, comRaw={};
+    roster.forEach(f=>{ const c=catOf(f); if(c==null) return; const nv=this.eurNum(f.nav), cm=this.fundCommitted(f);
+      navRaw[c]=(navRaw[c]||0)+nv; navTot+=nv; comRaw[c]=(comRaw[c]||0)+cm; comTot+=cm; });
+    navTot=navTot||1; comTot=comTot||1;
+    const nameOf=(k)=> key==='strategy'? ((this.STRATS.find(s=>s[0]===k)||[null,k])[1]) : k;
+    const colorOf=(k)=> key==='strategy'? ((this.STRATS.find(s=>s[0]===k)||[null,null,'--data-9'])[2]) : '--data-9';
+    return Object.keys(navRaw).map(k=>({k,name:nameOf(k),color:colorOf(k),
+      delta: Math.round((navRaw[k]/navTot*100 - comRaw[k]/comTot*100)*10)/10}))
+      .sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta)); }
   pill(k,opts,def){ return this.seg(opts.map(o=>typeof o==='string'?{label:o,value:o}:o), this.dtog(k,def), v=>this.setDtog(k,v), {sm:true}); }
   twoCol(a,b,cols){ return this.h('div',{style:{display:'grid',gridTemplateColumns:cols||'1fr 1fr',gap:16,alignItems:'stretch'}},a,b); }
   stack(arr){ return this.h('div',{style:{display:'flex',flexDirection:'column',gap:14}},arr); }
@@ -4655,6 +4667,19 @@ class Component extends DCLogic {
           stratGaps.length? ['You hold ',h('strong',{key:'g'},'no direct fund'),' in '+stratGaps.join(', ')+' — clear places to add if you want the exposure.'] : 'You hold direct funds across every strategy bucket — a well-rounded book.'),
         this.gapCTA('strategy',false)),
       caption:'Alpha acts as your advisor — fill the gaps to round out your strategy exposure.'});
+    // item 71 — 'Where you're concentrated' box + allocated-vs-committed Z-chart (real deviation data), moved down the page
+    const concRows=this.basisPct('strategy'); // for the concentration ranking (current basis)
+    const concRanked=Object.keys(concRows).map(k=>{ const s=this.STRATS.find(x=>x[0]===k); return {n:s?s[1]:k, color:s?s[2]:'--data-9', p:concRows[k]||0}; }).filter(r=>r.p>0).sort((a,b)=>b.p-a.p);
+    const concentrationBox=this.card({title:'Where you’re concentrated',
+      children:h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, concRanked.slice(0,6).map((r,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',gap:10,fontSize:13}},
+        h('span',{style:{width:11,height:11,borderRadius:3,background:`var(${r.color})`,flex:'0 0 11px'}}),
+        h('span',{style:{flex:1,color:'var(--ink)'}},r.n),
+        h('span',{style:{fontFamily:SF,fontWeight:600}},r.p+'%')))),
+      caption:'Your largest strategy exposures on a '+basis+' basis.'});
+    const zRows=this.navVsCommittedDeltas('strategy');
+    const zCard=this.card({title:'Allocated vs committed',badge:this.badge('your portfolio','conf'),
+      children: zRows.length? this.miniZ(zRows) : h('div',{style:{fontSize:12.5,color:'var(--muted)'}},'No deviation to show.'),
+      caption:'Deviation between how you’re invested today (NAV) and your committed exposure. Positive = more current value than committed weight. Actual data — not simulated.'});
     const col=(children)=>h('div',{style:{display:'flex',flexDirection:'column',gap:16,minWidth:0}}, children);
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16,minHeight:'100%'}},
       nudge,
@@ -4662,6 +4687,7 @@ class Component extends DCLogic {
         col([perfCol]),
         col([allocHeader, strategyCard, regionCard, currencyCard, sectorCard, vintageCard]),
         col([cashCol, jcurveCard])),
+      this.twoCol(concentrationBox, zCard, '0.85fr 1.15fr'),
       alphaReadCard);
   }
 

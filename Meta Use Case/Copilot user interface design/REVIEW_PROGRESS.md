@@ -98,7 +98,7 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 ## 69–80 Overview Alpha panels + concentration/Z-chart + sticky
 - ☑ 69 'Suggest funds to fill the gap' CTA in Alpha's-read — added an 'Alpha's read on your strategy funds' panel to the Overview (lists strategy buckets with no direct fund) + `gapCTA('strategy')`, placed below the 3-col grid. Verified live: panel + gap CTA render in homeOverviewBody; logicError null.
 - ☑ 70 Concentration pie syncs NAV↔Committed (never zero) — donut/bars data source tied to the toggle via `basisPct` (item 57); on Committed every dimension still sums to ~100 (sector 100.1, currency 100, strategy 100) — never an empty chart. Verified live.
-- ☐ 71 Move concentration box down + Z-chart (delta vs committed) beside it
+- ☑ 71 Move concentration box down + Z-chart beside it — added `navVsCommittedDeltas(key)` (NAV%−Committed% per bucket from held funds, real data) + a 'Where you're concentrated' box and 'Allocated vs committed' miniZ Z-chart as a twoCol row below the 3-col grid. Verified live: deltas Buyout +7.6pp/Infra −3.6pp/…; overview renders, both cards present, logicError null.
 - ☐ 72 Style Alpha's read panel in brand dark-blue
 - ☐ 73 Small Alpha insights at top, Alpha's read below (stacked, not 3 side-by-side)
 - ☐ 74 Ask Alpha companion docked left on every page (confirm)
