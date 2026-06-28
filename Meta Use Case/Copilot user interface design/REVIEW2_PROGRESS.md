@@ -23,4 +23,6 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 20 heading → Where you hold the most investments
 - [x] 21 investments table inline at bottom of drill (no separate page)
 - [x] 22 held terminology = investments (drill Alpha-read title + KPI)
-NEXT: item 23 (click go-bigger section → open detailed bucket view)
+- [x] 23 go-bigger buckets clickable → focus that bucket in the table below
+- [x] 24 Alpha read CTA: View the opportunities (not Buy now)
+NEXT: item 25 (region/dimension pages: all-metrics + sort, same as strategy)
