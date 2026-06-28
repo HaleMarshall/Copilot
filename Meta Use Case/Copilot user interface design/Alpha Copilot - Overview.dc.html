@@ -4800,7 +4800,7 @@ class Component extends DCLogic {
     const cfLegend=h('div',{style:{display:'flex',gap:18,justifyContent:'center',marginTop:10,flexWrap:'wrap'}}, cfSeries.map((s,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',gap:7,fontSize:12.5}},h('span',{style:{width:10,height:10,borderRadius:2,background:`var(${s.color})`}}),s.name)));
     const cfNetBanner=h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,marginTop:14,padding:'10px 13px',borderRadius:10,background:'var(--surface-2)',border:'1px solid var(--line)'}},
       h('div',{style:{minWidth:0}},
-        h('div',{style:{fontSize:11.5,fontWeight:700,color:'var(--ink)'}},'Net cash position'),
+        h('div',{style:{fontSize:11.5,fontWeight:700,color:'var(--ink)'}},'Net distributions'), /* item 3 — net distributions, not 'net cash position' */
         h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:1}},'Lifetime distributions €'+cfDists.toFixed(1)+'m − capital calls €'+cfCalls.toFixed(1)+'m')),
       h('div',{style:{display:'flex',flexDirection:'column',alignItems:'flex-end',flex:'0 0 auto'}},
         h('span',{style:{fontFamily:SF,fontSize:22,fontWeight:700,color:cfNet>=0?'var(--over)':'var(--under)'}},(cfNet>=0?'+':'−')+'€'+Math.abs(cfNet).toFixed(1)+'m'),
@@ -4814,10 +4814,10 @@ class Component extends DCLogic {
         cfLegend,
         cfNetBanner,
         h('div',{style:{marginTop:14}}, kpiGrid([
-          ['Cash position',P.cashPosition,'available now'],
+          ['Committed',P.committed,'total commitment'], /* item 4 — committed, not committable */
+          ['Called',P.called||'€16.6m','drawn to date'],
           ['Uncalled',P.uncalled,'committed, not drawn'],
-          ['Committable',P.committable,'headroom to invest'],
-          ['Net cash flow',(cfNet>=0?'+':'−')+'€'+Math.abs(cfNet).toFixed(1)+'m','distributions − calls']])),
+          ['Cash position',P.cashPosition,'available now']])),
         pacingLink)});
     const jcurveCard=this.card({title:'Cumulative net cash (J-curve)',info:true,onClick:()=>this.openHomePop('cashflow'),
       children:h('div',{style:{paddingTop:6}}, cfJcurve),
@@ -4856,14 +4856,14 @@ class Component extends DCLogic {
       caption:'Deviation between how you’re invested today (NAV) and your committed exposure. Positive = more current value than committed weight. Actual data — not simulated.'});
     /* Alpha's executive-summary strip removed from the portfolio overview per request */
     const col=(children)=>h('div',{style:{display:'flex',flexDirection:'column',gap:16,minWidth:0}}, children);
+    /* items 5/6 — 'Where you're concentrated' + 'Allocated vs committed' removed; Alpha's read on your strategy moved to the top */
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16,minHeight:'100%'}},
       nudge,
+      alphaReadCard,
       h('div',{style:{display:'grid',gridTemplateColumns:'minmax(0,1.3fr) minmax(0,0.85fr) minmax(0,1.3fr)',gap:16,alignItems:'start'}},
         col([perfCol]),
         col([allocHeader, strategyCard, regionCard, currencyCard, sectorCard, vintageCard]),
-        col([cashCol, jcurveCard])),
-      this.twoCol(concentrationBox, zCard, '0.85fr 1.15fr'),
-      alphaReadCard);
+        col([cashCol, jcurveCard])));
   }
 
   HOME_DIMS(){
