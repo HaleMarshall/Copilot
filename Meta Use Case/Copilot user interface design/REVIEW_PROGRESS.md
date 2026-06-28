@@ -129,9 +129,9 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 ## 96–104 PDF export + asset-allocation bar labels
 - ☑ 96 Fix broken PDF export — replaced `window.print()` (rendered the dark app chrome = black box) with a dedicated white PDF preview modal (`pdfModalBody`, `showPdf` state) + print CSS (#sc-pdf-layer static, .sc-pdf-noprint hidden, .sc-pdf-page breaks). Verified live: clean rendered overview document, not a black box.
 - ☑ 97 Add y-axis to net-cash J-curve chart — swapped the axis-less `scenarioSvg` for `fAxisLine` (real labelled numeric y-axis + gridlines, €m fmt). Verified live: y-axis ticks €-3m…€2m render.
-- ☐ 98 Move clipped bar values outside the bar (Strategy/Region/Currency)
-- ☐ 99 Color broken-out (outside) bar value labels black
-- ☐ 100 Fix unreadable MEA value label
+- ☑ 98 Move clipped bar values outside the bar — `gridBars` now computes `inside` (bar wide enough for the label); if not, label renders outside to the right of the bar end. Verified live: MEA 6% renders outside.
+- ☑ 99 Color broken-out (outside) bar value labels black — outside labels use `color:var(--ink)` (black); inside labels stay white. Verified live: MEA label color var(--ink).
+- ☑ 100 Fix unreadable MEA value label — MEA (short bar) now renders its value outside in black (covered by 98/99). Verified live.
 - ☐ 101 Add unit sign to currency figures
 - ☑ 102 Polished overview PDF (all info points) — summary doc renders title + 6 KPIs + 4 allocation tables + cashflow, polished white layout. Verified live.
 - ☑ 103 Detailed-vs-summary PDF toggle — Summary/Detailed seg in the modal header (`pdfMode`). Verified live.
