@@ -4826,7 +4826,11 @@ class Component extends DCLogic {
           'Your '+d.label.toLowerCase()+' exposure is led by ',h('strong',{style:{color:'#fff'}},heavy.n),' ('+heavy.you+'% of '+basis+')',topF?[', with ',h('strong',{key:'t',style:{color:'#fff'}},topF.name),' your largest single fund']:null,'. ',
           empty.length? ['You have ',h('strong',{key:'e',style:{color:'#fff'}},'no direct fund'),' in '+empty.map(r=>r.n).join(', ')+' — clear places to add if you want the exposure.'] : 'You hold direct funds across every bucket — a well-rounded book.'),
         this.kpiTiles([['Funds held',allFunds.length+''],['NAV in this book','€'+totNav.toFixed(1)+'m'],['Buckets covered',fundRows.length+' of '+rows.length],['Largest holding',topF?topF.name:'—']]),
-        this.gapCTA(key,true)),
+        h('div',{style:{display:'flex',gap:9,flexWrap:'wrap'}},
+          this.gapCTA(key,true),
+          /* item 78 — keep a direct invest/Buy action in the top portfolio summary */
+          h('button',{onClick:()=>this.setState({homeDrill:null,homeFocusCat:null,ws:'act',uc:'opp',page:'opp',oppSource:'active',homeLaunched:true,ask:{...this.state.ask,state:'min'}}),
+            style:{border:'1px solid rgba(255,255,255,.55)',background:'transparent',color:'#fff',borderRadius:10,padding:'11px 14px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'🛒 Buy now →'))),
       caption:'A plain-language read of your '+d.label.toLowerCase()+' book and where the gaps are.'});
 
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},

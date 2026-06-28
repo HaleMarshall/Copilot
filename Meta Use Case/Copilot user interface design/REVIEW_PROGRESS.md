@@ -105,7 +105,7 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 75 Exec-summary strip at top, 5 bullets — slim 'Alpha's executive summary' strip with exactly 5 bullets at the very top (built item 73). Verified live: 5 bullets, top placement.
 - ☑ 76 AI Overview at top of Detail page + Suggest More Funds beneath — moved summaryCard (Alpha's read, blue, with gap/Suggest CTA) to the very top of homeDrillBody; mix/insight/funds pushed down. Verified live: AI panel index 0 (before mix/funds), Suggest-funds CTA present.
 - ☑ 77 Detail page portfolio summary (funds held, NAV, buckets, largest) — the 4 metric tiles (Funds held / NAV in this book / Buckets covered / Largest holding) sit in the top AI panel. Verified live: all 4 present at top.
-- ☐ 78 Keep sell/Buy-now in Detail summary
+- ☑ 78 Keep sell/Buy-now in Detail summary — added a '🛒 Buy now →' invest action (routes to Opportunities) alongside the Suggest-funds CTA in the top portfolio-summary panel. Verified live: both buttons present.
 - ☐ 79 Deviation Z-charts on every breakdown page
 - ☐ 80 Sticky breakdown panel while rest scrolls
 
