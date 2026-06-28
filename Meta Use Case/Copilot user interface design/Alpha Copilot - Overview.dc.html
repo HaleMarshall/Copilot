@@ -5204,7 +5204,7 @@ class Component extends DCLogic {
         right:h('button',{onClick:()=>this.setState({simSuggest:d.key}),style:{border:'1px solid var(--line)',background:'var(--surface)',borderRadius:8,padding:'6px 12px',fontSize:12,fontWeight:600,color:'var(--brand)',cursor:'pointer'}},'✦ Suggest funds'),
         style:focus===d.key?{boxShadow:'0 0 0 2px var(--brand)',borderColor:'var(--brand)'}:{},
         children:h('div',{style:{display:'flex',gap:24,flexWrap:'wrap',alignItems:'flex-start',paddingTop:2}},
-          h('div',{style:{flex:'1 1 300px',minWidth:260}}, pieCol(curSlices,'Current portfolio','You','based on committed capital'), sliders),
+          h('div',{style:{flex:'1 1 300px',minWidth:260}}, pieCol(curSlices,'Current Commitment','You','your invested/committed capital'), sliders),
           pieCol(tgtSlices,'Your target','Target'),
           h('div',{style:{flex:'1 1 260px',minWidth:240}},
             h('div',{style:{fontSize:10.5,fontWeight:700,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:4}},'Target vs current (pp) · updates live'), /* item 158 */

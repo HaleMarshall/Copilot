@@ -201,6 +201,21 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 158 Label Gap Chart updates live — sim distance label '· updates live' + 'Recomputes as you move the sliders.' Verified live.
 - ☑ 159 Clarify 'Current Portfolio' = committed capital — pieCol sub 'based on committed capital' under the Current-portfolio donut. Verified live.
 
-**NEXT: item 160** — (review items 160+ unread; read then continue one-by-one).
+## 160–172 Simulator labels/target figures + controls
+- ☑ 160 Rename 'Current Portfolio' (clearer) — superseded by 161's specific wording; pie now 'Current Commitment' + sub 'your invested/committed capital'. Verified.
+- ☑ 161 Rename pie label to 'Current Commitment' — done. Verified live.
+- ☐ 162 'Current target based on…' caption under target pie
+- ☐ 163 Caption explains 3 target sources (past / risk class / Alpha)
+- ☐ 164 Grayed mini allocation breakdown beside Current Target number
+- ☐ 165 Show concrete Target % per bucket (20% Buyout…)
+- ☐ 166 Show concrete Current Portfolio % per bucket
+- ☐ 167 Current Target as explicit numeric value
+- ☐ 168 Remove 'Window State' element
+- ⊘ 169 Keep Vintage excluded from Simulator comparison
+- ⊘ 170 Keep Currency dimension included
+- ☐ 171 Risk Class toggle at top of Adjust-your-target
+- ☐ 172 Pro asset-allocation behind hidden 'Detail' toggle
+
+**NEXT: item 162** — 'Current target based on…' caption under the target pie.
 
 **NEXT: item 145** — render the 4 Distance-from-Target dimensions as donut/C-charts via the toggle.
