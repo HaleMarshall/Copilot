@@ -2288,11 +2288,14 @@ class Component extends DCLogic {
       wseg([{label:'Build',value:'build'},{label:'Keep',value:'keep'},{label:'Match peers',value:'match'},{label:'Model',value:'model'},{label:'Manual',value:'manual'}], s.targetMode, v=>this.setState({targetMode:v})),
       {build:'Alpha designs a target for your risk class & horizon.',keep:'Hold your current 20% target.',match:'Mirror the selected peer group\u2019s median.',model:'Adopt the Moonfare Model Portfolio for your risk class.',manual:'You set every weight by hand.'}[s.targetMode]);
 
-    const peerLever = this.leverRow('Peer group',
+    /* item 173 — explain what 'Peers' means (matched on age group, risk class & profession) and distinguish from Custom */
+    const peerLever = this.leverRow(h('span',{style:{display:'inline-flex',alignItems:'center',gap:6}},'Peer group',
+        h('span',{title:'Peers = investors matched to you on age group, risk class and profession — people like you. Custom lets you compare against any profile you define (e.g. someone investing €100m, a different risk class, US-based, in engineering/tech, aged 20–35).',
+          style:{display:'inline-flex',alignItems:'center',justifyContent:'center',width:14,height:14,borderRadius:'50%',border:'1px solid var(--muted)',color:'var(--muted)',fontSize:9,fontWeight:700,cursor:'help'}},'i')),
       h('button',{onClick:()=>this.setState({cohortOpen:true,controlOpen:true}),
         style:{display:'flex',width:'100%',alignItems:'center',justifyContent:'space-between',border:'1px solid var(--line)',background:'var(--surface)',color:'var(--ink)',borderRadius:9,padding:'8px 11px',cursor:'pointer',fontSize:12.5,fontWeight:600}},
         h('span',null,this.cohortSummary()), h('span',{style:{color:'var(--brand)',fontFamily:this.SF,fontWeight:700}}, 'n = '+(co.gated?'—':co.n))),
-      'Who you\u2019re compared against. Click to refine cohort.');
+      'Peers = people like you (age group \u00b7 risk class \u00b7 profession). Custom = any profile you define. Click to refine.');
 
     const cmpLever = this.leverRow('Compare canvas against',
       wseg([{label:'Peers',value:'peers'},{label:'Platform',value:'platform'},{label:'Model',value:'model'}], s.cmp, v=>this.setState({cmp:v})),

@@ -216,6 +216,9 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 171 Risk Class toggle at top of Adjust-your-target — chip row on strategy row, re-derives target (simTargets:null). Verified ('Risk class — feeds your target').
 - ☑ 172 Pro asset-allocation behind hidden 'Detail' toggle — simDetail:false default shows 1 dim; toggle expands to 4. Verified (collapsed dimCount 1, expanded 4).
 
-**NEXT: item 173** — Peers benchmark info/tooltip (Peer = matched on age group, risk class, profession; distinct from Custom). Read review.md from line ~1629.
+## 173+ Comparison/Simulator (target world)
+- ☑ 173 Peers benchmark info/tooltip — ⓘ on Peer-group lever (title: matched on age group, risk class & profession; Custom = any profile e.g. €100m/US/tech/20–35) + rewritten help line. Verified (leverRow renders title + help).
+
+**NEXT: item 174** — hide target-adjustment dials by default behind a bottom toggle (show large target pie prominently). Note: item 172 already gates the pro full-allocation dims; 174 asks the *primary* dials also collapse, with the toggle at the page bottom and the pie hero. Read review.md ~1639.
 
 **NEXT: item 145** — render the 4 Distance-from-Target dimensions as donut/C-charts via the toggle.
