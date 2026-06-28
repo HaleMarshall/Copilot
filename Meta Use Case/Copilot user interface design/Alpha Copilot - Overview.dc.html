@@ -5639,7 +5639,7 @@ class Component extends DCLogic {
     const h=this.h; const SF=this.SF; const a=this.state.oppDetail; if(!a) return null;
     const tab=this.state.oppDetailTab||'why'; const add=a.kind==='add';
     const fund=a.fund||a.strat; const gapAbs=Math.abs(a.gap);
-    const tabs=[['why','Why this'],['whynot','Why not'],['compare','Compare'],['questions','Questions'],['demand','Demand']];
+    const tabs=[['why','Why this'],['whynot','Why not'],['impact','Close the gap'],['compare','Compare'],['questions','Questions'],['demand','Demand']]; /* items 146-150 */
     const tabBar=h('div',{style:{display:'flex',gap:4,flexWrap:'wrap',borderBottom:'1px solid var(--line)',marginBottom:16}}, tabs.map(([k,l])=>{ const on=tab===k;
       return h('button',{key:k,onClick:()=>this.setState({oppDetailTab:k}),
         style:{border:'none',background:'transparent',cursor:'pointer',padding:'9px 12px',fontSize:12.5,fontWeight:on?700:500,color:on?'var(--brand-ink)':'var(--muted)',borderBottom:'2px solid '+(on?'var(--brand)':'transparent'),marginBottom:-1}},l); }));
@@ -5691,6 +5691,22 @@ class Component extends DCLogic {
           'A distribution landing in the next quarter (more headroom).',
           'Trimming an over-weight sleeve first to fund this without new cash.',
           'A larger, lower-fee vintage of the same strategy entering the pipeline.'],'ok'));
+    } else if(tab==='impact'){
+      /* items 146-150 — Close the Gap: now vs after-action pies + exposure deltas, only the dimensions this action changes */
+      const mx=(this.MIX&&this.MIX.you)||{}; const key=a.fundKey; const g=Math.abs(a.gap);
+      const before={...mx}; const after={...before};
+      if(add&&key!=null){ after[key]=(before[key]||0)+g; const others=Object.keys(before).filter(k=>k!==key); const so=others.reduce((s,k)=>s+(before[k]||0),0)||1; const sc=Math.max(0,(100-after[key]))/so; others.forEach(k=>after[k]=+((before[k]||0)*sc).toFixed(1)); }
+      else if(key!=null){ after[key]=Math.max(0,(before[key]||0)-g); }
+      const nm=k=>(this.STRATS.find(s=>s[0]===k)||[null,k])[1]; const col=k=>(this.STRATS.find(s=>s[0]===k)||[null,null,'--data-9'])[2];
+      const sl=(m)=>Object.keys(m).filter(k=>m[k]>0.4).map(k=>({n:nm(k),color:col(k),p:m[k]}));
+      const deltas=Object.keys(before).filter(k=>Math.abs((after[k]||0)-(before[k]||0))>=0.5).map(k=>({n:nm(k),from:Math.round(before[k]||0),to:Math.round(after[k]||0)})).sort((x,y)=>Math.abs(y.to-y.from)-Math.abs(x.to-x.from));
+      const pie=(m,label)=>h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:8,flex:'1 1 200px'}}, h('div',{style:{fontSize:10.5,fontWeight:700,textTransform:'uppercase',letterSpacing:'.05em',color:'var(--muted)'}},label), this.donutNamed(sl(m),150,'Strategy',label==='Now'?'today':'after'));
+      body=h('div',null,
+        h('div',{style:{fontSize:13,color:'var(--ink)',marginBottom:14,lineHeight:1.55}},'Where you are now versus how it would look if you take this action — your '+a.strat+' gap closes from '+g+'pp toward target.'),
+        h('div',{style:{display:'flex',gap:18,flexWrap:'wrap',marginBottom:16}}, pie(before,'Now'), pie(after,'If you do this')),
+        h('div',{style:{background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:12,padding:'13px 15px'}},
+          h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:8}}, h('span',null,'✦'), h('div',{style:{fontSize:11,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--brand)',fontWeight:700}},'Alpha — what changes')),
+          h('div',{style:{fontSize:12.5,lineHeight:1.6,color:'var(--ink)'}}, 'Adding '+a.fund+' shifts your exposure: ', deltas.map((d,i)=>h('span',{key:i},(i?', ':''),h('strong',null,d.n),' '+d.from+'%→'+d.to+'%')), '. Only the dimensions this action changes are shown.')));
     } else if(tab==='compare'){
       const rows=[['Net IRR (target)','18%','14%'],['Net MOIC (target)','2.1x','1.7x'],['Mgmt fee','1.5%','2.0%'],['Vintage','2025','2023 (passed)'],['Team stability','Intact','1 partner left']];
       body=h('div',null,

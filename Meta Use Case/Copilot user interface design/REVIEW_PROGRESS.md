@@ -186,11 +186,11 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 ## 144–159 Simulator distance/impact + Passed-Missed page + labels
 - ⊘ 144 Consistent nomenclature across Distance-from-Target dims — confirmed: toggle labels Strategy/Region/Currency/Sector + bucket names all come from HOME_DIMS, same as every allocation view.
 - ☑ 145 Render the 4 Distance-from-Target dims as pie/donut charts (toggle) — Distance card now shows a donut (C-chart) of the selected dimension's current mix beside the gap bars; the 4-dim toggle switches it. Verified live: distSlices donut wired.
-- ☐ 146 Show Distance from Target reducing after an action
-- ☐ 147 Two pie charts: current vs after-action
-- ☐ 148 Ask Alpha summary: target status + exposure deltas
-- ☐ 149 Impact view shows only dimensions the action changes
-- ☐ 150 'Close the Gap' overview (now vs if-you-do-this)
+- ☑ 146 Show Distance from Target reducing after an action — 'Close the gap' tab's after-pie moves the strategy toward target (gap closes from {g}pp). Verified live.
+- ☑ 147 Two pie charts: current vs after-action — 'Now' + 'If you do this' donuts side by side. Verified live.
+- ☑ 148 Ask Alpha summary: target status + exposure deltas — '✦ Alpha — what changes' lists before→after deltas per affected bucket. Verified live.
+- ☑ 149 Impact view shows only dimensions the action changes — deltas filtered to buckets changing ≥0.5pp + 'Only the dimensions this action changes are shown'. Verified live.
+- ☑ 150 'Close the Gap' overview (now vs if-you-do-this) — new 'Close the gap' tab in the recommendation detail. Verified live: tab + pies + summary present.
 - ☐ 151 Rename 'What you passed on' → 'What you missed out on'
 - ☐ 152 Make 'Missed out on' its own dedicated page
 - ☐ 153 Distinguish 'Pass' (decided) from missed-out
