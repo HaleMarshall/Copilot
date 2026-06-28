@@ -265,6 +265,21 @@ Built: MANAGERS() dataset (15 managers, multi-asset-class, since-inception IRR +
 
 Built: MGR_META() (domicile/listed/est/since/avgDpi/nFunds/topQ/scores/offering), mgrMeta/mgrById/mgrBestWorst/mgrFollowVerdict, comparison-list builder (cmpList: GPs/funds/strategies), managerProfileBody().
 
-**NEXT: item 200** — comparison-list builder + 201 Apple-style side-by-side + 202 drill-in detail + 203 GP-level entity + 208 scorecards + 209 weighting + 214 header + 218 select-in. Then 210 filters, 211 scope, 212/213 fund-vs-fund.
+- ☑ 200 Comparison-list builder — cmpList supports GPs, funds AND strategies (add buttons + strategy chips). Verified.
+- ☑ 201 Apple-style side-by-side comparison — managerCompareBody table, best-per-row ✓ highlight. Verified.
+- ☑ 202 Drill-in metric detail (side page) — click metric → cmpMetricDetail bars + explanation. Verified.
+- ☑ 203 GP-level / GP-in-strategy entity — 'KKR · Buyout' added when an asset class is active. Verified.
+- ☑ 208 Scorecards — Consistency/Delivery/Mark-up rows per column. Verified.
+- ☑ 209 Manual weighting — 'Rank by' criterion re-ranks columns + flags leader. Verified.
+- ☑ 210 List filters — Listed/Private + Has-offering (Cinven excluded when Listed). Verified.
+- ☑ 211 Scope separation — 'Platform-wide manager research… separate from your portfolio' note. Verified.
+- ☑ 212 Fund-vs-fund — fund entries (EQT IX) compared with fund metrics. Verified.
+- ☑ 213 Fund-level metric rules — funds show Net IRR/DPI/Vintage only, no Consistency. Verified.
+- ☑ 214 Comparison header — GP names carry full firm history. Verified.
+- ☑ 218 Pick managers into comparison — row ＋GP/＋fund buttons + banner → Compare page. Verified.
+
+Built: managerCompareBody() (Apple-style, drill-in), cmpEntryInfo() (GP/GP-in-strategy/fund/strategy), MGR_METRIC_EXPL(), new t2-7 'Comparison' page.
+
+**NEXT: item 220** — S&P 500 benchmark on personal performance page (IRR/DPI). Read review.md ~2049.
 
 **NEXT: item 145** — render the 4 Distance-from-Target dimensions as donut/C-charts via the toggle.
