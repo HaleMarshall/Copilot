@@ -5419,15 +5419,17 @@ class Component extends DCLogic {
       children:h('div',null, seqRows, planSummary),
       caption:'The order to act — closes your biggest gaps first. Tap a step for the rationale.'});
     const addActs=o.actions.filter(a=>a.kind==='add'&&a.fund);
-    const fundRow2=(a)=>h('div',{key:a.rank,style:{display:'flex',gap:12,alignItems:'flex-start',padding:'13px 14px',border:'1px solid var(--line)',borderRadius:12,background:'var(--surface)'}},
+    /* item 141 — highlight the single best-matching fund as 'Target fit'; item 142 — no expected-return/return-target on the card, fit only */
+    const fundRow2=(a,best)=>h('div',{key:a.rank,style:{display:'flex',gap:12,alignItems:'flex-start',padding:'13px 14px',border:'1px solid '+(best?'var(--brand)':'var(--line)'),borderRadius:12,background:best?'var(--brand-wash)':'var(--surface)'}},
       h('div',{style:{flex:1,minWidth:0}},
-        h('div',{style:{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}}, h('span',{style:{width:9,height:9,borderRadius:3,background:'var('+a.color+')',flex:'0 0 9px'}}), h('span',{style:{fontFamily:SF,fontSize:14,fontWeight:700}},a.fund)),
+        h('div',{style:{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}}, h('span',{style:{width:9,height:9,borderRadius:3,background:'var('+a.color+')',flex:'0 0 9px'}}), h('span',{style:{fontFamily:SF,fontSize:14,fontWeight:700}},a.fund),
+          best?h('span',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'#fff',background:'var(--brand)',borderRadius:999,padding:'2px 8px'}},'✓ Target fit'):null),
         h('div',{style:{fontSize:11.5,color:'var(--muted)',marginTop:3}},a.strat+(a.note?' · '+a.note:'')),
         a.fundId?h('button',{onClick:()=>this.openFundPage(a.fundId),style:{marginTop:8,border:'none',background:'transparent',color:'var(--brand-ink)',fontSize:12,fontWeight:700,cursor:'pointer',padding:0}},'View fund opportunity →'):null),
       h('div',{style:{flex:'0 0 auto'}}, this.shopBtn(a.fund,a.strat,true)));
     const fundsInSeqCard=this.card({title:'Funds in this sequence',badge:this.badge('concrete','synth'),
-      children: addActs.length? h('div',{style:{display:'flex',flexDirection:'column',gap:10}}, addActs.map(fundRow2)) : h('div',{style:{padding:'20px',textAlign:'center',color:'var(--muted)',fontSize:12.5,border:'1px dashed var(--line)',borderRadius:12}},'The sequence is run-offs only — no new fund to buy.'),
-      caption:'The concrete funds your recommended sequence resolves into. Open one for its full opportunity page.'});
+      children: addActs.length? h('div',{style:{display:'flex',flexDirection:'column',gap:10}}, addActs.map((a,i)=>fundRow2(a,i===0))) : h('div',{style:{padding:'20px',textAlign:'center',color:'var(--muted)',fontSize:12.5,border:'1px dashed var(--line)',borderRadius:12}},'The sequence is run-offs only — no new fund to buy.'),
+      caption:'The concrete funds your recommended sequence resolves into. The best match for you is flagged Target fit. Open one for its full opportunity page.'});
 
     // ---- Missed-opportunity / passed-on lane (t1-11) ----
     const missed=[
@@ -5466,17 +5468,19 @@ class Component extends DCLogic {
         secMktAction('Sell-side','Sell on the Moonfare Secondary Market','List a holding for liquidity ahead of a known cash need.','Explore selling  →',()=>this.setState({ws:'act',uc:'t2-6',page:'sell',homeLaunched:true,deepLink:null,homePop:null,homeDrill:null}))),
       caption:'Moonfare’s secondary marketplace — buy or sell existing stakes. Distinct from a secondaries fund.'});
     // items 135/136/137 — Current Opportunities (full opacity) + greyed-out Upcoming preview (still drillable)
-    const oppTile=(f,faded)=>h('div',{key:f.id,onClick:()=>this.openFundPage(f.id),
-      onMouseEnter:e=>{e.currentTarget.style.borderColor='var(--brand-tint-3)';},onMouseLeave:e=>{e.currentTarget.style.borderColor=faded?'var(--line)':'var(--line)';},
-      style:{flex:'1 1 200px',minWidth:190,border:'1px solid var(--line)',borderRadius:12,padding:'13px 14px',background:'var(--surface)',cursor:'pointer',opacity:faded?0.55:1}},
-      h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:5}}, h('span',{style:{width:9,height:9,borderRadius:3,background:'var('+(f.color||'--data-1')+')',flex:'0 0 9px'}}), h('span',{style:{fontFamily:SF,fontSize:13.5,fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},f.fund||f.name)),
-      h('div',{style:{fontSize:11.5,color:'var(--muted)'}}, f.strat+' · target '+(f.tgt||'—')),
+    /* item 142 — fund card shows NO expected-return / return-target; item 141 — best match flagged 'Target fit' */
+    const oppTile=(f,faded,best)=>h('div',{key:f.id,onClick:()=>this.openFundPage(f.id),
+      onMouseEnter:e=>{if(!best)e.currentTarget.style.borderColor='var(--brand-tint-3)';},onMouseLeave:e=>{e.currentTarget.style.borderColor=best?'var(--brand)':'var(--line)';},
+      style:{flex:'1 1 200px',minWidth:190,border:'1px solid '+(best?'var(--brand)':'var(--line)'),borderRadius:12,padding:'13px 14px',background:best?'var(--brand-wash)':'var(--surface)',cursor:'pointer',opacity:faded?0.55:1}},
+      h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:5,flexWrap:'wrap'}}, h('span',{style:{width:9,height:9,borderRadius:3,background:'var('+(f.color||'--data-1')+')',flex:'0 0 9px'}}), h('span',{style:{fontFamily:SF,fontSize:13.5,fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},f.fund||f.name),
+        best?h('span',{style:{fontSize:9,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'#fff',background:'var(--brand)',borderRadius:999,padding:'2px 7px'}},'✓ Target fit'):null),
+      h('div',{style:{fontSize:11.5,color:'var(--muted)'}}, f.strat),
       faded? h('div',{style:{marginTop:7,display:'inline-block',fontSize:9.5,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--synthetic)',background:'var(--synthetic-wash)',border:'1px solid var(--synthetic)',borderRadius:999,padding:'2px 8px'}},'Coming soon · '+(f.close||'')) : h('div',{style:{marginTop:7,fontSize:11.5,color:'var(--brand-ink)',fontWeight:700}},'Open now · closes '+(f.close||'')),
       h('div',{style:{marginTop:8,fontSize:11.5,color:'var(--brand)',fontWeight:600}},'View detail →'));
     const upcomingCard=this.card({title:'Opportunities',badge:this.badge('live + preview','synth'),
       children:h('div',null,
         h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',margin:'2px 0 9px'}},'Current — available now'),
-        h('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}}, this.OPP_FUNDS_LIST().map(f=>oppTile(f,false))),
+        h('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}}, this.OPP_FUNDS_LIST().map(f=>oppTile(f,false, !!(addActs[0]&&f.strat===addActs[0].strat)))),
         h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',margin:'16px 0 9px'}},'Upcoming — preview'),
         h('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}}, this.UPCOMING_FUNDS().map(f=>oppTile(f,true)))),
       caption:'Current funds are open now; upcoming funds are greyed previews of what’s likely next — still click any to open its detail.'});

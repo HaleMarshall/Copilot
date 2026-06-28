@@ -179,8 +179,8 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ⊘ 138 Allow same fund to appear multiple times — confirmed: opportunity/sequence lists (seq funds, Current Opps, Upcoming, missed) have no fund-level dedupe, so a fund can appear at multiple relevant points.
 - ☑ 139 Move Why-this/Why-not/Compare to fund level — added a fund-scoped 'Why this · Why not · Compare' card (3-tab seg, `fundWhyTab`) to the fund detail page main column. Verified live: card + 3 tabs render on EQT IX page.
 - ☑ 140 Open Baseline first, then Simulator case — default `oppSource:'baseline'`; srcOpts reordered Baseline→Active sim→saved. Sim→Opp handoffs still pass 'active' (explicit Simulator-case entry). Verified live: baseline first + default.
-- ☐ 141 Highlight best-matching fund as 'Target fit'
-- ☐ 142 Remove 'Expected Return' from fund card (keep fit only)
+- ☑ 141 Highlight best-matching fund as 'Target fit' — '✓ Target fit' badge + brand highlight on the top fund in Funds-in-sequence and the best matching Current Opportunity (matched to the top recommendation's strategy). Verified live.
+- ☑ 142 Remove 'Expected Return' from fund card (keep fit only) — opportunity tile no longer shows the 'target {multiple}' return-target line; only strategy + open/close + Target-fit highlight. Verified live.
 - ☐ 143 Distance-from-Target toggle across all 4 dimensions
 
 **NEXT: item 131** — replace the shopping-cart add icon (not a plus) on rec rows + top nav.
