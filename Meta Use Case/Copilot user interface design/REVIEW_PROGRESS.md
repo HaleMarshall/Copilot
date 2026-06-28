@@ -197,8 +197,10 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 154 Group by asset class then performance — items grouped by `cls`, sorted by `perf` desc within. Verified live.
 - ☑ 155 Prominent asset-class/strategy label — each item leads with uppercase brand-ink '{class} · {sub}'. Verified live.
 - ☑ 156 'Similar Alternative' beside each — 'Similar alternative' button → openFundPage(altId) + Add, on every item (5). Verified live.
-- ☐ 157 Clarify 'SHAPE · 1 OF 11' label
-- ☐ 158 Label Gap Chart updates live
-- ☐ 159 Clarify 'Current Portfolio' = committed capital
+- ☑ 157 Clarify 'SHAPE · 1 OF 11' label — stageEyebrow now '{label} · {verb} · use case {idx} of {N}'. Verified: 'use case' in source.
+- ☑ 158 Label Gap Chart updates live — sim distance label '· updates live' + 'Recomputes as you move the sliders.' Verified live.
+- ☑ 159 Clarify 'Current Portfolio' = committed capital — pieCol sub 'based on committed capital' under the Current-portfolio donut. Verified live.
+
+**NEXT: item 160** — (review items 160+ unread; read then continue one-by-one).
 
 **NEXT: item 145** — render the 4 Distance-from-Target dimensions as donut/C-charts via the toggle.

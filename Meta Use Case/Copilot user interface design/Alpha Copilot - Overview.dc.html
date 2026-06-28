@@ -5185,8 +5185,9 @@ class Component extends DCLogic {
       const tot=cats.reduce((a,k)=>a+(tObj[k]||0),0)||1;
       const tgtSlices=cats.map(k=>({color:d.colors[k],p:+(((tObj[k]||0)/tot*100)).toFixed(1),n:nm(d.key,k)}));
       const z=cats.map(k=>({name:nm(d.key,k),color:d.colors[k],delta:+(((tObj[k]||0)/tot*100)-d.actual[k]).toFixed(1),sig:Math.abs(((tObj[k]||0)/tot*100)-d.actual[k])>=2})).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
-      const pieCol=(slices,label,center)=>h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:9,flex:'0 0 auto'}},
-        h('div',{style:{fontSize:10.5,fontWeight:700,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.05em'}},label),
+      const pieCol=(slices,label,center,sub)=>h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:9,flex:'0 0 auto'}},
+        h('div',{style:{textAlign:'center'}}, h('div',{style:{fontSize:10.5,fontWeight:700,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.05em'}},label),
+          sub?h('div',{style:{fontSize:9.5,color:'var(--muted)',marginTop:1}},sub):null), /* item 159 */
         this.donutNamed(slices,150,center,d.label.toLowerCase()));
       const sliders=h('div',{style:{display:'flex',flexDirection:'column',gap:10,marginTop:16}},
         h('div',{style:{fontSize:10.5,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)'}},'Adjust your target'),
@@ -5203,10 +5204,11 @@ class Component extends DCLogic {
         right:h('button',{onClick:()=>this.setState({simSuggest:d.key}),style:{border:'1px solid var(--line)',background:'var(--surface)',borderRadius:8,padding:'6px 12px',fontSize:12,fontWeight:600,color:'var(--brand)',cursor:'pointer'}},'✦ Suggest funds'),
         style:focus===d.key?{boxShadow:'0 0 0 2px var(--brand)',borderColor:'var(--brand)'}:{},
         children:h('div',{style:{display:'flex',gap:24,flexWrap:'wrap',alignItems:'flex-start',paddingTop:2}},
-          h('div',{style:{flex:'1 1 300px',minWidth:260}}, pieCol(curSlices,'Current portfolio','You'), sliders),
+          h('div',{style:{flex:'1 1 300px',minWidth:260}}, pieCol(curSlices,'Current portfolio','You','based on committed capital'), sliders),
           pieCol(tgtSlices,'Your target','Target'),
           h('div',{style:{flex:'1 1 260px',minWidth:240}},
-            h('div',{style:{fontSize:10.5,fontWeight:700,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:10}},'Target vs current (pp)'),
+            h('div',{style:{fontSize:10.5,fontWeight:700,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:4}},'Target vs current (pp) · updates live'), /* item 158 */
+            h('div',{style:{fontSize:10.5,color:'var(--muted)',marginBottom:8,textTransform:'none',letterSpacing:0}},'Recomputes as you move the sliders.'),
             z.some(x=>Math.abs(x.delta)>=0.5)? this.miniZ(z) : h('div',{style:{fontSize:12,color:'var(--muted)',padding:'20px 0',textAlign:'center'}},'Move a slider to open a gap vs your current mix.')))});
     };
     const grid=h('div',{style:{display:'flex',flexDirection:'column',gap:18}},
@@ -5999,7 +6001,7 @@ class Component extends DCLogic {
       wsNav:this.wsNav(), personaToggle:this.personaToggle(), controlPanel:this.controlPanel(),
       wsCount:this.curWS().ids.length,
       controlClosed: this.controlIsLeverPanel() && !s.controlOpen, openControl:()=>this.setState({controlOpen:true}),
-      stageEyebrow: (()=>{ const u=this.curUC(); const w=this.curWS(); const idx=this.wsUCs(w.id).findIndex(x=>x.id===u.id)+1; return `${w.label} · ${w.verb} · ${idx} of ${w.ids.length}`; })(),
+      stageEyebrow: (()=>{ const u=this.curUC(); const w=this.curWS(); const idx=this.wsUCs(w.id).findIndex(x=>x.id===u.id)+1; return `${w.label} · ${w.verb} · use case ${idx} of ${w.ids.length}`; })(), /* item 157 — clarify '1 of 11' = use cases */
       stageTitle:this.curUC().title, stageSubtitle:this.curUC().meta,
       showOverview: this.curPage().view==='overview', showOther: this.curPage().view!=='overview', surfaceBody:this.surfaceBody(),
       cohortLabel: this.cohortSummary(),
