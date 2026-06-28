@@ -438,7 +438,7 @@ class Component extends DCLogic {
     this.h = h;
     this.STRATS = [
       ['buyout','Buyout','--data-1'],['growth','Growth','--data-2'],['venture','Venture','--data-3'],
-      ['credit','Private Credit','--data-4'],['infra','Infrastructure','--data-5'],['realestate','Real Estate','--data-6'],
+      ['credit','Private Credit','--data-4'],['infra','Infrastructure','--data-5'], /* item 18 — real estate removed (none held) */
       ['secondaries','Secondaries','--data-7'],['ai','AI / Tech','--data-8'],['directs','Direct & Co-Invest','--data-10'],['other','Other','--data-9']
     ];
     this.MIX = {
@@ -3782,7 +3782,7 @@ class Component extends DCLogic {
       style:{marginLeft:'auto',border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:9,padding:'6px 12px',fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},
       big?'↙ Show compact':'⤢ Go bigger');
     const header=h('div',{style:{display:'flex',alignItems:'center',gap:10,marginBottom:big?16:12}},
-      h('div',{style:{fontFamily:SF,fontSize:big?19:16,fontWeight:600}},'Where you hold the most funds'),
+      h('div',{style:{fontFamily:SF,fontSize:big?19:16,fontWeight:600}},'Where you hold the most investments'), /* items 20/22 — 'investments', not funds/opportunities */
       h('span',{style:{fontSize:12,color:'var(--muted)'}}, 'Most concentrated in '+top.n+' · '+byCat[top.k].length+' fund'+(byCat[top.k].length>1?'s':'')),
       toggleBtn);
     const items = big? ranked : ranked.slice(0,3);
@@ -5062,7 +5062,11 @@ class Component extends DCLogic {
         h('div',{style:{fontSize:13,lineHeight:1.6,color:'rgba(255,255,255,.92)'}},
           'Your '+d.label.toLowerCase()+' exposure is led by ',h('strong',{style:{color:'#fff'}},heavy.n),' ('+heavy.you+'% of '+basis+')',topF?[', with ',h('strong',{key:'t',style:{color:'#fff'}},topF.name),' your largest single fund']:null,'. ',
           empty.length? ['You have ',h('strong',{key:'e',style:{color:'#fff'}},'no direct fund'),' in '+empty.map(r=>r.n).join(', ')+' — clear places to add if you want the exposure.'] : 'You hold direct funds across every bucket — a well-rounded book.'),
-        this.kpiTiles([['Funds held',allFunds.length+''],['NAV in this book','€'+totNav.toFixed(1)+'m'],['Buckets covered',fundRows.length+' of '+rows.length],['Largest holding',topF?topF.name:'—']]),
+        /* item 19 — readable KPI tiles on the dark Alpha card (white text on translucent panels, not white-on-beige) */
+        h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}, [['Funds held',allFunds.length+''],['NAV in this book','€'+totNav.toFixed(1)+'m'],['Buckets covered',fundRows.length+' of '+rows.length],['Largest holding',topF?topF.name:'—']].map((t,i)=>
+          h('div',{key:i,style:{background:'rgba(255,255,255,.14)',borderRadius:10,padding:'10px 12px',minWidth:0}},
+            h('div',{style:{fontSize:10.5,color:'rgba(255,255,255,.78)'}},t[0]),
+            h('div',{style:{fontFamily:SF,fontSize:17,fontWeight:700,color:'#fff',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},t[1])))),
         h('div',{style:{display:'flex',gap:9,flexWrap:'wrap'}},
           this.gapCTA(key,true),
           /* item 78 — keep a direct invest/Buy action in the top portfolio summary */

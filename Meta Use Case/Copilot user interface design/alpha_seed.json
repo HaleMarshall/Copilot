@@ -63,11 +63,6 @@
 "--data-5"
 ],
 [
-"realestate",
-"Real Estate",
-"--data-6"
-],
-[
 "secondaries",
 "Secondaries",
 "--data-7"
@@ -90,36 +85,33 @@
 ],
 "mix": {
 "you": {
-"buyout": 30,
+"buyout": 38,
 "growth": 14,
 "venture": 10,
 "credit": 2,
 "infra": 6,
-"realestate": 8,
 "secondaries": 6,
 "ai": 18,
 "directs": 4,
 "other": 2
 },
 "platform": {
-"buyout": 30,
+"buyout": 38,
 "growth": 15,
 "venture": 11,
 "credit": 9,
 "infra": 7,
-"realestate": 8,
 "secondaries": 6,
 "ai": 10,
 "directs": 3,
 "other": 1
 },
 "model": {
-"buyout": 26,
+"buyout": 33,
 "growth": 14,
 "venture": 8,
 "credit": 14,
 "infra": 12,
-"realestate": 7,
 "secondaries": 6,
 "ai": 9,
 "directs": 3,

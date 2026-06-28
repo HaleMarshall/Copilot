@@ -18,4 +18,7 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 15 category descriptors next to each dimension item (direct deals included)
 - [x] 16 Alpha read on strategy: gap-to-target + concentration intelligence
 - [x] 17 actionable suggestion in Alpha read (not just a summary)
-NEXT: item 18 (remove real estate from the graph)
+- [x] 18 removed Real Estate from strategy graph (seed strats+mix + code STRATS; reseeded)
+- [x] 19 readable Alpha-read KPI tiles (white on translucent, not white-on-beige)
+- [x] 20 heading → Where you hold the most investments
+NEXT: item 21 (show all funds table at bottom: View the investments you hold by strategy)
