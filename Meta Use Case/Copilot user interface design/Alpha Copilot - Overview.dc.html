@@ -1258,7 +1258,7 @@ class Component extends DCLogic {
   ]; }
   agentSuggestFunds(q){
     const funds=this.chatFundCandidates();
-    const segs=[{t:'Here are the funds that best close your gap to target, ranked by fit. Each carries a five-point rationale and is sized to your headroom — tap '},{chip:'🛒 Buy'},{t:' to add one to your cart.'}];
+    const segs=[{t:'Here are the funds that best close your gap to target, ranked by fit. Each carries a five-point rationale and is sized to your headroom — tap '},{chip:'💼 Add'},{t:' to add one to your commitments.'}];
     this.setAsk(null,{ typing:false, msgs:this.state.ask.msgs.concat([{who:'alpha', segs, kind:'funds', funds}]) });
   }
   agentChart(q){ const t=(q||'').toLowerCase();
@@ -3600,10 +3600,10 @@ class Component extends DCLogic {
   shopBtn(name,strat,sm){ const h=this.h; const inC=this.inCart(name);
     if(this.isHeld(name)){ /* item 62 — held funds show a static cart marker, not a buy action */
       return h('span',{title:'Already in your portfolio',
-        style:{flex:'0 0 auto',display:'inline-flex',alignItems:'center',justifyContent:'center',gap:4,border:'1px solid var(--over)',background:'var(--over-wash)',color:'var(--over)',borderRadius:8,padding:sm?'4px 7px':'6px 10px',fontSize:sm?11:12,fontWeight:700,whiteSpace:'nowrap'}}, sm?'🛒':'🛒 Held');
+        style:{flex:'0 0 auto',display:'inline-flex',alignItems:'center',justifyContent:'center',gap:4,border:'1px solid var(--over)',background:'var(--over-wash)',color:'var(--over)',borderRadius:8,padding:sm?'4px 7px':'6px 10px',fontSize:sm?11:12,fontWeight:700,whiteSpace:'nowrap'}}, sm?'💼':'💼 Held');
     }
-    return h('button',{onClick:e=>{e.stopPropagation();this.addToCart(name,strat);},title:inC?'In cart':'Add to cart',
-      style:{flex:'0 0 auto',display:'inline-flex',alignItems:'center',justifyContent:'center',gap:4,border:'1px solid '+(inC?'var(--over)':'var(--brand-tint-3)'),background:inC?'var(--over-wash)':'var(--surface)',color:inC?'var(--over)':'var(--brand-ink)',borderRadius:8,padding:sm?'4px 7px':'6px 10px',fontSize:sm?11:12,fontWeight:700,cursor:'pointer',whiteSpace:'nowrap'}}, inC?'🛒✓':('🛒'+(sm?'':' Buy')));
+    return h('button',{onClick:e=>{e.stopPropagation();this.addToCart(name,strat);},title:inC?'In your commitments':'Add to commitments',
+      style:{flex:'0 0 auto',display:'inline-flex',alignItems:'center',justifyContent:'center',gap:4,border:'1px solid '+(inC?'var(--over)':'var(--brand-tint-3)'),background:inC?'var(--over-wash)':'var(--surface)',color:inC?'var(--over)':'var(--brand-ink)',borderRadius:8,padding:sm?'4px 7px':'6px 10px',fontSize:sm?11:12,fontWeight:700,cursor:'pointer',whiteSpace:'nowrap'}}, inC?'💼✓':('💼'+(sm?'':' Buy')));
   }
   addToCart(name,strat){ const c=this.state.cart||[]; if(c.some(x=>x.name===name)){ this.setState({showCart:true,cartCommitted:false}); return; }
     const f=this.HELD_FUNDS().find(x=>x.name===name); this.setState({cart:c.concat([{name, ticket:150, strat:strat||(f&&f.strat)||''}]), showCart:true, cartCommitted:false, showNotif:false, showProfile:false}); }
@@ -3617,15 +3617,15 @@ class Component extends DCLogic {
         ? h('button',{onClick:e=>{e.stopPropagation();this.suggestSimilar(name,strat);},title:'You already hold this fund — see comparable funds on the platform',
             style:{border:'none',borderRadius:9,padding:pad,fontSize:fs,fontWeight:700,cursor:'pointer',background:'var(--brand)',color:'#fff',fontFamily:'Inter,system-ui,sans-serif'}}, '✨ Suggest similar funds')
         : h('button',{onClick:e=>{e.stopPropagation();this.addToCart(name,strat);},
-            style:{border:'none',borderRadius:9,padding:pad,fontSize:fs,fontWeight:700,cursor:'pointer',background:inC?'var(--over)':'var(--brand)',color:'#fff',fontFamily:'Inter,system-ui,sans-serif'}}, inC?'🛒 In cart':'🛒 Buy now'),
+            style:{border:'none',borderRadius:9,padding:pad,fontSize:fs,fontWeight:700,cursor:'pointer',background:inC?'var(--over)':'var(--brand)',color:'#fff',fontFamily:'Inter,system-ui,sans-serif'}}, inC?'💼 Added':'💼 Buy now'),
       held?null:h('button',{onClick:e=>{e.stopPropagation();this.addToPortfolio(name);},
         style:{border:'1px solid '+(inP?'var(--over)':'var(--brand-tint-3)'),borderRadius:9,padding:pad,fontSize:fs,fontWeight:600,cursor:'pointer',background:inP?'var(--over-wash)':'var(--surface)',color:inP?'var(--over)':'var(--brand-ink)',fontFamily:'Inter,system-ui,sans-serif'}}, inP?'✓ In portfolio plan':'＋ Portfolio plan'),
       held?null:h('button',{onClick:e=>{e.stopPropagation();this.toggleWatch(name);},
         style:{border:'1px solid '+(inW?'var(--brand)':'var(--line)'),background:inW?'var(--brand-wash)':'var(--surface)',color:inW?'var(--brand-ink)':'var(--muted)',borderRadius:9,padding:pad,fontSize:fs,fontWeight:600,cursor:'pointer'}}, inW?'♥ Watchlisted':'♡ Watchlist'));
   }
   cartBtn(){ const h=this.h; const n=(this.state.cart||[]).length;
-    return h('button',{onClick:()=>this.setState({showCart:!this.state.showCart,showNotif:false,showProfile:false,cartCommitted:false}),title:'Your cart',
-      style:{position:'relative',border:'1px solid var(--topbar-line)',background:n?'var(--brand-wash)':'var(--topbar-chip)',color:'var(--topbar-ink)',width:30,height:30,borderRadius:8,cursor:'pointer',fontSize:14,flex:'0 0 auto'}},'🛒',
+    return h('button',{onClick:()=>this.setState({showCart:!this.state.showCart,showNotif:false,showProfile:false,cartCommitted:false}),title:'Your commitments',
+      style:{position:'relative',border:'1px solid var(--topbar-line)',background:n?'var(--brand-wash)':'var(--topbar-chip)',color:'var(--topbar-ink)',width:30,height:30,borderRadius:8,cursor:'pointer',fontSize:14,flex:'0 0 auto'}},'💼',
       n?h('span',{style:{position:'absolute',top:-5,right:-5,minWidth:16,height:16,padding:'0 3px',borderRadius:999,background:'var(--brand)',color:'#fff',fontSize:9.5,fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',boxSizing:'border-box',border:'1px solid var(--navy)'}},String(n)):null);
   }
   cartPanelBody(){
@@ -3648,7 +3648,7 @@ class Component extends DCLogic {
             h('button',{onClick:()=>step(x,25),style:cartStep},'＋'))))))
       : h('div',{style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',padding:'30px',color:'var(--muted)',gap:10}},
           this.state.cartCommitted? h('div',{style:{display:'contents'}}, h('div',{style:{fontSize:34}},'✓'), h('div',{style:{fontFamily:SF,fontSize:16,fontWeight:700,color:'var(--over)'}},'Commitment submitted'), h('div',{style:{fontSize:12.5,lineHeight:1.5,maxWidth:260}},'Moonfare will send your subscription documents to review and sign. You can track status under Notifications.'))
-            : h('div',{style:{display:'contents'}}, h('div',{style:{fontSize:30}},'🛒'), h('div',{style:{fontSize:13,lineHeight:1.5,maxWidth:250}},'Your cart is empty. Add a fund from any opportunity, fund card or your portfolio to start a commitment.'))),
+            : h('div',{style:{display:'contents'}}, h('div',{style:{fontSize:30}},'💼'), h('div',{style:{fontSize:13,lineHeight:1.5,maxWidth:250}},'Your commitments list is empty. Add a fund from any opportunity, fund card or your portfolio to start a commitment.'))),
       items.length? h('div',{style:{flex:'0 0 auto',padding:'16px 18px',borderTop:'1px solid var(--line)',background:'var(--surface-2)'}},
         h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:6}}, h('span',{style:{fontSize:12.5,color:'var(--muted)'}},'Total commitment'), h('span',{style:{fontFamily:SF,fontSize:20,fontWeight:700}},'€'+total+'k')),
         h('div',{style:{fontSize:11,color:'var(--muted)',lineHeight:1.5,marginBottom:12}},'Against your €4.3m investable headroom · calls are drawn over time, not upfront.'),
@@ -4975,7 +4975,7 @@ class Component extends DCLogic {
           this.gapCTA(key,true),
           /* item 78 — keep a direct invest/Buy action in the top portfolio summary */
           h('button',{onClick:()=>this.setState({homeDrill:null,homeFocusCat:null,ws:'act',uc:'opp',page:'opp',oppSource:'active',homeLaunched:true,ask:{...this.state.ask,state:'min'}}),
-            style:{border:'1px solid rgba(255,255,255,.55)',background:'transparent',color:'#fff',borderRadius:10,padding:'11px 14px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'🛒 Buy now →'))),
+            style:{border:'1px solid rgba(255,255,255,.55)',background:'transparent',color:'#fff',borderRadius:10,padding:'11px 14px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'💼 Buy now →'))),
       caption:'A plain-language read of your '+d.label.toLowerCase()+' book and where the gaps are.'});
 
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},

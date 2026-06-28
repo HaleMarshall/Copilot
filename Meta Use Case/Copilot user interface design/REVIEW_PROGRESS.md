@@ -169,7 +169,7 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 
 ## 130–143 Opportunities rework (sequence/funds split, add-icon, current/upcoming, fund-level Why)
 - ⊘ 130 Keep 5 'Why this' reasons + 'Show detailed reasoning' — confirmed present in oppDetail 'why' tab (5-item checklist + expandable detail).
-- ☐ 131 Replace shopping-cart 'add' icon (not a plus) on rec rows + top nav
+- ☑ 131 Replace shopping-cart 'add' icon (not a plus) — swapped 🛒 → 💼 (briefcase = 'add to your commitments') on rec rows, shopBtn, fundActions buy, top-nav button, empty state; reworded 'cart' → 'commitments' in labels/tooltips. Verified live: shopBtn '💼 Buy', cart button briefcase, 0 cart glyphs.
 - ☐ 132 Split Act layout: Recommended Sequence (left) + concrete Funds (right)
 - ☐ 133 Short 'Why Private Credit' rationale at overview/asset-class level (target terms only)
 - ☐ 134 Recommendation copy = concrete 'Add €X to …' actions
