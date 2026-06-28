@@ -181,6 +181,6 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 140 Open Baseline first, then Simulator case — default `oppSource:'baseline'`; srcOpts reordered Baseline→Active sim→saved. Sim→Opp handoffs still pass 'active' (explicit Simulator-case entry). Verified live: baseline first + default.
 - ☑ 141 Highlight best-matching fund as 'Target fit' — '✓ Target fit' badge + brand highlight on the top fund in Funds-in-sequence and the best matching Current Opportunity (matched to the top recommendation's strategy). Verified live.
 - ☑ 142 Remove 'Expected Return' from fund card (keep fit only) — opportunity tile no longer shows the 'target {multiple}' return-target line; only strategy + open/close + Target-fit highlight. Verified live.
-- ☐ 143 Distance-from-Target toggle across all 4 dimensions
+- ☑ 143 Distance-from-Target toggle across 4 dimensions — gapCard now has a Strategy/Region/Currency/Sector seg (`oppDistDim`); non-strategy dims compute target−actual per bucket. Verified live: 4-dim toggle wired.
 
-**NEXT: item 131** — replace the shopping-cart add icon (not a plus) on rec rows + top nav.
+**NEXT: item 144** — (review items 144+ unread; read the review section then continue one-by-one).

@@ -5351,10 +5351,15 @@ class Component extends DCLogic {
           this.oppStat('Exp. return', o.perf+'%', 'vs '+o.perfTarget+'% target'))));
 
     // gap chart
-    const gapZ=o.gaps.map(g=>({name:g.name,delta:g.gap,color:g.color,sig:Math.abs(g.gap)>=1}));
-    const gapCard=this.card({title:'Distance from target, by strategy (pp)',badge:this.badge('vs your target mix','synth'),
-      children:h('div',{style:{padding:'6px 0'}},this.miniZ(gapZ)),
-      caption:'Bars right = below target (do more); left = above target (do less). The engine turns the largest weighted gaps into the actions on the right.'});
+    /* item 143 — Distance-from-Target across all four dimensions via a toggle (not four charts at once) */
+    const distDim=this.dtog('oppDistDim','strategy');
+    const distZ=(()=>{ if(distDim==='strategy') return o.gaps.map(g=>({name:g.name,delta:g.gap,color:g.color,sig:Math.abs(g.gap)>=1}));
+      const d=this.HOME_DIMS().find(x=>x.key===distDim); if(!d||!d.target) return [];
+      return Object.keys(d.actual).map(k=>{ const dl=+(((d.target[k]||0)-(d.actual[k]||0))).toFixed(1); return {name:k,color:d.colors[k],delta:dl,sig:Math.abs(dl)>=1}; }).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta)); })();
+    const distToggle=this.seg([{label:'Strategy',value:'strategy'},{label:'Region',value:'region'},{label:'Currency',value:'currency'},{label:'Sector',value:'sector'}], distDim, v=>this.setDtog('oppDistDim',v),{sm:true});
+    const gapCard=this.card({title:'Distance from target (pp)',badge:this.badge('vs your target','synth'),right:distToggle,
+      children:h('div',{style:{padding:'6px 0'}}, distZ.length? this.miniZ(distZ) : h('div',{style:{fontSize:12.5,color:'var(--muted)',padding:'14px 0',textAlign:'center'}},'On target across this dimension.')),
+      caption:'Bars right = below target (do more); left = above target (do less). Toggle the dimension — Strategy, Region, Currency or Sector.'});
 
     // weighting card
     const wCard=this.card({title:'What matters most to you',
