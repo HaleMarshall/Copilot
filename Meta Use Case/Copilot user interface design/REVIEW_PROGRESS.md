@@ -138,4 +138,14 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 103 Detailed-vs-summary PDF toggle — Summary/Detailed seg in the modal header (`pdfMode`). Verified live.
 - ☑ 104 Detailed PDF: one section per page — detailed mode wraps each section in `.sc-pdf-page` (page-break-after). Verified live: 6 pages (Performance + Strategy/Region/Currency/Sector + Cashflow).
 
-**NEXT: item 97** — add a labelled y-axis to the net-cash J-curve chart.
+## 105–112 Future Programme Inputs (Michael Blome adoption)
+- ⊘ 105 No duplicated Strategic Allocation block — confirmed: futureFilters sections are Pacing / Annual commitment / Macro / Programme inputs / Product mix; the 8 Product-mix sliders already cover allocation. No separate buyout-split block.
+- ☑ 106 Commitment Years control — slider 1–25yr (default 10) in new Programme inputs section. Verified live.
+- ☑ 107 Recycle Year control — 'Recycle until year' slider yr 0–15 (default 8) + explainer. Verified live.
+- ☑ 108 Recycle Rate control — slider 0–100% (default 100). Verified live.
+- ☑ 109 Execution quality dropdown — Top quartile / Average seg (default top quartile). Verified live.
+- ⊘ 110 No DPI Target Year — confirmed not present.
+- ⊘ 111 No performance targets (Net IRR / DPI multiple) — confirmed not present.
+- ⊘ 112 No Max Drawdown control — confirmed not present.
+
+**NEXT: item 113** — 'Buy on Moonfare secondary market' buy-side action in Opportunities (113–129 cluster).
