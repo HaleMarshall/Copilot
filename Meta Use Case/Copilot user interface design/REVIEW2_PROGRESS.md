@@ -40,4 +40,6 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 37 click a fund → fund modal with larger graph (existing openFund) — verified
 - [x] 38 vintage panel: top positions only (no funds-by-commitment)
 - [x] 39 cashflow detailed view: each investment on the J-curve by NAV (net positive/in J-curve)
-NEXT: item 40 (peer reassurance for bad vintages + diversification suggestion)
+- [x] 40 peer reassurance for bad vintages + diversify suggestion (conditional branch)
+- [x] 41 encouragement when ahead of peers; silent when behind w/o vintage excuse
+NEXT: item 42 (commitments per year: % and € views)

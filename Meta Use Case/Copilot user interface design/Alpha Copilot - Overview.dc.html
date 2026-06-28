@@ -3924,6 +3924,18 @@ class Component extends DCLogic {
       eyebrow='Your portfolio · Performance'; title='How your portfolio is performing';
       body=[
         this.kpiTiles([['Net IRR','11.0%','since inception'],['MOIC','1.80x','net of fees'],['TVPI','2.10x',''],['DPI','2.10x','realised'],['Portfolio value','€16.6m','current NAV'],['Distributions','€2.1m','returned to date']]),
+        /* items 40/41 — peer-aware reassurance / encouragement (and stay silent when you're behind with no vintage excuse) */
+        (()=>{ const youIrr=parseFloat((this.DB&&this.DB.portfolio&&this.DB.portfolio.irr)||'11.0')||11.0; const peerIrr=9.4; const vintageBunched=true;
+          if(youIrr>=peerIrr){
+            return this.card({key:'peer',title:'Alpha’s read — vs your peers',badge:this.badge('AI','synth'),tone:'alpha',
+              children:h('div',{style:{fontSize:13,lineHeight:1.6,color:'rgba(255,255,255,.95)'}}, 'You’re ',h('strong',{style:{color:'#fff'}},'ahead of peers like you'),' — ',h('strong',{style:{color:'#fff'}},youIrr+'% net IRR'),' versus ~'+peerIrr+'% for investors with a similar profile and vintage spread. Keep committing as vigorously as you have; your pacing is working.'),
+              caption:'Performance vs investors matched to your profile.'}); }
+          if(vintageBunched){
+            return this.card({key:'peer',title:'Alpha’s read — vs your peers',badge:this.badge('AI','synth'),tone:'alpha',
+              children:h('div',{style:{fontSize:13,lineHeight:1.6,color:'rgba(255,255,255,.95)'}}, 'Your headline metrics trail peers right now — but ',h('strong',{style:{color:'#fff'}},'investors who committed in the same vintages are seeing very similar results'),'. It’s the vintage cycle, not your fund selection. Spreading future commitments across ',h('strong',{style:{color:'#fff'}},'more vintages (a higher distribution rate)'),' would diversify your book and lift returns over time.'),
+              caption:'Context, not criticism — and a concrete way forward.'}); }
+          return null; /* item 41 — behind with no vintage explanation: say nothing */
+        })(),
         /* item 220 — benchmark the personal IRR against a public index (S&P 500, PME basis) so the figure has context; MOIC & peer benchmarks deliberately omitted */
         (()=>{ const you=11.0, spx=8.7, spread=+(you-spx).toFixed(1); const max=Math.max(you,spx)*1.15;
           if(you<=spx) return null; /* item 9 — only show the public-market comparison when you're above it */
