@@ -167,4 +167,20 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ⊘ 128 Keep asset-allocation-driven recommendation — confirmed: oppNextActions ranks by gap-to-target ('Add €Xm to {strategy}'), fund selection secondary.
 - ⊘ 129 Keep Fit-Score on recommendations — confirmed: header Target fit / After top move stats; each action row shows 'fit +{lift}'.
 
-**NEXT: item 115** — show both % and € everywhere committed/allocation figures appear.
+## 130–143 Opportunities rework (sequence/funds split, add-icon, current/upcoming, fund-level Why)
+- ⊘ 130 Keep 5 'Why this' reasons + 'Show detailed reasoning' — confirmed present in oppDetail 'why' tab (5-item checklist + expandable detail).
+- ☐ 131 Replace shopping-cart 'add' icon (not a plus) on rec rows + top nav
+- ☐ 132 Split Act layout: Recommended Sequence (left) + concrete Funds (right)
+- ☐ 133 Short 'Why Private Credit' rationale at overview/asset-class level (target terms only)
+- ☐ 134 Recommendation copy = concrete 'Add €X to …' actions
+- ☐ 135 Add 'Current Opportunities' section
+- ☐ 136 Add greyed-out 'Upcoming' preview section
+- ☐ 137 Greyed upcoming funds still drillable
+- ☐ 138 Allow same fund to appear multiple times in sequence
+- ☐ 139 Move Why-this/Why-not/Compare to fund level
+- ☐ 140 Open Baseline first, then Simulator case
+- ☐ 141 Highlight best-matching fund as 'Target fit'
+- ☐ 142 Remove 'Expected Return' from fund card (keep fit only)
+- ☐ 143 Distance-from-Target toggle across all 4 dimensions
+
+**NEXT: item 131** — replace the shopping-cart add icon (not a plus) on rec rows + top nav.
