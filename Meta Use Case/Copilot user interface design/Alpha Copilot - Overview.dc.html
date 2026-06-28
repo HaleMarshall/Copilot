@@ -5369,11 +5369,23 @@ class Component extends DCLogic {
           h('b',null,'Pattern: '),'you have systematically under-invested in ',h('b',null,'private credit'),' and ',h('b',null,'secondaries'),' — the two sleeves you pass on most. Both sit at the top of your Next Best Action above.')),
       caption:'Good opportunities you plausibly should have taken, with how they performed since. The look-back is how the engine learns your blind spots — not to second-guess, but to stop the same gap recurring.'});
 
+    // items 113/114 — Moonfare Secondary Market: buy-side (new) + sell-side, unambiguously named (not 'Secondary Force')
+    const secMktAction=(eyebrow,title,body,cta,act)=>h('div',{style:{flex:'1 1 280px',minWidth:0,border:'1px solid var(--line)',borderRadius:12,background:'var(--surface)',padding:'14px 16px',display:'flex',flexDirection:'column',gap:8}},
+      h('div',{style:{fontSize:10,letterSpacing:'.07em',textTransform:'uppercase',color:'var(--muted)',fontWeight:700}},eyebrow),
+      h('div',{style:{fontFamily:SF,fontSize:15.5,fontWeight:700,color:'var(--ink)'}},title),
+      h('div',{style:{fontSize:12.5,color:'var(--muted)',lineHeight:1.5,flex:1}},body),
+      h('button',{onClick:act,style:{alignSelf:'flex-start',border:'none',background:'var(--brand)',color:'#fff',borderRadius:9,padding:'9px 14px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},cta));
+    const secondaryCard=this.card({title:'Moonfare Secondary Market',badge:this.badge('liquidity','synth'),
+      children:h('div',{style:{display:'flex',gap:12,flexWrap:'wrap'}},
+        secMktAction('Buy-side · new','Buy on the Moonfare Secondary Market','Acquire stakes in top funds and top investors at a discount — diversify back in time or grab a bargain. (The marketplace, not a secondaries fund.)','Browse stakes to buy  →',()=>this.askFromPage('Show me stakes available to buy on the Moonfare Secondary Market — top funds and top investors, ideally at a discount.')),
+        secMktAction('Sell-side','Sell on the Moonfare Secondary Market','List a holding for liquidity ahead of a known cash need.','Explore selling  →',()=>this.setState({ws:'act',uc:'t2-6',page:'sell',homeLaunched:true,deepLink:null,homePop:null,homeDrill:null}))),
+      caption:'Moonfare’s secondary marketplace — buy or sell existing stakes. Distinct from a secondaries fund.'});
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
       srcRow, head,
       h('div',{style:{display:'grid',gridTemplateColumns:'minmax(300px,360px) 1fr',gap:16,alignItems:'start'}},
         h('div',{style:{display:'flex',flexDirection:'column',gap:16}}, wCard, gapCard),
         actionsCard),
+      secondaryCard,
       missedCard);
   }
   comparisonBody(){

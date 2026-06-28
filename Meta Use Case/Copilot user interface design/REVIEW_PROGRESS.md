@@ -148,4 +148,23 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ⊘ 111 No performance targets (Net IRR / DPI multiple) — confirmed not present.
 - ⊘ 112 No Max Drawdown control — confirmed not present.
 
-**NEXT: item 113** — 'Buy on Moonfare secondary market' buy-side action in Opportunities (113–129 cluster).
+## 113–129 Opportunities / Simulator / weighting
+- ☑ 113 'Buy on Moonfare secondary market' buy-side action — added a 'Moonfare Secondary Market' card to Opportunities with a buy-side action ('Buy on the Moonfare Secondary Market' → acquire stakes at a discount) alongside the sell-side. Verified: wired into opportunitiesBody return; logicError null.
+- ☑ 114 Disambiguate 'Secondary' naming — card/buttons say 'Moonfare Secondary Market' + caption 'the marketplace, not a secondaries fund'. Verified: visible labels unambiguous.
+- ☐ 115 Show both % and € everywhere
+- ☐ 116 'NAV uncommitted' per individual investment
+- ☐ 117 Per-fund Performance detail table (Age/Committed/Called/Distributed)
+- ☐ 118 Performance table sort: Vintage default + Strategy
+- ☐ 119 Strip Fund Detail to just the table (drop investor-due)
+- ☐ 120 'Upcoming Opportunities' preview + coming-soon
+- ☐ 121 Build out Internal/Platform view
+- ☐ 122 Remove 'Performance' from weighting panel
+- ☐ 123 Add 'Currency' weighting factor
+- ⊘ 124 Keep weighting at aggregate Target-Fit level (no per-item)
+- ☐ 125 Make 'Baseline' comparison do something
+- ⊘ 126 Keep 'Why not' view but positive
+- ☐ 127 Fix flow: recommendation → concrete fund opportunity → fund page
+- ⊘ 128 Keep asset-allocation-driven recommendation
+- ⊘ 129 Keep Fit-Score on recommendations
+
+**NEXT: item 115** — show both % and € everywhere committed/allocation figures appear.
