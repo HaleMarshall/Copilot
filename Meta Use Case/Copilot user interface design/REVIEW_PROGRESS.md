@@ -226,6 +226,13 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 179 Your row Actual/Target double toggle — simYouMode; benchmark rows target-only. Verified ('Your actual' on actual).
 - ☑ 180 Custom Target opens manual dials — selecting Custom sets simShowDials:true. Verified (Save/Risk-toggle appear).
 
-**NEXT: item 176** — Comparison page stays actual-only ('Ist') benchmarking (confirm). Then 177 (benchmark options Model/Peers/Platform/Top 10%/Custom), 181/182 (keep nav + two pages — confirm), 183 (page title 'Compare yourself'), 184 (current/target toggle). Read review.md ~1659.
+- ⊘ 176 Comparison page stays actual-only — confirmed: comparisonBody charts all read actual (% of wealth · actual, fill rate, current mix); no target/future.
+- ⊘ 177 Comparison benchmark options — confirmed: toggleRow has Peers/Model/Platform/Top 10%/Custom (line ~5670).
+- ⊘ 181 Keep Understand→Shape→Act→Research nav — confirmed: WS() defines the four workspaces unchanged.
+- ⊘ 182 Keep Comparison & Simulator as two pages — confirmed: SIM use case has separate sim + compare views (line ~2212).
+- ☑ 183 Rename page title → 'Compare yourself' with two modes in the subtitle (actual / target). Verified (mk('sim',...,'Compare yourself')).
+- ☑ 184 'Your current / Your target' mode toggle — simCmpMode drives benchmark resolution (cmpMix actual ↔ benchTargetMix). Verified (target→'Peers Target', current→'Peers today'/'Your actual').
+
+**NEXT: item 185** — read review.md ~1749 onward.
 
 **NEXT: item 145** — render the 4 Distance-from-Target dimensions as donut/C-charts via the toggle.
