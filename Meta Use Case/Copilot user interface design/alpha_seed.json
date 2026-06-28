@@ -1,1646 +1,1647 @@
 {
-  "portfolio": {
-    "navText": "€16.6m",
-    "nav": 16.6,
-    "paidInText": "€13.0m",
-    "distributionsText": "€10.6m",
-    "distributions": 10.6,
-    "irr": "11.0",
-    "irrTable": "11%",
-    "irrGross": "13%",
-    "dpi": "0.8",
-    "dpiTableNet": "0.82x",
-    "dpiTableGross": "0.90x",
-    "moic": "1.8",
-    "moicTableNet": "1.80x",
-    "moicTableGross": "1.95x",
-    "tvpiTableNet": "2.10x",
-    "tvpiTableGross": "2.30x",
-    "fundsHeld": 8,
-    "managers": 6,
-    "largestHolding": "EQT IX",
-    "largestHoldingDetail": "€4.6m · 28% NAV",
-    "rank": "Top 18%",
-    "cashPosition": "€1.1m",
-    "uncalled": "€3.9m",
-    "committable": "€4.3m"
-  },
-  "pm": {
-    "you": 15.7,
-    "platform": 10.5,
-    "model": 12,
-    "target": 20,
-    "rank": "Top 18%",
-    "rankPos": 111,
-    "rankOf": 2000
-  },
-  "strats": [
-    [
-      "buyout",
-      "Buyout",
-      "--data-1"
-    ],
-    [
-      "growth",
-      "Growth",
-      "--data-2"
-    ],
-    [
-      "venture",
-      "Venture",
-      "--data-3"
-    ],
-    [
-      "credit",
-      "Private Credit",
-      "--data-4"
-    ],
-    [
-      "infra",
-      "Infrastructure",
-      "--data-5"
-    ],
-    [
-      "realestate",
-      "Real Estate",
-      "--data-6"
-    ],
-    [
-      "secondaries",
-      "Secondaries",
-      "--data-7"
-    ],
-    [
-      "ai",
-      "AI / Tech",
-      "--data-8"
-    ],
-    [
-      "directs",
-      "Direct & Co-Invest",
-      "--data-10"
-    ],
-    [
-      "other",
-      "Other",
-      "--data-9"
-    ]
-  ],
-  "mix": {
-    "you": {
-      "buyout": 30,
-      "growth": 14,
-      "venture": 10,
-      "credit": 2,
-      "infra": 6,
-      "realestate": 8,
-      "secondaries": 6,
-      "ai": 18,
-      "directs": 4,
-      "other": 2
-    },
-    "platform": {
-      "buyout": 30,
-      "growth": 15,
-      "venture": 11,
-      "credit": 9,
-      "infra": 7,
-      "realestate": 8,
-      "secondaries": 6,
-      "ai": 10,
-      "directs": 3,
-      "other": 1
-    },
-    "model": {
-      "buyout": 26,
-      "growth": 14,
-      "venture": 8,
-      "credit": 14,
-      "infra": 12,
-      "realestate": 7,
-      "secondaries": 6,
-      "ai": 9,
-      "directs": 3,
-      "other": 1
-    }
-  },
-  "dims": {
-    "region": {
-      "actual": {
-        "USA": 42,
-        "Europe": 34,
-        "APAC": 18,
-        "MEA": 6
-      },
-      "target": {
-        "USA": 38,
-        "Europe": 32,
-        "APAC": 24,
-        "MEA": 6
-      },
-      "colors": {
-        "USA": "--data-1",
-        "Europe": "--data-5",
-        "APAC": "--data-8",
-        "MEA": "--data-9"
-      }
-    },
-    "currency": {
-      "actual": {
-        "USD": 40,
-        "EUR": 38,
-        "GBP": 9,
-        "CHF": 6,
-        "JPY": 4,
-        "Other": 3
-      },
-      "target": {
-        "USD": 36,
-        "EUR": 40,
-        "GBP": 9,
-        "CHF": 7,
-        "JPY": 5,
-        "Other": 3
-      },
-      "colors": {
-        "USD": "--data-1",
-        "EUR": "--data-5",
-        "GBP": "--data-2",
-        "CHF": "--data-6",
-        "JPY": "--data-3",
-        "Other": "--data-9"
-      }
-    },
-    "sector": {
-      "actual": {
-        "Tech": 20,
-        "AI": 14,
-        "Healthcare": 16,
-        "Financials": 14,
-        "Industrials": 18,
-        "Consumer": 12,
-        "Energy": 6
-      },
-      "target": {
-        "Tech": 14,
-        "AI": 8,
-        "Healthcare": 18,
-        "Financials": 16,
-        "Industrials": 20,
-        "Consumer": 16,
-        "Energy": 8
-      },
-      "colors": {
-        "Tech": "--data-9",
-        "AI": "--data-8",
-        "Healthcare": "--data-2",
-        "Financials": "--data-4",
-        "Industrials": "--data-5",
-        "Consumer": "--data-7",
-        "Energy": "--data-6"
-      }
-    }
-  },
-  "cashflows": {
-    "cats": [
-      "2019",
-      "2020",
-      "2021",
-      "2022",
-      "2023",
-      "2024",
-      "2025"
-    ],
-    "calls": [
-      1.2,
-      1.6,
-      2.1,
-      1.7,
-      1.2,
-      0.9,
-      0.6
-    ],
-    "distributions": [
-      0.3,
-      0.7,
-      1.1,
-      1.6,
-      2.0,
-      2.3,
-      2.6
-    ]
-  },
-  "heldFunds": [
-    {
-      "id": "eqtix",
-      "name": "EQT IX",
-      "mgr": "EQT Partners",
-      "logo": "eqt",
-      "strat": "Buyout",
-      "vintage": 2019,
-      "contrib": 1.8,
-      "moic": "2.3x",
-      "dpi": "1.1x",
-      "irr": "19.4%",
-      "nav": "€4.6m",
-      "called": "92%",
-      "stage": "Harvesting",
-      "note": "Top contributor this quarter — three portfolio exits marked up.",
-      "tvpi": "2.4x",
-      "dvpi": "2.3x",
-      "month": "Mar 2019",
-      "navUncommitted": "€0.2m"
-    },
-    {
-      "id": "thrive8",
-      "name": "Thrive Capital VIII",
-      "mgr": "Thrive Capital",
-      "logo": "general-atlantic",
-      "strat": "AI / Tech",
-      "vintage": 2021,
-      "contrib": 1.2,
-      "moic": "1.9x",
-      "dpi": "0.3x",
-      "irr": "16.1%",
-      "nav": "€3.1m",
-      "called": "74%",
-      "stage": "Buying",
-      "note": "AI holdings re-rated; still early on realisations.",
-      "tvpi": "2.0x",
-      "dvpi": "1.9x",
-      "month": "Jul 2021",
-      "navUncommitted": "€1.0m"
-    },
-    {
-      "id": "ga",
-      "name": "General Atlantic IP",
-      "mgr": "General Atlantic",
-      "logo": "general-atlantic",
-      "strat": "Growth",
-      "vintage": 2020,
-      "contrib": 0.7,
-      "moic": "1.7x",
-      "dpi": "0.5x",
-      "irr": "14.2%",
-      "nav": "€2.4m",
-      "called": "81%",
-      "stage": "Deploying",
-      "note": "Steady growth-equity compounding across tech & consumer.",
-      "tvpi": "1.8x",
-      "dvpi": "1.7x",
-      "month": "Feb 2020",
-      "navUncommitted": "€0.6m"
-    },
-    {
-      "id": "cvc9",
-      "name": "CVC IX",
-      "mgr": "CVC Capital",
-      "logo": "eqt",
-      "strat": "Buyout",
-      "vintage": 2022,
-      "contrib": 0.4,
-      "moic": "1.4x",
-      "dpi": "0.2x",
-      "irr": "11.8%",
-      "nav": "€2.0m",
-      "called": "58%",
-      "stage": "Buying",
-      "note": "Mid-life European buyout — tracking plan.",
-      "tvpi": "1.5x",
-      "dvpi": "1.4x",
-      "month": "Sep 2022",
-      "navUncommitted": "€1.1m"
-    },
-    {
-      "id": "arespcs",
-      "name": "Ares PCS",
-      "mgr": "Ares Management",
-      "logo": "ares",
-      "strat": "Private Credit",
-      "vintage": 2023,
-      "contrib": -0.3,
-      "moic": "1.1x",
-      "dpi": "0.1x",
-      "irr": "8.4%",
-      "nav": "€1.5m",
-      "called": "46%",
-      "stage": "Deploying",
-      "note": "Income accruing; mark held flat — small drag this quarter.",
-      "tvpi": "1.2x",
-      "dvpi": "1.1x",
-      "month": "May 2023",
-      "navUncommitted": "€1.4m"
-    },
-    {
-      "id": "cinven8",
-      "name": "Cinven 8",
-      "mgr": "Cinven",
-      "logo": "eqt",
-      "strat": "Buyout",
-      "vintage": 2021,
-      "contrib": -0.6,
-      "moic": "1.2x",
-      "dpi": "0.1x",
-      "irr": "7.1%",
-      "nav": "€1.8m",
-      "called": "69%",
-      "stage": "Buying",
-      "note": "One holding written down — biggest detractor this quarter.",
-      "tvpi": "1.3x",
-      "dvpi": "1.2x",
-      "month": "Nov 2021",
-      "navUncommitted": "€0.8m"
-    },
-    {
-      "id": "northwind",
-      "name": "Northwind Infra III",
-      "mgr": "Northwind",
-      "logo": "ares",
-      "strat": "Infrastructure",
-      "vintage": 2024,
-      "contrib": -0.2,
-      "moic": "0.9x",
-      "dpi": "0.0x",
-      "irr": "−4.0%",
-      "nav": "€0.7m",
-      "called": "38%",
-      "stage": "J-curve",
-      "note": "Young infra fund — J-curve trough, expected.",
-      "tvpi": "0.9x",
-      "dvpi": "0.9x",
-      "month": "Jan 2024",
-      "navUncommitted": "€1.2m"
-    },
-    {
-      "id": "meridian",
-      "name": "Meridian Growth IV",
-      "mgr": "Meridian",
-      "logo": "general-atlantic",
-      "strat": "Growth",
-      "vintage": 2024,
-      "contrib": -0.1,
-      "moic": "1.0x",
-      "dpi": "0.0x",
-      "irr": "−1.2%",
-      "nav": "€0.5m",
-      "called": "22%",
-      "stage": "J-curve",
-      "note": "Recently called; too early to mark.",
-      "tvpi": "1.0x",
-      "dvpi": "1.0x",
-      "month": "Aug 2024",
-      "navUncommitted": "€1.5m"
-    }
-  ],
-  "heldMeta": {
-    "eqtix": {
-      "currency": "EUR",
-      "region": "Europe",
-      "sector": "Industrials",
-      "strat": "buyout",
-      "vintage": 2019,
-      "nav": 4.6
-    },
-    "thrive8": {
-      "currency": "USD",
-      "region": "USA",
-      "sector": "AI",
-      "strat": "ai",
-      "vintage": 2021,
-      "nav": 3.1
-    },
-    "ga": {
-      "currency": "USD",
-      "region": "USA",
-      "sector": "Tech",
-      "strat": "growth",
-      "vintage": 2020,
-      "nav": 2.4
-    },
-    "cvc9": {
-      "currency": "EUR",
-      "region": "Europe",
-      "sector": "Industrials",
-      "strat": "buyout",
-      "vintage": 2022,
-      "nav": 2.0
-    },
-    "arespcs": {
-      "currency": "USD",
-      "region": "USA",
-      "sector": "Financials",
-      "strat": "credit",
-      "vintage": 2023,
-      "nav": 1.5
-    },
-    "cinven8": {
-      "currency": "EUR",
-      "region": "Europe",
-      "sector": "Healthcare",
-      "strat": "buyout",
-      "vintage": 2021,
-      "nav": 1.8
-    },
-    "northwind": {
-      "currency": "EUR",
-      "region": "Europe",
-      "sector": "Energy",
-      "strat": "infra",
-      "vintage": 2024,
-      "nav": 0.7
-    },
-    "meridian": {
-      "currency": "GBP",
-      "region": "APAC",
-      "sector": "Tech",
-      "strat": "growth",
-      "vintage": 2024,
-      "nav": 0.5
-    }
-  },
-  "modelCoarse": {
-    "income_resilience": {
-      "buyout": 18,
-      "growth": 3,
-      "venture": 0,
-      "credit": 40,
-      "infra": 22,
-      "realestate": 0,
-      "secondaries": 12,
-      "ai": 2,
-      "directs": 3,
-      "other": 0
-    },
-    "balanced_compounding": {
-      "buyout": 40,
-      "growth": 10,
-      "venture": 0,
-      "credit": 18,
-      "infra": 15,
-      "realestate": 0,
-      "secondaries": 12,
-      "ai": 2,
-      "directs": 3,
-      "other": 0
-    },
-    "equity_growth": {
-      "buyout": 55,
-      "growth": 12,
-      "venture": 0,
-      "credit": 8,
-      "infra": 8,
-      "realestate": 0,
-      "secondaries": 8,
-      "ai": 4,
-      "directs": 5,
-      "other": 0
-    },
-    "innovation_ai_alpha": {
-      "buyout": 30,
-      "growth": 25,
-      "venture": 0,
-      "credit": 5,
-      "infra": 7,
-      "realestate": 0,
-      "secondaries": 8,
-      "ai": 15,
-      "directs": 10,
-      "other": 0
-    },
-    "opportunistic_advanced": {
-      "buyout": 33,
-      "growth": 10,
-      "venture": 0,
-      "credit": 12,
-      "infra": 10,
-      "realestate": 0,
-      "secondaries": 20,
-      "ai": 5,
-      "directs": 10,
-      "other": 0
-    }
-  },
-  "modelFine": {
-    "income_resilience": [
-      [
-        "Large-Cap Buyout",
-        8,
-        "--data-1"
-      ],
-      [
-        "Mid-Cap Buyout",
-        7,
-        "--data-2"
-      ],
-      [
-        "Small-Cap Buyout",
-        3,
-        "--data-3"
-      ],
-      [
-        "Infrastructure",
-        22,
-        "--data-5"
-      ],
-      [
-        "Growth / Tech",
-        3,
-        "--data-7"
-      ],
-      [
-        "Private Credit",
-        40,
-        "--data-4"
-      ],
-      [
-        "Secondaries",
-        12,
-        "--data-6"
-      ],
-      [
-        "Direct & Co-Investments",
-        3,
-        "--data-10"
-      ],
-      [
-        "AI",
-        2,
-        "--data-8"
-      ]
-    ],
-    "balanced_compounding": [
-      [
-        "Large-Cap Buyout",
-        15,
-        "--data-1"
-      ],
-      [
-        "Mid-Cap Buyout",
-        18,
-        "--data-2"
-      ],
-      [
-        "Small-Cap Buyout",
-        7,
-        "--data-3"
-      ],
-      [
-        "Infrastructure",
-        15,
-        "--data-5"
-      ],
-      [
-        "Growth / Tech",
-        10,
-        "--data-7"
-      ],
-      [
-        "Private Credit",
-        18,
-        "--data-4"
-      ],
-      [
-        "Secondaries",
-        12,
-        "--data-6"
-      ],
-      [
-        "Direct & Co-Investments",
-        3,
-        "--data-10"
-      ],
-      [
-        "AI",
-        2,
-        "--data-8"
-      ]
-    ],
-    "equity_growth": [
-      [
-        "Large-Cap Buyout",
-        18,
-        "--data-1"
-      ],
-      [
-        "Mid-Cap Buyout",
-        25,
-        "--data-2"
-      ],
-      [
-        "Small-Cap Buyout",
-        12,
-        "--data-3"
-      ],
-      [
-        "Infrastructure",
-        8,
-        "--data-5"
-      ],
-      [
-        "Growth / Tech",
-        12,
-        "--data-7"
-      ],
-      [
-        "Private Credit",
-        8,
-        "--data-4"
-      ],
-      [
-        "Secondaries",
-        8,
-        "--data-6"
-      ],
-      [
-        "Direct & Co-Investments",
-        5,
-        "--data-10"
-      ],
-      [
-        "AI",
-        4,
-        "--data-8"
-      ]
-    ],
-    "innovation_ai_alpha": [
-      [
-        "Large-Cap Buyout",
-        8,
-        "--data-1"
-      ],
-      [
-        "Mid-Cap Buyout",
-        15,
-        "--data-2"
-      ],
-      [
-        "Small-Cap Buyout",
-        7,
-        "--data-3"
-      ],
-      [
-        "Infrastructure",
-        7,
-        "--data-5"
-      ],
-      [
-        "Growth / Tech",
-        25,
-        "--data-7"
-      ],
-      [
-        "Private Credit",
-        5,
-        "--data-4"
-      ],
-      [
-        "Secondaries",
-        8,
-        "--data-6"
-      ],
-      [
-        "Direct & Co-Investments",
-        10,
-        "--data-10"
-      ],
-      [
-        "AI",
-        15,
-        "--data-8"
-      ]
-    ],
-    "opportunistic_advanced": [
-      [
-        "Large-Cap Buyout",
-        10,
-        "--data-1"
-      ],
-      [
-        "Mid-Cap Buyout",
-        15,
-        "--data-2"
-      ],
-      [
-        "Small-Cap Buyout",
-        8,
-        "--data-3"
-      ],
-      [
-        "Infrastructure",
-        10,
-        "--data-5"
-      ],
-      [
-        "Growth / Tech",
-        10,
-        "--data-7"
-      ],
-      [
-        "Private Credit",
-        12,
-        "--data-4"
-      ],
-      [
-        "Secondaries",
-        20,
-        "--data-6"
-      ],
-      [
-        "Direct & Co-Investments",
-        10,
-        "--data-10"
-      ],
-      [
-        "AI",
-        5,
-        "--data-8"
-      ]
-    ]
-  },
-  "followFunds": [
-    {
-      "id": "kkr13",
-      "name": "KKR North America XIII",
-      "mgr": "KKR",
-      "strat": "Buyout",
-      "region": "North America",
-      "size": "€19.0bn",
-      "tgt": "2.0–2.2x",
-      "close": "Oct 2026",
-      "min": "€50,000",
-      "prospect": true,
-      "by": {
-        "top10": "7 of the platform’s top-10% performers committed in the last 30 days.",
-        "peers": "5 investors in your peer group committed in the last 30 days."
-      },
-      "why": [
-        "Large-cap North American buyout from a top-quartile, multi-cycle manager.",
-        "Adds geographic balance — your book is currently Europe-heavy.",
-        "A 2026 vintage deploying into reset valuations.",
-        "Resembles funds your followed group has historically done well in.",
-        "Fits your ticket size and liquidity headroom."
-      ]
-    },
-    {
-      "id": "lex12",
-      "name": "Lexington Capital Partners XII",
-      "mgr": "Lexington Partners",
-      "strat": "Secondaries",
-      "region": "Global",
-      "size": "€24.0bn",
-      "tgt": "1.7–1.8x",
-      "close": "Jan 2027",
-      "min": "€100,000",
-      "prospect": true,
-      "by": {
-        "top10": "4 top-10% performers added secondaries exposure this month.",
-        "peers": "3 investors in your peer group added secondaries this month."
-      },
-      "why": [
-        "Diversified secondaries — faster distributions and a shorter J-curve.",
-        "Smooths your 2021–22 vintage bunching.",
-        "Buys already-funded NAV, easing near-term call pressure.",
-        "A repeat allocation among your followed group.",
-        "Comfortably within your liquidity headroom."
-      ]
-    }
-  ],
-  "scorecards": {
-    "ticket": [
-      {
-        "l": "Suggested ticket",
-        "you": "€150k",
-        "peer": "€128k",
-        "up": true
-      },
-      {
-        "l": "Commitments / yr",
-        "you": "3",
-        "peer": "2.1",
-        "up": true
-      },
-      {
-        "l": "Of investable wealth",
-        "you": "4.3pp",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Headroom to target",
-        "you": "€1.1m",
-        "peer": "—",
-        "up": true
-      }
-    ],
-    "capacity": [
-      {
-        "l": "Uncalled commitments",
-        "you": "€3.4m",
-        "peer": "—",
-        "up": false
-      },
-      {
-        "l": "Liquidity headroom",
-        "you": "€1.1m",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Illiquidity carried",
-        "you": "62%",
-        "peer": "48%",
-        "up": false
-      },
-      {
-        "l": "Safe new commitment",
-        "you": "€0.8m",
-        "peer": "—",
-        "up": true
-      }
-    ],
-    "consistency": [
-      {
-        "l": "Consistency score",
-        "you": "8.4/10",
-        "peer": "6.1/10",
-        "up": true
-      },
-      {
-        "l": "Distribution stability",
-        "you": "High",
-        "peer": "Med",
-        "up": true
-      },
-      {
-        "l": "Markup quality",
-        "you": "Good",
-        "peer": "Fair",
-        "up": true
-      },
-      {
-        "l": "Dispersion (3 funds)",
-        "you": "Low",
-        "peer": "Med",
-        "up": true
-      }
-    ],
-    "demand": [
-      {
-        "l": "Fills fastest",
-        "you": "EQT X",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Median time-to-fill",
-        "you": "18 days",
-        "peer": "31 days",
-        "up": true
-      },
-      {
-        "l": "Oversubscription",
-        "you": "2.4×",
-        "peer": "1.6×",
-        "up": false
-      },
-      {
-        "l": "Your alloc. likelihood",
-        "you": "78%",
-        "peer": "—",
-        "up": true
-      }
-    ],
-    "sc1": [
-      {
-        "l": "Funds today",
-        "you": "11",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Target by Y5",
-        "you": "18–22",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "New / year",
-        "you": "2–3",
-        "peer": "2.1",
-        "up": true
-      },
-      {
-        "l": "Max single-fund weight",
-        "you": "8%",
-        "peer": "—",
-        "up": true
-      }
-    ],
-    "sc2": [
-      {
-        "l": "Funds today",
-        "you": "11",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Target by Y5",
-        "you": "18–22",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "New / year",
-        "you": "2–3",
-        "peer": "2.1",
-        "up": true
-      },
-      {
-        "l": "Max single-fund weight",
-        "you": "8%",
-        "peer": "—",
-        "up": true
-      }
-    ],
-    "sc3": [
-      {
-        "l": "Suggested ticket",
-        "you": "€150k",
-        "peer": "€128k",
-        "up": true
-      },
-      {
-        "l": "Commitments / yr",
-        "you": "3",
-        "peer": "2.1",
-        "up": true
-      },
-      {
-        "l": "Headroom to target",
-        "you": "€1.1m",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Of PM capital",
-        "you": "3.8%",
-        "peer": "—",
-        "up": true
-      }
-    ],
-    "sc4": [
-      {
-        "l": "Safe new commitment",
-        "you": "€0.8m",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Buffer in Stress",
-        "you": "€0.6m",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Buffer in Severe",
-        "you": "−€1.3m",
-        "peer": "—",
-        "up": false
-      },
-      {
-        "l": "Fix",
-        "you": "Slow pacing / secondaries",
-        "peer": "—",
-        "up": true
-      }
-    ],
-    "sc5": [
-      {
-        "l": "Avg ticket",
-        "you": "€158k",
-        "peer": "€128k",
-        "up": true
-      },
-      {
-        "l": "Ticket spread",
-        "you": "±€20k",
-        "peer": "±€55k",
-        "up": true
-      },
-      {
-        "l": "Commitments / yr",
-        "you": "2.4",
-        "peer": "2.1",
-        "up": true
-      },
-      {
-        "l": "Bunching",
-        "you": "low",
-        "peer": "med",
-        "up": true
-      }
-    ],
-    "sc6": [
-      {
-        "l": "Funds held",
-        "you": "8",
-        "peer": "6",
-        "up": true
-      },
-      {
-        "l": "Median ticket",
-        "you": "€150k",
-        "peer": "€120k",
-        "up": true
-      },
-      {
-        "l": "Tickets / year",
-        "you": "2.4",
-        "peer": "2.1",
-        "up": true
-      },
-      {
-        "l": "Concentration (HHI)",
-        "you": "0.14",
-        "peer": "0.19",
-        "up": true
-      }
-    ],
-    "sc8": [
-      {
-        "l": "Net 12-mo cash",
-        "you": "−€0.9m",
-        "peer": "—",
-        "up": false
-      },
-      {
-        "l": "Uncalled",
-        "you": "€3.4m",
-        "peer": "—",
-        "up": false
-      },
-      {
-        "l": "Liquidity buffer",
-        "you": "€1.1m",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Crossover",
-        "you": "Q2 2027",
-        "peer": "—",
-        "up": true
-      }
-    ],
-    "sc9": [
-      {
-        "l": "Liquidity headroom",
-        "you": "€1.1m",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Safe new commitment",
-        "you": "€0.8m",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Uncalled",
-        "you": "€3.4m",
-        "peer": "—",
-        "up": false
-      },
-      {
-        "l": "Buffer after",
-        "you": "€0.3m",
-        "peer": "—",
-        "up": true
-      }
-    ],
-    "sc12": [
-      {
-        "l": "Target Net MOIC",
-        "you": "2.1x",
-        "peer": "1.7x",
-        "up": true
-      },
-      {
-        "l": "Target Net IRR",
-        "you": "18%",
-        "peer": "14%",
-        "up": true
-      },
-      {
-        "l": "Mgmt fee",
-        "you": "1.5%",
-        "peer": "2.0%",
-        "up": true
-      },
-      {
-        "l": "Vintage",
-        "you": "2025",
-        "peer": "—",
-        "up": true
-      }
-    ],
-    "sc13": [
-      {
-        "l": "# funds",
-        "you": "11",
-        "peer": "19",
-        "up": false
-      },
-      {
-        "l": "Vintages spanned",
-        "you": "9",
-        "peer": "12",
-        "up": false
-      },
-      {
-        "l": "Avg ticket",
-        "you": "€158k",
-        "peer": "€240k",
-        "up": false
-      },
-      {
-        "l": "Secondaries %",
-        "you": "6%",
-        "peer": "14%",
-        "up": false
-      }
-    ],
-    "sc14": [
-      {
-        "l": "Commitments / yr",
-        "you": "2.4",
-        "peer": "3.6",
-        "up": false
-      },
-      {
-        "l": "Vintage spread",
-        "you": "9y",
-        "peer": "14y",
-        "up": false
-      },
-      {
-        "l": "Single-fund max",
-        "you": "12%",
-        "peer": "7%",
-        "up": false
-      },
-      {
-        "l": "Defensive sleeve",
-        "you": "18%",
-        "peer": "30%",
-        "up": false
-      }
-    ],
-    "sc15": [
-      {
-        "l": "Avg ticket",
-        "you": "€158k",
-        "peer": "€310k",
-        "up": false
-      },
-      {
-        "l": "# deals / yr",
-        "you": "2.4",
-        "peer": "1.8",
-        "up": true
-      },
-      {
-        "l": "Directs / co-invest",
-        "you": "12%",
-        "peer": "24%",
-        "up": false
-      },
-      {
-        "l": "Concentration (HHI)",
-        "you": "0.14",
-        "peer": "0.22",
-        "up": true
-      }
-    ],
-    "sc16": [
-      {
-        "l": "Total drift",
-        "you": "34pp",
-        "peer": "—",
-        "up": false
-      },
-      {
-        "l": "Strategies off",
-        "you": "5 / 9",
-        "peer": "—",
-        "up": false
-      },
-      {
-        "l": "Biggest gap",
-        "you": "Credit −12",
-        "peer": "—",
-        "up": false
-      },
-      {
-        "l": "Closest fund",
-        "you": "Ares PCS",
-        "peer": "—",
-        "up": true
-      }
-    ],
-    "sc17": [
-      {
-        "l": "Deals / yr",
-        "you": "2.4",
-        "peer": "2.1",
-        "up": true
-      },
-      {
-        "l": "# funds",
-        "you": "11",
-        "peer": "9",
-        "up": true
-      },
-      {
-        "l": "Per vintage",
-        "you": "1.3",
-        "peer": "1.1",
-        "up": true
-      },
-      {
-        "l": "Active now",
-        "you": "yes",
-        "peer": "select",
-        "up": true
-      }
-    ],
-    "sc18": [
-      {
-        "l": "You",
-        "you": "Selective",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Cohort",
-        "you": "Waiting",
-        "peer": "—",
-        "up": false
-      },
-      {
-        "l": "PE pros",
-        "you": "Active",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Family off.",
-        "you": "Gradual",
-        "peer": "—",
-        "up": true
-      }
-    ],
-    "sc19": [
-      {
-        "l": "Time to rebalance",
-        "you": "~12mo",
-        "peer": "~36mo",
-        "up": true
-      },
-      {
-        "l": "J-curve",
-        "you": "shorter",
-        "peer": "longer",
-        "up": true
-      },
-      {
-        "l": "Entry discount",
-        "you": "8–12%",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Forced selling",
-        "you": "none",
-        "peer": "—",
-        "up": true
-      }
-    ],
-    "sc20": [
-      {
-        "l": "Top return",
-        "you": "Thrive",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Most consistent",
-        "you": "EQT",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Best blend",
-        "you": "EQT",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Watch",
-        "you": "Cinven",
-        "peer": "—",
-        "up": false
-      }
-    ],
-    "sc21": [
-      {
-        "l": "Net deployment",
-        "you": "55%",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Ahead / behind",
-        "you": "on-pace",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Harvesting",
-        "you": "3 of 11",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Dry powder",
-        "you": "€3.4m",
-        "peer": "—",
-        "up": false
-      }
-    ],
-    "sc22": [
-      {
-        "l": "Called vs committed",
-        "you": "63%",
-        "peer": "58%",
-        "up": true
-      },
-      {
-        "l": "Vs fund size",
-        "you": "on-pace",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Ahead of plan",
-        "you": "2 funds",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Underdeployed",
-        "you": "1 fund",
-        "peer": "—",
-        "up": false
-      }
-    ],
-    "sc23": [
-      {
-        "l": "Liquidity fit",
-        "you": "tight",
-        "peer": "—",
-        "up": false
-      },
-      {
-        "l": "Concentration",
-        "you": "high",
-        "peer": "—",
-        "up": false
-      },
-      {
-        "l": "Vintage fit",
-        "you": "crowded",
-        "peer": "—",
-        "up": false
-      },
-      {
-        "l": "Strategy fit",
-        "you": "ok",
-        "peer": "—",
-        "up": true
-      }
-    ],
-    "sc24": [
-      {
-        "l": "Liquidity headroom",
-        "you": "€1.1m",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Safe ticket now",
-        "you": "€0.4m",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "After Q2 distribs",
-        "you": "€0.9m",
-        "peer": "—",
-        "up": true
-      },
-      {
-        "l": "Vintage clears",
-        "you": "2026",
-        "peer": "—",
-        "up": true
-      }
-    ],
-    "sc25": [
-      {
-        "l": "GDP slowdown",
-        "you": "high",
-        "peer": "med",
-        "up": false
-      },
-      {
-        "l": "Inflation",
-        "you": "exposed",
-        "peer": "hedged",
-        "up": false
-      },
-      {
-        "l": "Rates",
-        "you": "sensitive",
-        "peer": "neutral",
-        "up": false
-      },
-      {
-        "l": "Resilience",
-        "you": "0.58",
-        "peer": "0.66",
-        "up": false
-      }
-    ],
-    "sc26": [
-      {
-        "l": "Infrastructure",
-        "you": "6%",
-        "peer": "12%",
-        "up": false
-      },
-      {
-        "l": "Real assets",
-        "you": "8%",
-        "peer": "10%",
-        "up": false
-      },
-      {
-        "l": "Floating-rate credit",
-        "you": "2%",
-        "peer": "9%",
-        "up": false
-      },
-      {
-        "l": "Growth (un-hedged)",
-        "you": "high",
-        "peer": "med",
-        "up": false
-      }
-    ]
-  },
-  "peer": {
-    "baseMedian": 8.9,
-    "wealthDelta": {
-      "25-100M": 3.2,
-      "100M+": 6.0,
-      "1-5M": -1.6
-    },
-    "profDelta": {
-      "Investor/PE": 4.2,
-      "Family Office": 7.5
-    },
-    "top10Delta": 5.4,
-    "riskMedianFactor": 0.25,
-    "mixTilt": {
-      "ai": 4,
-      "growth": 4,
-      "venture": 4,
-      "credit": -3,
-      "infra": -3,
-      "realestate": -3
-    },
-    "funds": {
-      "you": 8,
-      "base": 6
-    },
-    "ticket": {
-      "you": "€150k",
-      "base": 128,
-      "wealthK": 0.9
-    },
-    "irr": {
-      "you": "11.0%",
-      "base": 8.9
-    }
-  },
-  "platform": {
-    "total": 5500,
-    "pmMedian": 10.5,
-    "irr": "9.8%",
-    "funds": 7,
-    "ticket": "€118k"
-  },
-  "endowments": {
-    "harvard": {
-      "lcbo": 22,
-      "mcbo": 14,
-      "scbo": 6,
-      "infra": 8,
-      "growth": 20,
-      "credit": 6,
-      "secondaries": 8,
-      "directs": 6,
-      "ai": 10
-    },
-    "yale": {
-      "lcbo": 18,
-      "mcbo": 16,
-      "scbo": 8,
-      "infra": 6,
-      "growth": 24,
-      "credit": 4,
-      "secondaries": 6,
-      "directs": 8,
-      "ai": 10
-    },
-    "princeton": {
-      "lcbo": 20,
-      "mcbo": 15,
-      "scbo": 7,
-      "infra": 7,
-      "growth": 22,
-      "credit": 5,
-      "secondaries": 7,
-      "directs": 7,
-      "ai": 10
-    },
-    "hyp": {
-      "lcbo": 20,
-      "mcbo": 15,
-      "scbo": 7,
-      "infra": 7,
-      "growth": 22,
-      "credit": 5,
-      "secondaries": 7,
-      "directs": 7,
-      "ai": 10
-    }
-  },
-  "benchTable": {
-    "rows": [
-      {
-        "l": "PM allocation",
-        "you": "15.7%",
-        "peers": "8.9%",
-        "model": "12%",
-        "top10": "14.3%"
-      },
-      {
-        "l": "Net IRR",
-        "you": "11.0%",
-        "peers": "9.4%",
-        "model": "10.5%",
-        "top10": "14.2%"
-      },
-      {
-        "l": "Funds held",
-        "you": "8",
-        "peers": "6",
-        "model": "—",
-        "top10": "11"
-      },
-      {
-        "l": "Avg ticket",
-        "you": "€150k",
-        "peers": "€128k",
-        "model": "—",
-        "top10": "€210k"
-      },
-      {
-        "l": "Diversification (HHI)",
-        "you": "0.14",
-        "peers": "0.19",
-        "model": "0.12",
-        "top10": "0.11"
-      },
-      {
-        "l": "Vintage spread",
-        "you": "6 yrs",
-        "peers": "4 yrs",
-        "model": "8 yrs",
-        "top10": "7 yrs"
-      }
-    ]
-  }
+"portfolio": {
+"navText": "€16.6m",
+"nav": 16.6,
+"paidInText": "€13.0m",
+"distributionsText": "€10.6m",
+"distributions": 10.6,
+"irr": "11.0",
+"irrTable": "11%",
+"irrGross": "13%",
+"dpi": "0.8",
+"dpiTableNet": "0.82x",
+"dpiTableGross": "0.90x",
+"moic": "1.8",
+"moicTableNet": "1.80x",
+"moicTableGross": "1.95x",
+"tvpiTableNet": "2.10x",
+"tvpiTableGross": "2.30x",
+"fundsHeld": 8,
+"managers": 6,
+"largestHolding": "EQT IX",
+"largestHoldingDetail": "€4.6m · 28% NAV",
+"rank": "Top 18%",
+"cashPosition": "€1.1m",
+"uncalled": "€3.9m",
+"committable": "€4.3m",
+"tvpi": "2.1"
+},
+"pm": {
+"you": 15.7,
+"platform": 10.5,
+"model": 12,
+"target": 20,
+"rank": "Top 18%",
+"rankPos": 111,
+"rankOf": 2000
+},
+"strats": [
+[
+"buyout",
+"Buyout",
+"--data-1"
+],
+[
+"growth",
+"Growth",
+"--data-2"
+],
+[
+"venture",
+"Venture",
+"--data-3"
+],
+[
+"credit",
+"Private Credit",
+"--data-4"
+],
+[
+"infra",
+"Infrastructure",
+"--data-5"
+],
+[
+"realestate",
+"Real Estate",
+"--data-6"
+],
+[
+"secondaries",
+"Secondaries",
+"--data-7"
+],
+[
+"ai",
+"AI / Tech",
+"--data-8"
+],
+[
+"directs",
+"Direct & Co-Invest",
+"--data-10"
+],
+[
+"other",
+"Other",
+"--data-9"
+]
+],
+"mix": {
+"you": {
+"buyout": 30,
+"growth": 14,
+"venture": 10,
+"credit": 2,
+"infra": 6,
+"realestate": 8,
+"secondaries": 6,
+"ai": 18,
+"directs": 4,
+"other": 2
+},
+"platform": {
+"buyout": 30,
+"growth": 15,
+"venture": 11,
+"credit": 9,
+"infra": 7,
+"realestate": 8,
+"secondaries": 6,
+"ai": 10,
+"directs": 3,
+"other": 1
+},
+"model": {
+"buyout": 26,
+"growth": 14,
+"venture": 8,
+"credit": 14,
+"infra": 12,
+"realestate": 7,
+"secondaries": 6,
+"ai": 9,
+"directs": 3,
+"other": 1
+}
+},
+"dims": {
+"region": {
+"actual": {
+"USA": 42,
+"Europe": 34,
+"APAC": 18,
+"MEA": 6
+},
+"target": {
+"USA": 38,
+"Europe": 32,
+"APAC": 24,
+"MEA": 6
+},
+"colors": {
+"USA": "--data-1",
+"Europe": "--data-5",
+"APAC": "--data-8",
+"MEA": "--data-9"
+}
+},
+"currency": {
+"actual": {
+"USD": 40,
+"EUR": 38,
+"GBP": 9,
+"CHF": 6,
+"JPY": 4,
+"Other": 3
+},
+"target": {
+"USD": 36,
+"EUR": 40,
+"GBP": 9,
+"CHF": 7,
+"JPY": 5,
+"Other": 3
+},
+"colors": {
+"USD": "--data-1",
+"EUR": "--data-5",
+"GBP": "--data-2",
+"CHF": "--data-6",
+"JPY": "--data-3",
+"Other": "--data-9"
+}
+},
+"sector": {
+"actual": {
+"Tech": 20,
+"AI": 14,
+"Healthcare": 16,
+"Financials": 14,
+"Industrials": 18,
+"Consumer": 12,
+"Energy": 6
+},
+"target": {
+"Tech": 14,
+"AI": 8,
+"Healthcare": 18,
+"Financials": 16,
+"Industrials": 20,
+"Consumer": 16,
+"Energy": 8
+},
+"colors": {
+"Tech": "--data-9",
+"AI": "--data-8",
+"Healthcare": "--data-2",
+"Financials": "--data-4",
+"Industrials": "--data-5",
+"Consumer": "--data-7",
+"Energy": "--data-6"
+}
+}
+},
+"cashflows": {
+"cats": [
+"2019",
+"2020",
+"2021",
+"2022",
+"2023",
+"2024",
+"2025"
+],
+"calls": [
+1.2,
+1.6,
+2.1,
+1.7,
+1.2,
+0.9,
+0.6
+],
+"distributions": [
+0.3,
+0.7,
+1.1,
+1.6,
+2.0,
+2.3,
+2.6
+]
+},
+"heldFunds": [
+{
+"id": "eqtix",
+"name": "EQT IX",
+"mgr": "EQT Partners",
+"logo": "eqt",
+"strat": "Buyout",
+"vintage": 2019,
+"contrib": 1.8,
+"moic": "2.3x",
+"dpi": "1.1x",
+"irr": "19.4%",
+"nav": "€4.6m",
+"called": "92%",
+"stage": "Harvesting",
+"note": "Top contributor this quarter — three portfolio exits marked up.",
+"tvpi": "2.4x",
+"dvpi": "2.3x",
+"month": "Mar 2019",
+"navUncommitted": "€0.2m"
+},
+{
+"id": "thrive8",
+"name": "Thrive Capital VIII",
+"mgr": "Thrive Capital",
+"logo": "general-atlantic",
+"strat": "AI / Tech",
+"vintage": 2021,
+"contrib": 1.2,
+"moic": "1.9x",
+"dpi": "0.3x",
+"irr": "16.1%",
+"nav": "€3.1m",
+"called": "74%",
+"stage": "Buying",
+"note": "AI holdings re-rated; still early on realisations.",
+"tvpi": "2.0x",
+"dvpi": "1.9x",
+"month": "Jul 2021",
+"navUncommitted": "€1.0m"
+},
+{
+"id": "ga",
+"name": "General Atlantic IP",
+"mgr": "General Atlantic",
+"logo": "general-atlantic",
+"strat": "Growth",
+"vintage": 2020,
+"contrib": 0.7,
+"moic": "1.7x",
+"dpi": "0.5x",
+"irr": "14.2%",
+"nav": "€2.4m",
+"called": "81%",
+"stage": "Deploying",
+"note": "Steady growth-equity compounding across tech & consumer.",
+"tvpi": "1.8x",
+"dvpi": "1.7x",
+"month": "Feb 2020",
+"navUncommitted": "€0.6m"
+},
+{
+"id": "cvc9",
+"name": "CVC IX",
+"mgr": "CVC Capital",
+"logo": "eqt",
+"strat": "Buyout",
+"vintage": 2022,
+"contrib": 0.4,
+"moic": "1.4x",
+"dpi": "0.2x",
+"irr": "11.8%",
+"nav": "€2.0m",
+"called": "58%",
+"stage": "Buying",
+"note": "Mid-life European buyout — tracking plan.",
+"tvpi": "1.5x",
+"dvpi": "1.4x",
+"month": "Sep 2022",
+"navUncommitted": "€1.1m"
+},
+{
+"id": "arespcs",
+"name": "Ares PCS",
+"mgr": "Ares Management",
+"logo": "ares",
+"strat": "Private Credit",
+"vintage": 2023,
+"contrib": -0.3,
+"moic": "1.1x",
+"dpi": "0.1x",
+"irr": "8.4%",
+"nav": "€1.5m",
+"called": "46%",
+"stage": "Deploying",
+"note": "Income accruing; mark held flat — small drag this quarter.",
+"tvpi": "1.2x",
+"dvpi": "1.1x",
+"month": "May 2023",
+"navUncommitted": "€1.4m"
+},
+{
+"id": "cinven8",
+"name": "Cinven 8",
+"mgr": "Cinven",
+"logo": "eqt",
+"strat": "Buyout",
+"vintage": 2021,
+"contrib": -0.6,
+"moic": "1.2x",
+"dpi": "0.1x",
+"irr": "7.1%",
+"nav": "€1.8m",
+"called": "69%",
+"stage": "Buying",
+"note": "One holding written down — biggest detractor this quarter.",
+"tvpi": "1.3x",
+"dvpi": "1.2x",
+"month": "Nov 2021",
+"navUncommitted": "€0.8m"
+},
+{
+"id": "northwind",
+"name": "Northwind Infra III",
+"mgr": "Northwind",
+"logo": "ares",
+"strat": "Infrastructure",
+"vintage": 2024,
+"contrib": -0.2,
+"moic": "0.9x",
+"dpi": "0.0x",
+"irr": "−4.0%",
+"nav": "€0.7m",
+"called": "38%",
+"stage": "J-curve",
+"note": "Young infra fund — J-curve trough, expected.",
+"tvpi": "0.9x",
+"dvpi": "0.9x",
+"month": "Jan 2024",
+"navUncommitted": "€1.2m"
+},
+{
+"id": "meridian",
+"name": "Meridian Growth IV",
+"mgr": "Meridian",
+"logo": "general-atlantic",
+"strat": "Growth",
+"vintage": 2024,
+"contrib": -0.1,
+"moic": "1.0x",
+"dpi": "0.0x",
+"irr": "−1.2%",
+"nav": "€0.5m",
+"called": "22%",
+"stage": "J-curve",
+"note": "Recently called; too early to mark.",
+"tvpi": "1.0x",
+"dvpi": "1.0x",
+"month": "Aug 2024",
+"navUncommitted": "€1.5m"
+}
+],
+"heldMeta": {
+"eqtix": {
+"currency": "EUR",
+"region": "Europe",
+"sector": "Industrials",
+"strat": "buyout",
+"vintage": 2019,
+"nav": 4.6
+},
+"thrive8": {
+"currency": "USD",
+"region": "USA",
+"sector": "AI",
+"strat": "ai",
+"vintage": 2021,
+"nav": 3.1
+},
+"ga": {
+"currency": "USD",
+"region": "USA",
+"sector": "Tech",
+"strat": "growth",
+"vintage": 2020,
+"nav": 2.4
+},
+"cvc9": {
+"currency": "EUR",
+"region": "Europe",
+"sector": "Industrials",
+"strat": "buyout",
+"vintage": 2022,
+"nav": 2.0
+},
+"arespcs": {
+"currency": "USD",
+"region": "USA",
+"sector": "Financials",
+"strat": "credit",
+"vintage": 2023,
+"nav": 1.5
+},
+"cinven8": {
+"currency": "EUR",
+"region": "Europe",
+"sector": "Healthcare",
+"strat": "buyout",
+"vintage": 2021,
+"nav": 1.8
+},
+"northwind": {
+"currency": "EUR",
+"region": "Europe",
+"sector": "Energy",
+"strat": "infra",
+"vintage": 2024,
+"nav": 0.7
+},
+"meridian": {
+"currency": "GBP",
+"region": "APAC",
+"sector": "Tech",
+"strat": "growth",
+"vintage": 2024,
+"nav": 0.5
+}
+},
+"modelCoarse": {
+"income_resilience": {
+"buyout": 18,
+"growth": 3,
+"venture": 0,
+"credit": 40,
+"infra": 22,
+"realestate": 0,
+"secondaries": 12,
+"ai": 2,
+"directs": 3,
+"other": 0
+},
+"balanced_compounding": {
+"buyout": 40,
+"growth": 10,
+"venture": 0,
+"credit": 18,
+"infra": 15,
+"realestate": 0,
+"secondaries": 12,
+"ai": 2,
+"directs": 3,
+"other": 0
+},
+"equity_growth": {
+"buyout": 55,
+"growth": 12,
+"venture": 0,
+"credit": 8,
+"infra": 8,
+"realestate": 0,
+"secondaries": 8,
+"ai": 4,
+"directs": 5,
+"other": 0
+},
+"innovation_ai_alpha": {
+"buyout": 30,
+"growth": 25,
+"venture": 0,
+"credit": 5,
+"infra": 7,
+"realestate": 0,
+"secondaries": 8,
+"ai": 15,
+"directs": 10,
+"other": 0
+},
+"opportunistic_advanced": {
+"buyout": 33,
+"growth": 10,
+"venture": 0,
+"credit": 12,
+"infra": 10,
+"realestate": 0,
+"secondaries": 20,
+"ai": 5,
+"directs": 10,
+"other": 0
+}
+},
+"modelFine": {
+"income_resilience": [
+[
+"Large-Cap Buyout",
+8,
+"--data-1"
+],
+[
+"Mid-Cap Buyout",
+7,
+"--data-2"
+],
+[
+"Small-Cap Buyout",
+3,
+"--data-3"
+],
+[
+"Infrastructure",
+22,
+"--data-5"
+],
+[
+"Growth / Tech",
+3,
+"--data-7"
+],
+[
+"Private Credit",
+40,
+"--data-4"
+],
+[
+"Secondaries",
+12,
+"--data-6"
+],
+[
+"Direct & Co-Investments",
+3,
+"--data-10"
+],
+[
+"AI",
+2,
+"--data-8"
+]
+],
+"balanced_compounding": [
+[
+"Large-Cap Buyout",
+15,
+"--data-1"
+],
+[
+"Mid-Cap Buyout",
+18,
+"--data-2"
+],
+[
+"Small-Cap Buyout",
+7,
+"--data-3"
+],
+[
+"Infrastructure",
+15,
+"--data-5"
+],
+[
+"Growth / Tech",
+10,
+"--data-7"
+],
+[
+"Private Credit",
+18,
+"--data-4"
+],
+[
+"Secondaries",
+12,
+"--data-6"
+],
+[
+"Direct & Co-Investments",
+3,
+"--data-10"
+],
+[
+"AI",
+2,
+"--data-8"
+]
+],
+"equity_growth": [
+[
+"Large-Cap Buyout",
+18,
+"--data-1"
+],
+[
+"Mid-Cap Buyout",
+25,
+"--data-2"
+],
+[
+"Small-Cap Buyout",
+12,
+"--data-3"
+],
+[
+"Infrastructure",
+8,
+"--data-5"
+],
+[
+"Growth / Tech",
+12,
+"--data-7"
+],
+[
+"Private Credit",
+8,
+"--data-4"
+],
+[
+"Secondaries",
+8,
+"--data-6"
+],
+[
+"Direct & Co-Investments",
+5,
+"--data-10"
+],
+[
+"AI",
+4,
+"--data-8"
+]
+],
+"innovation_ai_alpha": [
+[
+"Large-Cap Buyout",
+8,
+"--data-1"
+],
+[
+"Mid-Cap Buyout",
+15,
+"--data-2"
+],
+[
+"Small-Cap Buyout",
+7,
+"--data-3"
+],
+[
+"Infrastructure",
+7,
+"--data-5"
+],
+[
+"Growth / Tech",
+25,
+"--data-7"
+],
+[
+"Private Credit",
+5,
+"--data-4"
+],
+[
+"Secondaries",
+8,
+"--data-6"
+],
+[
+"Direct & Co-Investments",
+10,
+"--data-10"
+],
+[
+"AI",
+15,
+"--data-8"
+]
+],
+"opportunistic_advanced": [
+[
+"Large-Cap Buyout",
+10,
+"--data-1"
+],
+[
+"Mid-Cap Buyout",
+15,
+"--data-2"
+],
+[
+"Small-Cap Buyout",
+8,
+"--data-3"
+],
+[
+"Infrastructure",
+10,
+"--data-5"
+],
+[
+"Growth / Tech",
+10,
+"--data-7"
+],
+[
+"Private Credit",
+12,
+"--data-4"
+],
+[
+"Secondaries",
+20,
+"--data-6"
+],
+[
+"Direct & Co-Investments",
+10,
+"--data-10"
+],
+[
+"AI",
+5,
+"--data-8"
+]
+]
+},
+"followFunds": [
+{
+"id": "kkr13",
+"name": "KKR North America XIII",
+"mgr": "KKR",
+"strat": "Buyout",
+"region": "North America",
+"size": "€19.0bn",
+"tgt": "2.0–2.2x",
+"close": "Oct 2026",
+"min": "€50,000",
+"prospect": true,
+"by": {
+"top10": "7 of the platform’s top-10% performers committed in the last 30 days.",
+"peers": "5 investors in your peer group committed in the last 30 days."
+},
+"why": [
+"Large-cap North American buyout from a top-quartile, multi-cycle manager.",
+"Adds geographic balance — your book is currently Europe-heavy.",
+"A 2026 vintage deploying into reset valuations.",
+"Resembles funds your followed group has historically done well in.",
+"Fits your ticket size and liquidity headroom."
+]
+},
+{
+"id": "lex12",
+"name": "Lexington Capital Partners XII",
+"mgr": "Lexington Partners",
+"strat": "Secondaries",
+"region": "Global",
+"size": "€24.0bn",
+"tgt": "1.7–1.8x",
+"close": "Jan 2027",
+"min": "€100,000",
+"prospect": true,
+"by": {
+"top10": "4 top-10% performers added secondaries exposure this month.",
+"peers": "3 investors in your peer group added secondaries this month."
+},
+"why": [
+"Diversified secondaries — faster distributions and a shorter J-curve.",
+"Smooths your 2021–22 vintage bunching.",
+"Buys already-funded NAV, easing near-term call pressure.",
+"A repeat allocation among your followed group.",
+"Comfortably within your liquidity headroom."
+]
+}
+],
+"scorecards": {
+"ticket": [
+{
+"l": "Suggested ticket",
+"you": "€150k",
+"peer": "€128k",
+"up": true
+},
+{
+"l": "Commitments / yr",
+"you": "3",
+"peer": "2.1",
+"up": true
+},
+{
+"l": "Of investable wealth",
+"you": "4.3pp",
+"peer": "—",
+"up": true
+},
+{
+"l": "Headroom to target",
+"you": "€1.1m",
+"peer": "—",
+"up": true
+}
+],
+"capacity": [
+{
+"l": "Uncalled commitments",
+"you": "€3.4m",
+"peer": "—",
+"up": false
+},
+{
+"l": "Liquidity headroom",
+"you": "€1.1m",
+"peer": "—",
+"up": true
+},
+{
+"l": "Illiquidity carried",
+"you": "62%",
+"peer": "48%",
+"up": false
+},
+{
+"l": "Safe new commitment",
+"you": "€0.8m",
+"peer": "—",
+"up": true
+}
+],
+"consistency": [
+{
+"l": "Consistency score",
+"you": "8.4/10",
+"peer": "6.1/10",
+"up": true
+},
+{
+"l": "Distribution stability",
+"you": "High",
+"peer": "Med",
+"up": true
+},
+{
+"l": "Markup quality",
+"you": "Good",
+"peer": "Fair",
+"up": true
+},
+{
+"l": "Dispersion (3 funds)",
+"you": "Low",
+"peer": "Med",
+"up": true
+}
+],
+"demand": [
+{
+"l": "Fills fastest",
+"you": "EQT X",
+"peer": "—",
+"up": true
+},
+{
+"l": "Median time-to-fill",
+"you": "18 days",
+"peer": "31 days",
+"up": true
+},
+{
+"l": "Oversubscription",
+"you": "2.4×",
+"peer": "1.6×",
+"up": false
+},
+{
+"l": "Your alloc. likelihood",
+"you": "78%",
+"peer": "—",
+"up": true
+}
+],
+"sc1": [
+{
+"l": "Funds today",
+"you": "11",
+"peer": "—",
+"up": true
+},
+{
+"l": "Target by Y5",
+"you": "18–22",
+"peer": "—",
+"up": true
+},
+{
+"l": "New / year",
+"you": "2–3",
+"peer": "2.1",
+"up": true
+},
+{
+"l": "Max single-fund weight",
+"you": "8%",
+"peer": "—",
+"up": true
+}
+],
+"sc2": [
+{
+"l": "Funds today",
+"you": "11",
+"peer": "—",
+"up": true
+},
+{
+"l": "Target by Y5",
+"you": "18–22",
+"peer": "—",
+"up": true
+},
+{
+"l": "New / year",
+"you": "2–3",
+"peer": "2.1",
+"up": true
+},
+{
+"l": "Max single-fund weight",
+"you": "8%",
+"peer": "—",
+"up": true
+}
+],
+"sc3": [
+{
+"l": "Suggested ticket",
+"you": "€150k",
+"peer": "€128k",
+"up": true
+},
+{
+"l": "Commitments / yr",
+"you": "3",
+"peer": "2.1",
+"up": true
+},
+{
+"l": "Headroom to target",
+"you": "€1.1m",
+"peer": "—",
+"up": true
+},
+{
+"l": "Of PM capital",
+"you": "3.8%",
+"peer": "—",
+"up": true
+}
+],
+"sc4": [
+{
+"l": "Safe new commitment",
+"you": "€0.8m",
+"peer": "—",
+"up": true
+},
+{
+"l": "Buffer in Stress",
+"you": "€0.6m",
+"peer": "—",
+"up": true
+},
+{
+"l": "Buffer in Severe",
+"you": "−€1.3m",
+"peer": "—",
+"up": false
+},
+{
+"l": "Fix",
+"you": "Slow pacing / secondaries",
+"peer": "—",
+"up": true
+}
+],
+"sc5": [
+{
+"l": "Avg ticket",
+"you": "€158k",
+"peer": "€128k",
+"up": true
+},
+{
+"l": "Ticket spread",
+"you": "±€20k",
+"peer": "±€55k",
+"up": true
+},
+{
+"l": "Commitments / yr",
+"you": "2.4",
+"peer": "2.1",
+"up": true
+},
+{
+"l": "Bunching",
+"you": "low",
+"peer": "med",
+"up": true
+}
+],
+"sc6": [
+{
+"l": "Funds held",
+"you": "8",
+"peer": "6",
+"up": true
+},
+{
+"l": "Median ticket",
+"you": "€150k",
+"peer": "€120k",
+"up": true
+},
+{
+"l": "Tickets / year",
+"you": "2.4",
+"peer": "2.1",
+"up": true
+},
+{
+"l": "Concentration (HHI)",
+"you": "0.14",
+"peer": "0.19",
+"up": true
+}
+],
+"sc8": [
+{
+"l": "Net 12-mo cash",
+"you": "−€0.9m",
+"peer": "—",
+"up": false
+},
+{
+"l": "Uncalled",
+"you": "€3.4m",
+"peer": "—",
+"up": false
+},
+{
+"l": "Liquidity buffer",
+"you": "€1.1m",
+"peer": "—",
+"up": true
+},
+{
+"l": "Crossover",
+"you": "Q2 2027",
+"peer": "—",
+"up": true
+}
+],
+"sc9": [
+{
+"l": "Liquidity headroom",
+"you": "€1.1m",
+"peer": "—",
+"up": true
+},
+{
+"l": "Safe new commitment",
+"you": "€0.8m",
+"peer": "—",
+"up": true
+},
+{
+"l": "Uncalled",
+"you": "€3.4m",
+"peer": "—",
+"up": false
+},
+{
+"l": "Buffer after",
+"you": "€0.3m",
+"peer": "—",
+"up": true
+}
+],
+"sc12": [
+{
+"l": "Target Net MOIC",
+"you": "2.1x",
+"peer": "1.7x",
+"up": true
+},
+{
+"l": "Target Net IRR",
+"you": "18%",
+"peer": "14%",
+"up": true
+},
+{
+"l": "Mgmt fee",
+"you": "1.5%",
+"peer": "2.0%",
+"up": true
+},
+{
+"l": "Vintage",
+"you": "2025",
+"peer": "—",
+"up": true
+}
+],
+"sc13": [
+{
+"l": "# funds",
+"you": "11",
+"peer": "19",
+"up": false
+},
+{
+"l": "Vintages spanned",
+"you": "9",
+"peer": "12",
+"up": false
+},
+{
+"l": "Avg ticket",
+"you": "€158k",
+"peer": "€240k",
+"up": false
+},
+{
+"l": "Secondaries %",
+"you": "6%",
+"peer": "14%",
+"up": false
+}
+],
+"sc14": [
+{
+"l": "Commitments / yr",
+"you": "2.4",
+"peer": "3.6",
+"up": false
+},
+{
+"l": "Vintage spread",
+"you": "9y",
+"peer": "14y",
+"up": false
+},
+{
+"l": "Single-fund max",
+"you": "12%",
+"peer": "7%",
+"up": false
+},
+{
+"l": "Defensive sleeve",
+"you": "18%",
+"peer": "30%",
+"up": false
+}
+],
+"sc15": [
+{
+"l": "Avg ticket",
+"you": "€158k",
+"peer": "€310k",
+"up": false
+},
+{
+"l": "# deals / yr",
+"you": "2.4",
+"peer": "1.8",
+"up": true
+},
+{
+"l": "Directs / co-invest",
+"you": "12%",
+"peer": "24%",
+"up": false
+},
+{
+"l": "Concentration (HHI)",
+"you": "0.14",
+"peer": "0.22",
+"up": true
+}
+],
+"sc16": [
+{
+"l": "Total drift",
+"you": "34pp",
+"peer": "—",
+"up": false
+},
+{
+"l": "Strategies off",
+"you": "5 / 9",
+"peer": "—",
+"up": false
+},
+{
+"l": "Biggest gap",
+"you": "Credit −12",
+"peer": "—",
+"up": false
+},
+{
+"l": "Closest fund",
+"you": "Ares PCS",
+"peer": "—",
+"up": true
+}
+],
+"sc17": [
+{
+"l": "Deals / yr",
+"you": "2.4",
+"peer": "2.1",
+"up": true
+},
+{
+"l": "# funds",
+"you": "11",
+"peer": "9",
+"up": true
+},
+{
+"l": "Per vintage",
+"you": "1.3",
+"peer": "1.1",
+"up": true
+},
+{
+"l": "Active now",
+"you": "yes",
+"peer": "select",
+"up": true
+}
+],
+"sc18": [
+{
+"l": "You",
+"you": "Selective",
+"peer": "—",
+"up": true
+},
+{
+"l": "Cohort",
+"you": "Waiting",
+"peer": "—",
+"up": false
+},
+{
+"l": "PE pros",
+"you": "Active",
+"peer": "—",
+"up": true
+},
+{
+"l": "Family off.",
+"you": "Gradual",
+"peer": "—",
+"up": true
+}
+],
+"sc19": [
+{
+"l": "Time to rebalance",
+"you": "~12mo",
+"peer": "~36mo",
+"up": true
+},
+{
+"l": "J-curve",
+"you": "shorter",
+"peer": "longer",
+"up": true
+},
+{
+"l": "Entry discount",
+"you": "8–12%",
+"peer": "—",
+"up": true
+},
+{
+"l": "Forced selling",
+"you": "none",
+"peer": "—",
+"up": true
+}
+],
+"sc20": [
+{
+"l": "Top return",
+"you": "Thrive",
+"peer": "—",
+"up": true
+},
+{
+"l": "Most consistent",
+"you": "EQT",
+"peer": "—",
+"up": true
+},
+{
+"l": "Best blend",
+"you": "EQT",
+"peer": "—",
+"up": true
+},
+{
+"l": "Watch",
+"you": "Cinven",
+"peer": "—",
+"up": false
+}
+],
+"sc21": [
+{
+"l": "Net deployment",
+"you": "55%",
+"peer": "—",
+"up": true
+},
+{
+"l": "Ahead / behind",
+"you": "on-pace",
+"peer": "—",
+"up": true
+},
+{
+"l": "Harvesting",
+"you": "3 of 11",
+"peer": "—",
+"up": true
+},
+{
+"l": "Dry powder",
+"you": "€3.4m",
+"peer": "—",
+"up": false
+}
+],
+"sc22": [
+{
+"l": "Called vs committed",
+"you": "63%",
+"peer": "58%",
+"up": true
+},
+{
+"l": "Vs fund size",
+"you": "on-pace",
+"peer": "—",
+"up": true
+},
+{
+"l": "Ahead of plan",
+"you": "2 funds",
+"peer": "—",
+"up": true
+},
+{
+"l": "Underdeployed",
+"you": "1 fund",
+"peer": "—",
+"up": false
+}
+],
+"sc23": [
+{
+"l": "Liquidity fit",
+"you": "tight",
+"peer": "—",
+"up": false
+},
+{
+"l": "Concentration",
+"you": "high",
+"peer": "—",
+"up": false
+},
+{
+"l": "Vintage fit",
+"you": "crowded",
+"peer": "—",
+"up": false
+},
+{
+"l": "Strategy fit",
+"you": "ok",
+"peer": "—",
+"up": true
+}
+],
+"sc24": [
+{
+"l": "Liquidity headroom",
+"you": "€1.1m",
+"peer": "—",
+"up": true
+},
+{
+"l": "Safe ticket now",
+"you": "€0.4m",
+"peer": "—",
+"up": true
+},
+{
+"l": "After Q2 distribs",
+"you": "€0.9m",
+"peer": "—",
+"up": true
+},
+{
+"l": "Vintage clears",
+"you": "2026",
+"peer": "—",
+"up": true
+}
+],
+"sc25": [
+{
+"l": "GDP slowdown",
+"you": "high",
+"peer": "med",
+"up": false
+},
+{
+"l": "Inflation",
+"you": "exposed",
+"peer": "hedged",
+"up": false
+},
+{
+"l": "Rates",
+"you": "sensitive",
+"peer": "neutral",
+"up": false
+},
+{
+"l": "Resilience",
+"you": "0.58",
+"peer": "0.66",
+"up": false
+}
+],
+"sc26": [
+{
+"l": "Infrastructure",
+"you": "6%",
+"peer": "12%",
+"up": false
+},
+{
+"l": "Real assets",
+"you": "8%",
+"peer": "10%",
+"up": false
+},
+{
+"l": "Floating-rate credit",
+"you": "2%",
+"peer": "9%",
+"up": false
+},
+{
+"l": "Growth (un-hedged)",
+"you": "high",
+"peer": "med",
+"up": false
+}
+]
+},
+"peer": {
+"baseMedian": 8.9,
+"wealthDelta": {
+"25-100M": 3.2,
+"100M+": 6.0,
+"1-5M": -1.6
+},
+"profDelta": {
+"Investor/PE": 4.2,
+"Family Office": 7.5
+},
+"top10Delta": 5.4,
+"riskMedianFactor": 0.25,
+"mixTilt": {
+"ai": 4,
+"growth": 4,
+"venture": 4,
+"credit": -3,
+"infra": -3,
+"realestate": -3
+},
+"funds": {
+"you": 8,
+"base": 6
+},
+"ticket": {
+"you": "€150k",
+"base": 128,
+"wealthK": 0.9
+},
+"irr": {
+"you": "11.0%",
+"base": 8.9
+}
+},
+"platform": {
+"total": 5500,
+"pmMedian": 10.5,
+"irr": "9.8%",
+"funds": 7,
+"ticket": "€118k"
+},
+"endowments": {
+"harvard": {
+"lcbo": 22,
+"mcbo": 14,
+"scbo": 6,
+"infra": 8,
+"growth": 20,
+"credit": 6,
+"secondaries": 8,
+"directs": 6,
+"ai": 10
+},
+"yale": {
+"lcbo": 18,
+"mcbo": 16,
+"scbo": 8,
+"infra": 6,
+"growth": 24,
+"credit": 4,
+"secondaries": 6,
+"directs": 8,
+"ai": 10
+},
+"princeton": {
+"lcbo": 20,
+"mcbo": 15,
+"scbo": 7,
+"infra": 7,
+"growth": 22,
+"credit": 5,
+"secondaries": 7,
+"directs": 7,
+"ai": 10
+},
+"hyp": {
+"lcbo": 20,
+"mcbo": 15,
+"scbo": 7,
+"infra": 7,
+"growth": 22,
+"credit": 5,
+"secondaries": 7,
+"directs": 7,
+"ai": 10
+}
+},
+"benchTable": {
+"rows": [
+{
+"l": "PM allocation",
+"you": "15.7%",
+"peers": "8.9%",
+"model": "12%",
+"top10": "14.3%"
+},
+{
+"l": "Net IRR",
+"you": "11.0%",
+"peers": "9.4%",
+"model": "10.5%",
+"top10": "14.2%"
+},
+{
+"l": "Funds held",
+"you": "8",
+"peers": "6",
+"model": "—",
+"top10": "11"
+},
+{
+"l": "Avg ticket",
+"you": "€150k",
+"peers": "€128k",
+"model": "—",
+"top10": "€210k"
+},
+{
+"l": "Diversification (HHI)",
+"you": "0.14",
+"peers": "0.19",
+"model": "0.12",
+"top10": "0.11"
+},
+{
+"l": "Vintage spread",
+"you": "6 yrs",
+"peers": "4 yrs",
+"model": "8 yrs",
+"top10": "7 yrs"
+}
+]
+}
 }

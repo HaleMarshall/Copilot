@@ -564,6 +564,8 @@ class Component extends DCLogic {
     .then(r=>r.json()).then(d=>{ if(d&&d.remembered&&d.remembered.length) this.refreshDB(); }).catch(()=>{}); }
   /* relationship-manager proactive prompt built from stored memory (shown when the chat opens) */
   proactiveNudge(){ const h=this.h; const SF=this.SF;
+    /* item 1 — 'since we last spoke' only applies to returning investors; a new investor hasn't spoken yet */
+    if(this.state.demoState==='cold') return null;
     const mems=((this.DB&&this.DB.memories)||[]).filter(m=>!(m.payload&&m.payload.source==='human'));
     const mem=mems.find(m=>!this.dtog('memdone:'+m.kind,false));
     if(!mem) return null;
@@ -575,8 +577,8 @@ class Component extends DCLogic {
       cta='Review my US exposure'; act=()=>{ this.setDtog('memdone:'+mem.kind,true); this.askSend('show me a chart of my regional mix'); };
     } else if(mem.kind==='liquidity_event'){
       title='You mentioned a liquidity event'+(month?(' in '+month):'');
-      body='Did your '+(month?month+' ':'')+'liquidity event come through? If you have fresh cash to put to work, I can line up funds that fit your target and deploy it without breaking your pacing plan.';
-      cta='Yes — show me funds'; act=()=>{ this.setDtog('memdone:'+mem.kind,true); this.askSend('what funds can I buy to deploy new cash?'); };
+      body='Did your '+(month?month+' ':'')+'liquidity event come through? If you have fresh cash to put to work, I can line up opportunities that fit your target and deploy it without breaking your pacing plan.';
+      cta='Yes — show me the opportunities'; act=()=>{ this.setDtog('memdone:'+mem.kind,true); this.goOppFromNotif(); };
     } else if(mem.kind==='esg'){
       title='Your ESG / impact interest';
       body='You mentioned an interest in ESG and impact. I can prioritise climate- and impact-aligned managers in your opportunities.';
@@ -4711,6 +4713,7 @@ class Component extends DCLogic {
           yAxis('Return · multiple'),
           perfMini('IRR',P.irr,'%',(parseFloat(P.irr)||0)/14,'var(--brand)',['0%','7%','14%']),
           perfMini('DPI',P.dpi,'x',(parseFloat(P.dpi)||0)/3,'var(--data-4)',['0.0x','1.5x','3.0x']),
+          perfMini('TVPI',P.tvpi,'x',(parseFloat(P.tvpi)||0)/3,'var(--data-7)',['0.0x','1.5x','3.0x']), /* item 2 — TVPI chart */
           perfMini('MOIC',P.moic,'x',(parseFloat(P.moic)||0)/2,'var(--data-5)',['0.0x','1.0x','2.0x'])),
         h('div',{style:{textAlign:'center',fontSize:10,color:'var(--muted)',marginTop:5}},'Since inception · net of fees'),
         h('div',{style:{marginTop:16}}, this.perfTiles([['MOIC',P.moicTableNet,P.moicTableGross],['TVPI',P.tvpiTableNet,P.tvpiTableGross],['DPI',P.dpiTableNet,P.dpiTableGross],['IRR',P.irrTable,P.irrGross]])),
