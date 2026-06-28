@@ -109,4 +109,21 @@ Legend for notes: file = `Alpha Copilot - Overview.dc.html` unless stated.
 - ☑ 79 Deviation Z-charts on every breakdown page — added an 'Allocated vs committed — {dim}' miniZ card to homeDrillBody (strategy/region/currency/sector) + vintageDrillBody, all driven by navVsCommittedDeltas. Verified live: Region/Currency/Vintage Z-charts present; logicError null.
 - ☑ 80 Sticky breakdown panel while rest scrolls — restructured homeDrillBody into a 2-col: left breakdown column (mix donut + concentration) is `position:sticky top:12px`; right column (big block, Z-chart, funds) scrolls. Verified live: 1 sticky panel, drill renders. (Teaser→detail step preserved.)
 
-**NEXT: item 81** — repeat chart visual on detail page with AI summary directly beneath (81–95 cluster: vintage, cashflow, Ask-Alpha-about-this).
+## 81–95 Detail visuals, exec summary, vintage, cashflow
+- ☑ 81 Repeat chart visual on detail page + AI summary directly beneath — added an 'Alpha's read' AI line (AI badge) directly under the mix donut/bars inside mixCard. Verified live: chart + AI-read-beneath present; logicError null.
+- ☑ 82 Limit executive summary to Top 5/Top 3 — exec strip uses `.slice(0,5)` (max 5 bullets), not the full model. Verified (item 73: 5 bullets).
+- ☑ 83 Executive summary positives-only — all 5 bullets are positive (▲, NAV/top-performer/distributions/largest-book/diversification); no negatives. Verified.
+- ☐ 84 Enlarge Vintage figures (unreadable)
+- ☐ 85 'Ask Alpha about this' on every page
+- ☐ 86 Vintage last 5 years only
+- ☐ 87 Vintage teaser/intermediate step
+- ☐ 88 Vintage Alpha summary (over-vintaged)
+- ☐ 89 Cashflow top KPIs: Committed/Called/Uncalled/Cash Position
+- ☐ 90 Mark notifications seen after ~5s
+- ☐ 91 Rename 'Net Cash Flow' → 'Net Distributions', below top row
+- ☐ 92 Cashflow Alpha summary (J-curve, reassuring)
+- ☐ 93 Investable-capital prompt with cash position
+- ☐ 94 Only show investable-capital prompt when cash>0
+- ☐ 95 Cashflow pop-up: funds-to-invest first, add-cash below
+
+**NEXT: item 84** — enlarge Vintage value labels.
