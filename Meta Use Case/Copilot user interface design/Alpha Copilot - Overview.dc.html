@@ -5676,7 +5676,8 @@ class Component extends DCLogic {
         /* review4 item 1 — duplicate 'Simulate and compare your targets' title removed (the use-case header above already shows it); one concise line kept */
         h('div',{style:{fontSize:13,color:'var(--muted)',lineHeight:1.5,maxWidth:620,marginTop:4}},
           'Set a target per dimension, then simulate it against the group you’re comparing — Custom lets you shape it with the sliders. Save each target individually.')),
-      h('div',{style:{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:6,flex:'0 0 auto'}},
+      h('div',{style:{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:10,flex:'0 0 auto'}},
+        this.followCardCompact(), /* review4 item 7 — Follow-a-group next to the simulator title, right side */
         h('button',{onClick:()=>this.aiBuildTarget(),style:{display:'inline-flex',alignItems:'center',gap:8,background:'linear-gradient(135deg,#2C2DFE,#5B5CFF)',color:'#fff',border:'none',borderRadius:11,padding:'12px 18px',fontSize:13,fontWeight:700,cursor:'pointer',boxShadow:'0 8px 22px -10px rgba(44,45,254,.6)',fontFamily:'Inter,system-ui,sans-serif'}},'✦ Build my target with Alpha'),
         h('div',{style:{fontSize:10.5,color:'var(--muted)'}},'New here? Let Alpha propose a starting target.')));
 
@@ -6320,7 +6321,7 @@ class Component extends DCLogic {
       youVsTargetHead, /* item 71 */
       pmTargetCard,    /* item 71 — PM allocation actual vs target + Z/gap */
       this.compareYourselfCard(), /* item 76 — strategy mix + funds underneath vs peers/platform/top10/custom, with watchlist/invest/similar */
-      this.followCard(), /* PDF#4 — follower function moved up to sit right next to 'Compare Yourself' */
+      /* review4 item 7 — Follow-a-group moved to the simulator (next to its title); removed from comparison */
       this.lifecycleCard(), /* PDF#1 — lifecycle-period comparison vs peers/model/top10 at the same investor stage */
       this.twoCol(dimPieCard, dimZCard, '1.05fr .95fr'),
       dimSuggestCard, /* item 74 — suggest funds (current + greyed pipeline) under the selected dimension */
@@ -6452,6 +6453,16 @@ class Component extends DCLogic {
             h('span',null,''),h('span',null,dimLabel),h('span',{style:{textAlign:'right'}},'You'),h('span',{style:{textAlign:'right'}},cmpShort),h('span',{style:{textAlign:'right'}},'Δpp'),h('span',null,'')),
           list)),
       caption:'Your ACTUAL '+dimLabel.toLowerCase()+' mix (left) vs '+cmpShort+'’ ACTUAL mix (right) — never your target. Toggle the dimension top-left and the comparator top-right; click a row to compare your funds against '+cmpShort+'’ funds.'});
+  }
+  /* review4 item 7 — compact Follow-a-group, sits next to the simulator title on the right */
+  followCardCompact(){
+    const h=this.h, SF=this.SF; const g=this.state.following;
+    const chip=(val,label)=>{ const on=g===val; return h('button',{key:val,onClick:()=>this.setState(Object.assign({following:on?null:val}, val==='custom'?{cmp:'custom',controlOpen:true}:{})),
+      style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand)':'var(--surface)',color:on?'#fff':'var(--muted)',borderRadius:999,padding:'4px 10px',fontSize:11,fontWeight:on?700:500,cursor:'pointer'}}, label); };
+    return h('div',{style:{flex:'0 0 auto',width:'min(280px,90vw)',border:'1px solid var(--line)',borderRadius:12,background:'var(--surface)',padding:'12px 14px'}},
+      h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:6}}, h('span',{style:{fontSize:14}},'🔔'), h('div',{style:{fontFamily:SF,fontSize:13.5,fontWeight:700}},'Follow a group')),
+      h('div',{style:{fontSize:11,color:'var(--muted)',lineHeight:1.4,marginBottom:8}}, g? ('Following '+(g==='top10'?'the top 10%':g==='custom'?('a custom group'+(this.state.followCustomName?(' · '+this.state.followCustomName):'')):'your peers')+' — alerts in the bell.') : 'Get alerts when a group commits to a fund.'),
+      h('div',{style:{display:'flex',gap:6,flexWrap:'wrap'}}, chip('peers','Peers'), chip('top10','Top 10%'), chip('custom','✎ Custom')));
   }
   followCard(){
     const h=this.h; const SF=this.SF; const g=this.state.following;
