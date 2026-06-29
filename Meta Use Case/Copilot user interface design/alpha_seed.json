@@ -422,7 +422,8 @@
       "strat": "buyout",
       "vintage": 2019,
       "nav": 4.6,
-      "format": "Primary funds"
+      "format": "Primary funds",
+      "committed": 3.5
     },
     "thrive8": {
       "currency": "USD",
@@ -431,7 +432,8 @@
       "strat": "ai",
       "vintage": 2021,
       "nav": 3.1,
-      "format": "Primary funds"
+      "format": "Primary funds",
+      "committed": 3.0
     },
     "ga": {
       "currency": "USD",
@@ -440,7 +442,8 @@
       "strat": "growth",
       "vintage": 2020,
       "nav": 2.4,
-      "format": "Primary funds"
+      "format": "Primary funds",
+      "committed": 2.5
     },
     "cvc9": {
       "currency": "EUR",
@@ -449,7 +452,8 @@
       "strat": "buyout",
       "vintage": 2022,
       "nav": 2.0,
-      "format": "Primary funds"
+      "format": "Primary funds",
+      "committed": 2.5
     },
     "arespcs": {
       "currency": "USD",
@@ -458,7 +462,8 @@
       "strat": "credit",
       "vintage": 2023,
       "nav": 1.5,
-      "format": "Primary funds"
+      "format": "Primary funds",
+      "committed": 2.0
     },
     "cinven8": {
       "currency": "EUR",
@@ -467,7 +472,8 @@
       "strat": "buyout",
       "vintage": 2021,
       "nav": 1.8,
-      "format": "Secondaries"
+      "format": "Secondaries",
+      "committed": 2.0
     },
     "northwind": {
       "currency": "EUR",
@@ -476,7 +482,8 @@
       "strat": "infra",
       "vintage": 2024,
       "nav": 0.7,
-      "format": "Fund of funds"
+      "format": "Fund of funds",
+      "committed": 2.5
     },
     "meridian": {
       "currency": "GBP",
@@ -485,7 +492,8 @@
       "strat": "growth",
       "vintage": 2024,
       "nav": 0.5,
-      "format": "Direct deals"
+      "format": "Direct deals",
+      "committed": 2.5
     }
   },
   "modelCoarse": {

@@ -4045,7 +4045,9 @@ class Component extends DCLogic {
     meridian:{currency:'GBP',region:'APAC',sector:'Tech',strat:'growth',vintage:2024,nav:0.5}
   }; }
   /* vintage distribution by NAV (€m) across commitment years */
-  VINTAGES(){ const m=this.HELD_META(); const o={}; Object.keys(m).forEach(id=>{ const v=m[id].vintage; o[v]=(o[v]||0)+m[id].nav; });
+  /* review7 item 11 — basis-aware: NAV = NAV allocated in that commitment year; Committed = commitments made per year */
+  VINTAGES(basis){ const m=this.HELD_META(); const o={}; const useCommitted=(basis||'NAV')==='Committed';
+    Object.keys(m).forEach(id=>{ const v=m[id].vintage; const amt=useCommitted?(m[id].committed!=null?m[id].committed:m[id].nav):m[id].nav; o[v]=(o[v]||0)+amt; });
     const years=['2019','2020','2021','2022','2023','2024']; return years.map(y=>({y, v:+(o[y]||0).toFixed(1)})); }
   /* Left-docked detail panel — opens when a home chart is clicked. Breaks down the dimension AND the funds you hold in each bucket. */
   /* compact clickable fund row → opens fund modal */
@@ -5155,7 +5157,7 @@ class Component extends DCLogic {
         h('span',{style:{flex:1,color:'var(--ink)'}},s.n),
         h('span',{style:{fontFamily:SF,fontWeight:600,color:'var(--muted)'}},fmtUnit(s.p))))));
     // vintage distribution (NAV €m by commitment year)
-    const vint=this.VINTAGES(); const vmax=Math.max(...vint.map(x=>x.v),1)*1.2;
+    const vint=this.VINTAGES(basis); const vmax=Math.max(...vint.map(x=>x.v),1)*1.2; /* review7 item 11 — vintage follows the NAV/Committed basis toggle */
     const vintChart=h('div',{onClick:()=>this.openHomePop('vintage'),style:{display:'flex',alignItems:'flex-end',gap:8,height:104,padding:'0 2px',cursor:'pointer'}}, vint.map((x,i)=>
       h('div',{key:i,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-end',height:'100%'}},
         h('div',{style:{fontSize:10,fontFamily:SF,fontWeight:600,color:'var(--ink)',marginBottom:3}}, x.v),
@@ -5173,7 +5175,7 @@ class Component extends DCLogic {
     const currencyCard=allocBlock('Currency','currency', h('div',null, donutRow(ccySlices,'FX'), ccyNote));
     const sectorCard=allocBlock('Sector','sector', donutRow(secSlices,'Sector'));
     const formatCard=allocBlock('Format','format', donutRow(fmtSlices,'Format')); /* PDF#3 */
-    const vintageCard=allocBlock('Vintage','vintage', h('div',null, vintChart, h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:3,textAlign:'center'}},'NAV by commitment year (€m)')));
+    const vintageCard=allocBlock('Vintage','vintage', h('div',null, vintChart, h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:3,textAlign:'center'}}, (basis==='Committed'?'Commitments per year (€m)':'NAV by allocated capital in year (€m)')))); /* review7 item 11 */
 
     // ============ COLUMN 3 — CASH FLOWS (from DB) ============
     const CF=(this.DB&&this.DB.cashflows)||{cats:[],calls:[],distributions:[]};

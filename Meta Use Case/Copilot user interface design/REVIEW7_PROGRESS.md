@@ -43,4 +43,6 @@ Build strictly one at a time, verify (node --check + Playwright render/logicErro
 - [x] 8 + 12 strategy/region/currency/sector equalised to one 4-col row (395x323 each, stretched to tallest); format+vintage own row — verified
 - [x] 9 region MEA -> "Rest of World" (seed dims.region + HOME_DIMS fallback + region-name map; reseeded) — verified
 - [x] 10 alloc order Strategy, Sector, Region, Currency, then Format, Vintage — verified
-- NEXT: item 11 (vintage NAV/Committed toggle = NAV-allocated-in-year vs commitments-per-year)
+- [x] 11 vintage chart follows NAV/Committed basis (NAV-allocated-in-year vs commitments-per-year); +per-fund committed in seed; reseeded — verified
+- [x] 12 (done with item 8 — equalised to largest)
+- NEXT: item 13 (currency graph: show base-currency amount next to each currency)
