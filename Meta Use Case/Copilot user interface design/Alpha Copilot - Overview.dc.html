@@ -3556,7 +3556,8 @@ class Component extends DCLogic {
     {id:'northwind',name:'Northwind Infra III',mgr:'Northwind',logo:'ares',strat:'Infrastructure',vintage:2024,month:'Jan 2024',contrib:-0.2,moic:'0.9x',tvpi:'0.9x',dvpi:'0.9x',dpi:'0.0x',irr:'−4.0%',nav:'€0.7m',navUncommitted:'€1.2m',called:'38%',stage:'J-curve',note:'Young infra fund — J-curve trough, expected.'},
     {id:'meridian',name:'Meridian Growth IV',mgr:'Meridian',logo:'general-atlantic',strat:'Growth',vintage:2024,month:'Aug 2024',contrib:-0.1,moic:'1.0x',tvpi:'1.0x',dvpi:'1.0x',dpi:'0.0x',irr:'−1.2%',nav:'€0.5m',navUncommitted:'€1.5m',called:'22%',stage:'J-curve',note:'Recently called; too early to mark.'}
   ]; }
-  fundById(id){ return this.HELD_FUNDS().find(f=>f.id===id) || this.FOLLOW_FUNDS().find(f=>f.id===id) || this.OPP_FUNDS_LIST().find(f=>f.id===id) || this.UPCOMING_FUNDS().find(f=>f.id===id); }
+  fundById(id){ return this.HELD_FUNDS().find(f=>f.id===id) || this.FOLLOW_FUNDS().find(f=>f.id===id) || this.OPP_FUNDS_LIST().find(f=>f.id===id) || this.UPCOMING_FUNDS().find(f=>f.id===id) || this._featuredMatch(id); }
+  _featuredMatch(id){ const ff=this.FEATURED_FUND&&this.FEATURED_FUND(); if(ff&&ff.id===id) return {...ff, strat:ff.ac||'Venture Capital', region:(ff.region||'Global').split(',')[0].trim(), mgr:'Moonfare', logo:'', featured:true}; return null; }
   /* items 38/54/63/64 — holding status drives the fund CTA: held → "Suggest similar funds"; not-held → "Buy now" */
   isHeld(name){ return this.HELD_FUNDS().some(f=>f.name===name); }
   suggestSimilar(name,strat){ const f=this.HELD_FUNDS().find(x=>x.name===name); const s=strat||(f&&f.strat)||'';
@@ -3618,114 +3619,228 @@ class Component extends DCLogic {
       recordDate:fx.recordDate||'the record date',asOf:fx.asOf||'',navEUR,navLocal,moicH,moicLocal,irrH,irrLocal,driftPct,
       calledEUR:+calledEUR.toFixed(1),distEUR:+distEUR.toFixed(1),fxAdjEUR,navNetEUR,irrNet,defaultView};
   }
+  /* rich marketing content for the featured Moonfare Technology Fund (from the reference pages) */
+  featuredContent(){ return {
+    facts:[['Strategy','Venture Capital',true],['Geography','North America, Global'],['Fund Lifetime','10+1+1+1+1',true],['Investment Period','1 year (Fund), 2 years (Direct)'],['# of Investments','8-15 (Fund), 8-15 (Direct)'],['Closing date','Q2 2026'],['Min. Investment','$100,000']],
+    kpis:[['Target Fund Size¹','$100 million'],['Target Net MOIC²','>3.0x'],['Expected Initial Close³','June 2026']],
+    overviewCallouts:[['Access to AI-focused venture & growth funds.','Curated exposure to highly selective and oversubscribed technology managers.','8–15','Fund managers'],
+      ['The decade’s defining themes.','AI, Cybersecurity, Next-gen Healthcare, Deep Tech, Fintech, Web3, Space, Physical AI.','8+','Emerging themes'],
+      ['Private-market upside, at the source.','Investing at early and growth stage — where value compounds before exit.','Early – Growth','Entry stage']],
+    aboutTitle:'About Moonfare Technology Fund',
+    about:'Leveraging Moonfare’s extensive track record and network of leading managers developed over the past decade, the Moonfare Technology Fund (MTF or the Fund) aims to provide investors with opportunities within the technology sector, spanning early-stage venture capital to growth-stage investments. It seeks to provide diversified exposure to venture capital and growth managers (Fund Investments), and curated direct co-investment opportunities in high-growth technology companies (Direct Investments).',
+    aboutStats:[['Moonfare’s GP Relationships⁴','300'],['Assets Under Management⁵','€3.8 billion'],['Funds + Direct Deals Offered to Date⁵','160+']],
+    strategy:'MTF aims to provide unique access to often capacity-constrained managers, as well as direct exposure in historically proven category leaders with a track record for top-quartile performance. The Fund seeks to capture value early in the technology lifecycle, focusing on transformative sectors such as artificial intelligence, cybersecurity, defence, deep tech, healthcare, fintech, data infrastructure, climate technology and advanced manufacturing.',
+    approach:'The Fund will pursue a hybrid investment approach, allocating approximately 70–80% to a ‘Core Layer’ of sought-after Fund investments and approximately 20–30% to an ‘Alpha Layer’ of competitive direct investments — co-investing alongside leading names in technology.',
+    layers:{core:{pct:'70–80%',sub:'In 8–15 early & growth managers with selective access to oversubscribed funds.',ticket:'$2–8 million'},alpha:{pct:'20–30%',sub:'Co-investing alongside leading names in technology — sourced from top-tier sponsors.',ticket:'$0.5–3 million'}},
+    timeline:[['1990s',[['Internet','Google, Yahoo, Microsoft, Amazon, PayPal, eBay']]],
+      ['2000s',[['Mobile','Apple, Samsung']]],
+      ['2010s',[['Social','LinkedIn, Facebook, Twitter, Pinterest, Instagram'],['Cloud','Spotify, Airbnb, WhatsApp, AWS']]],
+      ['2020s',[['SaaS','Uber, Slack, HashiCorp, Salesforce, VMware'],['Data / ML','Databricks, Snowflake, Palantir, Datadog, Splunk']]],
+      ['2025+',[['Gen AI','Anthropic, OpenAI, Cohere, Sakana AI']]]],
+    seedIntro:'Four premium managers form the backbone of the Moonfare Technology Fund, reducing blind-pool risk and speeding up time to deployment for your capital. Moreover, the Fund’s pipeline boasts industry heavyweights such as Founders Fund, Khosla Ventures, KKR and General Catalyst.',
+    alphaCos:[['Databricks','$0.7m','--data-8'],['Parloa','$1.0m (newly confirmed)','--data-9'],['Future investments','$23.3m','--data-7']],
+    coreMgrs:[['Founders Fund','$3.0m'],['Andreessen Horowitz','$4.0m'],['Lightspeed','$3.0m'],['Accel','$3.0m'],['DCVC','$5.0m (newly confirmed)'],['Future investments','$57.0m']],
+    alphaTotal:'$25.0M', coreTotal:'$75.0M',
+    seedFunds:['Lightspeed Co-Investment Fund I, L.P.','Accel Leaders 5, L.P.','Founders Fund Growth IV Management L.P.','Andreessen Horowitz Late-Stage Vehicle V and 2026 Fund Multiplexer II','Portfolio II, a separate series of Insight Partners Public Equities Focus, L.P (Databricks)'],
+    team:{lead:'Led by Pavel Ermoline, Head of Venture Capital and Direct Investing, Moonfare has a team of highly experienced investment professionals, well positioned to execute the Fund’s strategy of selecting attractive growth-equity funds.',
+      members:[['Pavel Ermoline','Head of Venture Capital and Direct Investing'],['Dr. Steffen Pauls','Founder and Co-CEO'],['Magnus Grufman','COO and Managing Director'],['Sanjay Gupta','Independent Member'],['Frederick Goltz','Independent Member'],['Thomas Jetter','Independent Member'],['Bill Murphy','Independent Member'],['David Lindstrom','Independent Member']],
+      stats:[['200+','Years of experience in private markets'],['5500+','Opportunities reviewed and assessed'],['160+','Funds and direct deals approved'],['10+','Proprietary strategies launched'],['300','General Partner relationships'],['€3.8bn','Assets under Management']]},
+    terms:[['Fund Name','Moonfare Technology Fund SCSp'],['General Partner (GP)','Access GP S.à r.l.'],['Manager (AIFM)','Fundcraft Management S.a.r.l'],['Investment Advisor','Moonfare GmbH'],['Fund Currency','USD'],['Minimum Investment','USD 100,000'],['Investment Term','12 months after final close (Fund); 24 months (Direct)'],['Initial Fee','Up to 1.00% (institutional 0%–0.5%)'],['Annual Fee','0.65%–0.70% p.a.'],['Carried Interest','5% (Fund) net of 1x; 10% (Direct) net of 2.5x'],['Fund Administrator','Fundcraft Services S.à r.l'],['Fund Auditor','PricewaterhouseCoopers']]
+  }; }
+  fundFitModel(f,m){
+    const youMix=this.MIX.you||{}; const tgt=this.modelMix()||{};
+    const sk=(m&&m.strat)||((this.STRATS.find(s=>s[1]===f.strat)||[])[0])||'buyout';
+    const label=(this.STRATS.find(s=>s[0]===sk)||[null,f.strat||'this strategy'])[1];
+    const gap=+(((tgt[sk]||0)-(youMix[sk]||0))).toFixed(1);
+    const fit=Math.max(45,Math.min(96,Math.round(72+gap*2.4+5)));
+    const region=(m&&m.region)||f.region||'global';
+    const pts=[];
+    pts.push(gap>0.5? ['Closes a real gap','You sit '+gap+'pp below your target in '+label+' — this commitment moves you toward it, the highest-impact use of new capital right now.']
+                    : ['On-strategy add',label+' is already near your target weight — a modest ticket keeps you balanced without over-concentrating.']);
+    pts.push(['Fits your liquidity','Sized against your €1.1m cash position and €3.9m uncalled, the suggested ticket stays inside your plan — no forced selling, no overcommitment for your risk class.']);
+    pts.push(['Diversifies your book','Adds '+region+' exposure and a '+(label.toLowerCase())+' manager that complements — rather than doubles — what you already hold.']);
+    pts.push(['Quality access','Top-quartile manager with the deal team intact; the kind of capacity-constrained access that is hard to get directly.']);
+    return {fit,label,gap,watch:'It extends your illiquidity — only commit capital you won’t need for 7+ years. If you’re already over-weight '+label+', size it down or pick a complementary sleeve instead.'};
+  }
   fundPageBody(){
-    const h=this.h; const SF=this.SF; const f=this.fundById(this.state.fundPageId); if(!f) return null;
-    const m=(this.HELD_META&&this.HELD_META()[f.id])||{}; const pos=(f.contrib||0)>=0;
-    const close=()=>this.closeFundPage();
-    const stat=(l,v,c)=>h('div',{style:{flex:'1 1 110px'}}, h('div',{style:{fontSize:10,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em'}},l), h('div',{style:{fontFamily:SF,fontSize:22,fontWeight:600,color:c||'var(--ink)'}},v));
-    const card=(title,node,right)=>h('div',{style:{border:'1px solid var(--line)',borderRadius:14,background:'var(--surface)',padding:'16px 18px',marginBottom:16}},
-      h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,marginBottom:12}}, h('div',{style:{fontFamily:SF,fontSize:16,fontWeight:700}},title), right||null), node);
-    const chip=(l,v)=>h('div',{style:{flex:'1 1 120px',border:'1px solid var(--line)',borderRadius:9,padding:'9px 11px',background:'var(--surface-2)'}},
-      h('div',{style:{fontSize:9.5,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em'}},l), h('div',{style:{fontSize:13,fontWeight:600,marginTop:2}},v));
-    const prospect=!!f.prospect;
-    // performance bars (held funds: NAV growth proxy from moic)
-    const perfBars=()=>{ const moic=parseFloat(f.moic)||1.2; const seq=[1, 1+(moic-1)*0.3, 1+(moic-1)*0.6, 1+(moic-1)*0.85, moic]; const mx=Math.max(...seq)*1.15;
-      return h('div',{style:{display:'flex',alignItems:'flex-end',gap:14,height:150,padding:'4px 4px 0'}}, seq.map((v,i)=>h('div',{key:i,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-end',height:'100%'}},
+    const h=this.h; const SF=this.SF; const s=this.state; const f=this.fundById(this.state.fundPageId); if(!f) return null;
+    const m=(this.HELD_META&&this.HELD_META()[f.id])||{}; const pos=(f.contrib||0)>=0; const close=()=>this.closeFundPage();
+    const prospect=!!f.prospect; const featured=(f.id===((this.DB&&this.DB.featured&&this.DB.featured.id)||'moonfare-tech'))||(f.featured===true);
+    const C=featured?this.featuredContent():null;
+    const num=x=>parseFloat(String(x||'').replace(/[^0-9.\-]/g,''))||0;
+    // ---------- right rail ----------
+    const railFacts = C? C.facts
+      : prospect? [['Strategy',f.strat,true],['Geography',f.region||'Global'],['Target net',f.tgt||'—'],['Fund size',f.size||'—'],['Closing date',f.close||'—'],['Min. Investment',f.min||'€50,000']]
+      : [['Strategy',f.strat,true],['Geography',m.region||'Global'],['Sector',m.sector||'Diversified'],['Currency',m.currency||'—'],['Vintage',(m.vintage||f.vintage)+''],['Stage',f.stage||'—'],['Your NAV',f.nav||'—']];
+    const railRow=([l,v,link])=>h('div',{key:l,style:{display:'flex',justifyContent:'space-between',gap:10,padding:'9px 0',borderBottom:'1px solid var(--line)'}},
+      h('span',{style:{fontSize:12.5,color:'var(--muted)'}},l), h('span',{style:{fontSize:12.5,fontWeight:600,color:link?'var(--brand-ink)':'var(--ink)',textAlign:'right'}},v));
+    const rail=h('div',{style:{position:'sticky',top:0,border:'1px solid var(--line)',borderRadius:16,background:'var(--surface)',padding:'16px 18px',boxShadow:'0 10px 30px -20px rgba(0,0,0,.25)'}},
+      h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}},
+        h('span',{style:{display:'inline-flex',alignItems:'center',gap:7,fontSize:11.5,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--over)'}}, h('span',{style:{width:9,height:9,borderRadius:'50%',background:'var(--over)'}}), prospect||featured?'Open':'Held'),
+        h('span',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--brand-ink)'}},'Investment process')),
+      h('div',null, railFacts.map(railRow)),
+      h('button',{onClick:()=>this.toggleCmp&&this.toggleCmp({kind:'fund',id:f.id,label:f.name}),style:{width:'100%',marginTop:14,border:'1px solid var(--brand)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:11,padding:'11px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'⇄ Compare Fund'),
+      h('button',{onClick:()=>this.addToCart(f.name,f.strat),style:{width:'100%',marginTop:9,border:'none',background:'var(--brand)',color:'#fff',borderRadius:11,padding:'12px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}}, (featured||prospect)?'Request Allocation':'Invest more'));
+    // ---------- hero + KPIs ----------
+    const heroImg=h('div',{style:{position:'relative',flex:'1 1 300px',minWidth:240,minHeight:200,borderRadius:14,overflow:'hidden',background:'radial-gradient(circle at 40% 36%, #34343a 0%, #1a1a1c 40%, #0a0a0b 72%)',display:'flex',alignItems:'flex-start',padding:18}},
+      h('img',{src:'assets/moonfare_logo_white.png',alt:'',onError:e=>{e.target.style.display='none';},style:{height:26,opacity:.95}}));
+    const kpis = C? C.kpis : prospect? [['Target net MOIC',f.tgt||'—'],['Fund size',f.size||'—'],['Closing date',f.close||'—']]
+      : [['Net IRR',f.irr||'—'],['Net MOIC',f.moic||'—'],['DPI',f.dpi||'—']];
+    const kpiCard=([l,v])=>h('div',{key:l,style:{flex:'1 1 150px',border:'1px solid var(--line)',borderRadius:12,padding:'14px 16px',background:'var(--surface)'}},
+      h('div',{style:{fontSize:11,color:'var(--muted)'}},l), h('div',{style:{fontFamily:'ui-monospace,SFMono-Regular,Menlo,monospace',fontSize:18,fontWeight:700,marginTop:6,color:'var(--ink)'}},v));
+    const topRow=h('div',{style:{display:'flex',gap:14,flexWrap:'wrap',alignItems:'stretch'}}, heroImg,
+      h('div',{style:{flex:'1 1 200px',display:'flex',flexDirection:'column',gap:12}}, kpis.map(kpiCard)));
+    const tags=h('div',{style:{display:'flex',gap:8,flexWrap:'wrap'}}, (C?['Information Technology','Broad']:[f.strat, m.sector].filter(Boolean)).map(t=>h('span',{key:t,style:{fontSize:11.5,color:'var(--muted)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:7,padding:'4px 11px'}},t)));
+    const desc=h('div',{style:{fontSize:14,color:'var(--ink)',lineHeight:1.55,maxWidth:680}}, C? (this.FEATURED_FUND().desc) : (f.note|| (f.name+' — '+(f.strat||'')+(m.region?(' · '+m.region):'')+'.')));
+    // ---------- tabs ----------
+    const TABS = C? [['overview','Fund overview'],['opportunity','The opportunity'],['fit','Why it fits you'],['seed','Seed portfolio'],['team','Meet the team'],['terms','How it works']]
+      : [['overview','Fund overview'],['fit','Why it fits you'],['terms','Documents']];
+    const tab=this.dtog('fundPageTab', TABS[0][0]);
+    const tabValid=TABS.some(t=>t[0]===tab)?tab:TABS[0][0];
+    const tabNav=h('div',{style:{display:'flex',gap:4,flexWrap:'wrap',borderBottom:'1px solid var(--line)'}}, TABS.map(([v,l])=>{ const on=tabValid===v;
+      return h('button',{key:v,onClick:()=>this.setDtog('fundPageTab',v),style:{border:'none',background:'transparent',cursor:'pointer',padding:'10px 14px',fontSize:11.5,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:on?'var(--brand-ink)':'var(--muted)',borderBottom:'2px solid '+(on?'var(--brand)':'transparent'),marginBottom:-1}},l); }));
+    const big=(t)=>h('div',{style:{fontFamily:SF,fontSize:30,fontWeight:600,color:'var(--ink)',margin:'4px 0 16px'}},t);
+    const sub=(t)=>h('div',{style:{fontFamily:SF,fontSize:19,fontWeight:700,margin:'22px 0 10px'}},t);
+    const para=(t)=>h('div',{style:{fontSize:13.5,color:'var(--ink)',lineHeight:1.6,maxWidth:720}},t);
+    const check=(t)=>h('div',{style:{display:'flex',gap:10,alignItems:'flex-start',fontSize:13.5,lineHeight:1.6}}, h('span',{style:{color:'var(--brand)',fontWeight:700,flex:'0 0 16px'}},'✓'), h('span',null,t));
+    let content;
+    if(tabValid==='overview' && !C){
+      const about = prospect? (f.by&&(f.by[this.state.following]||f.by.top10)||(f.name+' — '+(f.strat||'')+(f.region?(' · '+f.region):'')+'.'))
+        : (f.name+' is one of your '+(f.strat||'').toLowerCase()+' holdings, vintage '+(m.vintage||f.vintage)+', currently '+(f.stage||'').toLowerCase()+'. It has called '+f.called+' of its commitment and is marked at '+(f.nav||'—')+' NAV — a net MOIC of '+(f.moic||'—')+' and net IRR of '+(f.irr||'—')+'. Look-through is primarily '+(m.sector||'diversified')+' companies, '+(m.region||'global')+'.');
+      const moicv=parseFloat(f.moic)||1.2; const seq=[1,1+(moicv-1)*0.3,1+(moicv-1)*0.6,1+(moicv-1)*0.85,moicv]; const mx=Math.max.apply(null,seq)*1.15;
+      const vbars=h('div',{style:{display:'flex',alignItems:'flex-end',gap:14,height:150,padding:'4px 4px 0'}}, seq.map((v,i)=>h('div',{key:i,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-end',height:'100%'}},
         h('div',{style:{fontSize:11,fontFamily:SF,fontWeight:600,marginBottom:4}}, v.toFixed(2)+'x'),
         h('div',{style:{width:'58%',maxWidth:42,height:(v/mx*100)+'%',background:'var(--data-1)',borderRadius:'5px 5px 0 0',minHeight:3}}),
-        h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:6}}, ['Vintage','+1y','+2y','+3y','Today'][i])))); };
-    const docRow=(d)=>h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,border:'1px solid var(--line)',borderRadius:10,padding:'11px 13px',marginBottom:8}},
-      h('div',{style:{display:'flex',alignItems:'center',gap:11,minWidth:0}}, h('span',{style:{fontSize:18,flex:'0 0 auto'}},'📄'),
-        h('div',{style:{minWidth:0}}, h('div',{style:{fontSize:13,fontWeight:600}},d.n), h('div',{style:{fontSize:11,color:'var(--muted)'}},d.meta))),
-      h('span',{style:{fontSize:11.5,color:'var(--brand-ink)',fontWeight:700,flex:'0 0 auto',border:'1px solid var(--brand-tint-3)',borderRadius:8,padding:'5px 10px'}},'Download'));
-    /* item 139 — Why this / Why not / Compare scoped to THIS fund, at the fund-detail level */
-    const wt=this.dtog('fundWhyTab','why'); const sname=(f.strat||'this strategy');
-    const wlist=(items,warn)=>h('div',{style:{display:'flex',flexDirection:'column',gap:9}}, items.map((t,i)=>h('div',{key:i,style:{display:'flex',gap:9,alignItems:'flex-start',fontSize:12.5,lineHeight:1.5}}, h('span',{style:{flex:'0 0 16px',color:warn?'var(--under)':'var(--over)',fontWeight:700}},warn?'!':'✓'), h('span',null,t))));
-    const whyBody = wt==='why'? wlist([
-        f.name+' is a top-quartile '+sname.toLowerCase()+' manager with the deal team intact.',
-        'It fits inside your liquidity headroom at the suggested ticket — no overcommitment.',
-        'The current vintage is actively deploying into a favourable entry environment.',
-        'It closes a real gap in your portfolio rather than doubling an over-weight.',
-        'Best target-fit per euro versus the comparable funds on the platform.'])
-      : wt==='whynot'? wlist([
-        'Investors needing liquidity inside 7 years — this extends your illiquidity.',
-        'Anyone already over-weight '+sname+'.',
-        'Below the '+(f.min||'€50,000')+' minimum comfort for this fund.'],true)
-      : h('div',{style:{border:'1px solid var(--line)',borderRadius:10,overflow:'hidden'}},
-          [['Net IRR (target)','18%','14%'],['Net MOIC (target)',(f.tgt||'2.0x'),'1.7x'],['Mgmt fee','1.5%','2.0%'],['Team stability','Intact','1 partner left']].map((r,i)=>h('div',{key:i,style:{display:'grid',gridTemplateColumns:'1.3fr 1fr 1fr',padding:'9px 12px',borderBottom:i<3?'1px solid var(--line)':'none',fontSize:12.5}}, h('span',{style:{color:'var(--muted)'}},r[0]), h('span',{style:{textAlign:'right',fontWeight:700,color:'var(--brand-ink)'}},r[1]), h('span',{style:{textAlign:'right'}},r[2]))));
-    const fundWhyCard=card('Why this · Why not · Compare', h('div',null,
-      this.seg([{label:'Why this',value:'why'},{label:'Why not',value:'whynot'},{label:'Compare',value:'compare'}], wt, v=>this.setDtog('fundWhyTab',v),{sm:true}),
-      h('div',{style:{marginTop:12}}, whyBody)), this.badge('AI','synth'));
-    /* items 50-56 — currency card (held funds only): home vs fund-level currency + FX impact + reconciliation */
-    const fundFxCard=(()=>{ if(prospect) return null; const x=this.fundFxModel(f,m);
-      const view=this.dtog('fundCcyView',x.defaultView);
-      if(x.isHome){ return card('Currency', h('div',{style:{fontSize:12.5,lineHeight:1.6,color:'var(--muted)'}},
-        'This fund reports in ',h('b',{style:{color:'var(--ink)'}},x.base),' — your home currency. No conversion is applied; every metric above is already in '+x.base+'.'), this.badge('home currency','conf')); }
-      const colHead=(label,on)=>h('div',{style:{textAlign:'right',fontSize:10,fontWeight:700,textTransform:'uppercase',letterSpacing:'.04em',color:on?'var(--brand-ink)':'var(--muted)'}},label);
-      const valCell=(v,on)=>h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:14,fontWeight:on?700:500,color:on?'var(--ink)':'var(--muted)'}},v);
-      const row=(metric,fundV,homeV,impact)=>h('div',{style:{display:'grid',gridTemplateColumns:'1.2fr 1fr 1fr 0.9fr',gap:8,alignItems:'center',padding:'9px 4px',borderTop:'1px solid var(--line)'}},
-        h('span',{style:{fontSize:12.5,fontWeight:600}},metric), valCell(fundV,view==='fund'), valCell(homeV,view==='home'),
-        h('span',{style:{textAlign:'right',fontSize:11.5,fontWeight:700,color:impact.startsWith('−')||impact.startsWith('-')?'var(--under)':'var(--over)'}},impact));
-      const navImpact=(x.navLocal/x.rT - x.navEUR); /* not used directly */
-      const toggle=h('div',{onClick:e=>e.stopPropagation()}, this.seg([{label:'Home ('+x.base+')',value:'home'},{label:'Fund ('+x.ccy+')',value:'fund'}], view, v=>this.setDtog('fundCcyView',v),{sm:true}));
-      const net=this.dtog('fundFxNet',false);
-      return card('Currency — '+x.ccy+' fund, '+x.base+' home', h('div',null,
-        h('div',{style:{fontSize:12.5,lineHeight:1.55,color:'var(--muted)',marginBottom:10}},
-          'This fund reports in ',h('b',{style:{color:'var(--ink)'}},x.ccy),', but your home currency is ',h('b',{style:{color:'var(--ink)'}},x.base),'. Toggle to see the performance impact on each metric and on NAV.'),
-        /* item 50 — impact per metric + NAV, both currencies side by side */
-        h('div',{style:{display:'grid',gridTemplateColumns:'1.2fr 1fr 1fr 0.9fr',gap:8,padding:'0 4px 2px'}},
-          h('span',{style:{fontSize:10,fontWeight:700,textTransform:'uppercase',letterSpacing:'.04em',color:'var(--muted)'}},'Metric'),
-          colHead('Fund · '+x.ccy,view==='fund'), colHead('Home · '+x.base,view==='home'), colHead('FX impact',true)),
-        row('NAV', x.sym+x.navLocal.toFixed(1)+'m', x.baseSym+x.navEUR.toFixed(1)+'m', (x.driftPct>=0?'−':'+')+Math.abs(x.driftPct).toFixed(1)+'%'),
-        row('Net MOIC', x.moicLocal.toFixed(2)+'x', x.moicH.toFixed(2)+'x', (x.moicH-x.moicLocal>=0?'+':'−')+Math.abs(x.moicH-x.moicLocal).toFixed(2)+'x'),
-        row('Net IRR', x.irrLocal.toFixed(1)+'%', x.irrH.toFixed(1)+'%', (x.irrH-x.irrLocal>=0?'+':'−')+Math.abs(x.irrH-x.irrLocal).toFixed(1)+'pp'),
-        /* item 51 — small footnote: the conversion rate used */
-        h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:10,lineHeight:1.5}},
-          'Converted at 1 '+x.base+' = '+x.rT+' '+x.ccy+(x.asOf?(' · rate as of '+x.asOf):''),'.'),
-        /* item 52 — record-date rate + delta to today */
-        h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:3,lineHeight:1.5}},
-          'At the metric record date ('+x.recordDate+') the rate was 1 '+x.base+' = '+x.rR+' '+x.ccy+' — a move of '+(x.driftPct>=0?'+':'')+x.driftPct+'% in '+x.base+' since then.'),
-        /* items 53/54/55 — net home-currency reconciliation, only when the investor asks for it */
-        h('button',{onClick:()=>this.setDtog('fundFxNet',!net),style:{marginTop:12,border:'1px solid var(--line)',background:'var(--surface-2)',color:'var(--brand-ink)',borderRadius:9,padding:'9px 12px',fontSize:12,fontWeight:700,cursor:'pointer',width:'100%'}},
-          (net?'▾ ':'▸ ')+'Show net home-currency impact (calls & distributions)'),
-        net? h('div',{style:{marginTop:10,border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',borderRadius:10,padding:'12px 14px',fontSize:12.5,lineHeight:1.6,color:'var(--ink)'}},
-          'Your capital was called when 1 '+x.base+' ≈ '+x.rC+' '+x.ccy+' and distributions were paid when 1 '+x.base+' ≈ '+x.rD+' '+x.ccy+'. Summing the FX difference across calls ('+x.baseSym+x.calledEUR+'m) and distributions ('+x.baseSym+x.distEUR+'m) versus today’s rate gives a net adjustment of ',
-          h('b',{style:{color:x.fxAdjEUR>=0?'var(--over)':'var(--under)'}},(x.fxAdjEUR>=0?'+':'−')+x.baseSym+Math.abs(x.fxAdjEUR).toFixed(2)+'m'),'. ',
-          /* item 54 — the net home-currency metric */
-          'Adjusted for this, your NAV in '+x.base+' is ',h('b',null,x.baseSym+x.navNetEUR.toFixed(1)+'m'),' and your net IRR in '+x.base+' is ',h('b',null,x.irrNet.toFixed(1)+'%'),'.') : null),
-        toggle);
-    })();
-    const main=h('div',null,
-      card('About this fund', h('div',{style:{fontSize:13,lineHeight:1.6,color:'var(--ink)'}},
-        prospect? (f.by&&(f.by[this.state.following]||f.by.top10)||'') : (f.name+' is one of your '+(f.strat||'').toLowerCase()+' holdings, vintage '+(m.vintage||f.vintage)+', currently '+(f.stage||'').toLowerCase()+'. It has called '+f.called+' of its commitment and is marked at '+f.nav+' NAV — a net MOIC of '+f.moic+' and net IRR of '+f.irr+'. Look-through is primarily '+(m.sector||'diversified')+' companies, '+(m.region||'global')+', '+(m.currency||'multi-currency')+'-denominated.'),
-        f.note?h('div',{style:{marginTop:12,background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:10,padding:'11px 13px',fontSize:12.5,lineHeight:1.5}}, h('b',null,'Alpha’s note: '), f.note):null)),
-      fundWhyCard,
-      fundFxCard, /* items 50-56 */
-      prospect? null : card('Value growth (net MOIC path)', perfBars(), this.badge('illustrative','synth')),
-      card('Fund documents', h('div',null, this.FUND_DOCS().map((d,i)=>h('div',{key:i},docRow(d))),
-        h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:4}},'Demo — document links are illustrative.'))));
-    const facts=prospect
-      ? [['Strategy',f.strat],['Region',f.region||'—'],['Fund size',f.size||'—'],['Target net',f.tgt||'—'],['Minimum',f.min||'—'],['Closes',f.close||'—']]
-      : [['Strategy',f.strat],['Region',m.region||'—'],['Sector',m.sector||'—'],['Currency',m.currency||'—'],['Vintage',(m.vintage||f.vintage)+''],['Stage',f.stage]];
-    const side=h('div',null,
-      card('Key facts', h('div',{style:{display:'flex',gap:8,flexWrap:'wrap'}}, facts.map(([l,v])=>chip(l,v)))),
-      card('Take action', h('div',null,
-        h('div',{style:{marginBottom:10}}, this.fundActions(f.name,false,f.strat)),
-        h('button',{onClick:()=>{this.closeFundPage(); this.askFromPage('Tell me more about '+f.name+' — does it fit my portfolio?');},style:{width:'100%',border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:10,padding:'10px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},'Ask Alpha about this fund →'))));
-    /* item 12 — the full fund page no longer covers the whole screen: the top chrome (nav) and the Ask Alpha rail stay visible */
+        h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:6}}, ['Vintage','+1y','+2y','+3y','Today'][i]))));
+      content=h('div',null, big('Fund Overview'), para(about),
+        f.note? h('div',{style:{marginTop:12,background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:10,padding:'11px 13px',fontSize:12.5,lineHeight:1.5}}, h('b',null,'Alpha’s note: '), f.note) : null,
+        prospect? null : h('div',null, sub('Value growth (net MOIC path)'), vbars, h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:6}},'Illustrative path from vintage to today.')),
+        prospect? null : this.fundFxCardFor(f,m));
+    } else if(tabValid==='overview' && C){
+      const callout=([t,d,v,l])=>h('div',{style:{display:'flex',gap:12,alignItems:'flex-end',justifyContent:'space-between',padding:'14px 0',borderTop:'1px solid var(--line)'}},
+        h('div',{style:{minWidth:0,maxWidth:520}}, h('div',{style:{fontSize:14,fontWeight:700}},t), h('div',{style:{fontSize:12,color:'var(--muted)',marginTop:3,lineHeight:1.45}},d)),
+        h('div',{style:{textAlign:'right',flex:'0 0 auto'}}, h('div',{style:{fontFamily:SF,fontSize:22,fontWeight:700}},v), h('div',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)'}},l)));
+      const stat3=(arr)=>h('div',{style:{display:'flex',gap:24,flexWrap:'wrap',margin:'4px 0 6px'}}, arr.map(([l,v])=>h('div',{key:l,style:{flex:'1 1 160px'}}, h('div',{style:{fontSize:11.5,color:'var(--muted)'}},l), h('div',{style:{fontFamily:'ui-monospace,Menlo,monospace',fontSize:20,fontWeight:700,marginTop:4}},v))));
+      const layerBar=h('div',{style:{margin:'10px 0 14px'}},
+        h('div',{style:{display:'flex',height:16,borderRadius:6,overflow:'hidden'}}, h('div',{style:{width:'75%',background:'var(--data-1)'}}), h('div',{style:{width:'25%',background:'var(--data-8)'}})),
+        h('div',{style:{display:'flex',justifyContent:'space-between',fontSize:10,color:'var(--muted)',marginTop:4}}, ['0%','25%','50%','75%','100%'].map((t,i)=>h('span',{key:i},t))));
+      const layerCol=(name,L,color)=>h('div',{style:{flex:'1 1 240px'}},
+        h('div',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',borderTop:'2px solid var('+color+')',paddingTop:8}},name),
+        h('div',{style:{fontFamily:SF,fontSize:30,fontWeight:700,margin:'2px 0 8px'}},L.pct),
+        h('div',{style:{fontSize:12,color:'var(--muted)',lineHeight:1.5,borderTop:'1px solid var(--line)',paddingTop:8}},L.sub),
+        h('div',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginTop:10}},'Target ticket'),
+        h('div',{style:{fontFamily:SF,fontSize:16,fontWeight:700}},L.ticket));
+      content=h('div',null, big('Fund Overview'),
+        C.overviewCallouts.map(callout),
+        sub(C.aboutTitle), para(C.about), h('div',{style:{height:6}}), stat3(C.aboutStats),
+        sub('Fund Strategy'), check(C.strategy),
+        sub('Investment Approach'), para(C.approach), layerBar,
+        h('div',{style:{display:'flex',gap:24,flexWrap:'wrap'}}, layerCol('Core layer target allocation',C.layers.core,'--data-1'), layerCol('Alpha layer target allocation',C.layers.alpha,'--data-8')),
+        h('div',{style:{fontSize:11,color:'var(--muted)',lineHeight:1.5,marginTop:18}},'Target returns are objectives only and do not constitute a guarantee of future performance. Moonfare leverages deep connectivity with 300 GP relationships globally to unlock best-in-class access to oversubscribed venture capital and growth funds.'));
+    } else if(tabValid==='opportunity' && C){
+      const period=([yr,rows])=>h('div',{style:{flex:'1 1 160px',minWidth:140}},
+        h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:8}}, h('span',{style:{width:11,height:11,borderRadius:'50%',background:'var(--brand)',flex:'0 0 11px'}}), h('div',{style:{fontFamily:SF,fontSize:20,fontWeight:700,color:'var(--brand-ink)'}},yr)),
+        rows.map(([t,cos])=>h('div',{key:t,style:{marginBottom:10}}, h('div',{style:{fontSize:12.5,fontWeight:700}},t), h('div',{style:{fontSize:11.5,color:'var(--muted)',lineHeight:1.5,marginTop:2}},cos))));
+      content=h('div',null, big('The Opportunity'),
+        check('We believe the next platform wave is taking shape and creating category-defining companies. Transformative technology platforms — the internet (1990s), cloud (2010s) and the machine-learning & generative-AI revolution (2020s) — each produced decade-defining names. We sit at the cusp of another such wave, with AI at its heart, and believe these companies are poised for private-market investment.'),
+        h('div',{style:{display:'flex',gap:18,flexWrap:'wrap',marginTop:22,borderTop:'1px solid var(--line)',paddingTop:18}}, C.timeline.map(period)),
+        h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:18}},'For illustrative purposes only. Past performance is not necessarily indicative of future results.'));
+    } else if(tabValid==='fit'){
+      const fm=this.fundFitModel(f,m);
+      const fitCard=this.card?null:null;
+      content=h('div',null, big('Why it fits your portfolio'),
+        h('div',{style:{display:'flex',gap:16,flexWrap:'wrap',alignItems:'stretch'}},
+          h('div',{style:{flex:'1 1 420px',minWidth:300,background:'linear-gradient(135deg,var(--brand),var(--brand-ink))',borderRadius:16,padding:'20px 22px',color:'#fff'}},
+            h('div',{style:{display:'flex',alignItems:'center',gap:10,marginBottom:12}}, h('img',{src:'assets/askalpha-logo.png',alt:'',onError:e=>{e.target.style.display='none';},style:{width:34,height:34,borderRadius:9}}), h('div',{style:{fontSize:11,letterSpacing:'.12em',textTransform:'uppercase',fontWeight:700,color:'rgba(255,255,255,.85)'}},'Ask Alpha · Portfolio fit')),
+            h('div',{style:{fontSize:14,lineHeight:1.6,color:'rgba(255,255,255,.95)',marginBottom:14}}, 'Here’s how ',h('b',{style:{color:'#fff'}},f.name),' maps onto your portfolio, your targets and your liquidity — not a generic pitch.'),
+            h('div',{style:{display:'flex',flexDirection:'column',gap:12}}, this.fundFitModel(f,m) && [
+              ['Closes a real gap',null],['Fits your liquidity',null],['Diversifies your book',null],['Quality access',null]
+            ].map((_,i)=>{ const fmx=this.fundFitModel(f,m); const pt=[
+                fmx.gap>0.5? ['Closes a real gap','You sit '+fmx.gap+'pp below your target in '+fmx.label+' — this is the highest-impact use of new capital right now.'] : ['On-strategy add',fmx.label+' is already near your target weight — a modest ticket keeps you balanced.'],
+                ['Fits your liquidity','Sized against your €1.1m cash and €3.9m uncalled, the suggested ticket stays inside your plan — no overcommitment for your risk class.'],
+                ['Diversifies your book','Adds '+((m&&m.region)||f.region||'global')+' exposure and a '+fmx.label.toLowerCase()+' manager that complements, rather than doubles, what you hold.'],
+                ['Quality access','Top-quartile manager, deal team intact — capacity-constrained access that’s hard to get directly.']
+              ][i]; return h('div',{key:i,style:{display:'flex',gap:10,alignItems:'flex-start'}}, h('span',{style:{color:'#fff',fontWeight:700,flex:'0 0 16px'}},'✓'), h('div',null, h('div',{style:{fontWeight:700,fontSize:13.5,color:'#fff'}},pt[0]), h('div',{style:{fontSize:12.5,lineHeight:1.5,color:'rgba(255,255,255,.85)',marginTop:2}},pt[1]))); })) ),
+          h('div',{style:{flex:'0 0 180px',display:'flex',flexDirection:'column',gap:12}},
+            h('div',{style:{border:'1px solid var(--line)',borderRadius:14,padding:'16px',textAlign:'center',background:'var(--surface)'}},
+              h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)'}},'Portfolio-fit score'),
+              h('div',{style:{fontFamily:SF,fontSize:40,fontWeight:700,color:'var(--brand)',lineHeight:1.1,marginTop:4}}, this.fundFitModel(f,m).fit),
+              h('div',{style:{fontSize:11,color:'var(--muted)'}},'out of 100')),
+            h('div',{style:{border:'1px solid var(--synthetic)',background:'var(--synthetic-wash)',borderRadius:14,padding:'13px 14px'}},
+              h('div',{style:{fontSize:11,fontWeight:700,color:'var(--synthetic)',marginBottom:5}},'⚑ What to watch'),
+              h('div',{style:{fontSize:12,color:'var(--ink)',lineHeight:1.5}}, this.fundFitModel(f,m).watch)))),
+        h('div',{style:{marginTop:16}}, this.fundActions(f.name,false,f.strat)));
+    } else if(tabValid==='seed' && C){
+      const slices=[{n:'Core managers',p:75,color:'--data-1'},{n:'Alpha companies',p:25,color:'--data-8'}];
+      const layerList=(title,arr)=>h('div',{style:{flex:'1 1 240px'}}, h('div',{style:{fontSize:13,fontWeight:700,marginBottom:8}},title),
+        arr.map(([n,v])=>h('div',{key:n,style:{display:'flex',alignItems:'center',gap:8,fontSize:12.5,padding:'5px 0'}}, h('span',{style:{width:9,height:9,borderRadius:'50%',background:'var(--brand)',flex:'0 0 9px'}}), h('span',{style:{flex:1}},n), h('span',{style:{fontFamily:SF,fontWeight:600,color:'var(--muted)'}},v))));
+      content=h('div',null, big('Seed Portfolio'), sub('A transparent, all-star seed portfolio'), para(C.seedIntro),
+        h('div',{style:{display:'flex',gap:24,flexWrap:'wrap',alignItems:'center',margin:'16px 0'}},
+          layerList('Alpha Layer Companies',C.alphaCos.map(c=>[c[0],c[1]])),
+          this.donutNamed(slices,170,'Seed','$100M'),
+          layerList('Core Layer Managers',C.coreMgrs)),
+        h('div',{style:{display:'flex',gap:40,flexWrap:'wrap',marginTop:6}},
+          h('div',null, h('div',{style:{fontSize:11,color:'var(--muted)'}},'Alpha layer total'), h('div',{style:{fontFamily:SF,fontSize:26,fontWeight:700}},C.alphaTotal)),
+          h('div',null, h('div',{style:{fontSize:11,color:'var(--muted)'}},'Core layer total'), h('div',{style:{fontFamily:SF,fontSize:26,fontWeight:700}},C.coreTotal))),
+        sub('Funds in the seed portfolio'),
+        h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, C.seedFunds.map((n,i)=>h('div',{key:i,style:{fontSize:12.5,color:'var(--ink)',borderBottom:'1px solid var(--line)',paddingBottom:7}},n))));
+    } else if(tabValid==='team' && C){
+      const av=(name)=>h('div',{style:{width:46,height:46,borderRadius:'50%',background:'var(--surface-2)',border:'1px solid var(--line)',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:700,fontSize:14,color:'var(--brand-ink)',flex:'0 0 46px'}}, name.split(' ').map(w=>w[0]).slice(0,2).join(''));
+      content=h('div',null, big('Meet the Team'), sub('Moonfare’s Investment Committee'), para(C.team.lead),
+        h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:16,margin:'16px 0'}}, C.team.members.map(([n,r])=>h('div',{key:n,style:{display:'flex',gap:11,alignItems:'center'}}, av(n), h('div',{style:{minWidth:0}}, h('div',{style:{fontFamily:SF,fontSize:14,fontWeight:700}},n), h('div',{style:{fontSize:11.5,color:'var(--muted)',lineHeight:1.35}},r))))),
+        h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))',gap:'18px 24px',borderTop:'1px solid var(--line)',paddingTop:18}}, C.team.stats.map(([v,l])=>h('div',{key:l}, h('div',{style:{fontFamily:SF,fontSize:26,fontWeight:700}},v), h('div',{style:{fontSize:11.5,color:'var(--muted)',marginTop:2}},l)))));
+    } else { // terms / documents
+      content=h('div',null, big(C?'How It Works':'Documents'),
+        C? h('div',null, sub('Fund Terms'),
+          h('div',{style:{border:'1px solid var(--line)',borderRadius:12,overflow:'hidden'}}, C.terms.map((r,i)=>h('div',{key:i,style:{display:'grid',gridTemplateColumns:'1fr 1.3fr',gap:12,padding:'10px 14px',borderBottom:i<C.terms.length-1?'1px solid var(--line)':'none',background:i%2?'var(--surface-2)':'transparent',fontSize:12.5}}, h('span',{style:{color:'var(--muted)'}},r[0]), h('span',{style:{fontWeight:600}},r[1]))))) : null,
+        sub('Documents'),
+        h('div',null, this.FUND_DOCS().map((d,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,border:'1px solid var(--line)',borderRadius:10,padding:'11px 13px',marginBottom:8}},
+          h('div',{style:{display:'flex',alignItems:'center',gap:11,minWidth:0}}, h('span',{style:{fontSize:18}},'📄'), h('div',{style:{minWidth:0}}, h('div',{style:{fontSize:13,fontWeight:600}},d.n), h('div',{style:{fontSize:11,color:'var(--muted)'}},d.meta))),
+          h('span',{style:{fontSize:11.5,color:'var(--brand-ink)',fontWeight:700,border:'1px solid var(--brand-tint-3)',borderRadius:8,padding:'5px 10px'}},'Request')))),
+        h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:6}},'Demo — document access is illustrative.'));
+    }
+    // held-fund performance strip retained for held funds
+    const perfStrip = (!prospect && !featured)? h('div',{style:{flex:'0 0 auto',display:'flex',gap:10,flexWrap:'wrap',padding:'14px 22px',borderBottom:'1px solid var(--line)',background:'var(--surface-2)'}},
+      this.fpStat('This-qtr',(pos?'+':'')+f.contrib+'pp',pos?'var(--over)':'var(--under)'), this.fpStat('Net MOIC',f.moic), this.fpStat('TVPI',f.tvpi), this.fpStat('DPI',f.dpi), this.fpStat('Net IRR',f.irr), this.fpStat('Your NAV',f.nav), this.fpStat('Called',f.called)) : null;
     return h('div',{style:{position:'fixed',top:109,left:52,right:0,bottom:0,zIndex:90,background:'var(--bg)',display:'flex',flexDirection:'column',borderTop:'1px solid var(--line)',borderLeft:'1px solid var(--line)'}},
-      h('div',{style:{flex:'0 0 auto',display:'flex',alignItems:'center',gap:14,padding:'16px 22px',borderBottom:'1px solid var(--line)',background:'var(--surface)'}},
-        h('button',{onClick:close,style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--ink)',borderRadius:9,padding:'7px 12px',fontSize:12.5,fontWeight:600,cursor:'pointer',flex:'0 0 auto'}},'‹ Back'),
-        h('img',{src:'assets/logos/'+(f.logo||'eqt')+'.png',alt:'',style:{width:46,height:46,borderRadius:11,background:'#fff',border:'1px solid var(--line)',padding:6,objectFit:'contain',flex:'0 0 auto'}}),
-        h('div',{style:{minWidth:0,flex:1}},
-          h('div',{style:{fontSize:11,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.05em'}}, f.mgr+' · '+f.strat+(f.region?(' · '+f.region):'')),
-          h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:700}}, f.name),
-          h('div',{style:{fontSize:12,color:'var(--muted)'}}, prospect?('Open · closes '+(f.close||'soon')):('Vintage '+(f.vintage||m.vintage)+' · '+f.stage))),
-        h('button',{onClick:close,title:'Close',style:{border:'1px solid var(--line)',background:'var(--surface-2)',color:'var(--muted)',width:30,height:30,borderRadius:8,cursor:'pointer',fontSize:15,flex:'0 0 auto'}},'✕')),
-      prospect?null:h('div',{style:{flex:'0 0 auto',display:'flex',gap:10,flexWrap:'wrap',padding:'14px 22px',borderBottom:'1px solid var(--line)',background:'var(--surface-2)'}},
-        stat('This-qtr contribution',(pos?'+':'')+f.contrib+'pp',pos?'var(--over)':'var(--under)'), stat('Net MOIC',f.moic), stat('TVPI',f.tvpi), stat('DVPI',f.dvpi), stat('DPI',f.dpi), stat('Net IRR',f.irr), stat('Your NAV',f.nav), stat('NAV uncommitted',f.navUncommitted||'—'), stat('Called',f.called)), /* item 116 — NAV uncommitted per investment */
-      h('div',{style:{flex:1,overflowY:'auto',padding:'18px 22px'}},
-        h('div',{style:{display:'grid',gridTemplateColumns:'1.6fr 1fr',gap:18,maxWidth:1100,margin:'0 auto',alignItems:'start'}}, main, side)));
+      h('div',{style:{flex:'0 0 auto',display:'flex',alignItems:'center',gap:14,padding:'14px 22px',borderBottom:'1px solid var(--line)',background:'var(--surface)'}},
+        h('button',{onClick:close,style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--ink)',borderRadius:9,padding:'7px 12px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},'‹ Back'),
+        h('img',{src:'assets/logos/'+(f.logo||'eqt')+'.png',alt:'',onError:e=>{e.target.style.display='none';},style:{width:40,height:40,borderRadius:10,background:'#fff',border:'1px solid var(--line)',padding:5,objectFit:'contain'}}),
+        h('div',{style:{flex:1,minWidth:0}}, h('div',{style:{fontSize:11,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.05em'}}, (f.mgr||'Moonfare')+' · '+(f.strat||'')), h('div',{style:{fontFamily:SF,fontSize:18,fontWeight:700}},f.name)),
+        h('button',{onClick:close,title:'Close',style:{border:'1px solid var(--line)',background:'var(--surface-2)',color:'var(--muted)',width:30,height:30,borderRadius:8,cursor:'pointer',fontSize:15}},'✕')),
+      perfStrip,
+      h('div',{style:{flex:1,overflowY:'auto',padding:'20px 24px'}},
+        h('div',{style:{maxWidth:1180,margin:'0 auto'}},
+          h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}}, (C?f.name+' SCSp investing in':((f.mgr||'')+' · '+(f.strat||'')))),
+          h('div',{style:{fontFamily:SF,fontSize:30,fontWeight:600,margin:'2px 0 16px'}},f.name),
+          h('div',{style:{display:'grid',gridTemplateColumns:'minmax(0,1.7fr) minmax(0,320px)',gap:20,alignItems:'start'}},
+            h('div',{style:{minWidth:0,display:'flex',flexDirection:'column',gap:14}}, topRow, tags, desc, h('div',{style:{marginTop:6}},tabNav), content),
+            rail))));
+  }
+  fpStat(l,v,c){ const h=this.h; return h('div',{style:{flex:'0 0 auto'}}, h('div',{style:{fontSize:10,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em'}},l), h('div',{style:{fontFamily:this.SF,fontSize:20,fontWeight:600,color:c||'var(--ink)'}},v)); }
+  /* items 50-56 — currency card for held funds (home vs fund-level, FX impact, reconciliation) */
+  fundFxCardFor(f,m){
+    const h=this.h, SF=this.SF; const x=this.fundFxModel(f,m);
+    const wrap=(title,node)=>h('div',{style:{border:'1px solid var(--line)',borderRadius:14,background:'var(--surface)',padding:'16px 18px',marginTop:18}}, h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10}}, h('div',{style:{fontFamily:SF,fontSize:16,fontWeight:700}},title), this.badge('AI','synth')), node);
+    if(x.isHome) return wrap('Currency', h('div',{style:{fontSize:12.5,lineHeight:1.6,color:'var(--muted)'}},'This fund reports in ',h('b',{style:{color:'var(--ink)'}},x.base),' — your home currency. No conversion is applied.'));
+    const view=this.dtog('fundCcyView',x.defaultView);
+    const colHead=(label,on)=>h('div',{style:{textAlign:'right',fontSize:10,fontWeight:700,textTransform:'uppercase',letterSpacing:'.04em',color:on?'var(--brand-ink)':'var(--muted)'}},label);
+    const valCell=(v,on)=>h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:14,fontWeight:on?700:500,color:on?'var(--ink)':'var(--muted)'}},v);
+    const row=(metric,fundV,homeV,impact)=>h('div',{style:{display:'grid',gridTemplateColumns:'1.2fr 1fr 1fr 0.9fr',gap:8,alignItems:'center',padding:'9px 4px',borderTop:'1px solid var(--line)'}},
+      h('span',{style:{fontSize:12.5,fontWeight:600}},metric), valCell(fundV,view==='fund'), valCell(homeV,view==='home'),
+      h('span',{style:{textAlign:'right',fontSize:11.5,fontWeight:700,color:impact.startsWith('−')||impact.startsWith('-')?'var(--under)':'var(--over)'}},impact));
+    const net=this.dtog('fundFxNet',false);
+    return wrap('Currency — '+x.ccy+' fund, '+x.base+' home', h('div',null,
+      h('div',{onClick:e=>e.stopPropagation(),style:{marginBottom:10}}, this.seg([{label:'Home ('+x.base+')',value:'home'},{label:'Fund ('+x.ccy+')',value:'fund'}], view, v=>this.setDtog('fundCcyView',v),{sm:true})),
+      h('div',{style:{display:'grid',gridTemplateColumns:'1.2fr 1fr 1fr 0.9fr',gap:8,padding:'0 4px 2px'}},
+        h('span',{style:{fontSize:10,fontWeight:700,textTransform:'uppercase',letterSpacing:'.04em',color:'var(--muted)'}},'Metric'),
+        colHead('Fund · '+x.ccy,view==='fund'), colHead('Home · '+x.base,view==='home'), colHead('FX impact',true)),
+      row('NAV', x.sym+x.navLocal.toFixed(1)+'m', x.baseSym+x.navEUR.toFixed(1)+'m', (x.driftPct>=0?'−':'+')+Math.abs(x.driftPct).toFixed(1)+'%'),
+      row('Net MOIC', x.moicLocal.toFixed(2)+'x', x.moicH.toFixed(2)+'x', (x.moicH-x.moicLocal>=0?'+':'−')+Math.abs(x.moicH-x.moicLocal).toFixed(2)+'x'),
+      row('Net IRR', x.irrLocal.toFixed(1)+'%', x.irrH.toFixed(1)+'%', (x.irrH-x.irrLocal>=0?'+':'−')+Math.abs(x.irrH-x.irrLocal).toFixed(1)+'pp'),
+      h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:10,lineHeight:1.5}},'Converted at 1 '+x.base+' = '+x.rT+' '+x.ccy+(x.asOf?(' · rate as of '+x.asOf):'')+'. At the record date ('+x.recordDate+') it was '+x.rR+' — a move of '+(x.driftPct>=0?'+':'')+x.driftPct+'% since.'),
+      h('button',{onClick:()=>this.setDtog('fundFxNet',!net),style:{marginTop:12,border:'1px solid var(--line)',background:'var(--surface-2)',color:'var(--brand-ink)',borderRadius:9,padding:'9px 12px',fontSize:12,fontWeight:700,cursor:'pointer',width:'100%'}}, (net?'▾ ':'▸ ')+'Show net home-currency impact (calls & distributions)'),
+      net? h('div',{style:{marginTop:10,border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',borderRadius:10,padding:'12px 14px',fontSize:12.5,lineHeight:1.6}}, 'Calls drawn at ~'+x.rC+', distributions paid at ~'+x.rD+'. Summed FX difference vs today: ',h('b',{style:{color:x.fxAdjEUR>=0?'var(--over)':'var(--under)'}},(x.fxAdjEUR>=0?'+':'−')+x.baseSym+Math.abs(x.fxAdjEUR).toFixed(2)+'m'),'. Adjusted NAV ',h('b',null,x.baseSym+x.navNetEUR.toFixed(1)+'m'),', net IRR ',h('b',null,x.irrNet.toFixed(1)+'%'),'.') : null));
   }
   closeFund(){ this.setState({fundDetail:null}); }
   addFundToSim(id){ const f=this.fundById(id); this.setState({fundDetail:null, simFund:f, ws:'shape', uc:'t1-13', page:'nav', deepLink:null, ask:{...this.state.ask,state:'min'}}); }
@@ -6732,7 +6847,7 @@ class Component extends DCLogic {
     return h('div',{style:{display:'flex',flexWrap:'wrap',border:'1px solid var(--line)',borderRadius:16,overflow:'hidden',background:'var(--surface)',boxShadow:'0 12px 34px -20px rgba(0,0,0,.35)'}},
       left, mid, right,
       h('div',{style:{flex:'1 1 100%',display:'flex',gap:10,padding:'0 22px 16px',flexWrap:'wrap'}},
-        h('button',{onClick:()=>this.askFromPage('Tell me about the '+f.name+' — does it fit my portfolio?'),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'10px 18px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'View this fund →'),
+        h('button',{onClick:()=>this.openFundPage(f.id),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'10px 18px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'View this fund →'),
         h('button',{onClick:()=>this.toggleWatch(f.name),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:10,padding:'10px 16px',fontSize:12.5,fontWeight:600,cursor:'pointer'}}, (this.state.watchlist||[]).includes(f.name)?'♥ Watchlisted':'♡ Watchlist')));
   }
   managerOverviewBody(){
