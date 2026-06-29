@@ -5381,6 +5381,17 @@ class Component extends DCLogic {
     this.setState({savedSims:this.state.savedSims.concat([snap]),simCompare:true});
     this.saveSimToDB(snap.name, {strategy:mix, perf:snap.perf});
   }
+  /* item 59 — save a single dimension's target individually (not all of them at once) */
+  saveDimTarget(dimKey){
+    const d=this.HOME_DIMS().find(x=>x.key===dimKey); if(!d) return;
+    const t=(this.state.simTargets&&this.state.simTargets[dimKey])||d.target||d.actual;
+    const cats=Object.keys(d.actual); const tot=cats.reduce((a,k)=>a+(+t[k]||0),0)||1; const mix={};
+    cats.forEach(k=>mix[k]=+(((+t[k]||0)/tot*100)).toFixed(1));
+    const saved={...(this.state.savedDimTargets||{}), [dimKey]:mix};
+    this.setState({savedDimTargets:saved, savedDimMsg:dimKey});
+    this.saveSimToDB('Target · '+d.label, {[dimKey]:mix});
+    if(dimKey==='strategy') this.saveTargetSim(); /* keep the strategy compare card working */
+  }
   saveSim(){
     if(this.state.savedSims.length>=5) return;
     const m=this.simModel(); const n=this.state.savedSims.length+1;
@@ -5537,21 +5548,25 @@ class Component extends DCLogic {
             h('span',{style:{textAlign:'right',fontFamily:SF,fontWeight:600,fontSize:12.5,color:'var(--muted)'}},r.cmp+'%'),
             h('span',{style:{textAlign:'right',fontFamily:SF,fontWeight:700,fontSize:12.5,color: r.dd===0?'var(--muted)':(r.dd>0?'var(--over)':'var(--under)')}}, (r.dd>0?'+':'')+r.dd))));
       }
+      const savedThis=(s.savedDimMsg===d.key);
       return this.card({title:'Your '+d.label.toLowerCase()+' target',info:true,
-        right:h('button',{onClick:()=>this.setState({simSuggest:d.key}),style:{border:'1px solid var(--line)',background:'var(--surface)',borderRadius:8,padding:'6px 12px',fontSize:12,fontWeight:600,color:'var(--brand)',cursor:'pointer'}},'✦ Suggest funds'),
+        right:h('div',{style:{display:'flex',gap:8,alignItems:'center'}},
+          savedThis? h('span',{style:{fontSize:11,color:'var(--over)',fontWeight:700,whiteSpace:'nowrap'}},'✓ Saved') : null,
+          h('button',{onClick:()=>this.setState({simSuggest:d.key}),style:{border:'1px solid var(--line)',background:'var(--surface)',borderRadius:8,padding:'6px 12px',fontSize:12,fontWeight:600,color:'var(--brand)',cursor:'pointer'}},'✦ Suggest funds'),
+          /* item 59 — save THIS dimension's target individually, right next to Suggest funds */
+          h('button',{onClick:()=>this.saveDimTarget(d.key),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'6px 12px',fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif',whiteSpace:'nowrap'}},'✓ Save '+d.label.toLowerCase()+' target')),
         children:h('div',null, pieRow, h('div',{style:{borderTop:'1px solid var(--line)',marginTop:14,paddingTop:14,display:'flex',flexDirection:'column',gap:12}}, selector, lower)),
         caption: mode==='custom'? 'Drag a slider or type a percentage to shape your '+d.label.toLowerCase()+' target — the pie updates live. Pick a risk strategy to re-derive it.' : 'Your '+d.label.toLowerCase()+' target vs '+compLabel+'. Pick Custom to define it yourself with the sliders.'});
     };
     const grid=h('div',{style:{display:'flex',flexDirection:'column',gap:18}},
       ordered.map(d=>h('div',{key:d.key}, dimTargetCard(d))));
 
+    /* item 59 — targets are saved individually per dimension (button on each card above); no single save-all */
+    const savedDims=Object.keys(s.savedDimTargets||{});
     const actions=h('div',{style:{display:'flex',gap:12,flexWrap:'wrap',alignItems:'center'}},
-      h('button',{onClick:()=>this.saveTargetSim(),disabled:s.savedSims.length>=5,
-        style:{background:s.savedSims.length>=5?'var(--surface-2)':'var(--brand)',color:s.savedSims.length>=5?'var(--muted)':'#fff',border:'none',borderRadius:10,padding:'12px 20px',fontSize:13,fontWeight:600,cursor:s.savedSims.length>=5?'default':'pointer',fontFamily:'Inter,system-ui,sans-serif'}},
-        s.savedSims.length>=5?'5 targets saved (max)':'＋ Save target allocation'),
       h('button',{onClick:()=>this.resetTargets(),disabled:!dirty,
-        style:{background:'var(--surface)',color:dirty?'var(--ink)':'var(--muted)',border:'1px solid var(--line)',borderRadius:10,padding:'12px 18px',fontSize:13,fontWeight:600,cursor:dirty?'pointer':'default'}},'Reset target to current'),
-      h('span',{style:{fontSize:11.5,color:'var(--muted)'}}, dirty?'Your target now differs from your current portfolio.':'Target matches your current portfolio — slide to set goals.'));
+        style:{background:'var(--surface)',color:dirty?'var(--ink)':'var(--muted)',border:'1px solid var(--line)',borderRadius:10,padding:'12px 18px',fontSize:13,fontWeight:600,cursor:dirty?'pointer':'default'}},'Reset all targets to current'),
+      h('span',{style:{fontSize:11.5,color:'var(--muted)'}}, savedDims.length? ('Saved individually: '+savedDims.join(', ')+'. Use the “✓ Save … target” button on each card to save a dimension.') : 'Save each dimension individually with the “✓ Save … target” button on its card above.'));
 
     // ---- saved targets compare (preserves the Opportunities hand-off) ----
     let compareCard=null;
@@ -5592,7 +5607,7 @@ class Component extends DCLogic {
       h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:9,lineHeight:1.5}},'Comparisons vs peers, the model or best performers are on the levers (right). Ask Alpha for anything else.'));
 
     const anyCustom=Object.values(s.simCmp||{}).includes('custom');
-    return h('div',{style:{display:'flex',flexDirection:'column',gap:18}}, header, grid, ((dirty||anyCustom)?actions:null), deeper, compareCard);
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:18}}, header, grid, ((dirty||anyCustom||Object.keys(s.savedDimTargets||{}).length)?actions:null), deeper, compareCard);
   }
 
   /* ====================== OPPORTUNITIES (Act) ====================== */

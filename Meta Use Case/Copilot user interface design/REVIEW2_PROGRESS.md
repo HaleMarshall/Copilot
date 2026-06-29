@@ -7,7 +7,8 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 49 funds-held table inline in performance detail (KPIs+cards+all funds in one view)
 - [x] 50-56 fund-page multi-currency (home/fund toggle, per-metric+NAV FX impact, conv-rate footnote, record-date delta, call/dist FX reconciliation, net home metric on click, default to better number) (+fx history seeded)
 - [x] 57 comparison two-pies (current vs target) + switch current/target vs others; generalized to strategy/region/currency/sector + paired Z (cmpDimMix/cmpDimSlices helpers)
-- NEXT: item 58 (Peers side-panel: profession/age/risk/region/horizon/wealth/target, save custom peers)
+- [x] 58 Peers opens side panel to define own peers (prof/age/risk/region/horizon/wealth/target) + save/re-apply named groups; default actual peers (savePeers/applyPeers)
+- NEXT: item 59 (save target per dimension individually — toggle next to suggest funds, strategy/region/currency/sector)
 - [x] 1 nudge new-investor guard + liquidity CTA→opportunities
 - [x] 2 TVPI mini-chart in performance (+tvpi seeded)
 - [x] 3 cash-flow: 'Net distributions' not 'Net cash position'
