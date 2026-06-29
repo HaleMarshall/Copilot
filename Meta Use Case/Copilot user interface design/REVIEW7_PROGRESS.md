@@ -36,4 +36,5 @@ Build strictly one at a time, verify (node --check + Playwright render/logicErro
 - [x] 1 Alpha's read card shrunk to ~half (concise read + CTA) — fd1075d
 - [x] 2 renamed → "Alpha's read on your Portfolio" + portfolio-wide content — 483ae8f
 - [x] 3 "€3.6m above called capital" → "€3.6m net gain" (Nettgewinn = NAV−paid-in; action-items mistranslated to 'net distribution') — verified visible
-- NEXT: item 4
+- [x] 4 hero currency switch now shows FX rate line ("FX 1 EUR = 1.0830 USD · as of …") on non-base ccy — verified
+- NEXT: item 5 (mixed/blended FX rate from underlying portfolios)

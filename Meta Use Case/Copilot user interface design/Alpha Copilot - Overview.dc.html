@@ -5279,6 +5279,8 @@ class Component extends DCLogic {
         h('div',{style:{fontSize:10.5,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(255,255,255,.8)',fontWeight:700}},'Total portfolio value · base '+_baseCcy),
         _ccyToggle),
       h('div',{style:{fontFamily:SF,fontSize:44,fontWeight:700,lineHeight:1}}, _totalVal),
+      /* review7 item 4 — when a non-base currency is selected, always show the FX conversion rate used */
+      (_ccy!==_baseCcy)? h('div',{style:{display:'inline-flex',alignItems:'center',gap:6,alignSelf:'flex-start',background:'rgba(255,255,255,.14)',borderRadius:7,padding:'3px 9px',fontSize:11,fontWeight:600,color:'rgba(255,255,255,.92)'}}, 'FX 1 '+_baseCcy+' = '+(+_rate).toFixed(_rate>=50?0:4)+' '+_ccy+(_fx.asOf?(' · as of '+_fx.asOf):'')) : null,
       h('div',{style:{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}},
         h('span',{style:{display:'inline-flex',alignItems:'center',gap:6,background:'rgba(255,255,255,.16)',borderRadius:8,padding:'4px 10px',fontSize:12.5,fontWeight:700}},'▲ '+(_P.tvpi||'2.1')+'x TVPI'),
         h('span',{style:{fontSize:12.5,color:'rgba(255,255,255,.9)'}}, _aboveCalled+' net gain')), /* review7 item 3 — was 'above called capital' (confusing; called=16.6m). 3.6 = NAV − paid-in = net gain (Nettgewinn) */
