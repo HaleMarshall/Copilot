@@ -16,4 +16,5 @@
 - [x] 7 format full breakdown lists investments (heldMeta.format assigned)
 - [x] 8 detail panel shifts (left 52->392) to align with Ask Alpha chat when open
 - [x] 9 gridBars clamps over-max bars to plot (no number overflow)
-- NEXT: item 10 (Format large breakdown tree diagram)
+- [x] 10 Format large breakdown is a tree diagram (treemap)
+- === ALL 10 PORTFOLIO-OVERVIEW FEEDBACK ITEMS COMPLETE ===
