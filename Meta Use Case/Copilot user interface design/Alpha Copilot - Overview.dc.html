@@ -6385,57 +6385,73 @@ class Component extends DCLogic {
   /* item 76 — 'Compare Yourself': your strategy as a whole pie + each strategy listed with the funds underneath, vs Peers/Platform/Top 10%/Custom; click a strategy to see your weight vs theirs; per fund: Watchlist · Invest · Similar */
   compareYourselfCard(){
     const h=this.h, SF=this.SF; const s=this.state; const empty=this.dbEmpty();
+    /* review4 item 6 — always ACTUAL vs ACTUAL; dimension toggle top-left; comparator (peers/platform/top10/custom, no endowments) top-right; two pies + Z + funds comparison */
     const cmp=s.cmpCY||'peers'; const cmpShort={peers:'Peers',platform:'Platform',top10:'Top 10%',custom:'Custom'}[cmp]||'Peers';
-    const you=this.MIX.you||{}; const comp=this.cmpMix(cmp)||{};
-    const yT=this.STRATS.reduce((a,kv)=>a+(+you[kv[0]]||0),0)||1; const cT=this.STRATS.reduce((a,kv)=>a+(+comp[kv[0]]||0),0)||1;
-    const slices=this.STRATS.map(([k,n,c])=>({k,n,color:c,p:+(((+you[k]||0)/yT*100)).toFixed(1)})).filter(x=>x.p>0);
-    const focus=s.cyFocus; const meta=this.HELD_META(); const roster=this.HELD_FUNDS();
-    const byStrat={}; roster.forEach(f=>{ const sk=(meta[f.id]||{}).strat; (byStrat[sk]=byStrat[sk]||[]).push(f); });
+    const dim=s.cyDim||'strategy'; const dimLabel={strategy:'Strategy',region:'Region',currency:'Currency',sector:'Sector'}[dim]||'Strategy';
+    const youMix=this.cmpDimMix(dim,'current')||{}; const compMix=this.cmpDimMix(dim,cmp)||{};
+    const items=this.cmpDimItems(dim);
+    const youSlices=this.cmpDimSlices(dim,'current'); const compSlices=this.cmpDimSlices(dim,cmp);
+    const focus=s.cyFocus;
+    const meta=this.HELD_META(); const roster=this.HELD_FUNDS();
+    const catOf=(f)=> dim==='strategy'? (meta[f.id]||{}).strat : (meta[f.id]||{})[dim];
+    const byCat={}; roster.forEach(f=>{ const c=catOf(f); if(c==null) return; (byCat[c]=byCat[c]||[]).push(f); });
+    /* top-left dimension toggle */
+    const dimSel=this.seg([{label:'Strategy',value:'strategy'},{label:'Region',value:'region'},{label:'Currency',value:'currency'},{label:'Sector',value:'sector'}], dim, v=>this.setState({cyDim:v,cyFocus:null}),{sm:true});
+    /* top-right comparator toggle — no endowments */
     const sel=h('div',{style:{display:'flex',gap:6,flexWrap:'wrap'}}, [['peers','Peers'],['platform','Platform'],['top10','Top 10%'],['custom','Custom']].map(([v,l])=>{ const on=cmp===v;
-      return h('button',{key:v,onClick:()=>{ this.setState({cmpCY:v}); if(v==='peers') this.applyPeerCohort(); else if(v==='custom') this.clearCohort({cmp:'custom',controlOpen:true}); }, /* review4 item 2 */
+      return h('button',{key:v,onClick:()=>{ this.setState({cmpCY:v}); if(v==='peers') this.applyPeerCohort(); else if(v==='custom') this.clearCohort({cmp:'custom',controlOpen:true}); },
         style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 13px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}}, v==='custom'?'✎ '+l:l); }));
+    /* two pies — actual vs actual */
+    const dsize='min(190px,22vh)';
+    const pies=h('div',{style:{display:'flex',gap:'clamp(24px,5vw,70px)',justifyContent:'center',alignItems:'flex-start',flexWrap:'wrap'}},
+      h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutLabel('You · actual'), this.donutNamed(youSlices,dsize,'You',dimLabel.toLowerCase())),
+      h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutLabel(cmpShort+' · actual'), this.donutNamed(compSlices,dsize,cmpShort,dimLabel.toLowerCase())));
+    /* Z chart — your actual minus comparator actual */
+    const zRows=items.map(([k,n,c])=>{ const d=+((youMix[k]||0)-(compMix[k]||0)).toFixed(1); return {name:n,delta:d,color:c,sig:Math.abs(d)>=2}; }).filter(r=>r.delta!==0).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
+    const zCard=h('div',{style:{marginTop:14,paddingTop:14,borderTop:'1px solid var(--line)'}},
+      h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}}, dimLabel+' · over / under-weight vs '+cmpShort+' (pp)'),
+      zRows.length? this.miniZ(zRows) : h('div',{style:{fontSize:12,color:'var(--muted)',padding:'14px 0',textAlign:'center'}},'In line with '+cmpShort+'.'));
+    /* per-fund row (mine = full actions; comparator = representative, lighter) */
     const onPlatform=(name)=>this.isHeld(name) || (this.OPP_FUNDS_LIST&&this.OPP_FUNDS_LIST().some(o=>(o.name||o.fund)===name));
-    const cyFundRow=(f,label)=>{ const name=f.name||f.fund; const inW=(s.watchlist||[]).includes(name); const live=onPlatform(name);
-      return h('div',{key:f.id||name,style:{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap',border:'1px solid var(--line)',borderRadius:10,padding:'9px 11px',background:'var(--surface)'}},
-        h('img',{src:'assets/logos/'+(f.logo||'eqt')+'.png',alt:'',onError:e=>{e.target.style.display='none';},style:{width:28,height:28,borderRadius:7,background:'#fff',border:'1px solid var(--line)',padding:3,objectFit:'contain',flex:'0 0 auto'}}),
-        h('button',{onClick:()=>this.openOppFund? this.openOppFund(f):null,style:{flex:'1 1 150px',minWidth:0,textAlign:'left',border:'none',background:'none',cursor:'pointer',padding:0}},
-          h('div',{style:{fontFamily:SF,fontSize:12.5,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},name),
-          h('div',{style:{fontSize:10.5,color:'var(--muted)'}}, (f.mgr||'')+(live?'':' · not on platform now'))),
+    const fundRow=(f,label,mine)=>{ const name=f.name||f.fund; const inW=(s.watchlist||[]).includes(name); const live=onPlatform(name);
+      return h('div',{key:(mine?'m':'c')+(f.id||name),style:{display:'flex',alignItems:'center',gap:9,flexWrap:'wrap',border:'1px solid var(--line)',borderRadius:10,padding:'8px 10px',background:mine?'var(--surface)':'var(--surface-2)'}},
+        h('img',{src:'assets/logos/'+(f.logo||'eqt')+'.png',alt:'',onError:e=>{e.target.style.display='none';},style:{width:26,height:26,borderRadius:6,background:'#fff',border:'1px solid var(--line)',padding:3,objectFit:'contain',flex:'0 0 auto'}}),
+        h('button',{onClick:()=>this.openOppFund?this.openOppFund(f):null,style:{flex:'1 1 130px',minWidth:0,textAlign:'left',border:'none',background:'none',cursor:'pointer',padding:0}},
+          h('div',{style:{fontFamily:SF,fontSize:12,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},name),
+          h('div',{style:{fontSize:10,color:'var(--muted)'}}, f.mgr||'')),
         h('div',{style:{display:'flex',gap:6,flexWrap:'wrap',flex:'0 0 auto'}},
-          /* watchlist — get notified when it's back on the platform */
-          h('button',{onClick:e=>{e.stopPropagation();this.toggleWatch(name);},title:'Notify me when this fund is on the platform',
-            style:{border:'1px solid '+(inW?'var(--brand)':'var(--line)'),background:inW?'var(--brand-wash)':'var(--surface)',color:inW?'var(--brand-ink)':'var(--muted)',borderRadius:8,padding:'5px 10px',fontSize:11,fontWeight:600,cursor:'pointer'}}, inW?'♥ Watchlisted':'♡ Watchlist'),
-          /* invest — only if currently on the platform */
-          live? h('button',{onClick:e=>{e.stopPropagation();this.addToCart(name,label);},
-            style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'5px 10px',fontSize:11,fontWeight:700,cursor:'pointer'}},'✦ Seize the opportunity')
-            : h('span',{style:{fontSize:10.5,color:'var(--muted)',alignSelf:'center'}},'not investable now'),
-          /* similar — everywhere */
-          h('button',{onClick:e=>{e.stopPropagation();this.suggestSimilar(name,label);},
-            style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:8,padding:'5px 10px',fontSize:11,fontWeight:600,cursor:'pointer'}},'✨ Similar'))); };
-    const rows=this.STRATS.map(([k,n,c])=>{ const yv=Math.round((+you[k]||0)/yT*100); const cv=Math.round((+comp[k]||0)/cT*100); if(yv===0&&cv===0) return null; const dd=yv-cv; const open=focus===k;
-      const held=byStrat[k]||[]; const opp=(this.OPP_FUNDS_LIST?this.OPP_FUNDS_LIST():[]).filter(o=>(o.strat||'').toLowerCase().includes(n.split(' ')[0].toLowerCase())).slice(0,2);
-      const fundsHere=held.concat(opp.filter(o=>!held.some(hf=>(hf.name||hf.fund)===(o.name||o.fund))));
+          h('button',{onClick:e=>{e.stopPropagation();this.toggleWatch(name);},style:{border:'1px solid '+(inW?'var(--brand)':'var(--line)'),background:inW?'var(--brand-wash)':'var(--surface)',color:inW?'var(--brand-ink)':'var(--muted)',borderRadius:7,padding:'4px 8px',fontSize:10.5,fontWeight:600,cursor:'pointer'}}, inW?'♥':'♡'),
+          live? h('button',{onClick:e=>{e.stopPropagation();this.addToCart(name,label);},style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:7,padding:'4px 8px',fontSize:10.5,fontWeight:700,cursor:'pointer'}},'✦ Seize') : null,
+          h('button',{onClick:e=>{e.stopPropagation();this.suggestSimilar(name,label);},style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:7,padding:'4px 8px',fontSize:10.5,fontWeight:600,cursor:'pointer'}},'✨ Similar'))); };
+    /* comparator representative funds for a category (we don't hold peer-specific data; show platform funds in that bucket) */
+    const compFundsFor=(n)=>{ const key=String(n).split(' ')[0].toLowerCase();
+      return (this.OPP_FUNDS_LIST?this.OPP_FUNDS_LIST():[]).filter(o=>((o.strat||o.ac||'')+'').toLowerCase().includes(key)).slice(0,3); };
+    /* listed categories with funds underneath (mine vs comparator) */
+    const list=items.map(([k,n,c])=>{ const yv=Math.round(youMix[k]||0); const cv=Math.round(compMix[k]||0); if(yv===0&&cv===0) return null; const dd=yv-cv; const open=focus===k;
+      const mineFunds=byCat[k]||[]; const compFunds=compFundsFor(n);
       return h('div',{key:k,style:{border:'1px solid '+(open?'var(--brand)':'var(--line)'),borderRadius:11,overflow:'hidden'}},
-        h('button',{onClick:()=>this.setState({cyFocus:open?null:k}),style:{width:'100%',display:'grid',gridTemplateColumns:'18px 1fr 54px 54px 46px 18px',gap:8,alignItems:'center',padding:'10px 12px',border:'none',background:open?'var(--brand-wash)':'var(--surface)',cursor:'pointer',textAlign:'left'}},
+        h('button',{onClick:()=>this.setState({cyFocus:open?null:k}),style:{width:'100%',display:'grid',gridTemplateColumns:'18px 1fr 52px 52px 44px 18px',gap:8,alignItems:'center',padding:'10px 12px',border:'none',background:open?'var(--brand-wash)':'var(--surface)',cursor:'pointer',textAlign:'left'}},
           h('span',{style:{width:11,height:11,borderRadius:3,background:`var(${c})`}}),
           h('span',{style:{fontSize:13,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},n),
           h('span',{style:{textAlign:'right',fontFamily:SF,fontWeight:700,fontSize:12.5}},yv+'%'),
           h('span',{style:{textAlign:'right',fontFamily:SF,fontSize:12.5,color:'var(--muted)'}},cv+'%'),
           h('span',{style:{textAlign:'right',fontFamily:SF,fontWeight:700,fontSize:12,color:dd===0?'var(--muted)':(dd>0?'var(--over)':'var(--under)')}}, (dd>0?'+':'')+dd),
           h('span',{style:{textAlign:'right',color:'var(--muted)',fontSize:12}}, open?'▾':'▸')),
-        open? h('div',{style:{padding:'10px 12px',borderTop:'1px solid var(--line)',display:'flex',flexDirection:'column',gap:8}},
-          h('div',{style:{fontSize:11.5,color:'var(--muted)',lineHeight:1.45}}, 'Committed-capital weight in '+n+' — ',h('b',{style:{color:'var(--ink)'}},'You '+yv+'%'),' vs ',h('b',{style:{color:'var(--ink)'}},cmpShort+' '+cv+'%'),'. The funds you hold here:'),
-          fundsHere.length? fundsHere.map(f=>cyFundRow(f,n)) : h('div',{style:{fontSize:11.5,color:'var(--muted)'}},'No direct fund yet — use Similar or Invest on a platform fund to add '+n+'.')) : null);
+        open? h('div',{style:{padding:'10px 12px',borderTop:'1px solid var(--line)',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',gap:14}},
+          h('div',null, h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--muted)',marginBottom:7}},'Your funds in '+n),
+            mineFunds.length? h('div',{style:{display:'flex',flexDirection:'column',gap:6}}, mineFunds.map(f=>fundRow(f,n,true))) : h('div',{style:{fontSize:11.5,color:'var(--muted)'}},'No direct fund yet.')),
+          h('div',null, h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--muted)',marginBottom:7}},cmpShort+'’ funds in '+n),
+            compFunds.length? h('div',{style:{display:'flex',flexDirection:'column',gap:6}}, compFunds.map(f=>fundRow(f,n,false))) : h('div',{style:{fontSize:11.5,color:'var(--muted)'}},'Representative funds for this bucket appear here.'))) : null);
     }).filter(Boolean);
-    return this.card({title:'Compare Yourself — strategy & funds', info:true, right:sel,
-      children: empty? this.cmpEmpty() : h('div',{style:{display:'flex',gap:20,flexWrap:'wrap',alignItems:'flex-start'}},
-        h('div',{style:{flex:'0 0 auto',display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutNamed(slices,184,'You','your mix'),
-          h('div',{style:{fontSize:10.5,color:'var(--muted)'}},'your strategy mix — click a row to drill')),
-        h('div',{style:{flex:'1 1 320px',minWidth:280}},
-          h('div',{style:{display:'grid',gridTemplateColumns:'18px 1fr 54px 54px 46px 18px',gap:8,padding:'0 12px 6px',fontSize:9.5,fontWeight:700,letterSpacing:'.03em',textTransform:'uppercase',color:'var(--muted)'}},
-            h('span',null,''),h('span',null,'Strategy'),h('span',{style:{textAlign:'right'}},'You'),h('span',{style:{textAlign:'right'}},cmpShort),h('span',{style:{textAlign:'right'}},'Δpp'),h('span',null,'')),
-          h('div',{style:{display:'flex',flexDirection:'column',gap:8}}, rows))),
-      caption:'Your strategy mix as a whole (left) and every strategy listed with the funds you hold underneath — your committed-capital weight vs '+cmpShort+'. Click a strategy to drill in; on each fund: Watchlist (notify when on platform), Invest (if live), or see Similar funds.'});
+    return this.card({title:'Compare Yourself — '+dimLabel.toLowerCase()+' & funds', info:true,
+      right:h('div',{style:{display:'flex',gap:10,flexWrap:'wrap',alignItems:'center',justifyContent:'flex-end'}}, dimSel, sel),
+      children: empty? this.cmpEmpty() : h('div',null,
+        pies, zCard,
+        h('div',{style:{marginTop:16,display:'flex',flexDirection:'column',gap:8}},
+          h('div',{style:{display:'grid',gridTemplateColumns:'18px 1fr 52px 52px 44px 18px',gap:8,padding:'0 12px 4px',fontSize:9.5,fontWeight:700,letterSpacing:'.03em',textTransform:'uppercase',color:'var(--muted)'}},
+            h('span',null,''),h('span',null,dimLabel),h('span',{style:{textAlign:'right'}},'You'),h('span',{style:{textAlign:'right'}},cmpShort),h('span',{style:{textAlign:'right'}},'Δpp'),h('span',null,'')),
+          list)),
+      caption:'Your ACTUAL '+dimLabel.toLowerCase()+' mix (left) vs '+cmpShort+'’ ACTUAL mix (right) — never your target. Toggle the dimension top-left and the comparator top-right; click a row to compare your funds against '+cmpShort+'’ funds.'});
   }
   followCard(){
     const h=this.h; const SF=this.SF; const g=this.state.following;

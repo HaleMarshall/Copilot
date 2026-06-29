@@ -17,4 +17,5 @@ FUTURE
 - [x] 2 Peers auto-selects investor profile; Custom clears
 - [x] 3 clarity: simulating against the comparator group target (banner + labels)
 - [x] 4 comparison your-target PM allocation = user actual 35% (myPmTarget)
-- NEXT: item 5 (fill rate lifecycle-aware: peers/model/platform at same stage + projection; endowments rolling)
+- [x] 5 fill rate lifecycle-matched (stage + projection; endowments rolling)
+- NEXT: item 6 (Compare Yourself redesign: two pies + funds list, dim toggle, actual-vs-actual, no endowments)
