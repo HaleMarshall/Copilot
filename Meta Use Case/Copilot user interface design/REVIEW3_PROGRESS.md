@@ -15,4 +15,5 @@
 - [x] 6 cashflow quick summary top-3 J-curve + full cash-flows page (KPIs, calls/dist chart, full J-curve, committed/called table)
 - [x] 7 format full breakdown lists investments (heldMeta.format assigned)
 - [x] 8 detail panel shifts (left 52->392) to align with Ask Alpha chat when open
-- NEXT: item 9 (strategy graph large-number overflow fix)
+- [x] 9 gridBars clamps over-max bars to plot (no number overflow)
+- NEXT: item 10 (Format large breakdown tree diagram)

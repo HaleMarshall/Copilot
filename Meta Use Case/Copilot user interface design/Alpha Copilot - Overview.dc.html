@@ -4003,7 +4003,22 @@ class Component extends DCLogic {
     const header=h('div',{style:{display:'flex',alignItems:'center',gap:10,marginBottom:big?16:12}},
       h('div',{style:{fontFamily:SF,fontSize:big?19:16,fontWeight:600}},'Where you hold the most investments'), /* items 20/22 — 'investments', not funds/opportunities */
       h('span',{style:{fontSize:12,color:'var(--muted)'}}, 'Most concentrated in '+top.n+' · '+byCat[top.k].length+' fund'+(byCat[top.k].length>1?'s':'')),
-      toggleBtn);
+      label==='Format'?null:toggleBtn);
+    /* review3 item 10 — the Format large breakdown is a tree diagram (treemap) of the formats, sized by weight */
+    if(label==='Format'){
+      const sorted=ranked.slice().sort((a,b)=>(b.you||0)-(a.you||0));
+      const cA=[],cB=[]; let sA=0,sB=0;
+      sorted.forEach(it=>{ const w=Math.max(it.you||0,1); if(sA<=sB){cA.push(it);sA+=w;} else {cB.push(it);sB+=w;} });
+      const tcol=(arr,sum)=>h('div',{style:{flex:(sum||1)+' 1 0',display:'flex',flexDirection:'column',gap:6}}, arr.map(r=>{ const on=this.state.homeFocusCat===r.k;
+        return h('div',{key:r.k,onClick:()=>this.setState({homeFocusCat:r.k}),title:'See your '+r.n+' investments below',
+          style:{flex:(Math.max(r.you||0,1))+' 1 0',background:`var(${r.color})`,borderRadius:9,padding:'12px 14px',color:'#fff',display:'flex',flexDirection:'column',justifyContent:'flex-end',cursor:'pointer',overflow:'hidden',minHeight:56,outline:on?'2px solid #fff':'none',outlineOffset:on?'-4px':'0'}},
+          h('div',{style:{fontSize:13.5,fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},r.n),
+          h('div',{style:{fontFamily:SF,fontSize:11.5,opacity:.93}}, byCat[r.k].length+' fund'+(byCat[r.k].length>1?'s':'')+' · '+(r.you||0)+'% of NAV')); }));
+      const tree=h('div',{style:{display:'flex',gap:6,height:'clamp(220px,34vh,300px)'}}, tcol(cA,sA), tcol(cB,sB));
+      return h('div',{style:{border:'1px solid var(--line)',borderRadius:16,background:'var(--surface)',padding:'16px 18px'}}, header,
+        h('div',{style:{fontSize:11,color:'var(--muted)',marginBottom:10}},'Tile size = share of NAV by format. Tap a format to see its investments below.'),
+        tree);
+    }
     const items = big? ranked : ranked.slice(0,3);
     const body = big
       ? h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))',gap:14}},
