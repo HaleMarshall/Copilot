@@ -5239,13 +5239,15 @@ class Component extends DCLogic {
     const _under=_deltas.slice().sort((a,b)=>b.d-a.d)[0]||{n:'',d:0};
     const _over=_deltas.slice().sort((a,b)=>a.d-b.d)[0]||{n:'',d:0};
     const _topHold=this.STRATS.map(kv=>({n:kv[1],p:_mx[kv[0]]||0})).sort((a,b)=>b.p-a.p)[0]||{n:'',p:0};
-    /* review7 item 1 — this card was too large; condensed to ~half: one concise read line + the CTA (dropped the padded suggestion sub-box) */
-    const alphaReadCard=this.card({title:'Alpha’s read on your strategy',badge:this.badge('AI','synth'),tone:'alpha',
+    /* review7 item 1 — condensed to ~half size; item 2 — retitled to the whole Portfolio and content generalised (value, return, allocation target, concentration), not a single strategy */
+    const _Pr=(this.DB&&this.DB.portfolio)||{}; const _navTxt=_Pr.navText||'€16.6m'; const _tvpi=_Pr.tvpi||'2.1'; const _qoq=_Pr.qoqPct||'+3.7%';
+    const _pmYou=(this.PM&&this.PM.you)||15.7; const _pmTgt=this.myPmTarget();
+    const alphaReadCard=this.card({title:'Alpha’s read on your Portfolio',badge:this.badge('AI','synth'),tone:'alpha',
       children:h('div',{style:{display:'flex',flexDirection:'column',gap:9}},
         h('div',{style:{fontSize:12.5,lineHeight:1.5,color:'rgba(255,255,255,.92)'}},
-          'You’re ',h('strong',{key:'u',style:{color:'#fff'}}, Math.abs(_under.d)+'pp under'),' in '+_under.n+' and ',h('strong',{key:'o',style:{color:'#fff'}},Math.abs(_over.d)+'pp over'),' in '+_over.n+'. '+_topHold.n+' is your largest book ('+_topHold.p+'%) — the main concentration. ',h('strong',{key:'s',style:{color:'#fff'}},'Adding '+_under.n),' closes the gap.'),
+          'Your book is worth ',h('strong',{key:'v',style:{color:'#fff'}},_navTxt),' at ',h('strong',{key:'t',style:{color:'#fff'}},_tvpi+'x TVPI'),' ('+_qoq+' this quarter), and you’ve filled ',h('strong',{key:'p',style:{color:'#fff'}},_pmYou+'%'),' of your '+_pmTgt+'% private-markets target. Across the book your largest gap is ',h('strong',{key:'u',style:{color:'#fff'}},_under.n+' ('+Math.abs(_under.d)+'pp under)'),' and '+_topHold.n+' is your biggest concentration at '+_topHold.p+'%.'),
         this.gapCTA('strategy',true)),
-      caption:'A concise read plus a concrete next move.'});
+      caption:'A portfolio-wide read — value, return, allocation and concentration — plus a concrete next move.'});
     // item 71 — 'Where you're concentrated' box + allocated-vs-committed Z-chart (real deviation data), moved down the page
     const concRows=this.basisPct('strategy'); // for the concentration ranking (current basis)
     const concRanked=Object.keys(concRows).map(k=>{ const s=this.STRATS.find(x=>x[0]===k); return {n:s?s[1]:k, color:s?s[2]:'--data-9', p:concRows[k]||0}; }).filter(r=>r.p>0).sort((a,b)=>b.p-a.p);
