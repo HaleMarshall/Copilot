@@ -59,4 +59,6 @@ Build strictly one at a time, verify (node --check + Playwright render/logicErro
 - [x] 26+28 detailed vintage page: commitments-by-vintage chart (NAV/Committed toggle) + Vintage×dim heatmap (Strategy/Region/Sector/Currency/Format + NAV/Committed) + funds-by-vintage table — verified
 - [x] 27 removed the duplicate (bottom) top-three-performers table in the vintage semi-detailed pop; kept the top one — verified (1 visible heading)
 - [x] 29 PDF export: per-page selection checkboxes + branded cover (Moonfare logo) + per-page Moonfare branding - NEXT: item 29 (PDF button: select detailed pages, charts, Moonfare branding, cover page, legend) page numbers + charts + legend/definitions page — verified
-- NEXT: item 30 (Funds & Managers: all funds use Moonfare-Tech-Fund style — logo bottom-left over background image)
+- [x] 31 downloaded 15 city/landscape bg images to assets/bg (consistent ~640px); LANDSCAPES/landscapeUrl now local — verified served 200
+- [x] 30 Funds & Managers: every fund is a card in the Moonfare-Tech-Fund style (bg image + logo bottom-left + AC badge + IRR/MOIC/AUM + compare) — verified 26 cards
+- === ALL 31 ITEMS COMPLETE ===

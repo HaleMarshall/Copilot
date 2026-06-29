@@ -7367,8 +7367,9 @@ class Component extends DCLogic {
         h('button',{onClick:()=>this.toggleWatch(f.name),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:10,padding:'10px 16px',fontSize:12.5,fontWeight:600,cursor:'pointer'}}, (this.state.watchlist||[]).includes(f.name)?'♥ Watchlisted':'♡ Watchlist')));
   }
   /* nature / city landscape backdrops for manager logos on the Funds & Managers list (deterministic per key) */
-  LANDSCAPES(){ return ['1506744038136-46273834b3fb','1470071459604-3b5ec3a7fe05','1441974231531-c6227db76b6e','1501785888041-af3ef285b470','1444723121867-7a241cacace9','1490806843957-31f4c9a91c65','1469474968028-56623f02e42e','1433086966358-54859d0ed716','1518495973542-4542c06a5843','1480714378408-67cf0d13bc1b']; }
-  landscapeUrl(key){ const arr=this.LANDSCAPES(); let n=0; const k=String(key||'x'); for(let i=0;i<k.length;i++) n=(n*31+k.charCodeAt(i))>>>0; return 'https://images.unsplash.com/photo-'+arr[n%arr.length]+'?w=240&q=55&auto=format&fit=crop'; }
+  /* review7 item 31 — locally-downloaded city-skyline / landscape backgrounds (assets/bg), consistent ~640px format, no remote dependency */
+  LANDSCAPES(){ return ['1506744038136-46273834b3fb','1470071459604-3b5ec3a7fe05','1441974231531-c6227db76b6e','1501785888041-af3ef285b470','1444723121867-7a241cacace9','1490806843957-31f4c9a91c65','1469474968028-56623f02e42e','1433086966358-54859d0ed716','1518495973542-4542c06a5843','1480714378408-67cf0d13bc1b','1486406146926-c627a92ad1ab','1496568816309-51d7c20e3b21','1449824913935-59a10b8d2000','1493514789931-586cb221d7a7','1460472178825-e5240623afd5']; }
+  landscapeUrl(key){ const arr=this.LANDSCAPES(); let n=0; const k=String(key||'x'); for(let i=0;i<k.length;i++) n=(n*31+k.charCodeAt(i))>>>0; return 'assets/bg/'+arr[n%arr.length]+'.jpg'; }
   mgrTile(logo,mgrName,key,size){ const h=this.h; size=size||46;
     return h('div',{style:{position:'relative',width:size,height:size,borderRadius:9,overflow:'hidden',flex:'0 0 '+size+'px',background:'linear-gradient(135deg,#20243a,#3a3f63)'}},
       h('div',{style:{position:'absolute',inset:0,backgroundImage:'url('+this.landscapeUrl(key)+')',backgroundSize:'cover',backgroundPosition:'center'}}),
@@ -7520,27 +7521,29 @@ class Component extends DCLogic {
       if(q && !qAC && !(f.name.toLowerCase().includes(q)||f.mgr.toLowerCase().includes(q)||f.ac.toLowerCase().includes(q))) return false;
       return true;
     }).sort((a,b)=> s.mgrSort==='name'? a.name.localeCompare(b.name) : s.mgrSort==='cons'? (b.vintage-a.vintage) : (b.irr-a.irr));
-    const fundRow=(f)=>{ const det=this.fundDetail(f);
+    /* review7 item 30 — every fund rendered in the Moonfare-Technology-Fund card style: a background image with the fund logo in the bottom-left */
+    const fundCard=(f)=>{ const det=this.fundDetail(f);
       const fmoic = det.pipeline? '—' : Math.max(1.0, +(1.1+((f.irr||10)-8)*0.05).toFixed(1))+'x';
-      const faum = this.mgrAum(this.mgrById(f.mgrId));
-      return h('div',{key:f.id,style:{display:'grid',gridTemplateColumns:'44px 1.4fr .8fr .5fr .5fr .6fr .85fr',gap:12,alignItems:'center',padding:'11px 14px',borderRadius:12,border:'1px solid var(--line)',background:'var(--surface)',marginBottom:8}},
-        this.mgrTile(f.logo,f.mgr,f.mgrId||f.mgr||f.id,40), /* logo over a nature/city landscape */
-        h('div',{style:{minWidth:0}},
-          h('button',{onClick:()=>this.openFundResearch(f.id),title:'Open '+f.name,style:{border:'none',background:'none',padding:0,cursor:'pointer',textAlign:'left',fontFamily:SF,fontSize:14,fontWeight:600,color:'var(--brand-ink)'}}, f.name+' ›'),
-          h('div',{style:{fontSize:10.5,color:'var(--muted)'}}, f.mgr+' · vintage '+f.vintage)),
-        h('span',{style:{justifySelf:'start',fontSize:10.5,fontWeight:600,color:'var(--muted)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:999,padding:'2px 9px'}},f.ac),
-        h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:13.5,fontWeight:700,color: det.pipeline?'var(--muted)':'var(--ink)'}}, det.pipeline?'—':f.irr+'%'), h('div',{style:{fontSize:9,color:'var(--muted)'}}, det.pipeline?'pipeline':'IRR')),
-        h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:13.5,fontWeight:700}}, fmoic), h('div',{style:{fontSize:9,color:'var(--muted)'}},'MOIC')),
-        h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:13,fontWeight:700}}, faum), h('div',{style:{fontSize:9,color:'var(--muted)'}},'AUM')),
-        h('button',{onClick:()=>this.toggleCmp({kind:'fund',id:f.id,label:f.name}),style:{justifySelf:'end',border:'1px solid '+(this.inCmp('fund',f.id)?'var(--brand)':'var(--line)'),background:this.inCmp('fund',f.id)?'var(--brand-wash)':'var(--surface)',color:this.inCmp('fund',f.id)?'var(--brand-ink)':'var(--muted)',borderRadius:8,padding:'6px 11px',fontSize:11,fontWeight:600,cursor:'pointer'}}, (this.inCmp('fund',f.id)?'✓ ':'＋ ')+'compare'));
+      const faum = this.mgrAum(this.mgrById(f.mgrId)); const inC=this.inCmp('fund',f.id);
+      return h('div',{key:f.id,style:{border:'1px solid var(--line)',borderRadius:14,overflow:'hidden',background:'var(--surface)',display:'flex',flexDirection:'column'}},
+        h('div',{style:{position:'relative',height:92,backgroundImage:'linear-gradient(180deg,rgba(10,12,20,.12),rgba(10,12,20,.72)), url('+this.landscapeUrl(f.id||f.mgrId||f.name)+')',backgroundSize:'cover',backgroundPosition:'center'}},
+          h('span',{style:{position:'absolute',top:10,right:10,fontSize:9.5,fontWeight:700,color:'#fff',background:'rgba(0,0,0,.4)',borderRadius:999,padding:'3px 9px'}}, f.ac),
+          det.pipeline? h('span',{style:{position:'absolute',top:10,left:12,fontSize:9,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'#fff',background:'var(--synthetic)',borderRadius:999,padding:'3px 8px'}},'Pipeline') : null,
+          /* fund logo in the bottom-left, overlapping the image */
+          h('div',{style:{position:'absolute',left:12,bottom:-18,width:46,height:46,borderRadius:11,background:'#fff',border:'1px solid var(--line)',boxShadow:'0 6px 16px -6px rgba(0,0,0,.45)',padding:6,display:'flex',alignItems:'center',justifyContent:'center'}},
+            f.logo? h('img',{src:'assets/logos/'+f.logo+'.png',alt:f.mgr,onError:e=>{e.target.style.display='none';},style:{maxWidth:'100%',maxHeight:'100%',objectFit:'contain'}}) : h('span',{style:{fontFamily:SF,fontWeight:700,color:'var(--brand)',fontSize:15}},(f.mgr||'?').slice(0,2)))),
+        h('div',{style:{padding:'24px 14px 13px',display:'flex',flexDirection:'column',gap:9,flex:1}},
+          h('div',{style:{minWidth:0}},
+            h('button',{onClick:()=>this.openFundResearch(f.id),title:'Open '+f.name,style:{border:'none',background:'none',padding:0,cursor:'pointer',textAlign:'left',fontFamily:SF,fontSize:14.5,fontWeight:700,color:'var(--brand-ink)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',maxWidth:'100%'}}, f.name+' ›'),
+            h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:1}}, f.mgr+' · vintage '+f.vintage)),
+          h('div',{style:{display:'flex',gap:16,flexWrap:'wrap',borderTop:'1px solid var(--line)',paddingTop:9,marginTop:'auto'}},
+            [['IRR',det.pipeline?'—':f.irr+'%'],['MOIC',fmoic],['AUM',faum]].map((kv,i)=>h('div',{key:i}, h('div',{style:{fontFamily:SF,fontSize:13.5,fontWeight:700,color:(i===0&&det.pipeline)?'var(--muted)':'var(--ink)'}},kv[1]), h('div',{style:{fontSize:9,color:'var(--muted)'}},kv[0])))),
+          h('button',{onClick:()=>this.toggleCmp({kind:'fund',id:f.id,label:f.name}),style:{border:'1px solid '+(inC?'var(--brand)':'var(--line)'),background:inC?'var(--brand-wash)':'var(--surface)',color:inC?'var(--brand-ink)':'var(--muted)',borderRadius:8,padding:'7px',fontSize:11,fontWeight:600,cursor:'pointer'}}, (inC?'✓ ':'＋ ')+'compare')));
     };
     const fundsListCard=this.card({title: (s.mgrAC==='All'?'Funds on the Moonfare platform':s.mgrAC+' funds on the platform'), info:true,
-      children: funds.length? h('div',null,
-        h('div',{style:{display:'grid',gridTemplateColumns:'44px 1.4fr .8fr .5fr .5fr .6fr .85fr',gap:12,padding:'0 14px 8px',fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)'}},
-          h('span',null,''),h('span',null,'Fund'),h('span',null,'Asset class'),h('span',{style:{textAlign:'right'}},'IRR'),h('span',{style:{textAlign:'right'}},'MOIC'),h('span',{style:{textAlign:'right'}},'AUM'),h('span',null,'')),
-        funds.map(fundRow))
+      children: funds.length? h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(238px,1fr))',gap:14}}, funds.map(fundCard))
         : h('div',{style:{padding:'24px',textAlign:'center',color:'var(--muted)',fontSize:13}},'No funds match — broaden the asset class or clear the search.'),
-      caption:'Individual funds (e.g. EQT IX) — sortable by asset class. New funds still in the pipeline show no returns yet. Click any fund for its full detail.'});
+      caption:'Every fund in the Moonfare-Technology-Fund style — a background image with the fund logo bottom-left. Sortable by asset class; pipeline funds show no returns yet. Click any fund for its full detail.'});
 
     /* highlighted product at the very top of the Funds & Managers list */
     const featuredHead=h('div',{style:{display:'flex',alignItems:'baseline',gap:10}},
