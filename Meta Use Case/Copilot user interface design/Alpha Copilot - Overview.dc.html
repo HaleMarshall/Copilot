@@ -6189,21 +6189,29 @@ class Component extends DCLogic {
       caption:'Moonfare’s secondary marketplace — buy or sell existing stakes. Distinct from a secondaries fund.'});
     // items 135/136/137 — Current Opportunities (full opacity) + greyed-out Upcoming preview (still drillable)
     /* item 142 — fund card shows NO expected-return / return-target; item 141 — best match flagged 'Target fit' */
-    const oppTile=(f,faded,best)=>h('div',{key:f.id,onClick:()=>this.openFundPage(f.id),
+    const oppTile=(f,faded,best,gapPp)=>h('div',{key:f.id,onClick:()=>this.openFundPage(f.id),
       onMouseEnter:e=>{if(!best)e.currentTarget.style.borderColor='var(--brand-tint-3)';},onMouseLeave:e=>{e.currentTarget.style.borderColor=best?'var(--brand)':'var(--line)';},
       style:{flex:'1 1 200px',minWidth:190,border:'1px solid '+(best?'var(--brand)':'var(--line)'),borderRadius:12,padding:'13px 14px',background:best?'var(--brand-wash)':'var(--surface)',cursor:'pointer',opacity:faded?0.55:1}},
       h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:5,flexWrap:'wrap'}}, h('span',{style:{width:9,height:9,borderRadius:3,background:'var('+(f.color||'--data-1')+')',flex:'0 0 9px'}}), h('span',{style:{fontFamily:SF,fontSize:13.5,fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},f.fund||f.name),
         best?h('span',{style:{fontSize:9,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'#fff',background:'var(--brand)',borderRadius:999,padding:'2px 7px'}},'✓ Target fit'):null),
       h('div',{style:{fontSize:11.5,color:'var(--muted)'}}, f.strat),
+      /* review5 item 3 — show the gap this fund closes so the list reads as 'opportunities to close the gap' */
+      (gapPp!=null&&gapPp>0.6)? h('div',{style:{marginTop:6,display:'inline-block',fontSize:10,fontWeight:700,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:999,padding:'2px 8px'}},'Closes a +'+gapPp+'pp under-weight')
+        : (gapPp!=null&&gapPp<-0.6)? h('div',{style:{marginTop:6,display:'inline-block',fontSize:10,fontWeight:700,color:'var(--muted)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:999,padding:'2px 8px'}},'Already '+Math.abs(gapPp)+'pp over target') : null,
       faded? h('div',{style:{marginTop:7,display:'inline-block',fontSize:9.5,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--synthetic)',background:'var(--synthetic-wash)',border:'1px solid var(--synthetic)',borderRadius:999,padding:'2px 8px'}},'Coming soon · '+(f.close||'')) : h('div',{style:{marginTop:7,fontSize:11.5,color:'var(--brand-ink)',fontWeight:700}},'Open now · closes '+(f.close||'')),
       h('div',{style:{marginTop:8,fontSize:11.5,color:'var(--brand)',fontWeight:600}},'View detail →'));
-    const upcomingCard=this.card({title:'Opportunities',badge:this.badge('live + preview','synth'),
+    /* review5 item 3 — gap-rank the opportunities by the (live) strategy gap each fund closes */
+    const gapByName={}; (o.gaps||[]).forEach(g=>{ gapByName[g.name]=g.gap; });
+    const gapFor=(f)=> gapByName[f.strat]!=null? gapByName[f.strat] : 0;
+    const curFunds=this.OPP_FUNDS_LIST().slice().sort((a,b)=>gapFor(b)-gapFor(a));
+    const upFunds=this.UPCOMING_FUNDS().slice().sort((a,b)=>gapFor(b)-gapFor(a));
+    const upcomingCard=this.card({title:'Opportunities to close the gap',badge:this.badge('gap-ranked','synth'),
       children:h('div',null,
-        h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',margin:'2px 0 9px'}},'Current — available now'),
-        h('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}}, this.OPP_FUNDS_LIST().map(f=>oppTile(f,false, !!(addActs[0]&&f.strat===addActs[0].strat)))),
+        h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',margin:'2px 0 9px'}},'Current — available now · biggest gap first'),
+        h('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}}, curFunds.map(f=>oppTile(f,false, !!(addActs[0]&&f.strat===addActs[0].strat), gapFor(f)))),
         h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',margin:'16px 0 9px'}},'Upcoming — preview'),
-        h('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}}, this.UPCOMING_FUNDS().map(f=>oppTile(f,true)))),
-      caption:'Current funds are open now; upcoming funds are greyed previews of what’s likely next — still click any to open its detail.'});
+        h('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}}, upFunds.map(f=>oppTile(f,true,false,gapFor(f))))),
+      caption:'Ranked by the strategy gap each fund closes — the funds at the front fill your biggest under-weights, and each fund’s gap label + the highlighted best-fit update live with your weights above. Current funds are open now; upcoming are greyed previews. Click any to open its detail.'});
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
       srcRow, head,
       /* review5 item 1/2 — Distance from target at the TOP (current + target pies + Z), with 'What matters most' beside the pies (live-adjusts the target) */
