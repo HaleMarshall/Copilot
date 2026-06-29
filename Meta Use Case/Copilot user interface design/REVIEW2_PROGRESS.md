@@ -20,7 +20,8 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 72 customize follow group: custom-group option + 'Customize who you follow' (opens cohort editor) + follow saved peer groups
 - [x] 73 Ask Alpha on comparison page strengthened: insights banner + target-vs-actual question chips
 - [x] 74 per-dimension Suggest funds on comparison (current platform + greyed pipeline) under selected strategy/region/currency/sector
-- NEXT: item 75 (comparison under simulator: compare current portfolio portions to peers/platform/top10)
+- [x] 75 comparison defaults to current portfolio portions vs peers/platform/top10 (section 'Compare your current portfolio'; target view kept on toggle)
+- NEXT: item 76 (Compare Yourself: pie-as-whole + listed strategies w/ funds vs peers/platform/top10/custom, clickable pie, watchlist/invest/similar buttons)
 - [x] 1 nudge new-investor guard + liquidity CTA→opportunities
 - [x] 2 TVPI mini-chart in performance (+tvpi seeded)
 - [x] 3 cash-flow: 'Net distributions' not 'Net cash position'

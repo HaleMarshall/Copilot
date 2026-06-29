@@ -6073,6 +6073,7 @@ class Component extends DCLogic {
       this.twoCol(allocCard, fillCard, '1fr 1fr'),
       youVsTargetHead, /* item 71 */
       pmTargetCard,    /* item 71 — PM allocation actual vs target + Z/gap */
+      this.compareYourselfCard(), /* item 76 — strategy mix + funds underneath vs peers/platform/top10/custom, with watchlist/invest/similar */
       this.twoCol(dimPieCard, dimZCard, '1.05fr .95fr'),
       dimSuggestCard, /* item 74 — suggest funds (current + greyed pipeline) under the selected dimension */
       h('div',{style:{display:'flex',flexDirection:'column',gap:10,background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:14,padding:'14px 16px'}}, toggleRow, targetCard),
@@ -6100,6 +6101,61 @@ class Component extends DCLogic {
       rows.map((r,ri)=>h('div',{key:ri,style:{display:'flex',alignItems:'center',padding:'12px 16px',borderBottom:ri<rows.length-1?'1px solid var(--line)':'none',background:ri%2?'var(--surface-2)':'transparent'}},
         cols.map(([k],i)=>valCell(r,k,i)))));
     return wrap(table);
+  }
+  /* item 76 — 'Compare Yourself': your strategy as a whole pie + each strategy listed with the funds underneath, vs Peers/Platform/Top 10%/Custom; click a strategy to see your weight vs theirs; per fund: Watchlist · Invest · Similar */
+  compareYourselfCard(){
+    const h=this.h, SF=this.SF; const s=this.state; const empty=this.dbEmpty();
+    const cmp=s.cmpCY||'peers'; const cmpShort={peers:'Peers',platform:'Platform',top10:'Top 10%',custom:'Custom'}[cmp]||'Peers';
+    const you=this.MIX.you||{}; const comp=this.cmpMix(cmp)||{};
+    const yT=this.STRATS.reduce((a,kv)=>a+(+you[kv[0]]||0),0)||1; const cT=this.STRATS.reduce((a,kv)=>a+(+comp[kv[0]]||0),0)||1;
+    const slices=this.STRATS.map(([k,n,c])=>({k,n,color:c,p:+(((+you[k]||0)/yT*100)).toFixed(1)})).filter(x=>x.p>0);
+    const focus=s.cyFocus; const meta=this.HELD_META(); const roster=this.HELD_FUNDS();
+    const byStrat={}; roster.forEach(f=>{ const sk=(meta[f.id]||{}).strat; (byStrat[sk]=byStrat[sk]||[]).push(f); });
+    const sel=h('div',{style:{display:'flex',gap:6,flexWrap:'wrap'}}, [['peers','Peers'],['platform','Platform'],['top10','Top 10%'],['custom','Custom']].map(([v,l])=>{ const on=cmp===v;
+      return h('button',{key:v,onClick:()=>{ this.setState({cmpCY:v}); if(v==='custom') this.setState({cmp:'custom',controlOpen:true}); },
+        style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 13px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}}, v==='custom'?'✎ '+l:l); }));
+    const onPlatform=(name)=>this.isHeld(name) || (this.OPP_FUNDS_LIST&&this.OPP_FUNDS_LIST().some(o=>(o.name||o.fund)===name));
+    const cyFundRow=(f,label)=>{ const name=f.name||f.fund; const inW=(s.watchlist||[]).includes(name); const live=onPlatform(name);
+      return h('div',{key:f.id||name,style:{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap',border:'1px solid var(--line)',borderRadius:10,padding:'9px 11px',background:'var(--surface)'}},
+        h('img',{src:'assets/logos/'+(f.logo||'eqt')+'.png',alt:'',onError:e=>{e.target.style.display='none';},style:{width:28,height:28,borderRadius:7,background:'#fff',border:'1px solid var(--line)',padding:3,objectFit:'contain',flex:'0 0 auto'}}),
+        h('button',{onClick:()=>this.openOppFund? this.openOppFund(f):null,style:{flex:'1 1 150px',minWidth:0,textAlign:'left',border:'none',background:'none',cursor:'pointer',padding:0}},
+          h('div',{style:{fontFamily:SF,fontSize:12.5,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},name),
+          h('div',{style:{fontSize:10.5,color:'var(--muted)'}}, (f.mgr||'')+(live?'':' · not on platform now'))),
+        h('div',{style:{display:'flex',gap:6,flexWrap:'wrap',flex:'0 0 auto'}},
+          /* watchlist — get notified when it's back on the platform */
+          h('button',{onClick:e=>{e.stopPropagation();this.toggleWatch(name);},title:'Notify me when this fund is on the platform',
+            style:{border:'1px solid '+(inW?'var(--brand)':'var(--line)'),background:inW?'var(--brand-wash)':'var(--surface)',color:inW?'var(--brand-ink)':'var(--muted)',borderRadius:8,padding:'5px 10px',fontSize:11,fontWeight:600,cursor:'pointer'}}, inW?'♥ Watchlisted':'♡ Watchlist'),
+          /* invest — only if currently on the platform */
+          live? h('button',{onClick:e=>{e.stopPropagation();this.addToCart(name,label);},
+            style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'5px 10px',fontSize:11,fontWeight:700,cursor:'pointer'}},'💼 Invest')
+            : h('span',{style:{fontSize:10.5,color:'var(--muted)',alignSelf:'center'}},'not investable now'),
+          /* similar — everywhere */
+          h('button',{onClick:e=>{e.stopPropagation();this.suggestSimilar(name,label);},
+            style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:8,padding:'5px 10px',fontSize:11,fontWeight:600,cursor:'pointer'}},'✨ Similar'))); };
+    const rows=this.STRATS.map(([k,n,c])=>{ const yv=Math.round((+you[k]||0)/yT*100); const cv=Math.round((+comp[k]||0)/cT*100); if(yv===0&&cv===0) return null; const dd=yv-cv; const open=focus===k;
+      const held=byStrat[k]||[]; const opp=(this.OPP_FUNDS_LIST?this.OPP_FUNDS_LIST():[]).filter(o=>(o.strat||'').toLowerCase().includes(n.split(' ')[0].toLowerCase())).slice(0,2);
+      const fundsHere=held.concat(opp.filter(o=>!held.some(hf=>(hf.name||hf.fund)===(o.name||o.fund))));
+      return h('div',{key:k,style:{border:'1px solid '+(open?'var(--brand)':'var(--line)'),borderRadius:11,overflow:'hidden'}},
+        h('button',{onClick:()=>this.setState({cyFocus:open?null:k}),style:{width:'100%',display:'grid',gridTemplateColumns:'18px 1fr 54px 54px 46px 18px',gap:8,alignItems:'center',padding:'10px 12px',border:'none',background:open?'var(--brand-wash)':'var(--surface)',cursor:'pointer',textAlign:'left'}},
+          h('span',{style:{width:11,height:11,borderRadius:3,background:`var(${c})`}}),
+          h('span',{style:{fontSize:13,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},n),
+          h('span',{style:{textAlign:'right',fontFamily:SF,fontWeight:700,fontSize:12.5}},yv+'%'),
+          h('span',{style:{textAlign:'right',fontFamily:SF,fontSize:12.5,color:'var(--muted)'}},cv+'%'),
+          h('span',{style:{textAlign:'right',fontFamily:SF,fontWeight:700,fontSize:12,color:dd===0?'var(--muted)':(dd>0?'var(--over)':'var(--under)')}}, (dd>0?'+':'')+dd),
+          h('span',{style:{textAlign:'right',color:'var(--muted)',fontSize:12}}, open?'▾':'▸')),
+        open? h('div',{style:{padding:'10px 12px',borderTop:'1px solid var(--line)',display:'flex',flexDirection:'column',gap:8}},
+          h('div',{style:{fontSize:11.5,color:'var(--muted)',lineHeight:1.45}}, 'Committed-capital weight in '+n+' — ',h('b',{style:{color:'var(--ink)'}},'You '+yv+'%'),' vs ',h('b',{style:{color:'var(--ink)'}},cmpShort+' '+cv+'%'),'. The funds you hold here:'),
+          fundsHere.length? fundsHere.map(f=>cyFundRow(f,n)) : h('div',{style:{fontSize:11.5,color:'var(--muted)'}},'No direct fund yet — use Similar or Invest on a platform fund to add '+n+'.')) : null);
+    }).filter(Boolean);
+    return this.card({title:'Compare Yourself — strategy & funds', info:true, right:sel,
+      children: empty? this.cmpEmpty() : h('div',{style:{display:'flex',gap:20,flexWrap:'wrap',alignItems:'flex-start'}},
+        h('div',{style:{flex:'0 0 auto',display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutNamed(slices,184,'You','your mix'),
+          h('div',{style:{fontSize:10.5,color:'var(--muted)'}},'your strategy mix — click a row to drill')),
+        h('div',{style:{flex:'1 1 320px',minWidth:280}},
+          h('div',{style:{display:'grid',gridTemplateColumns:'18px 1fr 54px 54px 46px 18px',gap:8,padding:'0 12px 6px',fontSize:9.5,fontWeight:700,letterSpacing:'.03em',textTransform:'uppercase',color:'var(--muted)'}},
+            h('span',null,''),h('span',null,'Strategy'),h('span',{style:{textAlign:'right'}},'You'),h('span',{style:{textAlign:'right'}},cmpShort),h('span',{style:{textAlign:'right'}},'Δpp'),h('span',null,'')),
+          h('div',{style:{display:'flex',flexDirection:'column',gap:8}}, rows))),
+      caption:'Your strategy mix as a whole (left) and every strategy listed with the funds you hold underneath — your committed-capital weight vs '+cmpShort+'. Click a strategy to drill in; on each fund: Watchlist (notify when on platform), Invest (if live), or see Similar funds.'});
   }
   followCard(){
     const h=this.h; const SF=this.SF; const g=this.state.following;
