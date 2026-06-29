@@ -5975,10 +5975,10 @@ class Component extends DCLogic {
     const trims=scored.filter(g=>g.gap<-0.6).slice(0,2);
     const actions=[];
     adds.forEach((g,i)=>{ const f=funds[g.k]; const eur=Math.round(Math.abs(g.gap)*0.11*10)/10;
-      actions.push({rank:actions.length+1, kind:'add', strat:g.name, color:g.color, gap:g.gap, fundKey:g.k, fundId:f?f.id:null, /* item 127 */
+      actions.push({rank:actions.length+1, kind:'add', strat:g.name, color:g.color, gap:g.gap, fundKey:g.k, stratKey:g.k, fundId:f?f.id:null, /* item 127 */
         fund:f?f.fund:('Add to '+g.name), note:f?f.note:'Closes your largest under-weight',
         head:'Add ~\u20ac'+eur+'m to '+g.name, sub:f?f.fund+' · '+f.note:'', lift:+(Math.abs(g.gap)*0.7).toFixed(1)}); });
-    trims.forEach(g=>{ actions.push({rank:actions.length+1, kind:'trim', strat:g.name, color:g.color, gap:g.gap,
+    trims.forEach(g=>{ actions.push({rank:actions.length+1, kind:'trim', strat:g.name, color:g.color, gap:g.gap, stratKey:g.k,
         head:'Let '+g.name+' run off (\u2212'+Math.abs(g.gap)+'pp)', sub:'Stop reinvesting — over your target by '+Math.abs(g.gap)+'pp', lift:+(Math.abs(g.gap)*0.4).toFixed(1)}); });
     // target-fit score before / after acting on the top recommendation
     const drift=gaps.reduce((a,g)=>a+Math.abs(g.gap),0);
@@ -6001,6 +6001,34 @@ class Component extends DCLogic {
   oppBaseTarget(dim){ if(dim==='strategy') return this.oppTargetMix(); const d=this.HOME_DIMS().find(x=>x.key===dim); return (d&&d.target)||{}; }
   oppDimColors(dim){ if(dim==='strategy'){ const o=Object.fromEntries((this.STRATS||[]).map(([k,n,c])=>[k,c])); o.realestate=o.realestate||'--data-6'; return o; } const d=this.HOME_DIMS().find(x=>x.key===dim); return (d&&d.colors)||{}; }
   oppDimNames(dim){ if(dim==='strategy'){ const o=Object.fromEntries((this.STRATS||[]).map(([k,n])=>[k,n])); o.realestate=o.realestate||'Real Estate'; return o; } const d=this.HOME_DIMS().find(x=>x.key===dim); const o={}; Object.keys((d&&d.actual)||{}).forEach(k=>o[k]=k); return o; }
+  /* review5 item 4 — per-strategy reasoning tailored to THIS investor (risk profile + their actual gaps) */
+  oppStratWhy(a){
+    const risk=(this.riskLabel&&this.riskLabel())||'your risk profile';
+    const WHY={
+      credit:'Private credit is your largest under-weight and the cleanest diversifier from an equity-heavy, AI-tilted book — floating-rate, contractual income that pays through the J-curve and barely correlates with your buyout and tech exposure.',
+      infra:'Infrastructure brings inflation-linked, low-correlation cash yield. For an '+risk+' investor concentrated in growth and tech, it is the ballast that lifts target-fit without adding more equity beta.',
+      secondaries:'Secondaries pull your J-curve forward and diversify vintage — directly useful given your 2021–22 commitment bunching — while buying already-funded NAV at a discount.',
+      realestate:'Real assets add income and an inflation hedge that your current growth / tech tilt lacks.',
+      growth:'Growth equity compounds your innovation thesis, but you are already tilted here — add only the highest-conviction managers rather than broad exposure.',
+      buyout:'Buyout is your core compounder; you sit near or over target, so this is about manager quality and vintage spread, not more weight.',
+      venture:'Venture deepens early-stage upside, but it raises an already-high risk posture — size it modestly.',
+      ai:'AI / Tech is the thesis you came in for, but it now dominates your risk. The disciplined move is to let it run off toward target rather than adding more.',
+      directs:'Direct & co-invests concentrate single-asset risk; keep them a satellite, not a core add.'
+    };
+    return WHY[a.stratKey] || ('This step moves you '+Math.abs(a.gap)+'pp closer to your '+a.strat+' target.');
+  }
+  /* held funds inside a strategy, oldest vintage first — the natural run-off candidates */
+  oppHeldInStrat(stratKey){ const meta=this.HELD_META()||{}; const roster=this.HELD_FUNDS()||[];
+    return roster.filter(f=>(meta[f.id]||{}).strat===stratKey)
+      .map(f=>({id:f.id,name:f.name,logo:f.logo,mgr:(meta[f.id]||{}).mgr||f.mgr,vintage:(meta[f.id]||{}).vintage}))
+      .sort((x,y)=>(x.vintage||9999)-(y.vintage||9999)); }
+  /* for a run-off (trim) step: which of the investor's funds to let run off + where to redeploy to rebalance the other way */
+  oppRunoffPlan(a){
+    const runoff=this.oppHeldInStrat(a.stratKey);
+    const o=this.oppNextActions();
+    const redeploy=o.actions.filter(x=>x.kind==='add').slice(0,3).map(x=>({strat:x.strat,gap:Math.abs(x.gap),fund:x.fund,fundId:x.fundId}));
+    return {runoff, redeploy};
+  }
   /* item 2 — 'What matters most to you' adjusts the target pie LIVE:
      · single goal  → the set target is kept exactly as-is
      · weighted mix → the target is blended from current toward the set target by that dimension's weight, so a higher weight pulls the target fully onto the set target (aggressive rebalance) and a lower weight leaves it near where you are. Renormalised to 100. */
@@ -6124,20 +6152,53 @@ class Component extends DCLogic {
     // LEFT = selectable Recommended Sequence (pick ONE strategy step); RIGHT = that strategy's suggested funds as square logos
     const addActs=o.actions.filter(a=>a.kind==='add'&&a.fund);
     const pick = s.oppPick || (o.actions[0]&&o.actions[0].strat) || null;
+    // review5 item 4 — small label + chip helpers for the reasoning blocks
+    const seqLabel=(t)=>h('div',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:6}},t);
+    const askChip=(q)=>h('button',{key:q,onClick:e=>{e.stopPropagation();this.askFromPage(q);},style:{border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:999,padding:'6px 11px',fontSize:11,fontWeight:600,cursor:'pointer',textAlign:'left'}},'✦ '+q);
+    const qChips=(a)=> a.kind==='trim'
+      ? ['Which of my '+a.strat+' funds should I let run off?','Where should I redeploy the capital from '+a.strat+'?','Is trimming '+a.strat+' better than just pausing new commitments?']
+      : ['Why is '+a.strat+' right for my profile?','Which '+a.strat+' fund should I pick?','How much should I commit to '+a.strat+'?'];
+    // one held position to run off — logo, name, vintage, and ask/open actions
+    const runoffRow=(f,a)=>h('div',{key:f.id,style:{display:'flex',alignItems:'center',gap:10,border:'1px solid var(--line)',borderRadius:10,padding:'8px 10px',background:'var(--surface)'}},
+      h('img',{src:'assets/logos/'+(f.logo||'eqt')+'.png',alt:'',onError:e=>{e.target.style.display='none';},style:{width:26,height:26,borderRadius:6,background:'#fff',border:'1px solid var(--line)',padding:3,objectFit:'contain',flex:'0 0 auto'}}),
+      h('button',{onClick:e=>{e.stopPropagation();this.openFundPage(f.id);},style:{flex:'1 1 auto',minWidth:0,textAlign:'left',border:'none',background:'none',cursor:'pointer',padding:0}},
+        h('div',{style:{fontFamily:SF,fontSize:12.5,fontWeight:700,color:'var(--brand-ink)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},f.name+' ›'),
+        h('div',{style:{fontSize:10,color:'var(--muted)'}}, (f.mgr||'')+(f.vintage?' · vintage '+f.vintage:'')+(f.vintage?(f.vintage<=2021?' · most mature, run off first':' · newer, keep reinvesting longer'):''))),
+      h('button',{onClick:e=>{e.stopPropagation();this.askFromPage('Should I let '+f.name+' — my '+a.strat+' position — run off, or keep reinvesting?');},style:{flex:'0 0 auto',border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:8,padding:'6px 9px',fontSize:10.5,fontWeight:600,cursor:'pointer'}},'Ask Alpha'));
+    const redeployChip=(r)=>h('button',{key:r.strat,onClick:e=>{e.stopPropagation();this.setState({oppPick:r.strat});},style:{display:'flex',flexDirection:'column',gap:1,border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',borderRadius:10,padding:'7px 11px',cursor:'pointer',textAlign:'left'}},
+      h('span',{style:{fontSize:11.5,fontWeight:700,color:'var(--brand-ink)'}},'→ '+r.strat+'  +'+r.gap+'pp'),
+      r.fund? h('span',{style:{fontSize:10,color:'var(--muted)'}}, r.fund) : null);
     const seqRows=h('div',{style:{display:'flex',flexDirection:'column',gap:9}},
       o.actions.length? o.actions.map(a=>{ const on=a.strat===pick;
-        return h('div',{key:a.rank,onClick:()=>this.setState({oppPick:a.strat}),
-          style:{display:'flex',gap:11,alignItems:'center',padding:'11px 12px',border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',borderRadius:11,cursor:'pointer'}},
+        const headRow=h('div',{onClick:()=>this.setState({oppPick:on?null:a.strat}),
+          style:{display:'flex',gap:11,alignItems:'center',padding:'11px 12px',cursor:'pointer'}},
           h('div',{style:{flex:'0 0 24px',width:24,height:24,borderRadius:7,background:a.kind==='add'?'var(--brand)':'var(--surface-2)',color:a.kind==='add'?'#fff':'var(--muted)',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:12,fontFamily:'Inter,system-ui,sans-serif'}},a.rank),
           h('div',{style:{flex:1,minWidth:0}}, h('div',{style:{fontSize:13.5,fontWeight:700,color:'var(--ink)'}},a.head),
-            h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:2,lineHeight:1.4}}, a.kind==='add'? ('You’re '+Math.abs(a.gap)+'pp under target in '+a.strat+' — add to converge.') : ('You’re '+Math.abs(a.gap)+'pp over target in '+a.strat+' — let it run off.')),
-            h('button',{onClick:e=>{e.stopPropagation();this.setState({oppDetail:a,oppDetailTab:'why'});},style:{border:'none',background:'none',padding:0,marginTop:3,fontSize:11,color:'var(--brand)',fontWeight:600,cursor:'pointer'}},'Why this · why not · compare →')),
-          h('div',{style:{flex:'0 0 auto',textAlign:'right'}}, on?h('div',{style:{fontSize:9,fontWeight:700,color:'var(--brand)',textTransform:'uppercase'}},'Selected'):null, h('div',{style:{fontSize:9.5,color:'var(--muted)',textTransform:'uppercase'}},'fit +'), h('div',{style:{fontSize:14,fontWeight:800,color:'var(--over)'}},'+'+a.lift))); })
+            h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:2,lineHeight:1.4}}, a.kind==='add'? ('You’re '+Math.abs(a.gap)+'pp under target in '+a.strat+' — add to converge.') : ('You’re '+Math.abs(a.gap)+'pp over target in '+a.strat+' — let it run off.'))),
+          h('div',{style:{flex:'0 0 auto',textAlign:'right'}}, h('div',{style:{fontSize:9.5,color:'var(--muted)',textTransform:'uppercase'}},'fit +'), h('div',{style:{fontSize:14,fontWeight:800,color:'var(--over)'}},'+'+a.lift), h('div',{style:{fontSize:10,color:on?'var(--brand)':'var(--muted)',marginTop:2}}, on?'▾ hide':'▸ why')));
+        const runoff = a.kind==='trim'? this.oppRunoffPlan(a) : null;
+        const expanded = on? h('div',{style:{padding:'0 12px 13px',display:'flex',flexDirection:'column',gap:11}},
+          /* why this strategy for THIS investor */
+          h('div',{style:{fontSize:12,lineHeight:1.55,color:'var(--ink)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:9,padding:'10px 12px'}},
+            h('span',{style:{fontWeight:700,color:'var(--brand-ink)'}},'Why '+a.strat+' for you — '), this.oppStratWhy(a)),
+          /* run-off plan: which funds to let run off + where to redeploy */
+          runoff? h('div',{style:{display:'flex',flexDirection:'column',gap:12}},
+            h('div',null, seqLabel('Let run off in your portfolio — most mature first'),
+              runoff.runoff.length? h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, runoff.runoff.map(f=>runoffRow(f,a)))
+                : h('div',{style:{fontSize:11.5,color:'var(--muted)'}},'You hold no '+a.strat+' fund — simply stop new commitments to this sleeve.')),
+            h('div',null, seqLabel('Redeploy that capital to rebalance the other way'),
+              runoff.redeploy.length? h('div',{style:{display:'flex',gap:8,flexWrap:'wrap'}}, runoff.redeploy.map(redeployChip))
+                : h('div',{style:{fontSize:11.5,color:'var(--muted)'}},'No under-weight sleeve to redeploy into right now.'))) : null,
+          /* per-strategy Q&A → Ask Alpha */
+          h('div',null, seqLabel('Ask Alpha about this step'),
+            h('div',{style:{display:'flex',gap:7,flexWrap:'wrap'}}, qChips(a).map(askChip))),
+          h('button',{onClick:e=>{e.stopPropagation();this.setState({oppDetail:a,oppDetailTab:'why'});},style:{alignSelf:'flex-start',border:'none',background:'none',padding:0,fontSize:11,color:'var(--brand)',fontWeight:600,cursor:'pointer'}},'Open full why this · why not · compare →')) : null;
+        return h('div',{key:a.rank,style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',borderRadius:11,overflow:'hidden'}}, headRow, expanded); })
         : h('div',{style:{padding:'24px',textAlign:'center',color:'var(--muted)',fontSize:13,border:'1px dashed var(--line)',borderRadius:12}},'No material gaps — your selected simulation is already on target.'));
-    const seqCard=this.card({title:'Recommended sequence',
+    const seqCard=this.card({title:'Recommended sequence',badge:this.badge('reasoned for you','synth'),
       right:h('button',{onClick:()=>this.setState({ws:'shape',uc:'sim',page:'sim'}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:8,padding:'6px 11px',fontSize:11.5,fontWeight:600,cursor:'pointer'}},'← Back to Simulator'),
       children:h('div',null, seqRows, planSummary),
-      caption:'Select a single strategy step — the funds that fill it appear on the right. The engine orders by your biggest gaps first.'});
+      caption:'Each step opens the reasoning for why that strategy fits you. Add-steps list the funds that fill the gap (right); run-off steps name which of your holdings to let run off and where to redeploy to rebalance the other way. Ordered by your biggest gaps first.'});
     // RIGHT — the picked strategy's suggested funds as SQUARE LOGO tiles; click a logo → fund page; 'Seize this opportunity now' to commit
     const pickFunds = pick? this.oppFundsForStrat(pick) : [];
     const logoTile=(f)=>h('div',{key:f.id,style:{flex:'1 1 calc(50% - 6px)',minWidth:140,border:'1px solid var(--line)',borderRadius:12,padding:'13px',background:'var(--surface)',display:'flex',flexDirection:'column',gap:9}},
@@ -6147,9 +6208,19 @@ class Component extends DCLogic {
       h('div',{style:{minWidth:0}}, h('button',{onClick:()=>this.openOppFund(f),style:{border:'none',background:'none',padding:0,textAlign:'left',cursor:'pointer',fontFamily:SF,fontSize:13.5,fontWeight:700,color:'var(--brand-ink)'}}, f.name),
         h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:1}}, (f.mgr||'')+(f.active===false?' · coming soon':''))),
       h('button',{onClick:()=>this.addToCart(f.name,pick),style:{marginTop:'auto',border:'none',background: this.inCart(f.name)?'var(--over)':'var(--brand)',color:'#fff',borderRadius:9,padding:'9px',fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}}, this.inCart(f.name)?'✓ In your plan':'Seize this opportunity now'));
-    const pickedFundsCard=this.card({title: pick? ('Funds in '+pick) : 'Suggested funds', badge:this.badge('suggested for you','synth'),
-      children: pickFunds.length? h('div',{style:{display:'flex',flexWrap:'wrap',gap:12}}, pickFunds.map(logoTile)) : h('div',{style:{padding:'20px',textAlign:'center',color:'var(--muted)',fontSize:12.5,border:'1px dashed var(--line)',borderRadius:12}},'Select a strategy on the left to see the funds Alpha suggests for you.'),
-      caption:'The funds Alpha suggests inside '+(pick||'this strategy')+' for your profile. Click a logo for the fund detail; Seize this opportunity now to add it to your plan.'});
+    /* review5 item 4 — if the picked step is a run-off (over target), the right card explains there's nothing to add and points to the run-off + redeploy on the left, rather than a blank 'select a strategy' state */
+    const pickAct = pick? o.actions.find(a=>a.strat===pick) : null;
+    const pickIsTrim = pickAct && pickAct.kind==='trim';
+    const trimHeld = pickIsTrim? this.oppHeldInStrat(pickAct.stratKey) : [];
+    const pickedFundsCard=this.card({title: pick? ((pickIsTrim?'Run off in ':'Funds in ')+pick) : 'Suggested funds', badge:this.badge(pickIsTrim?'over target':'suggested for you','synth'),
+      children: pickFunds.length
+        ? h('div',{style:{display:'flex',flexWrap:'wrap',gap:12}}, pickFunds.map(logoTile))
+        : pickIsTrim
+          ? h('div',{style:{display:'flex',flexDirection:'column',gap:11}},
+              h('div',{style:{fontSize:12.5,lineHeight:1.55,color:'var(--ink)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:10,padding:'12px 13px'}}, 'You are ',h('b',null,Math.abs(pickAct.gap)+'pp over target'),' in ',h('b',null,pick),' — there are no new funds to add here. Let your most-mature holding run off and redeploy into your under-weights (the plan is on the left).'),
+              trimHeld.length? h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, trimHeld.map(f=>runoffRow(f,pickAct))) : null)
+          : h('div',{style:{padding:'20px',textAlign:'center',color:'var(--muted)',fontSize:12.5,border:'1px dashed var(--line)',borderRadius:12}},'Select a strategy on the left to see the funds Alpha suggests for you.'),
+      caption: pickIsTrim? ('Your '+pick+' positions — let the most mature run off rather than committing more. Click a logo for the fund detail.') : ('The funds Alpha suggests inside '+(pick||'this strategy')+' for your profile. Click a logo for the fund detail; Seize this opportunity now to add it to your plan.')});
 
     // ---- Missed-opportunity / passed-on lane (t1-11) ----
     const missed=[
