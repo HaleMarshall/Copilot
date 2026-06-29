@@ -1769,5 +1769,41 @@
       "model": "The model paces evenly across vintages.",
       "top10": "The top 10% paced evenly and added in dislocations (2020, 2023)."
     }
+  },
+  "featured": {
+    "id": "moonfare-tech",
+    "name": "Moonfare Technology Fund",
+    "desc": "Diversify your investment in transformational AI technologies via multiple elite managers, all in a single Moonfare investment.",
+    "region": "North America, Global",
+    "ac": "Venture Capital",
+    "tags": [
+      "Information Technology",
+      "Broad"
+    ],
+    "kpis": [
+      [
+        "$100 million",
+        "Target Fund Size¹"
+      ],
+      [
+        ">3.0x",
+        "Target Net MOIC²"
+      ],
+      [
+        "June 2026",
+        "Expected Initial Close³"
+      ],
+      [
+        "$100,000",
+        "Min. investment"
+      ]
+    ],
+    "seed": [
+      "Accel",
+      "a16z",
+      "Lightspeed",
+      "Founders Fund",
+      "Databricks"
+    ]
   }
 }
