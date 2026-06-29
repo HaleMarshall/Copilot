@@ -3686,7 +3686,7 @@ class Component extends DCLogic {
   /* item 15 — a short descriptor for each dimension category so the user is told what it is (direct deals included) */
   catDesc(dimKey,k){
     const S={buyout:'Control buyouts',growth:'Growth equity',venture:'Early-stage venture',credit:'Private credit',infra:'Infrastructure',realestate:'Real estate',secondaries:'Secondary stakes',ai:'AI & technology',directs:'Direct deals & co-investments',other:'Other'};
-    const R={USA:'North America',Europe:'Europe',APAC:'Asia-Pacific',MEA:'Middle East & Africa',DACH:'DE / AT / CH',UK:'United Kingdom',Asia:'Asia',RoW:'Rest of world'};
+    const R={USA:'North America',Europe:'Europe',APAC:'Asia-Pacific','Rest of World':'Rest of World',DACH:'DE / AT / CH',UK:'United Kingdom',Asia:'Asia',RoW:'Rest of world'};
     const C={USD:'US dollar',EUR:'Euro',GBP:'Sterling',CHF:'Swiss franc',JPY:'Japanese yen',Other:'Other currencies'};
     const SE={Tech:'Technology',Healthcare:'Healthcare',Financials:'Financial services',Industrials:'Industrials',Consumer:'Consumer',Energy:'Energy',AI:'AI & technology'};
     const map = dimKey==='strategy'?S : dimKey==='region'?R : dimKey==='currency'?C : SE;
@@ -5330,7 +5330,7 @@ class Component extends DCLogic {
     const empty=this.dbEmpty();
     const D=(this.DB&&!empty&&this.DB.dims)?this.DB.dims:null;
     const FB={
-      region:{actual:{USA:42,Europe:34,APAC:18,MEA:6},target:{USA:38,Europe:32,APAC:24,MEA:6},colors:{USA:'--data-1',Europe:'--data-5',APAC:'--data-8',MEA:'--data-9'}},
+      region:{actual:{USA:42,Europe:34,APAC:18,'Rest of World':6},target:{USA:38,Europe:32,APAC:24,'Rest of World':6},colors:{USA:'--data-1',Europe:'--data-5',APAC:'--data-8','Rest of World':'--data-9'}}, /* review7 item 9 — MEA renamed to Rest of World */
       currency:{actual:{USD:40,EUR:38,GBP:9,CHF:6,JPY:4,Other:3},target:{USD:36,EUR:40,GBP:9,CHF:7,JPY:5,Other:3},colors:{USD:'--data-1',EUR:'--data-5',GBP:'--data-2',CHF:'--data-6',JPY:'--data-3',Other:'--data-9'}},
       sector:{actual:{Tech:20,AI:14,Healthcare:16,Financials:14,Industrials:18,Consumer:12,Energy:6},target:{Tech:14,AI:8,Healthcare:18,Financials:16,Industrials:20,Consumer:16,Energy:8},colors:{Tech:'--data-9',AI:'--data-8',Healthcare:'--data-2',Financials:'--data-4',Industrials:'--data-5',Consumer:'--data-7',Energy:'--data-6'}},
       /* PDF#3 — Format dimension: direct deals / fund of funds / secondaries / primary */

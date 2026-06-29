@@ -132,19 +132,19 @@
         "USA": 42,
         "Europe": 34,
         "APAC": 18,
-        "MEA": 6
+        "Rest of World": 6
       },
       "target": {
         "USA": 38,
         "Europe": 32,
         "APAC": 24,
-        "MEA": 6
+        "Rest of World": 6
       },
       "colors": {
         "USA": "--data-1",
         "Europe": "--data-5",
         "APAC": "--data-8",
-        "MEA": "--data-9"
+        "Rest of World": "--data-9"
       }
     },
     "currency": {
