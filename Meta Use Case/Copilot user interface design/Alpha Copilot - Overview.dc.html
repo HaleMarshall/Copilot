@@ -1761,43 +1761,63 @@ class Component extends DCLogic {
       h('div',{style:{display:'flex',flexDirection:'column'}}, rows.map((k,i)=>h('div',{key:i,style:{display:'flex',justifyContent:'space-between',fontSize:12,color:'#222',borderBottom:'1px solid #eee',padding:'4px 0'}},
         h('span',null,key==='strategy'?stratNm(k):k), h('span',{style:{fontWeight:700}},pct[k]+'%')))));
   }
+  /* review7 item 29 — PDF export: page selection + cover + Moonfare branding + charts + legend */
+    defaultPdfPages(){ return {cover:true,performance:true,cashflow:true,allocation:true,vintage:true,holdings:true,legend:true}; }
   pdfModalBody(){
-    const h=this.h; const SF=this.SF; const P=(this.DB&&this.DB.portfolio)||{}; const detailed=this.state.pdfMode==='detailed';
-    const kpis=[['Net asset value',P.navText||'€16.6m'],['Distributions to date',P.distributionsText||'€2.1m'],['Committed','€20.5m'],['Uncalled','€3.9m'],['Net IRR',P.irr||'11.0%'],['Net MOIC',P.moic||'1.80x']];
-    const kpiGrid=h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10}}, kpis.map((t,i)=>h('div',{key:i,style:{border:'1px solid #e6e6e6',borderRadius:10,padding:'10px 12px',background:'#fafafa'}},
-      h('div',{style:{fontSize:10.5,color:'#777',marginBottom:2}},t[0]), h('div',{style:{fontFamily:SF,fontSize:18,fontWeight:700,color:'#111'}},t[1]))));
-    const docHead=h('div',{style:{borderBottom:'2px solid #111',paddingBottom:10,marginBottom:16}},
-      h('div',{style:{fontFamily:SF,fontSize:22,fontWeight:700,color:'#111'}},'Alpha — Portfolio Overview'),
-      h('div',{style:{fontSize:11.5,color:'#777',marginTop:3}},'Generated for your records · '+(detailed?'Detailed report':'Summary')+' · as of 14 Jun 2026'));
-    const sectionTitle=(t)=>h('div',{style:{fontFamily:SF,fontSize:16,fontWeight:700,color:'#111',margin:'0 0 10px'}},t);
+    const h=this.h, SF=this.SF; const P=(this.DB&&this.DB.portfolio)||{}; const roster=this.HELD_FUNDS();
+    const sel=Object.assign(this.defaultPdfPages(), this.state.pdfPages||{});
+    const asOf='30 Jun 2026'; const investor=(this.DB&&this.DB.profile&&this.DB.profile.name)||'Steffen Pauls';
+    const togglePage=(k)=>this.setState({pdfPages:Object.assign({}, sel, {[k]:!sel[k]})});
+    const brand=(title)=>h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',borderBottom:'2px solid #20243A',paddingBottom:8,marginBottom:14}},
+      h('div',{style:{display:'flex',alignItems:'center',gap:9}}, h('img',{src:'assets/moonfare_logo.png',alt:'Moonfare',onError:e=>{e.target.style.display='none';},style:{height:18}}), h('span',{style:{fontFamily:SF,fontSize:13,fontWeight:700,color:'#20243A'}},'· Alpha')),
+      h('div',{style:{fontFamily:SF,fontSize:15,fontWeight:700,color:'#111'}},title));
+    const foot=(n)=>h('div',{style:{display:'flex',justifyContent:'space-between',marginTop:14,paddingTop:8,borderTop:'1px solid #e6e6e6',fontSize:9.5,color:'#999'}}, h('span',null,'Moonfare · Alpha — Portfolio Report · Confidential'), h('span',null,'Page '+n+' · as of '+asOf));
+    const pageWrap=(title,n,body)=>h('div',{className:'sc-pdf-page',style:{padding:'10px 0 18px',marginBottom:18,borderBottom:'1px dashed #ddd'}}, brand(title), body, foot(n));
+    const kpis=[['Net asset value',P.navText||'€16.6m'],['Net IRR',P.irr||'11.0%'],['Net MOIC',P.moicTableNet||'1.80x'],['TVPI',P.tvpiTableNet||'2.10x'],['DPI',P.dpiTableNet||'0.82x'],['Committed','€20.5m']];
+    const kpiGrid=h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10}}, kpis.map((t,i)=>h('div',{key:i,style:{border:'1px solid #e6e6e6',borderRadius:10,padding:'10px 12px',background:'#fafafa'}}, h('div',{style:{fontSize:10.5,color:'#777',marginBottom:2}},t[0]), h('div',{style:{fontFamily:SF,fontSize:18,fontWeight:700,color:'#111'}},t[1]))));
     const dims=[['strategy','Strategy'],['region','Region'],['currency','Currency'],['sector','Sector']];
-    let doc;
-    if(detailed){ // item 104 — one section per page
-      const page=(children)=>h('div',{className:'sc-pdf-page',style:{padding:'8px 0 18px',marginBottom:18,borderBottom:'1px dashed #ddd'}},children);
-      doc=h('div',null,
-        page(h('div',null, docHead, sectionTitle('Performance & key figures'), kpiGrid)),
-        dims.map(([k,l],i)=>page(h('div',{key:i}, sectionTitle(l+' allocation'), this.pdfDimTable(k,l+' — % of NAV')))),
-        page(h('div',null, sectionTitle('Cash flow'),
-          h('div',{style:{fontSize:12.5,color:'#222',lineHeight:1.6}},'Committed €20.5m · Called €16.6m · Uncalled €3.9m · Cash position €1.1m. Net distributions +€0.9m. You have crossed the J-curve — distributions now outpace capital calls.'))));
-    } else { // item 102 — polished single summary page, all key points
-      doc=h('div',null, docHead,
-        sectionTitle('Performance & key figures'), kpiGrid,
-        h('div',{style:{height:16}}),
-        sectionTitle('Allocation'),
-        h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'18px 28px'}}, dims.map(([k,l],i)=>h('div',{key:i}, this.pdfDimTable(k,l)))),
-        h('div',{style:{height:16}}),
-        sectionTitle('Cash flow'),
-        h('div',{style:{fontSize:12.5,color:'#222',lineHeight:1.6}},'Committed €20.5m · Called €16.6m · Uncalled €3.9m · Cash position €1.1m · Net distributions +€0.9m. You have crossed the J-curve.'));
-    }
-    const header=h('div',{className:'sc-pdf-noprint',style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,padding:'12px 18px',borderBottom:'1px solid #e6e6e6',position:'sticky',top:0,background:'#fff',borderRadius:'12px 12px 0 0'}},
-      h('div',{style:{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}},
-        h('span',{style:{fontWeight:700,fontSize:13,color:'#111'}},'PDF export preview'),
-        this.seg([{label:'Summary',value:'summary'},{label:'Detailed',value:'detailed'}], this.state.pdfMode, v=>this.setState({pdfMode:v}),{sm:true})),
-      h('div',{style:{display:'flex',gap:8}},
-        h('button',{onClick:()=>window.print(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'8px 14px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'⤓ Save as PDF'),
-        h('button',{onClick:()=>this.setState({showPdf:false}),style:{border:'1px solid #ccc',background:'#fff',color:'#444',borderRadius:8,padding:'8px 12px',fontSize:12.5,fontWeight:600,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'Close')));
-    return h('div',{style:{color:'#111'}}, header, h('div',{style:{padding:'22px 26px 30px',fontFamily:'Inter,system-ui,sans-serif'}}, doc));
+    const cover=h('div',{className:'sc-pdf-page',style:{marginBottom:18,borderBottom:'1px dashed #ddd',borderRadius:12,overflow:'hidden'}},
+      h('div',{style:{background:'linear-gradient(135deg,#20243A,#141733)',color:'#fff',padding:'48px 40px 44px'}},
+        h('img',{src:'assets/moonfare_logo_white.png',alt:'Moonfare',onError:e=>{e.target.style.display='none';},style:{height:26,marginBottom:28}}),
+        h('div',{style:{fontSize:12,letterSpacing:'.14em',textTransform:'uppercase',color:'#8C8DFF',fontWeight:700}},'Portfolio Report'),
+        h('div',{style:{fontFamily:SF,fontSize:34,fontWeight:700,margin:'8px 0 6px'}},'Your Private-Markets Portfolio'),
+        h('div',{style:{fontSize:13,color:'rgba(234,235,255,.8)'}}, investor+' · prepared by Alpha · as of '+asOf),
+        h('div',{style:{display:'flex',gap:26,marginTop:30,flexWrap:'wrap'}}, [['Portfolio value',P.navText||'€16.6m'],['TVPI',(P.tvpi||'2.1')+'x'],['Net IRR',P.irr||'11.0%']].map((t,i)=>h('div',{key:i}, h('div',{style:{fontSize:10.5,color:'rgba(255,255,255,.65)'}},t[0]), h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:700}},t[1]))))));
+    const allocPage=h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'18px 24px'}}, dims.map(([k,l],i)=>{ const pct=this.basisPct(k); const colorsFor=(k==='strategy')?null:((this.HOME_DIMS().find(d=>d.key===k)||{colors:{}}).colors); const slices=Object.keys(pct).filter(x=>pct[x]>0).map(x=>({n:k==='strategy'?((this.STRATS.find(s=>s[0]===x)||[0,x])[1]):x, p:pct[x], color:(k==='strategy'?((this.STRATS.find(s=>s[0]===x)||[0,0,'--data-1'])[2]):(colorsFor[x]||'--data-9'))}));
+      return h('div',{key:i,style:{display:'flex',alignItems:'center',gap:12}}, this.donutNamed(slices,104,l,'mix'), h('div',{style:{flex:1}}, this.pdfDimTable(k,l))); }));
+    const cf=(this.DB&&this.DB.cashflows)||{cats:[],calls:[],distributions:[]}; const cmx=Math.max.apply(null,(cf.calls||[]).concat(cf.distributions||[]).concat([1]));
+    const cfPage=h('div',null,
+      h('div',{style:{fontSize:12.5,color:'#222',lineHeight:1.6,marginBottom:12}},'Committed €20.5m · Called €16.6m · Uncalled €3.9m · Cash position €1.1m · Net distributions +€0.9m. You have crossed the J-curve — distributions now outpace capital calls.'),
+      h('div',{style:{display:'flex',alignItems:'flex-end',gap:10,height:150}}, (cf.cats||[]).map((yr,i)=>h('div',{key:yr,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-end',height:'100%'}},
+        h('div',{style:{display:'flex',alignItems:'flex-end',gap:3,height:'100%',justifyContent:'center'}}, h('div',{title:'Called €'+cf.calls[i]+'m',style:{width:12,height:((cf.calls[i]||0)/cmx*100)+'%',background:'#1417C2',borderRadius:'2px 2px 0 0'}}), h('div',{title:'Distributed €'+cf.distributions[i]+'m',style:{width:12,height:((cf.distributions[i]||0)/cmx*100)+'%',background:'#2D8F6F',borderRadius:'2px 2px 0 0'}})),
+        h('div',{style:{fontSize:9,color:'#777',marginTop:3}},yr)))),
+      h('div',{style:{display:'flex',gap:16,justifyContent:'center',marginTop:8,fontSize:10.5,color:'#777'}}, h('span',null,'■ Capital calls'), h('span',null,'■ Distributions')));
+    const vint=this.VINTAGES('NAV'); const vmx=Math.max.apply(null,vint.map(x=>x.v).concat([1]));
+    const vintPage=h('div',{style:{display:'flex',alignItems:'flex-end',gap:14,height:170}}, vint.map((x,i)=>h('div',{key:i,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-end',height:'100%'}}, h('div',{style:{fontSize:11,fontFamily:SF,fontWeight:700,marginBottom:4}},'€'+x.v+'m'), h('div',{style:{width:'56%',maxWidth:40,height:(x.v/vmx*100)+'%',background:'#5B5CFF',borderRadius:'4px 4px 0 0'}}), h('div',{style:{fontSize:10,color:'#777',marginTop:5}},x.y))));
+    const holdRows=roster.slice().sort((a,b)=>(parseFloat(b.nav)||0)-(parseFloat(a.nav)||0));
+    const holdPage=h('div',null, h('div',{style:{display:'grid',gridTemplateColumns:'1.6fr .8fr .8fr .8fr .8fr',gap:6,fontSize:9.5,fontWeight:700,color:'#777',textTransform:'uppercase',borderBottom:'1px solid #ddd',paddingBottom:4}}, ['Investment','NAV','IRR','DPI','TVPI'].map((c,i)=>h('span',{key:i,style:{textAlign:i?'right':'left'}},c))),
+      holdRows.map(f=>h('div',{key:f.id,style:{display:'grid',gridTemplateColumns:'1.6fr .8fr .8fr .8fr .8fr',gap:6,fontSize:11.5,color:'#222',borderBottom:'1px solid #f0f0f0',padding:'5px 0'}}, h('span',null,f.name), h('span',{style:{textAlign:'right'}},f.nav||'—'), h('span',{style:{textAlign:'right'}},f.irr||'—'), h('span',{style:{textAlign:'right'}},f.dpi||'—'), h('span',{style:{textAlign:'right'}},f.tvpi||'—'))));
+    const legendPage=h('div',{style:{display:'flex',flexDirection:'column',gap:14}},
+      h('div',null, h('div',{style:{fontFamily:SF,fontWeight:700,fontSize:13,marginBottom:6,color:'#111'}},'Metric definitions'),
+        h('div',{style:{display:'flex',flexDirection:'column',gap:4,fontSize:11.5,color:'#333'}}, [['NAV','Net asset value — current marked value of your holdings'],['Net IRR','Annualised internal rate of return, net of fees'],['DPI','Distributions ÷ paid-in — cash already returned'],['TVPI','Total value ÷ paid-in — total value multiple'],['MOIC','Multiple on invested capital'],['DVPI','Distributions value ÷ paid-in']].map((r,i)=>h('div',{key:i}, h('b',null,r[0]+' — '), r[1])))),
+      h('div',null, h('div',{style:{fontFamily:SF,fontWeight:700,fontSize:13,margin:'6px 0',color:'#111'}},'Strategy colour key'),
+        h('div',{style:{display:'flex',flexWrap:'wrap',gap:'6px 16px'}}, this.STRATS.map(([k,n,c],i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',gap:6,fontSize:11.5,color:'#333'}}, h('span',{style:{width:11,height:11,borderRadius:3,background:'var('+c+')'}}), n)))));
+    let n=0; const pages=[];
+    if(sel.cover) pages.push(cover);
+    if(sel.performance) pages.push(pageWrap('Performance & key figures',++n, kpiGrid));
+    if(sel.cashflow) pages.push(pageWrap('Cash flow & J-curve',++n, cfPage));
+    if(sel.allocation) pages.push(pageWrap('Asset allocation',++n, allocPage));
+    if(sel.vintage) pages.push(pageWrap('Vintage exposure',++n, vintPage));
+    if(sel.holdings) pages.push(pageWrap('Holdings',++n, holdPage));
+    if(sel.legend) pages.push(pageWrap('Legend & definitions',++n, legendPage));
+    const PAGEDEF=[['cover','Cover'],['performance','Performance'],['cashflow','Cash flow'],['allocation','Allocation'],['vintage','Vintage'],['holdings','Holdings'],['legend','Legend']];
+    const chk=(k,l)=>h('button',{key:k,onClick:()=>togglePage(k),style:{display:'inline-flex',alignItems:'center',gap:6,border:'1px solid '+(sel[k]?'var(--brand)':'#ccc'),background:sel[k]?'var(--brand-wash)':'#fff',color:sel[k]?'var(--brand-ink)':'#666',borderRadius:8,padding:'5px 10px',fontSize:11.5,fontWeight:600,cursor:'pointer'}}, h('span',null, sel[k]?'☑':'☐'), l);
+    const header=h('div',{className:'sc-pdf-noprint',style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,padding:'12px 18px',borderBottom:'1px solid #e6e6e6',position:'sticky',top:0,background:'#fff',borderRadius:'12px 12px 0 0',flexWrap:'wrap'}},
+      h('div',{style:{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}}, h('span',{style:{fontWeight:700,fontSize:13,color:'#111'}},'PDF export — choose pages:'), h('div',{style:{display:'flex',gap:6,flexWrap:'wrap'}}, PAGEDEF.map(([k,l])=>chk(k,l)))),
+      h('div',{style:{display:'flex',gap:8}}, h('button',{onClick:()=>window.print(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'8px 14px',fontSize:12.5,fontWeight:700,cursor:'pointer'}},'⤓ Save as PDF'), h('button',{onClick:()=>this.setState({showPdf:false}),style:{border:'1px solid #ccc',background:'#fff',color:'#444',borderRadius:8,padding:'8px 12px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},'Close')));
+    return h('div',{style:{color:'#111'}}, header, h('div',{style:{padding:'22px 26px 30px',fontFamily:'Inter,system-ui,sans-serif'}}, pages.length?pages:h('div',{style:{color:'#777',textAlign:'center',padding:'40px'}},'Select at least one page to include.')));
   }
+
   /* ---------- top-right: notifications + profile (A29/A30, D15) ---------- */
   /* item 90 — once the bell has been open ~5s, mark notifications seen and clear the badge */
   toggleNotif(){ const open=!this.state.showNotif; this.setState({showNotif:open,showProfile:false});
