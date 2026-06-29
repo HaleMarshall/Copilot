@@ -21,4 +21,5 @@ FUTURE
 - [x] 6 Compare Yourself redesign (two actual pies + dim toggle + Z + funds compare; no endowments)
 - [x] 7 compact Follow-a-group next to simulator title; removed from comparison
 - [x] 8 At-your-stage trimmed to all-groups table (commit size, # deals, avg invest, hi/lo/avg)
-- NEXT: items 9-10 (remove Benchmark-against + Multi-layer benchmark sections)
+- [x] 9-10 removed Benchmark-against + Multi-layer benchmark (dimPie got own comparator)
+- NEXT: item 11 (Future section: J-curve prominent + pace scenarios + recycle modeling + per-year commitment editing + save)
