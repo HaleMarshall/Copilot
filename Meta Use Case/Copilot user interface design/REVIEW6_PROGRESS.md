@@ -25,7 +25,11 @@ Brief: re-verify all 3 PDFs (Opportunities, portfolio overview, simulate) built 
 ## Fix C (real bug found via audit)
 - [x] C. peerData()/peerBaseMedian() crashed when Custom cohort selected (fc={} → fc.wealth/prof/risk .includes on undefined). Guarded with ||[]. Verified: 0 console errors across compare/sim/home custom path; direct calls no throw. (25d78eb)
 
-## Remaining (subtle, verify next pass)
-- Overview: strategy page large-number handling (graph axis should scale / not break)
-- Overview: Ask-Alpha open → quick-info panel aligns to chat edge
-- Final: clean per-page console sweep (0 errors) across every section
+## Final pass — verified
+- Overview: strategy large-number handling — labels inside bars, axis auto-scales (niceStep), no horizontal overflow ✓
+- Overview: Ask-Alpha open → quick-info panel shifts right of the chat; both visible side-by-side, aligned to chat edge ✓
+- CLEAN CONSOLE SWEEP: 0 console errors across home, perf-review, perf-full, cash-full, sim, compare-peers, compare-custom, future, opp, missed, secondaries, drill-strategy, drill-format ✓
+
+## === AUDIT COMPLETE ===
+3 real fixes shipped: A overview dup title (27db4cd), B sim dup title (98a5c70), C Custom-cohort render crash (25d78eb).
+All 3 PDFs (Opportunities/overview/simulate) re-verified built + aligned. Future J-curve confirmed complete. App renders clean across every page.
