@@ -1370,7 +1370,7 @@ class Component extends DCLogic {
     {q:'Am I over-concentrated in AI?',                it:{ws:'understand',uc:'t1-9', page:'sectors',label:'Look-Through'}},
     {q:'Where is my performance so far?',              it:{ws:'understand',uc:'t1-12',page:'review', label:'Performance'}},
     {q:'Did I miss something?',                        it:{ws:'act',       uc:'t1-11',page:'missed', label:'Missed Opportunities'}},
-    {q:'What are my peers doing?',                     it:{ws:'shape',     uc:'sim',  page:'compare',label:'Comparison'}},
+    {q:'What are my peers doing?',                     it:{ws:'shape',     uc:'sim',  page:'compare',label:'Portfolio comparison'}},
     {q:'Do you want to follow someone?',               it:{ws:'shape',     uc:'sim',  page:'compare',label:'Follow a group'}},
     {q:'Do you want to simulate a different target?',  it:{ws:'shape',     uc:'sim',  page:'sim',    label:'Simulator'}}
   ]; }
@@ -2235,7 +2235,7 @@ class Component extends DCLogic {
       ['What if I invest like the next risk class up?','What happens to my return if I shift Buyout into Growth?','How do I compare to peers like me?'],
       ['Adjust-yourself dials','Per-metric impact','Target vs peer vs platform','Multi-layer peer benchmark'],
       [S[4],S[0],S[2],'Outcomes across similar clients'],
-      [{id:'sim',label:'Target simulator',view:'sim'},{id:'compare',label:'Comparison',view:'compare'},{id:'future',label:'Future',view:'future'}]);
+      [{id:'sim',label:'Target simulator',view:'sim'},{id:'compare',label:'Portfolio comparison',view:'compare'},{id:'future',label:'Future',view:'future'}]); /* item 77 — Target simulator + Portfolio comparison */
     SIM.tier=0;
     this._uc[0].items.push(SIM);
     // Opportunities hub — landing for the Act workspace; turns a saved simulation into ranked next actions

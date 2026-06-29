@@ -21,7 +21,8 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 73 Ask Alpha on comparison page strengthened: insights banner + target-vs-actual question chips
 - [x] 74 per-dimension Suggest funds on comparison (current platform + greyed pipeline) under selected strategy/region/currency/sector
 - [x] 75 comparison defaults to current portfolio portions vs peers/platform/top10 (section 'Compare your current portfolio'; target view kept on toggle)
-- NEXT: item 76 (Compare Yourself: pie-as-whole + listed strategies w/ funds vs peers/platform/top10/custom, clickable pie, watchlist/invest/similar buttons)
+- [x] 76 'Compare Yourself' card: whole pie + strategies listed w/ funds underneath vs peers/platform/top10/custom; drill committed-weight you-vs-comparator; per-fund Watchlist/Invest/Similar (compareYourselfCard)
+- NEXT: item 77 (rename simulator→'target simulator', comparison→'portfolio comparison')
 - [x] 1 nudge new-investor guard + liquidity CTA→opportunities
 - [x] 2 TVPI mini-chart in performance (+tvpi seeded)
 - [x] 3 cash-flow: 'Net distributions' not 'Net cash position'
