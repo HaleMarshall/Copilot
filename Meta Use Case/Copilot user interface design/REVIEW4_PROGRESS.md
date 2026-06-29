@@ -13,4 +13,5 @@ PORTFOLIO COMPARISON
 10. Remove 'Multi-layer benchmark' section
 FUTURE
 11. J-curve most prominent (historicals+current+projected dist), pace scenarios (aggressive/moderate/slow), recycle-rate modeling, per-year commitment editing, save
-- NEXT: item 1
+- [x] 1 removed duplicate simulator title
+- NEXT: item 2 (peers auto-select; custom unselected)

@@ -1170,6 +1170,16 @@ class Component extends DCLogic {
   /* item 58 — save / re-apply a user-defined peer group */
   savePeers(){ const list=(this.state.savedPeers||[]).slice(); const name='My peers '+(list.length+1); list.push({name, fc:{...(this.state.fc||{})}}); this.setState({savedPeers:list, savedPeersMsg:name+' saved'}); }
   applyPeers(p){ this.setState({fc:{...(p&&p.fc||{})}, cmp:'custom', controlOpen:true, savedPeersMsg:(p&&p.name)+' applied'}); }
+  /* review4 item 2 — Peers auto-selects THIS investor's profile; Custom starts unselected */
+  investorPeerFc(){ const s=this.state; const wm=+s.investWealthM||0;
+    const wealth=wm>=100?'100M+':wm>=25?'25-100M':wm>=5?'5-25M':'1-5M';
+    const ageRaw=(s.dims&&s.dims.ages&&s.dims.ages[0])||'45-54';
+    const ageB={'25-34':'20-35','35-44':'35-50','45-54':'50-65','55-64':'50-65','65+':'65+'}[ageRaw]||'50-65';
+    return {age:[ageB], risk:[s.riskId||'balanced_compounding'], wealth:[wealth], region:[(s.dims&&s.dims.region)||'DACH'], prof:[(s.dims&&s.dims.profession)||'Investor/PE']}; }
+  applyPeerCohort(extra){ this.setState(Object.assign({fc:this.investorPeerFc(), cohortMode:'peers'}, extra||{})); }
+  clearCohort(extra){ this.setState(Object.assign({fc:{}, cohortMode:'custom'}, extra||{})); }
+  /* set the comparison comparator, auto-selecting peers / clearing custom as appropriate */
+  setComparator(v, openPanel){ if(v==='peers') this.applyPeerCohort({cmp:'peers', controlOpen:openPanel?true:this.state.controlOpen}); else if(v==='custom') this.clearCohort({cmp:'custom', controlOpen:true}); else this.setState({cmp:v}); }
 
   /* ---------- Ask Alpha ---------- */
   askAlpha(){
@@ -5724,7 +5734,7 @@ class Component extends DCLogic {
       const selector=h('div',null,
         h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:7}},'Compare your target against'),
         h('div',{style:{display:'flex',flexWrap:'wrap',gap:6}}, CMP.map(([v,l])=>{ const on=mode===v;
-          return h('button',{key:v,onClick:()=>{ this.setSimCmp(d.key,v); if(v==='peers'||v==='custom') this.setState({cmp:(v==='peers'?'peers':'custom'), controlOpen:true}); },
+          return h('button',{key:v,onClick:()=>{ this.setSimCmp(d.key,v); if(v==='peers') this.applyPeerCohort({cmp:'peers',controlOpen:true}); else if(v==='custom') this.clearCohort({cmp:'custom',controlOpen:true}); }, /* review4 item 2 */
             style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 13px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}}, (v==='custom'||v==='peers')?'✎ '+l:l); })));
       /* item 68 — Adjust-my-target button reveals the sliders inline (any comparator, not only Custom) */
       const adjOpen=this.dtog('simAdjust_'+d.key,false);
@@ -6186,7 +6196,7 @@ class Component extends DCLogic {
     const cmpHint={peers:'n = '+co.n+' investors like you',model:'Moonfare house-view · '+this.riskLabel(),platform:'all '+this.PLATFORM_TOTAL+' platform investors',top10:'top 10% performers on the platform',custom:'n = '+co.n+' · refine the group in the control panel →'}[cmp]||'';
     const toggleRow=h('div',{style:{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}},
       h('span',{style:{fontSize:11,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)'}},'Benchmark against'),
-      this.seg([{label:'Peers',value:'peers'},{label:'Model',value:'model'},{label:'Platform',value:'platform'},{label:'Top 10%',value:'top10'},{label:'Custom',value:'custom'}], cmp, v=>this.setState({cmp:v, controlOpen:(v==='custom'||v==='peers')?true:s.controlOpen}),{sm:true}),
+      this.seg([{label:'Peers',value:'peers'},{label:'Model',value:'model'},{label:'Platform',value:'platform'},{label:'Top 10%',value:'top10'},{label:'Custom',value:'custom'}], cmp, v=>this.setComparator(v,true),{sm:true}), /* review4 item 2 — Peers auto-selects investor's profile; Custom clears */
       h('span',{style:{fontSize:11.5,color:'var(--muted)'}}, cmpHint));
 
     // ---- row 1 (STATIC — never changes with the toggle): Private Markets allocation · Fill rate ----
@@ -6350,7 +6360,7 @@ class Component extends DCLogic {
     const focus=s.cyFocus; const meta=this.HELD_META(); const roster=this.HELD_FUNDS();
     const byStrat={}; roster.forEach(f=>{ const sk=(meta[f.id]||{}).strat; (byStrat[sk]=byStrat[sk]||[]).push(f); });
     const sel=h('div',{style:{display:'flex',gap:6,flexWrap:'wrap'}}, [['peers','Peers'],['platform','Platform'],['top10','Top 10%'],['custom','Custom']].map(([v,l])=>{ const on=cmp===v;
-      return h('button',{key:v,onClick:()=>{ this.setState({cmpCY:v}); if(v==='custom') this.setState({cmp:'custom',controlOpen:true}); },
+      return h('button',{key:v,onClick:()=>{ this.setState({cmpCY:v}); if(v==='peers') this.applyPeerCohort(); else if(v==='custom') this.clearCohort({cmp:'custom',controlOpen:true}); }, /* review4 item 2 */
         style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 13px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}}, v==='custom'?'✎ '+l:l); }));
     const onPlatform=(name)=>this.isHeld(name) || (this.OPP_FUNDS_LIST&&this.OPP_FUNDS_LIST().some(o=>(o.name||o.fund)===name));
     const cyFundRow=(f,label)=>{ const name=f.name||f.fund; const inW=(s.watchlist||[]).includes(name); const live=onPlatform(name);
