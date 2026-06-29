@@ -5446,18 +5446,30 @@ class Component extends DCLogic {
       const P=(this.DB&&this.DB.portfolio)||{}; const cf=(this.DB&&this.DB.cashflows)||{cats:[],calls:[],distributions:[]};
       const ranked=roster.slice().sort((a,b)=>parseFloat(b.called)-parseFloat(a.called));
       const mx=Math.max.apply(null,(cf.calls||[]).concat(cf.distributions||[]).concat([1]));
-      const cfChart=this.card({title:'Capital calls vs distributions (€m)',badge:this.badge('your portfolio','conf'),
+      /* review7 item 16 — per-year € numbers above each bar */
+      const cfBar=(val,color)=>h('div',{style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-end',height:'100%'}},
+        h('div',{style:{fontSize:9,fontWeight:700,color:'var('+color+')',marginBottom:2}}, (val!=null&&val!==0?('€'+val):'')),
+        h('div',{title:'€'+val+'m',style:{width:14,height:((val||0)/mx*100)+'%',background:'var('+color+')',borderRadius:'3px 3px 0 0',minHeight:2}}));
+      const cfChart=this.card({title:'Capital calls vs distributions (€m)',badge:this.badge('your portfolio','conf'),style:{height:'100%'},
         children:h('div',null,
-          h('div',{style:{display:'flex',alignItems:'flex-end',gap:10,height:170,padding:'4px 2px 0'}}, (cf.cats||[]).map((yr,i)=>h('div',{key:yr,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-end',height:'100%',gap:3}},
-            h('div',{style:{display:'flex',alignItems:'flex-end',gap:3,height:'100%',width:'100%',justifyContent:'center'}},
-              h('div',{title:'Called €'+(cf.calls[i])+'m',style:{width:14,height:((cf.calls[i]||0)/mx*100)+'%',background:'var(--under)',borderRadius:'3px 3px 0 0',minHeight:2}}),
-              h('div',{title:'Distributed €'+(cf.distributions[i])+'m',style:{width:14,height:((cf.distributions[i]||0)/mx*100)+'%',background:'var(--over)',borderRadius:'3px 3px 0 0',minHeight:2}})),
-            h('div',{style:{fontSize:10,color:'var(--muted)'}},yr)))),
+          h('div',{style:{display:'flex',alignItems:'flex-end',gap:10,height:200,padding:'4px 2px 0'}}, (cf.cats||[]).map((yr,i)=>h('div',{key:yr,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-end',height:'100%'}},
+            h('div',{style:{display:'flex',alignItems:'flex-end',gap:4,height:'100%',width:'100%',justifyContent:'center'}}, cfBar(cf.calls[i],'--under'), cfBar(cf.distributions[i],'--over')),
+            h('div',{style:{fontSize:10,color:'var(--muted)',marginTop:4}},yr)))),
           h('div',{style:{display:'flex',gap:16,justifyContent:'center',marginTop:8}}, [['Capital calls','--under'],['Distributions','--over']].map(l=>h('div',{key:l[0],style:{display:'flex',alignItems:'center',gap:6,fontSize:11.5,color:'var(--muted)'}}, h('span',{style:{width:10,height:10,borderRadius:3,background:'var('+l[1]+')'}}), l[0])))),
-        caption:'Annual capital called vs distributions returned — the J-curve crossing where distributions overtake calls.'});
+        caption:'Annual capital called vs distributions returned, with each year’s € figures — the J-curve crossing where distributions overtake calls.'});
+      /* review7 item 16 — cash boxes beside the calls-vs-distributions chart (side by side) */
+      const cashTile=(lab,val,sub,col)=>h('div',{key:lab,style:{border:'1px solid var(--line)',borderRadius:12,padding:'12px 14px',background:'var(--surface-2)'}},
+        h('div',{style:{fontSize:11,color:'var(--muted)'}},lab), h('div',{style:{fontFamily:SF,fontSize:20,fontWeight:700,color:col||'var(--ink)',marginTop:3}},val), sub?h('div',{style:{fontSize:10,color:'var(--muted)',marginTop:1}},sub):null);
+      const cashBoxesCard=this.card({title:'Committed · called · distributions',badge:this.badge('your portfolio','conf'),style:{height:'100%'},
+        children:h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}},
+          cashTile('Committed',P.committed||'€20.5m','total commitment'),
+          cashTile('Called',P.navText||'€16.6m','drawn to date'),
+          cashTile('Uncalled',P.uncalled||'€3.9m','committed, not drawn'),
+          cashTile('Distributions',P.distributionsText||'€10.6m','returned'),
+          cashTile('Cash position',P.cashPosition||'€1.1m','in your cash account'),
+          cashTile('Net distributions','+€0.9m','distributions − calls','var(--over)'))});
       content=h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
-        this.kpiTiles([['Committed',P.committed||'€20.5m','total commitment'],['Called',P.navText||'€16.6m','drawn to date'],['Uncalled',P.uncalled||'€3.9m','committed, not drawn'],['Distributions',P.distributionsText||'€10.6m','returned'],['Cash position',P.cashPosition||'€1.1m','in your cash account'],['Net distributions','+€0.9m','distributions − calls']]),
-        cfChart,
+        h('div',{style:{display:'grid',gridTemplateColumns:'minmax(0,1fr) minmax(0,1.05fr)',gap:16,alignItems:'stretch'}}, cashBoxesCard, cfChart),
         this.card({title:'Each investment on the J-curve',badge:this.badge('your portfolio','conf'),children:h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, this.jCurveRows(roster.slice()))}),
         this.card({title:'Investments — committed, called & performance',badge:this.badge('your portfolio','conf'),children:h('div',null,
           h('div',{style:{display:'grid',gridTemplateColumns:'1.5fr 0.8fr 0.9fr 0.7fr',gap:8,padding:'0 12px 6px',fontSize:9.5,fontWeight:700,letterSpacing:'.03em',textTransform:'uppercase',color:'var(--muted)'}},
