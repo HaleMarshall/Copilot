@@ -18,7 +18,8 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 67-70 target-card redesign: comparator Model/Peers/Platform/Top10/Custom only; left target/middle comparator/right Z; Adjust-my-target button; Peers/Custom open group editor on sim; table removed
 - [x] 71 comparison 'You — actual vs your target' section: PM-alloc actual-vs-target (bars+gap) + strategy/sector/currency pies (target mode) w/ Z; multilayer benchmark kept
 - [x] 72 customize follow group: custom-group option + 'Customize who you follow' (opens cohort editor) + follow saved peer groups
-- NEXT: item 73 (Ask Alpha on the comparison page)
+- [x] 73 Ask Alpha on comparison page strengthened: insights banner + target-vs-actual question chips
+- NEXT: item 74 (per-dimension suggest funds on comparison: current platform + greyed pipeline, under each strategy/region/currency/sector)
 - [x] 1 nudge new-investor guard + liquidity CTA→opportunities
 - [x] 2 TVPI mini-chart in performance (+tvpi seeded)
 - [x] 3 cash-flow: 'Net distributions' not 'Net cash position'
