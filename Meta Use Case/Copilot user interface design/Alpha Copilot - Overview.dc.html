@@ -760,6 +760,14 @@ class Component extends DCLogic {
   // peer PM-allocation median ignoring the perf toggle (so the table can show Peers AND Top 10% side by side)
   /* review4 item 4 — the user's ACTUAL PM-allocation target (their input), not the seed/modelled default */
   myPmTarget(){ const t=+this.state.targetPct; return t>0? t : (this.PM&&this.PM.target)||20; }
+  /* review7 item 5 — effective base→target FX rate BLENDED across the portfolio's underlying currency mix (the rate is mixed, not a single pair) */
+  fxCurrencyMix(){ const cur=((this.HOME_DIMS().find(x=>x.key==='currency')||{}).actual)||{}; return cur; }
+  blendedFxRate(target){
+    const fx=(this.DB&&this.DB.fx)||{rates:{EUR:1}}; const rates=fx.rates||{EUR:1}; const rt=rates[target]||1;
+    const cur=this.fxCurrencyMix(); let num=0,den=0;
+    Object.keys(cur).forEach(c=>{ const rc=rates[c]; if(rc==null) return; num+=cur[c]*(rt/rc); den+=cur[c]; });
+    return den>0? +(num/den).toFixed(3) : +(+rt).toFixed(3);
+  }
   peerBaseMedian(){ if(this.dbEmpty()) return 0; const fc=this.state.fc;
     const P=(this.DB&&this.DB.peer)||{baseMedian:8.9,wealthDelta:{},profDelta:{},riskMedianFactor:0.25};
     let m=P.baseMedian||8.9;
@@ -5279,8 +5287,10 @@ class Component extends DCLogic {
         h('div',{style:{fontSize:10.5,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(255,255,255,.8)',fontWeight:700}},'Total portfolio value · base '+_baseCcy),
         _ccyToggle),
       h('div',{style:{fontFamily:SF,fontSize:44,fontWeight:700,lineHeight:1}}, _totalVal),
-      /* review7 item 4 — when a non-base currency is selected, always show the FX conversion rate used */
-      (_ccy!==_baseCcy)? h('div',{style:{display:'inline-flex',alignItems:'center',gap:6,alignSelf:'flex-start',background:'rgba(255,255,255,.14)',borderRadius:7,padding:'3px 9px',fontSize:11,fontWeight:600,color:'rgba(255,255,255,.92)'}}, 'FX 1 '+_baseCcy+' = '+(+_rate).toFixed(_rate>=50?0:4)+' '+_ccy+(_fx.asOf?(' · as of '+_fx.asOf):'')) : null,
+      /* review7 item 4 — when a non-base currency is selected, always show the FX conversion rate used; item 5 — and the BLENDED rate across the underlying currency mix */
+      (_ccy!==_baseCcy)? h('div',{style:{display:'inline-flex',alignItems:'center',gap:6,alignSelf:'flex-start',background:'rgba(255,255,255,.14)',borderRadius:7,padding:'3px 9px',fontSize:11,fontWeight:600,color:'rgba(255,255,255,.92)'}}, 'FX 1 '+_baseCcy+' = '+(+_rate).toFixed(_rate>=50?0:4)+' '+_ccy+' · blended across your mix ≈ '+this.blendedFxRate(_ccy)+(_fx.asOf?(' · as of '+_fx.asOf):'')) : null,
+      /* review7 item 5 — the base figure is a mix of the underlying portfolio currencies; show the composition it blends */
+      (()=>{ const cur=this.fxCurrencyMix(); const parts=Object.keys(cur).sort((a,b)=>cur[b]-cur[a]).map(c=>c+' '+cur[c]+'%'); return parts.length? h('div',{style:{fontSize:10.5,color:'rgba(255,255,255,.68)'}}, 'Underlying currency mix · '+parts.join(' · ')) : null; })(),
       h('div',{style:{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}},
         h('span',{style:{display:'inline-flex',alignItems:'center',gap:6,background:'rgba(255,255,255,.16)',borderRadius:8,padding:'4px 10px',fontSize:12.5,fontWeight:700}},'▲ '+(_P.tvpi||'2.1')+'x TVPI'),
         h('span',{style:{fontSize:12.5,color:'rgba(255,255,255,.9)'}}, _aboveCalled+' net gain')), /* review7 item 3 — was 'above called capital' (confusing; called=16.6m). 3.6 = NAV − paid-in = net gain (Nettgewinn) */
