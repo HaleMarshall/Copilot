@@ -4128,7 +4128,7 @@ class Component extends DCLogic {
       const cA=[],cB=[]; let sA=0,sB=0;
       sorted.forEach(it=>{ const w=Math.max(it.you||0,1); if(sA<=sB){cA.push(it);sA+=w;} else {cB.push(it);sB+=w;} });
       const tcol=(arr,sum)=>h('div',{style:{flex:(sum||1)+' 1 0',display:'flex',flexDirection:'column',gap:6}}, arr.map(r=>{ const on=this.state.homeFocusCat===r.k;
-        return h('div',{key:r.k,onClick:()=>this.setState({homeFocusCat:r.k}),title:'See your '+r.n+' investments below',
+        return h('div',{key:r.k,onClick:()=>this.setState({homeFocusCat:this.state.homeFocusCat===r.k?null:r.k}),title:'See your '+r.n+' investments below',
           style:{flex:(Math.max(r.you||0,1))+' 1 0',background:`var(${r.color})`,borderRadius:9,padding:'12px 14px',color:'#fff',display:'flex',flexDirection:'column',justifyContent:'flex-end',cursor:'pointer',overflow:'hidden',minHeight:56,outline:on?'2px solid #fff':'none',outlineOffset:on?'-4px':'0'}},
           h('div',{style:{fontSize:13.5,fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},r.n),
           h('div',{style:{fontFamily:SF,fontSize:11.5,opacity:.93}}, byCat[r.k].length+' fund'+(byCat[r.k].length>1?'s':'')+' · '+(r.you||0)+'% of NAV')); }));
@@ -4140,7 +4140,7 @@ class Component extends DCLogic {
     const items = big? ranked : ranked.slice(0,3);
     const body = big
       ? h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))',gap:14}},
-          items.map((r,i)=>h('div',{key:i,onClick:()=>this.setState({homeFocusCat:r.k}),title:'See your '+r.n+' investments below',
+          items.map((r,i)=>h('div',{key:i,onClick:()=>this.setState({homeFocusCat:this.state.homeFocusCat===r.k?null:r.k}),title:'See your '+r.n+' investments below',
             style:{border:'1px solid '+(this.state.homeFocusCat===r.k?'var(--brand)':'var(--line)'),borderRadius:14,padding:'18px 18px',background:this.state.homeFocusCat===r.k?'var(--brand-wash)':'var(--surface)',display:'flex',flexDirection:'column',gap:10,cursor:'pointer'}}, /* item 23 — click a bucket → focus it in the table below */
             h('div',{style:{display:'flex',alignItems:'center',gap:9}},
               h('span',{style:{width:13,height:13,borderRadius:4,background:`var(${r.color})`,flex:'0 0 13px'}}),
@@ -4152,7 +4152,7 @@ class Component extends DCLogic {
             h('div',{style:{display:'flex',flexWrap:'wrap',gap:6}}, byCat[r.k].map(f=>h('span',{key:f.id,style:{fontSize:11.5,color:'var(--ink)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:7,padding:'3px 8px'}},f.name))))))
       : h('div',{style:{display:'flex',flexDirection:'column',gap:10}},
           items.map((r,i)=>{ const w=Math.round(100*byCat[r.k].length/byCat[ranked[0].k].length); const on=this.state.homeFocusCat===r.k;
-            return h('div',{key:i,onClick:()=>this.setState({homeFocusCat:r.k}),title:'See your '+r.n+' investments below',style:{display:'flex',alignItems:'center',gap:12,cursor:'pointer',padding:on?'4px 6px':'0',borderRadius:8,background:on?'var(--brand-wash)':'transparent'}}, /* item 23 — clickable bucket → focus table below */
+            return h('div',{key:i,onClick:()=>this.setState({homeFocusCat:this.state.homeFocusCat===r.k?null:r.k}),title:'See your '+r.n+' investments below',style:{display:'flex',alignItems:'center',gap:12,cursor:'pointer',padding:on?'4px 6px':'0',borderRadius:8,background:on?'var(--brand-wash)':'transparent'}}, /* item 23 — clickable bucket → focus table below */
               h('span',{style:{width:11,height:11,borderRadius:3,background:`var(${r.color})`,flex:'0 0 11px'}}),
               h('span',{style:{flex:'0 0 150px',fontSize:13.5,fontWeight:on?700:600,fontFamily:SF,color:on?'var(--brand-ink)':'var(--ink)'}},r.n),
               h('div',{style:{flex:1,height:14,background:'var(--surface-2)',borderRadius:7,overflow:'hidden'}}, h('div',{style:{width:w+'%',height:'100%',background:`var(${r.color})`,borderRadius:7}})),
