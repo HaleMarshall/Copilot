@@ -4142,18 +4142,17 @@ class Component extends DCLogic {
       eyebrow='Your portfolio · Performance'; title='How your portfolio is performing';
       body=[
         this.kpiTiles([['Net IRR','11.0%','since inception'],['MOIC','1.80x','net of fees'],['TVPI','2.10x',''],['DPI','2.10x','realised'],['Portfolio value','€16.6m','current NAV'],['Distributions','€2.1m','returned to date']]),
-        /* items 40/41 — peer-aware reassurance / encouragement (and stay silent when you're behind with no vintage excuse) */
-        (()=>{ const youIrr=parseFloat((this.DB&&this.DB.portfolio&&this.DB.portfolio.irr)||'11.0')||11.0; const peerIrr=9.4; const vintageBunched=true;
-          if(youIrr>=peerIrr){
-            return this.card({key:'peer',title:'Alpha’s read — vs your peers',badge:this.badge('AI','synth'),tone:'alpha',
-              children:h('div',{style:{fontSize:13,lineHeight:1.6,color:'rgba(255,255,255,.95)'}}, 'You’re ',h('strong',{style:{color:'#fff'}},'ahead of peers like you'),' — ',h('strong',{style:{color:'#fff'}},youIrr+'% net IRR'),' versus ~'+peerIrr+'% for investors with a similar profile and vintage spread. Keep committing as vigorously as you have; your pacing is working.'),
-              caption:'Performance vs investors matched to your profile.'}); }
-          if(vintageBunched){
-            return this.card({key:'peer',title:'Alpha’s read — vs your peers',badge:this.badge('AI','synth'),tone:'alpha',
-              children:h('div',{style:{fontSize:13,lineHeight:1.6,color:'rgba(255,255,255,.95)'}}, 'Your headline metrics trail peers right now — but ',h('strong',{style:{color:'#fff'}},'investors who committed in the same vintages are seeing very similar results'),'. It’s the vintage cycle, not your fund selection. Spreading future commitments across ',h('strong',{style:{color:'#fff'}},'more vintages (a higher distribution rate)'),' would diversify your book and lift returns over time.'),
-              caption:'Context, not criticism — and a concrete way forward.'}); }
-          return null; /* item 41 — behind with no vintage explanation: say nothing */
-        })(),
+        /* review3 item 4 — ONE merged Alpha's read: peer comparison + top contributor + what to watch */
+        (()=>{ const youIrr=parseFloat((this.DB&&this.DB.portfolio&&this.DB.portfolio.irr)||'11.0')||11.0; const peerIrr=9.4;
+          const peerLine = youIrr>=peerIrr
+            ? ['You’re ',h('strong',{key:'p1',style:{color:'#fff'}},'ahead of peers like you'),' — ',h('strong',{key:'p2',style:{color:'#fff'}},youIrr+'% net IRR'),' versus ~'+peerIrr+'% for a similar profile and vintage spread. Keep committing as vigorously as you have; your pacing is working.']
+            : ['Your headline metrics trail peers right now — but ',h('strong',{key:'p1',style:{color:'#fff'}},'investors who committed in the same vintages see very similar results'),'. It’s the vintage cycle, not your fund selection; spreading future commitments across more vintages would lift returns over time.'];
+          return this.card({key:'alpha',title:'Alpha’s read',badge:this.badge('AI','synth'),tone:'alpha',
+            children:h('div',{style:{display:'flex',flexDirection:'column',gap:9}},
+              h('div',{style:{fontSize:13,lineHeight:1.6,color:'rgba(255,255,255,.95)'}}, h('span',{style:{fontWeight:700,color:'#fff'}},'vs your peers — '), peerLine),
+              h('div',{style:{fontSize:13,lineHeight:1.6,color:'rgba(255,255,255,.95)'}}, h('strong',{style:{color:'#fff'}},ranked[0].name),' is your top contributor this period (',h('strong',{style:{color:'#fff'}},(ranked[0].contrib>=0?'+':'')+ranked[0].contrib+'pp'),') and leads on IRR at ',h('strong',{style:{color:'#fff'}},this.metricVal(ranked[0],'IRR')),'.'),
+              h('div',{style:{fontSize:12.5,lineHeight:1.55,color:'rgba(255,255,255,.85)'}}, 'Your top three positions drive most of the return — strong, but keep an eye on single-name concentration. ',h('strong',{style:{color:'#fff'}},ranked[ranked.length-1].name),' is the main laggard to review.')),
+            caption:'How you compare, who’s driving your return, and what to watch — in one read.'}); })(),
         /* item 220 — benchmark the personal IRR against a public index (S&P 500, PME basis) so the figure has context; MOIC & peer benchmarks deliberately omitted */
         (()=>{ const you=11.0, spx=8.7, spread=+(you-spx).toFixed(1); const max=Math.max(you,spx)*1.15;
           if(you<=spx) return null; /* item 9 — only show the public-market comparison when you're above it */
@@ -4169,12 +4168,7 @@ class Component extends DCLogic {
                 h('span',{style:{fontSize:13,fontWeight:700,color:'var(--over)'}},'▲ +'+spread+'pp'),
                 h('span',{style:{fontSize:12,color:'var(--muted)'}},'your private-markets outperformance vs the S&P 500'))),
             caption:'Public-market-equivalent (PME): what the same cash flows would have earned in the S&P 500 total-return index. Your PE programme returned +'+spread+'pp a year above the index. MOIC and peer benchmarks aren’t shown here — too few comparable data points.'}); })(),
-        /* item 33 — Alpha's read: top contributor to the largest metric + an additional insight */
-        this.card({key:'b',title:'Alpha’s read',badge:this.badge('AI','synth'),tone:'alpha',
-          children:h('div',{style:{display:'flex',flexDirection:'column',gap:9}},
-            h('div',{style:{fontSize:13,lineHeight:1.6,color:'rgba(255,255,255,.95)'}}, h('strong',{style:{color:'#fff'}},ranked[0].name),' is your top contributor this period (',h('strong',{style:{color:'#fff'}},(ranked[0].contrib>=0?'+':'')+ranked[0].contrib+'pp'),') and leads on IRR at ',h('strong',{style:{color:'#fff'}},this.metricVal(ranked[0],'IRR')),'.'),
-            h('div',{style:{fontSize:12.5,lineHeight:1.55,color:'rgba(255,255,255,.85)'}}, 'Additional insight: your top three positions drive most of the return — strong, but keep an eye on single-name concentration. ',h('strong',{style:{color:'#fff'}},ranked[ranked.length-1].name),' is the main laggard to review.')),
-          caption:'Who’s driving your return — and what to watch.'}),
+        /* review3 item 4 — second Alpha's read merged into the one above */
         /* item 49 — show the funds you hold inline (everything in one detailed view, not a substitute page) */
         h('div',{key:'funds'}, this.panelSection('The funds you hold','full performance detail · '+roster.length+' funds'),
           h('div',{style:{marginBottom:10}}, this.holdingsMetricToggle()),

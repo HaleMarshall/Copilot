@@ -9,4 +9,5 @@
 8. Ask Alpha open -> detail panel shifts toward middle, aligned with Ask Alpha chat edge
 9. Strategy graph: large numbers overflow the page -> fix label placement/scaling
 10. Format large breakdown: tree diagram of formats
-- NEXT: item 1
+- [x] 1-3 overview restructure (Alpha read right of title; total-value hero + base ccy + KPI cards; allocation below perf+cash, vertical)
+- NEXT: item 4 (merge two Alpha reads in performance detail)
