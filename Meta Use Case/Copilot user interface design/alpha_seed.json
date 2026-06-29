@@ -27,7 +27,8 @@
     "tvpi": "2.1",
     "committed": "€20.5m",
     "companies": 187,
-    "countries": 19
+    "countries": 19,
+    "baseCcy": "EUR"
   },
   "pm": {
     "you": 15.7,
@@ -1638,5 +1639,15 @@
         "top10": "7 yrs"
       }
     ]
+  },
+  "fx": {
+    "base": "EUR",
+    "asOf": "27 Jun 2026",
+    "rates": {
+      "EUR": 1.0,
+      "USD": 1.083,
+      "GBP": 0.848,
+      "CHF": 0.962
+    }
   }
 }
