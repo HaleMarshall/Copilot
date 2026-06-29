@@ -15,4 +15,5 @@ FUTURE
 11. J-curve most prominent (historicals+current+projected dist), pace scenarios (aggressive/moderate/slow), recycle-rate modeling, per-year commitment editing, save
 - [x] 1 removed duplicate simulator title
 - [x] 2 Peers auto-selects investor profile; Custom clears
-- NEXT: item 3 (clarity: simulate against the comparator group target)
+- [x] 3 clarity: simulating against the comparator group target (banner + labels)
+- NEXT: item 4 (comparison PM-allocation target = user actual 35%)

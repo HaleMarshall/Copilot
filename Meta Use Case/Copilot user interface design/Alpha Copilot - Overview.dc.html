@@ -756,6 +756,8 @@ class Component extends DCLogic {
   cmp2Label(key){ return {peers:'Peers',platform:'Platform avg',model:'Model ('+this.riskLabel()+')',harvard:'Harvard endowment',yale:'Yale endowment',princeton:'Princeton endowment',hyp:'H+Y+P aggregate'}[key]||'Peers'; }
   cmp2Short(key){ return {peers:'Peer avg',platform:'Platform',model:'Model',harvard:'Harvard',yale:'Yale',princeton:'Princeton',hyp:'H+Y+P'}[key]||'Peers'; }
   // peer PM-allocation median ignoring the perf toggle (so the table can show Peers AND Top 10% side by side)
+  /* review4 item 4 — the user's ACTUAL PM-allocation target (their input), not the seed/modelled default */
+  myPmTarget(){ const t=+this.state.targetPct; return t>0? t : (this.PM&&this.PM.target)||20; }
   peerBaseMedian(){ if(this.dbEmpty()) return 0; const fc=this.state.fc;
     const P=(this.DB&&this.DB.peer)||{baseMedian:8.9,wealthDelta:{},profDelta:{},riskMedianFactor:0.25};
     let m=P.baseMedian||8.9;
@@ -882,7 +884,7 @@ class Component extends DCLogic {
       {label:'Endowments',sub:'actual · H+Y+P',v:cold?0:(this.PM.endow||34),color:'--data-2',
         onClick:e=>this.openPop(e,{title:'Endowments · PM allocation',value:`${this.PM.endow||34}% of assets in private markets (Harvard/Yale/Princeton style)`,method:'representative large-endowment private-markets allocation',cohort:'Endowments',n:3})}
     ];
-    return this.gridBars(rows,{max:40,ticks:[0,10,20,30,40],unit:'%',labelW:96,barH:30,gap:12,marker:this.PM.target,markerLabel:'target '+this.PM.target+'%'});
+    return this.gridBars(rows,{max:40,ticks:[0,10,20,30,40],unit:'%',labelW:96,barH:30,gap:12,marker:this.myPmTarget(),markerLabel:'your target '+this.myPmTarget()+'%'});
   }
 
   /* ---------- TR chart: Fill Rate (stacked Filled / Remaining) ---------- */
@@ -891,7 +893,7 @@ class Component extends DCLogic {
     const h=this.h; const cold=this.state.demoState==='cold'; const pd=this.peerData();
     const yourPm=cold?0:this.PM.you;
     let rows=[
-      {label:'You',sub:'of '+this.PM.target+'% target',ref:this.PM.target,color:'--brand'},
+      {label:'You',sub:'of '+this.myPmTarget()+'% target',ref:this.myPmTarget(),color:'--brand'},
       {label:opts.peerLabel||'Peers',sub:'of peer target',ref:pd.target,color:'--data-4'},
       {label:'Platform',sub:'average',ref:this.PM.platform,color:'--data-9'},
       {label:'Model target',sub:null,ref:18,color:'--data-6',full:true},
@@ -1938,7 +1940,7 @@ class Component extends DCLogic {
       h('thead',null,h('tr',null,head.map((c,i)=>h('th',{key:i,style:{textAlign:i?'right':'left',padding:'8px 6px',borderBottom:'2px solid var(--line)',color:'var(--muted)',fontSize:11,textTransform:'uppercase',letterSpacing:'.05em'}},c)))),
       h('tbody',null,rows.map((r,ri)=>h('tr',{key:ri},r.map((c,ci)=>h('td',{key:ci,style:{textAlign:ci?'right':'left',padding:'8px 6px',borderBottom:'1px solid var(--line)',fontFamily:ci?"Inter,system-ui,sans-serif":'inherit',fontWeight:ci?600:400}},c))))));
     const pd=this.peerData();
-    if(which==='tl') return tbl(['Actor','% of wealth'],[['You',this.PM.you+'%'],['Peers (median)',pd.median+'%'],['Platform (avg)',this.PM.platform+'%'],['Model',this.PM.model+'%'],['Your target',this.PM.target+'%']]);
+    if(which==='tl') return tbl(['Actor','% of wealth'],[['You',this.PM.you+'%'],['Peers (median)',pd.median+'%'],['Platform (avg)',this.PM.platform+'%'],['Model',this.PM.model+'%'],['Your target',this.myPmTarget()+'%']]);
     if(which==='tr') return tbl(['Reference','Target %','Fill %'],[['Your target','20%',Math.round(this.PM.you/20*100)+'%'],['Peer target',pd.target+'%',Math.round(this.PM.you/pd.target*100)+'%'],['Platform (actual)','10.5%',Math.round(this.PM.you/10.5*100)+'%'],['Model target','18%',Math.round(this.PM.you/18*100)+'%']]);
     if(which==='br'){ const rows=this.zDeltas(this.state.cmp).map(r=>[r.name,(r.delta>0?'+':'')+r.delta+'pp', r.sig?'significant':'n.s.']); return tbl(['Strategy','Δ vs '+this.state.cmp,'Significance'],rows); }
     return null;
@@ -6175,13 +6177,13 @@ class Component extends DCLogic {
     const under=fineDeltas.slice().sort((a,b)=>a.d-b.d)[0]||{n:'',d:0};
     const pmYou=this.PM.you, pmPeer=this.peerBaseMedian();
     const pmGap=+(pmYou-pmPeer).toFixed(1);
-    const fillPct=this.PM.target>0?Math.round(pmYou/this.PM.target*100):0;
-    const peerFill=this.PM.target>0?Math.round(pmPeer/this.PM.target*100):0;
+    const fillPct=this.myPmTarget()>0?Math.round(pmYou/this.myPmTarget()*100):0;
+    const peerFill=this.myPmTarget()>0?Math.round(pmPeer/this.myPmTarget()*100):0;
     const insights=[
       `You hold ${pmYou}% of investable wealth in private markets — ${Math.abs(pmGap)}pp ${pmGap>=0?'above':'below'} the ${cmp==='custom'?'custom-group':'peer'} median of ${pmPeer}%.`,
       (over.d>0? `Your biggest tilt versus ${cmpShort} is ${over.n} at +${over.d}pp; your largest gap is ${under.n} at ${under.d}pp — the Simulator can close it.`
               : `Your mix sits broadly in line with ${cmpShort} — your largest gap is ${under.n} at ${under.d}pp.`),
-      `You've filled ${fillPct}% of your ${this.PM.target}% private-markets target; ${cmpShort} sits at roughly ${peerFill}% of the same target.`
+      `You've filled ${fillPct}% of your ${this.myPmTarget()}% private-markets target; ${cmpShort} sits at roughly ${peerFill}% of the same target.`
     ];
     const insightBanner=h('div',{style:{background:'linear-gradient(135deg,#20243A,#141733)',borderRadius:16,padding:'18px 20px',color:'#fff',display:'flex',gap:16,alignItems:'flex-start'}},
       h('img',{src:'assets/askalpha-logo.png',alt:'AskAlpha',style:{width:40,height:40,borderRadius:11,flex:'0 0 40px',boxShadow:'0 8px 20px -8px rgba(0,0,0,.6)'}}),
@@ -6209,7 +6211,7 @@ class Component extends DCLogic {
       children:h('div',{style:{paddingTop:6}}, empty? this.cmpEmpty() : this.tlChart()),
       caption:'Actual share of investable wealth in private markets — You / Peers / Platform are real and move with your cohort filters; Model · target is the Moonfare house-view for your risk class.'});
     const fillCard=this.card({title:'Fill rate', info:true,
-      right:h('span',{style:{fontSize:11.5,color:'var(--muted)'}},'Your target: '+this.PM.target+'% · modelled'),
+      right:h('span',{style:{fontSize:11.5,color:'var(--muted)'}},'Your target: '+this.myPmTarget()+'% · your input'),
       children:h('div',{style:{paddingTop:6}}, empty? this.cmpEmpty() : this.trChart()),
       caption:'Deployment vs target — what share of each group’s private-markets target is already filled. The target % is a modelled assumption from profession/risk, so fill-rate is illustrative, not a measured figure.'});
 
@@ -6259,7 +6261,7 @@ class Component extends DCLogic {
       caption:(pieMode==='target'?'Your actual minus your target':'You ('+(self==='current'?'actual':'target')+') minus '+cmpShort)+', in percentage points. Follows the pies beside it.'});
 
     /* item 71 — me-actual vs my-target for Private Markets allocation, with a Z (strategy/sector/currency are covered by the pies below in 'You vs your target' mode) */
-    const _pmYou=this.PM.you, _pmTgt=this.PM.target; const _pmGap=+(_pmYou-_pmTgt).toFixed(1);
+    const _pmYou=this.PM.you, _pmTgt=this.myPmTarget(); const _pmGap=+(_pmYou-_pmTgt).toFixed(1);
     const pmTargetCard=this.card({title:'Private markets allocation · you vs your target', info:true,
       right:h('span',{style:{fontSize:11.5,color:'var(--muted)'}},'% of investable wealth'),
       children: empty? this.cmpEmpty() : h('div',null,
