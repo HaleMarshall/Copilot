@@ -1,0 +1,12 @@
+# Review 3 — portfolio-overview Feedback.pdf (10 items, LIVE meta view)
+1. Move 'Alpha's read on strategy' to the RIGHT of the Portfolio Overview title
+2. Base-currency clarity + prominent KPI hero (TOTAL PORTFOLIO VALUE big card + Funds/GPs/Companies/Countries)
+3. Move asset-allocation charts BELOW performance & cash flows, vertically oriented (not horizontal)
+4. Performance detail: merge the two Alpha's-read cards into one
+5. Funds-you-hold: show TOP 3 only + button to a full Performance page (strategy-style, full table+graphs)
+6. Cash flows: full cashflows page (full list + J-curve); quick summary top 3 only
+7. Format full breakdown: include investments list
+8. Ask Alpha open -> detail panel shifts toward middle, aligned with Ask Alpha chat edge
+9. Strategy graph: large numbers overflow the page -> fix label placement/scaling
+10. Format large breakdown: tree diagram of formats
+- NEXT: item 1

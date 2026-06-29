@@ -5157,41 +5157,52 @@ class Component extends DCLogic {
       children: zRows.length? this.miniZ(zRows) : h('div',{style:{fontSize:12.5,color:'var(--muted)'}},'No deviation to show.'),
       caption:'Deviation between how you’re invested today (NAV) and your committed exposure. Positive = more current value than committed weight. Actual data — not simulated.'});
     /* Alpha's executive-summary strip removed from the portfolio overview per request */
-    /* item 47 — portfolio-header KPI strip: total value, # funds, # GPs, # companies, # countries */
     const _P=(this.DB&&this.DB.portfolio)||{}; const _roster=this.HELD_FUNDS();
     const _nGPs=new Set(_roster.map(f=>f.mgr)).size; const _nFunds=_roster.length;
-    /* item 48 — currency toggle on total value + conversion-rate note when off base currency */
+    /* item 48 — currency toggle + base-currency clarity */
     const _fx=(this.DB&&this.DB.fx)||{base:'EUR',asOf:'',rates:{EUR:1}}; const _baseCcy=_fx.base||'EUR';
     const _ccy=this.dtog('hdrCcy',_baseCcy); const _rate=(_fx.rates&&_fx.rates[_ccy])||1;
     const _ccySym=(c)=>({EUR:'€',USD:'$',GBP:'£',CHF:'Fr ',JPY:'¥'})[c]||(c+' ');
     const _navN=(typeof _P.nav==='number'?_P.nav:parseFloat(String(_P.navText||'16.6').replace(/[^0-9.]/g,''))||16.6);
+    const _paidIn=parseFloat(String(_P.paidInText||'13').replace(/[^0-9.]/g,''))||13;
     const _totalVal=(_ccy===_baseCcy)?(_P.navText||'€16.6m'):(_ccySym(_ccy)+(_navN*_rate).toFixed(1)+'m');
+    const _aboveCalled=(_ccySym(_ccy))+( (_navN-_paidIn)*_rate ).toFixed(1)+'m';
     const _ccyToggle=h('div',{onClick:e=>e.stopPropagation()}, this.seg(Object.keys(_fx.rates||{EUR:1}).map(c=>({label:c,value:c})), _ccy, v=>this.setDtog('hdrCcy',v), {sm:true}));
-    const _convNote=(_ccy!==_baseCcy)? h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:8,paddingLeft:18}},
-      'Converted at 1 '+_baseCcy+' = '+_rate+' '+_ccy+(_fx.asOf?(' · rate as of '+_fx.asOf):'')) : null;
-    const _hdrKpis=[
-      {v:_totalVal, l:'Total value'},
-      {v:String(_nFunds||_P.fundsHeld||8), l:'Funds'},
-      {v:String(_nGPs||_P.managers||6), l:'GPs'},
-      {v:String(_P.companies||'—'), l:'Companies'},
-      {v:String(_P.countries||'—'), l:'Countries'}];
-    const portfolioHeaderKPIs=h('div',{style:{background:'var(--surface)',border:'1px solid var(--line)',borderRadius:14,padding:'14px 4px'}},
-      h('div',{style:{display:'flex',alignItems:'center',justifyContent:'flex-end',padding:'0 18px 6px'}}, _ccyToggle),
-      h('div',{style:{display:'flex',alignItems:'center',gap:0,flexWrap:'wrap'}},
-        _hdrKpis.map((k,i)=>h('div',{key:i,style:{flex:'1 1 0',minWidth:120,padding:'0 18px',textAlign:'left',borderLeft:i?'1px solid var(--line)':'none'}},
-          h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:700,color:'var(--ink)',lineHeight:1.1}},k.v),
-          h('div',{style:{fontSize:11.5,color:'var(--muted)',marginTop:3,letterSpacing:'.02em'}},k.l)))),
-      _convNote);
+    /* PDF#2 (review3) — prominent TOTAL PORTFOLIO VALUE hero + clear base currency, with Funds/GPs/Companies/Countries cards */
+    const heroLeft=h('div',{style:{flex:'1 1 360px',minWidth:280,background:'linear-gradient(135deg,var(--brand),var(--brand-ink))',borderRadius:16,padding:'20px 22px',color:'#fff',display:'flex',flexDirection:'column',gap:10}},
+      h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,flexWrap:'wrap'}},
+        h('div',{style:{fontSize:10.5,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(255,255,255,.8)',fontWeight:700}},'Total portfolio value · base '+_baseCcy),
+        _ccyToggle),
+      h('div',{style:{fontFamily:SF,fontSize:44,fontWeight:700,lineHeight:1}}, _totalVal),
+      h('div',{style:{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}},
+        h('span',{style:{display:'inline-flex',alignItems:'center',gap:6,background:'rgba(255,255,255,.16)',borderRadius:8,padding:'4px 10px',fontSize:12.5,fontWeight:700}},'▲ '+(_P.tvpi||'2.1')+'x TVPI'),
+        h('span',{style:{fontSize:12.5,color:'rgba(255,255,255,.9)'}}, _aboveCalled+' above called capital')),
+      h('div',{style:{fontSize:12.5,color:'#fff',fontWeight:600}}, '▲ '+(_P.qoqAbs||'+€0.6m')+' ('+(_P.qoqPct||'+3.7%')+') vs. last quarter'),
+      h('div',{style:{fontSize:11,color:'rgba(255,255,255,.7)'}}, _P.reporting||(_nFunds+' funds reporting')));
+    const _miniCard=(l,v)=>h('div',{style:{flex:'1 1 110px',minWidth:100,background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:14,padding:'14px 16px'}},
+      h('div',{style:{fontSize:11.5,color:'var(--muted)'}},l), h('div',{style:{fontFamily:SF,fontSize:26,fontWeight:700,color:'var(--ink)',marginTop:4}},v));
+    const heroRight=h('div',{style:{flex:'1 1 280px',minWidth:240,display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,alignContent:'stretch'}},
+      _miniCard('Funds',String(_nFunds||_P.fundsHeld||8)), _miniCard('GPs',String(_nGPs||_P.managers||6)),
+      _miniCard('Companies',String(_P.companies||'—')), _miniCard('Countries',String(_P.countries||'—')));
+    const portfolioHero=h('div',{style:{display:'flex',gap:14,flexWrap:'wrap',alignItems:'stretch'}}, heroLeft, heroRight);
+    /* item 1 (review3) — title with Alpha's read on strategy to its right */
+    const titleBlock=h('div',{style:{flex:'1 1 240px',minWidth:200}},
+      h('div',{style:{fontSize:10.5,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Understand · Portfolio Overview'),
+      h('div',{style:{fontFamily:SF,fontSize:26,fontWeight:600,margin:'3px 0 2px'}},'Portfolio Overview'),
+      h('div',{style:{fontSize:12.5,color:'var(--muted)',lineHeight:1.5,maxWidth:340}},'Your portfolio at a glance — performance, allocation and cash-flow, measured against your own targets.'));
+    const headerRow=h('div',{style:{display:'flex',gap:16,alignItems:'stretch',flexWrap:'wrap'}}, titleBlock, h('div',{style:{flex:'1 1 460px',minWidth:300}}, alphaReadCard));
     const col=(children)=>h('div',{style:{display:'flex',flexDirection:'column',gap:16,minWidth:0}}, children);
-    /* items 5/6 — 'Where you're concentrated' + 'Allocated vs committed' removed; Alpha's read on your strategy moved to the top */
+    /* item 3 (review3) — performance & cash flows on top, asset-allocation charts moved below (vertical, full-width grid) */
+    const topTwo=h('div',{style:{display:'grid',gridTemplateColumns:'minmax(0,1fr) minmax(0,1fr)',gap:16,alignItems:'start'}},
+      col([perfCol]), col([cashCol, jcurveCard]));
+    const allocGrid=h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(330px,1fr))',gap:16,alignItems:'start'}},
+      strategyCard, regionCard, currencyCard, sectorCard, formatCard, vintageCard);
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16,minHeight:'100%'}},
-      portfolioHeaderKPIs,
+      headerRow,           /* item 1 — title + Alpha's read on the right */
       nudge,
-      alphaReadCard,
-      h('div',{style:{display:'grid',gridTemplateColumns:'minmax(0,1.3fr) minmax(0,0.85fr) minmax(0,1.3fr)',gap:16,alignItems:'start'}},
-        col([perfCol]),
-        col([allocHeader, strategyCard, regionCard, currencyCard, sectorCard, formatCard, vintageCard]),
-        col([cashCol, jcurveCard])));
+      portfolioHero,       /* item 2 — prominent total value + base currency + KPI cards */
+      topTwo,              /* item 3 — performance & cash flows */
+      col([allocHeader, allocGrid])); /* item 3 — asset allocation below, vertical */
   }
 
   HOME_DIMS(){

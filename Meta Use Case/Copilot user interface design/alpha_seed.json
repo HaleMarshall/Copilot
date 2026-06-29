@@ -28,7 +28,10 @@
     "committed": "€20.5m",
     "companies": 187,
     "countries": 19,
-    "baseCcy": "EUR"
+    "baseCcy": "EUR",
+    "qoqAbs": "+€0.6m",
+    "qoqPct": "+3.7%",
+    "reporting": "5 of 8 funds reporting Q1 2026 · 3 lagged at Q4 2025"
   },
   "pm": {
     "you": 15.7,
