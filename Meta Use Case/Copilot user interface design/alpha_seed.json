@@ -1670,5 +1670,84 @@
       "GBP": 0.844,
       "CHF": 0.957
     }
+  },
+  "lifecycle": {
+    "yearsIn": 7,
+    "periodLabel": "Years 1–7",
+    "metrics": [
+      {
+        "k": "fillRate",
+        "label": "Fill rate",
+        "unit": "%",
+        "you": 78,
+        "peers": 64,
+        "model": 80,
+        "top10": 88
+      },
+      {
+        "k": "pmAlloc",
+        "label": "PM allocation",
+        "unit": "%",
+        "you": 15.7,
+        "peers": 11,
+        "model": 12,
+        "top10": 18
+      },
+      {
+        "k": "commitSize",
+        "label": "Avg commitment size",
+        "unit": "€k",
+        "you": 120,
+        "peers": 95,
+        "model": 110,
+        "top10": 165
+      },
+      {
+        "k": "numDeals",
+        "label": "Number of deals",
+        "unit": "",
+        "you": 8,
+        "peers": 6,
+        "model": 7,
+        "top10": 12
+      },
+      {
+        "k": "avgInvest",
+        "label": "Avg investment size",
+        "unit": "€k",
+        "you": 118,
+        "peers": 92,
+        "model": 108,
+        "top10": 160
+      }
+    ],
+    "sizeRange": {
+      "you": {
+        "hi": 460,
+        "lo": 50,
+        "avg": 118
+      },
+      "peers": {
+        "hi": 320,
+        "lo": 40,
+        "avg": 92
+      },
+      "model": {
+        "hi": 350,
+        "lo": 50,
+        "avg": 108
+      },
+      "top10": {
+        "hi": 640,
+        "lo": 75,
+        "avg": 160
+      }
+    },
+    "timing": {
+      "you": "Committed steadily across 2019–2025.",
+      "peers": "Peers at your stage front-loaded 2021–22 (vintage bunching).",
+      "model": "The model paces evenly across vintages.",
+      "top10": "The top 10% paced evenly and added in dislocations (2020, 2023)."
+    }
   }
 }

@@ -6074,6 +6074,7 @@ class Component extends DCLogic {
       youVsTargetHead, /* item 71 */
       pmTargetCard,    /* item 71 — PM allocation actual vs target + Z/gap */
       this.compareYourselfCard(), /* item 76 — strategy mix + funds underneath vs peers/platform/top10/custom, with watchlist/invest/similar */
+      this.lifecycleCard(), /* PDF#1 — lifecycle-period comparison vs peers/model/top10 at the same investor stage */
       this.twoCol(dimPieCard, dimZCard, '1.05fr .95fr'),
       dimSuggestCard, /* item 74 — suggest funds (current + greyed pipeline) under the selected dimension */
       h('div',{style:{display:'flex',flexDirection:'column',gap:10,background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:14,padding:'14px 16px'}}, toggleRow, targetCard),
@@ -6101,6 +6102,39 @@ class Component extends DCLogic {
       rows.map((r,ri)=>h('div',{key:ri,style:{display:'flex',alignItems:'center',padding:'12px 16px',borderBottom:ri<rows.length-1?'1px solid var(--line)':'none',background:ri%2?'var(--surface-2)':'transparent'}},
         cols.map(([k],i)=>valCell(r,k,i)))));
     return wrap(table);
+  }
+  /* PDF#1 — lifecycle-period comparison: vs peers/model/top10 at the SAME investor stage (e.g. 2y in) — fill rate, PM allocation, commitment size, # deals, timing, hi/lo/avg investment size */
+  lifecycleCard(){
+    const h=this.h, SF=this.SF; const s=this.state; const empty=this.dbEmpty();
+    const L=(this.DB&&this.DB.lifecycle)||null; if(empty||!L) return null;
+    const cmp=s.cmpLC||'peers'; const cmpShort={peers:'Peers',model:'Model',top10:'Top 10%'}[cmp]||'Peers';
+    const sel=h('div',{style:{display:'flex',gap:6,flexWrap:'wrap'}}, [['peers','Peers'],['model','Model'],['top10','Top 10%']].map(([v,l])=>{ const on=cmp===v;
+      return h('button',{key:v,onClick:()=>this.setState({cmpLC:v}),style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 13px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}}, l); }));
+    const fmt=(v,u)=>u==='€k'?('€'+v+'k'):(u==='%'?(v+'%'):(''+v));
+    const rowEl=(m)=>{ const cv=m[cmp]; const dd=+(m.you-cv).toFixed(1); const better=dd>=0;
+      return h('div',{key:m.k,style:{display:'grid',gridTemplateColumns:'1.3fr 80px 80px 70px',gap:8,alignItems:'center',padding:'9px 0',borderBottom:'1px solid var(--line)'}},
+        h('span',{style:{fontSize:12.5,fontWeight:600}},m.label),
+        h('span',{style:{textAlign:'right',fontFamily:SF,fontWeight:700,fontSize:13}},fmt(m.you,m.unit)),
+        h('span',{style:{textAlign:'right',fontFamily:SF,fontSize:13,color:'var(--muted)'}},fmt(cv,m.unit)),
+        h('span',{style:{textAlign:'right',fontFamily:SF,fontWeight:700,fontSize:12.5,color:dd===0?'var(--muted)':(better?'var(--over)':'var(--under)')}}, (dd>0?'+':'')+dd)); };
+    const sr=L.sizeRange||{}; const you=sr.you||{}; const cm=sr[cmp]||{};
+    const sizeBlock=h('div',{style:{marginTop:12,paddingTop:12,borderTop:'1px solid var(--line)'}},
+      h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}},'Investment size — highest · lowest · average (€k)'),
+      h('div',{style:{display:'grid',gridTemplateColumns:'1.3fr 80px 80px 70px',gap:8,fontSize:9.5,fontWeight:700,letterSpacing:'.03em',textTransform:'uppercase',color:'var(--muted)',paddingBottom:6}},
+        h('span',null,''),h('span',{style:{textAlign:'right'}},'You'),h('span',{style:{textAlign:'right'}},cmpShort),h('span',{style:{textAlign:'right'}},'Δ')),
+      [['Highest','hi'],['Lowest','lo'],['Average','avg']].map(([lab,kk])=>{ const yv=you[kk]||0, cv=cm[kk]||0; const dd=yv-cv;
+        return h('div',{key:kk,style:{display:'grid',gridTemplateColumns:'1.3fr 80px 80px 70px',gap:8,alignItems:'center',padding:'7px 0',borderBottom:'1px solid var(--line)'}},
+          h('span',{style:{fontSize:12.5}},lab), h('span',{style:{textAlign:'right',fontFamily:SF,fontWeight:600,fontSize:12.5}},'€'+yv+'k'), h('span',{style:{textAlign:'right',fontFamily:SF,fontSize:12.5,color:'var(--muted)'}},'€'+cv+'k'),
+          h('span',{style:{textAlign:'right',fontFamily:SF,fontWeight:700,fontSize:12,color:dd===0?'var(--muted)':(dd>0?'var(--over)':'var(--under)')}}, (dd>0?'+':'')+dd)); }));
+    const timing=h('div',{style:{marginTop:12,fontSize:12,color:'var(--muted)',lineHeight:1.5,background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:10,padding:'10px 12px'}},
+      h('b',{style:{color:'var(--ink)'}},'Timing — '),'You: '+(L.timing&&L.timing.you||'')+' '+cmpShort+': '+(L.timing&&L.timing[cmp]||''));
+    return this.card({title:'At your stage ('+L.periodLabel+') · vs others at the same point', badge:this.badge('lifecycle','synth'), right:sel,
+      children:h('div',null,
+        h('div',{style:{fontSize:12,color:'var(--muted)',lineHeight:1.5,marginBottom:10}},'Everything here is matched to your investor lifecycle period — what '+cmpShort.toLowerCase()+' did when they were '+L.yearsIn+' years into investing, not where they are today.'),
+        h('div',{style:{display:'grid',gridTemplateColumns:'1.3fr 80px 80px 70px',gap:8,fontSize:9.5,fontWeight:700,letterSpacing:'.03em',textTransform:'uppercase',color:'var(--muted)',paddingBottom:6,borderBottom:'1px solid var(--line)'}},
+          h('span',null,'Metric'),h('span',{style:{textAlign:'right'}},'You'),h('span',{style:{textAlign:'right'}},cmpShort),h('span',{style:{textAlign:'right'}},'Δ')),
+        L.metrics.map(rowEl), sizeBlock, timing),
+      caption:'Like-for-like with your lifecycle stage — fill rate, PM allocation, commitment size, number of deals, investment-size range and timing, vs '+cmpShort+' at the same point in their journey.'});
   }
   /* item 76 — 'Compare Yourself': your strategy as a whole pie + each strategy listed with the funds underneath, vs Peers/Platform/Top 10%/Custom; click a strategy to see your weight vs theirs; per fund: Watchlist · Invest · Similar */
   compareYourselfCard(){

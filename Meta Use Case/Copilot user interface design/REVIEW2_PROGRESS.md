@@ -22,7 +22,9 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 74 per-dimension Suggest funds on comparison (current platform + greyed pipeline) under selected strategy/region/currency/sector
 - [x] 75 comparison defaults to current portfolio portions vs peers/platform/top10 (section 'Compare your current portfolio'; target view kept on toggle)
 - [x] 76 'Compare Yourself' card: whole pie + strategies listed w/ funds underneath vs peers/platform/top10/custom; drill committed-weight you-vs-comparator; per-fund Watchlist/Invest/Similar (compareYourselfCard)
-- NEXT: item 77 (rename simulator→'target simulator', comparison→'portfolio comparison')
+- [x] 77 renamed tabs: 'Target simulator' + 'Portfolio comparison'
+- ALL 77 NUMBERED ITEMS COMPLETE.
+- NEXT: PDF additional comments (peer-lifecycle metrics; AI 'invested in company' button + tree chart; Format dimension direct/FoF/secondaries on overview+similar+comparison; move follower to top next to compare yourself)
 - [x] 1 nudge new-investor guard + liquidity CTA→opportunities
 - [x] 2 TVPI mini-chart in performance (+tvpi seeded)
 - [x] 3 cash-flow: 'Net distributions' not 'Net cash position'
