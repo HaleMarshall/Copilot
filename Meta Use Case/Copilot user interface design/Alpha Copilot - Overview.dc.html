@@ -6850,6 +6850,16 @@ class Component extends DCLogic {
         h('button',{onClick:()=>this.openFundPage(f.id),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'10px 18px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'View this fund →'),
         h('button',{onClick:()=>this.toggleWatch(f.name),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:10,padding:'10px 16px',fontSize:12.5,fontWeight:600,cursor:'pointer'}}, (this.state.watchlist||[]).includes(f.name)?'♥ Watchlisted':'♡ Watchlist')));
   }
+  /* nature / city landscape backdrops for manager logos on the Funds & Managers list (deterministic per key) */
+  LANDSCAPES(){ return ['1506744038136-46273834b3fb','1470071459604-3b5ec3a7fe05','1441974231531-c6227db76b6e','1501785888041-af3ef285b470','1444723121867-7a241cacace9','1490806843957-31f4c9a91c65','1469474968028-56623f02e42e','1433086966358-54859d0ed716','1518495973542-4542c06a5843','1480714378408-67cf0d13bc1b']; }
+  landscapeUrl(key){ const arr=this.LANDSCAPES(); let n=0; const k=String(key||'x'); for(let i=0;i<k.length;i++) n=(n*31+k.charCodeAt(i))>>>0; return 'https://images.unsplash.com/photo-'+arr[n%arr.length]+'?w=240&q=55&auto=format&fit=crop'; }
+  mgrTile(logo,mgrName,key,size){ const h=this.h; size=size||46;
+    return h('div',{style:{position:'relative',width:size,height:size,borderRadius:9,overflow:'hidden',flex:'0 0 '+size+'px',background:'linear-gradient(135deg,#20243a,#3a3f63)'}},
+      h('div',{style:{position:'absolute',inset:0,backgroundImage:'url('+this.landscapeUrl(key)+')',backgroundSize:'cover',backgroundPosition:'center'}}),
+      h('div',{style:{position:'absolute',inset:0,background:'rgba(10,12,24,.22)'}}),
+      h('div',{style:{position:'absolute',left:'16%',top:'16%',right:'16%',bottom:'16%',borderRadius:6,background:'rgba(255,255,255,.96)',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden',boxShadow:'0 1px 4px rgba(0,0,0,.25)'}},
+        h('span',{style:{position:'absolute',fontFamily:this.SF,fontWeight:700,fontSize:Math.round(size*0.24),color:'var(--brand-ink)'}},(mgrName||'·').slice(0,2)),
+        logo? h('img',{src:'assets/logos/'+logo+'.png',alt:'',onError:e=>{e.target.style.display='none';},style:{position:'relative',maxWidth:'86%',maxHeight:'86%',objectFit:'contain'}}):null)); }
   managerOverviewBody(){
     const h=this.h; const SF=this.SF; const s=this.state;
     const ACs=['All'].concat(this.mgrAssetClasses());
@@ -6922,8 +6932,7 @@ class Component extends DCLogic {
         // item 191 — select managers to compare
         h('input',{type:'checkbox',checked:sel,onChange:()=>this.toggleMgrSel(m.id),style:{width:16,height:16,accentColor:'var(--brand)',cursor:'pointer'}}),
         h('div',{style:{display:'flex',alignItems:'center',gap:10,minWidth:0}},
-          this.mgrLogo(m)? h('img',{src:'assets/logos/'+this.mgrLogo(m)+'.png',alt:'',style:{width:30,height:30,borderRadius:7,background:'#fff',border:'1px solid var(--line)',padding:3,objectFit:'contain',flex:'0 0 30px'}})
-            : h('div',{style:{width:30,height:30,borderRadius:7,background:'var(--brand-wash)',color:'var(--brand)',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:700,fontSize:12,flex:'0 0 30px'}},m.name.slice(0,2)),
+          this.mgrTile(this.mgrLogo(m),m.name,m.id||m.name,34), /* logo over a nature/city landscape */
           h('div',{style:{minWidth:0}},
             /* item 199 — clickable into the manager profile */
             h('button',{onClick:()=>this.openManagerProfile(m.id),title:'Open '+m.name+' profile',style:{border:'none',background:'none',padding:0,cursor:'pointer',textAlign:'left',fontFamily:SF,fontSize:15,fontWeight:600,color:'var(--brand-ink)'}}, m.name+' ›'),
@@ -6994,8 +7003,8 @@ class Component extends DCLogic {
       return true;
     }).sort((a,b)=> s.mgrSort==='name'? a.name.localeCompare(b.name) : s.mgrSort==='cons'? (b.vintage-a.vintage) : (b.irr-a.irr));
     const fundRow=(f)=>{ const det=this.fundDetail(f);
-      return h('div',{key:f.id,style:{display:'grid',gridTemplateColumns:'38px 1.7fr 1fr .7fr .7fr 1fr',gap:12,alignItems:'center',padding:'11px 14px',borderRadius:12,border:'1px solid var(--line)',background:'var(--surface)',marginBottom:8}},
-        f.logo? h('img',{src:'assets/logos/'+f.logo+'.png',alt:'',style:{width:30,height:30,borderRadius:7,background:'#fff',border:'1px solid var(--line)',padding:3,objectFit:'contain'}}) : h('div',{style:{width:30,height:30,borderRadius:7,background:'var(--surface-2)',color:'var(--muted)',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:700,fontSize:11}},f.mgr.slice(0,2)),
+      return h('div',{key:f.id,style:{display:'grid',gridTemplateColumns:'44px 1.7fr 1fr .7fr .7fr 1fr',gap:12,alignItems:'center',padding:'11px 14px',borderRadius:12,border:'1px solid var(--line)',background:'var(--surface)',marginBottom:8}},
+        this.mgrTile(f.logo,f.mgr,f.mgrId||f.mgr||f.id,40), /* logo over a nature/city landscape */
         h('div',{style:{minWidth:0}},
           h('button',{onClick:()=>this.openFundResearch(f.id),title:'Open '+f.name,style:{border:'none',background:'none',padding:0,cursor:'pointer',textAlign:'left',fontFamily:SF,fontSize:14.5,fontWeight:600,color:'var(--brand-ink)'}}, f.name+' ›'),
           h('div',{style:{fontSize:10.5,color:'var(--muted)'}}, f.mgr+' · vintage '+f.vintage)),
@@ -7006,7 +7015,7 @@ class Component extends DCLogic {
     };
     const fundsListCard=this.card({title: (s.mgrAC==='All'?'Funds on the Moonfare platform':s.mgrAC+' funds on the platform'), info:true,
       children: funds.length? h('div',null,
-        h('div',{style:{display:'grid',gridTemplateColumns:'38px 1.7fr 1fr .7fr .7fr 1fr',gap:12,padding:'0 14px 8px',fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)'}},
+        h('div',{style:{display:'grid',gridTemplateColumns:'44px 1.7fr 1fr .7fr .7fr 1fr',gap:12,padding:'0 14px 8px',fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)'}},
           h('span',null,''),h('span',null,'Fund'),h('span',null,'Asset class'),h('span',{style:{textAlign:'right'}},'IRR'),h('span',{style:{textAlign:'right'}},'DPI'),h('span',null,'')),
         funds.map(fundRow))
         : h('div',{style:{padding:'24px',textAlign:'center',color:'var(--muted)',fontSize:13}},'No funds match — broaden the asset class or clear the search.'),
