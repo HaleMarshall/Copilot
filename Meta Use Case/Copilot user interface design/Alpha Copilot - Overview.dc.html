@@ -5635,10 +5635,9 @@ class Component extends DCLogic {
     const header=h('div',{style:{display:'flex',gap:16,alignItems:'flex-start',justifyContent:'space-between',flexWrap:'wrap'}},
       h('div',{style:{minWidth:0}},
         h('div',{style:{fontSize:10.5,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Target simulator'), /* item 63 */
-        /* item 62 — single title 'Simulate and compare your targets'; the redundant 'Shape your target' heading removed */
-        h('div',{style:{fontFamily:SF,fontSize:26,fontWeight:600,margin:'3px 0 2px'}},'Simulate and compare your targets'),
-        h('div',{style:{fontSize:13,color:'var(--muted)',lineHeight:1.5,maxWidth:620}},
-          'One target pie per dimension — strategy, region, currency and sector. Compare each against your current mix, the model, peers, the platform, the top 10% or the endowments — or pick Custom to shape it with the sliders, then save each target individually.')),
+        /* review4 item 1 — duplicate 'Simulate and compare your targets' title removed (the use-case header above already shows it); one concise line kept */
+        h('div',{style:{fontSize:13,color:'var(--muted)',lineHeight:1.5,maxWidth:620,marginTop:4}},
+          'Set a target per dimension, then simulate it against the group you’re comparing — Custom lets you shape it with the sliders. Save each target individually.')),
       h('div',{style:{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:6,flex:'0 0 auto'}},
         h('button',{onClick:()=>this.aiBuildTarget(),style:{display:'inline-flex',alignItems:'center',gap:8,background:'linear-gradient(135deg,#2C2DFE,#5B5CFF)',color:'#fff',border:'none',borderRadius:11,padding:'12px 18px',fontSize:13,fontWeight:700,cursor:'pointer',boxShadow:'0 8px 22px -10px rgba(44,45,254,.6)',fontFamily:'Inter,system-ui,sans-serif'}},'✦ Build my target with Alpha'),
         h('div',{style:{fontSize:10.5,color:'var(--muted)'}},'New here? Let Alpha propose a starting target.')));
