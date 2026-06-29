@@ -5958,7 +5958,7 @@ class Component extends DCLogic {
     {id:'up-bx-infra',name:'Brookfield Infrastructure VI',fund:'Brookfield Infrastructure VI',mgr:'Brookfield',logo:'ares',strat:'Infrastructure',region:'Global',tgt:'1.7–1.9x',close:'Q1 2028',min:'€50,000',prospect:true,note:'Core infrastructure — preview',upcoming:true}
   ]; }
   oppNextActions(){
-    const src=this.oppSourceModel(); const tgt=this.oppTargetMix(); const w=this.state.oppWeights;
+    const src=this.oppSourceModel(); const tgt=this.oppLiveTargetMix('strategy'); const w=this.state.oppWeights; /* item 2 — live, weight-adjusted target so the funds change with the sliders */
     const funds=this.OPP_FUNDS();
     // per-strategy gap to target (target - current); positive => add, negative => trim
     const gaps=this.STRATS.map(([k,name,color])=>({k,name,color,gap:+((tgt[k]||0)-(src.mix[k]||0)).toFixed(1)}));
@@ -5997,12 +5997,27 @@ class Component extends DCLogic {
         style:{width:'100%',accentColor:'var(--brand)',cursor:'pointer'}}));
   }
   /* review5 item 1/2 — dimension-agnostic current & target mixes for the Distance-from-target section */
-  oppCurrentMix(dim){ if(dim==='strategy') return (this.MIX&&this.MIX.you)||{}; const d=this.HOME_DIMS().find(x=>x.key===dim); return (d&&d.actual)||{}; }
+  oppCurrentMix(dim){ if(dim==='strategy') return (this.oppSourceModel().mix)||(this.MIX&&this.MIX.you)||{}; const d=this.HOME_DIMS().find(x=>x.key===dim); return (d&&d.actual)||{}; }
   oppBaseTarget(dim){ if(dim==='strategy') return this.oppTargetMix(); const d=this.HOME_DIMS().find(x=>x.key===dim); return (d&&d.target)||{}; }
   oppDimColors(dim){ if(dim==='strategy'){ const o=Object.fromEntries((this.STRATS||[]).map(([k,n,c])=>[k,c])); o.realestate=o.realestate||'--data-6'; return o; } const d=this.HOME_DIMS().find(x=>x.key===dim); return (d&&d.colors)||{}; }
   oppDimNames(dim){ if(dim==='strategy'){ const o=Object.fromEntries((this.STRATS||[]).map(([k,n])=>[k,n])); o.realestate=o.realestate||'Real Estate'; return o; } const d=this.HOME_DIMS().find(x=>x.key===dim); const o={}; Object.keys((d&&d.actual)||{}).forEach(k=>o[k]=k); return o; }
-  /* item 2 wires the weighting in here; item 1 returns the set target as-is */
-  oppLiveTargetMix(dim){ return this.oppBaseTarget(dim); }
+  /* item 2 — 'What matters most to you' adjusts the target pie LIVE:
+     · single goal  → the set target is kept exactly as-is
+     · weighted mix → the target is blended from current toward the set target by that dimension's weight, so a higher weight pulls the target fully onto the set target (aggressive rebalance) and a lower weight leaves it near where you are. Renormalised to 100. */
+  oppLiveTargetMix(dim){
+    const base=this.oppBaseTarget(dim);
+    if(this.state.oppMode!=='weighted') return base;
+    const cur=this.oppCurrentMix(dim); const w=this.state.oppWeights||{};
+    const wMap={strategy:w.strategy,region:w.region,currency:w.currency,sector:w.sector};
+    let pull=wMap[dim];
+    if(pull==null){ const vals=Object.keys(wMap).map(k=>wMap[k]).filter(v=>v!=null); pull=vals.length? vals.reduce((a,b)=>a+b,0)/vals.length : 50; } /* format has no slider → mean emphasis */
+    const a=Math.max(0,Math.min(1,pull/100));
+    const keys=Array.from(new Set([...Object.keys(cur),...Object.keys(base)]));
+    const out={}; let sum=0;
+    keys.forEach(k=>{ const v=(cur[k]||0)+a*((base[k]||0)-(cur[k]||0)); out[k]=v; sum+=v; });
+    if(sum>0) keys.forEach(k=>out[k]=+(out[k]/sum*100).toFixed(1));
+    return out;
+  }
   opportunitiesBody(){
     const h=this.h; const SF=this.SF; const o=this.oppNextActions(); const s=this.state;
     // source picker
@@ -6049,20 +6064,28 @@ class Component extends DCLogic {
           distZ.length? this.miniZ(distZ) : h('div',{style:{fontSize:12.5,color:'var(--muted)',padding:'14px 0',textAlign:'center'}},'On target across this dimension.'))),
       caption:'Your CURRENT '+distDimLabel.toLowerCase()+' mix (left) vs your TARGET (middle) — '+targetSrc+'. Bars = gap to target (right = below target, do more). Toggle the dimension top-right.'});
 
-    // weighting card
-    const wCard=this.card({title:'What matters most to you',
+    // weighting card — review5 item 2: actually adjusts the target pie + funds LIVE
+    const wPullMap={strategy:s.oppWeights.strategy,region:s.oppWeights.region,currency:s.oppWeights.currency,sector:s.oppWeights.sector};
+    let wPull=wPullMap[distDim]; if(wPull==null){ const vv=Object.keys(wPullMap).map(k=>wPullMap[k]).filter(v=>v!=null); wPull=vv.length?Math.round(vv.reduce((a,b)=>a+b,0)/vv.length):50; }
+    const wLiveNote = s.oppMode==='weighted'
+      ? h('div',{style:{fontSize:11.5,lineHeight:1.5,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:9,padding:'9px 11px',marginBottom:12}},
+          '✦ Live — your ',h('b',null,distDimLabel),' target above is pulled ',h('b',null,wPull+'%'),' onto your set target. Drag a weight and the Target donut, the gap bars and the funds below all move with it.')
+      : h('div',{style:{fontSize:11.5,lineHeight:1.5,color:'var(--ink)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:9,padding:'9px 11px',marginBottom:12}},
+          h('b',null,'Single goal'),' — your set target is kept exactly as you set it; the engine only reprioritises the moves around one objective.');
+    const wCard=this.card({title:'What matters most to you',badge:this.badge(s.oppMode==='weighted'?'live':'set target','synth'),
       right:this.seg([{label:'Weighted mix',value:'weighted'},{label:'Single goal',value:'single'}], s.oppMode, v=>this.setState({oppMode:v}),{sm:true}),
       children:h('div',{style:{paddingTop:6}},
+        wLiveNote,
         s.oppMode==='weighted'
           ? h('div',null,
               /* items 122/123 — removed 'Performance' (no target / can't predict); added 'Currency' (a genuine decision dimension, distinct from Region) */
-              h('div',{style:{fontSize:12,color:'var(--muted)',marginBottom:12,lineHeight:1.5}},'Tell the engine how much each target dimension counts. It optimises the blend that moves your target-fit score up the most.'),
+              h('div',{style:{fontSize:12,color:'var(--muted)',marginBottom:12,lineHeight:1.5}},'Tell the engine how much each target dimension counts — the slider sets how hard the target pulls onto the mix you set.'),
               this.oppWeightRow('strategy','Strategy mix'), this.oppWeightRow('region','Region'),
               this.oppWeightRow('currency','Currency'), this.oppWeightRow('sector','Sector'))
           : h('div',null,
-              h('div',{style:{fontSize:12,color:'var(--muted)',marginBottom:12,lineHeight:1.5}},'Optimise for one objective only — the engine ignores the rest.'),
+              h('div',{style:{fontSize:12,color:'var(--muted)',marginBottom:12,lineHeight:1.5}},'Optimise for one objective only — the engine ignores the rest, and your target mix stays exactly as set.'),
               this.seg([{label:'Maximise return',value:'perf'},{label:'Hit target mix',value:'mix'},{label:'Smooth cash-flow',value:'cash'}], s.oppSingle||'perf', v=>this.setState({oppSingle:v})))),
-      caption: s.oppMode==='weighted'?'Weights are target-fit dimensions only — Strategy, Region, Currency, Sector. We don’t weight by performance (no target, can’t predict). Currency is separate from Region: a European fund can be USD-denominated.':'A single-objective run produces a more concentrated set of moves.'});
+      caption: s.oppMode==='weighted'?'Weights are target-fit dimensions only — Strategy, Region, Currency, Sector. A higher weight pulls the Target pie fully onto your set target (rebalance harder); a lower weight leaves it near where you are. We don’t weight by performance (no target, can’t predict).':'A single-objective run keeps your set target and produces a more concentrated set of moves.'});
 
     // ranked actions
     const actionList=h('div',{style:{display:'flex',flexDirection:'column',gap:10}},
