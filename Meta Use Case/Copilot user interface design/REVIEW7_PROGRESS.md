@@ -57,4 +57,5 @@ Build strictly one at a time, verify (node --check + Playwright render/logicErro
 - [x] 24 region (and other non-strategy dims) kept exactly as-is (no collapse) — verified 0 chevrons, funds expanded
 - [x] 25 at-a-glance buckets toggle — click again unselects (homeFocusCat toggles to null) — verified
 - [x] 26+28 detailed vintage page: commitments-by-vintage chart (NAV/Committed toggle) + Vintage×dim heatmap (Strategy/Region/Sector/Currency/Format + NAV/Committed) + funds-by-vintage table — verified
-- NEXT: item 27 (remove the 2nd / bottom top-three-performers table; keep the top one)
+- [x] 27 removed the duplicate (bottom) top-three-performers table in the vintage semi-detailed pop; kept the top one — verified (1 visible heading)
+- NEXT: item 29 (PDF button: select detailed pages, charts, Moonfare branding, cover page, legend)

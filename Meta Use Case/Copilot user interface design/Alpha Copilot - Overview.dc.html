@@ -4292,8 +4292,7 @@ class Component extends DCLogic {
         h('div',{key:'hm'}, this.panelSection('Vintage × strategy heat-map','look-through · 88% of NAV'),
           this.vintageHeatmap(vYears),
           h('div',{style:{fontSize:12,color:'var(--muted)',lineHeight:1.5,marginTop:8}},'Darker = more capital committed to that strategy in that vintage. Based on 88% of committed capital that resolves to a strategy.')),
-        /* item 38 — only the top positions here, not funds-by-commitment */
-        h('div',{key:'f'}, this.topFivePerformers(null))
+        /* review7 item 27 — removed the duplicate (bottom) 'top three performing investments' table; the top one (above) is kept */
       ];
     } else if(key==='performance'){
       const ranked=roster.slice().sort((a,b)=>b.contrib-a.contrib);
