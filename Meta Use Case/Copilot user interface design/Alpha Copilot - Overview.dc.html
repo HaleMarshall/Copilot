@@ -5239,17 +5239,13 @@ class Component extends DCLogic {
     const _under=_deltas.slice().sort((a,b)=>b.d-a.d)[0]||{n:'',d:0};
     const _over=_deltas.slice().sort((a,b)=>a.d-b.d)[0]||{n:'',d:0};
     const _topHold=this.STRATS.map(kv=>({n:kv[1],p:_mx[kv[0]]||0})).sort((a,b)=>b.p-a.p)[0]||{n:'',p:0};
+    /* review7 item 1 — this card was too large; condensed to ~half: one concise read line + the CTA (dropped the padded suggestion sub-box) */
     const alphaReadCard=this.card({title:'Alpha’s read on your strategy',badge:this.badge('AI','synth'),tone:'alpha',
-      children:h('div',{style:{display:'flex',flexDirection:'column',gap:11}},
-        /* item 16 — intelligence: gap-to-target + concentration */
-        h('div',{style:{fontSize:13,lineHeight:1.6,color:'rgba(255,255,255,.92)'}},
-          'You’re ',h('strong',{key:'u',style:{color:'#fff'}}, Math.abs(_under.d)+'pp under target'),' in '+_under.n+' and ',h('strong',{key:'o',style:{color:'#fff'}},Math.abs(_over.d)+'pp over'),' in '+_over.n+'. ',_topHold.n+' is your single largest book at '+_topHold.p+'% — the main concentration to watch.',
-          stratGaps.length? [' You hold ',h('strong',{key:'g',style:{color:'#fff'}},'no direct fund'),' in '+stratGaps.join(', ')+'.'] : null),
-        /* item 17 — an actionable suggestion (intelligence, not a summary) */
-        h('div',{style:{fontSize:12.5,lineHeight:1.55,color:'#fff',background:'rgba(255,255,255,.14)',borderRadius:10,padding:'10px 12px'}},
-          h('span',{style:{fontWeight:700}},'✦ Suggestion: '),'a new commitment to ',h('strong',null,_under.n),' would close your largest gap to target and dilute the '+_topHold.n+' concentration — the highest-impact next move. Pair it with a smaller '+(stratGaps[0]||_over.n)+' position to round out the book.'),
+      children:h('div',{style:{display:'flex',flexDirection:'column',gap:9}},
+        h('div',{style:{fontSize:12.5,lineHeight:1.5,color:'rgba(255,255,255,.92)'}},
+          'You’re ',h('strong',{key:'u',style:{color:'#fff'}}, Math.abs(_under.d)+'pp under'),' in '+_under.n+' and ',h('strong',{key:'o',style:{color:'#fff'}},Math.abs(_over.d)+'pp over'),' in '+_over.n+'. '+_topHold.n+' is your largest book ('+_topHold.p+'%) — the main concentration. ',h('strong',{key:'s',style:{color:'#fff'}},'Adding '+_under.n),' closes the gap.'),
         this.gapCTA('strategy',true)),
-      caption:'Alpha acts as your advisor — intelligence plus a concrete next move, not just a summary.'});
+      caption:'A concise read plus a concrete next move.'});
     // item 71 — 'Where you're concentrated' box + allocated-vs-committed Z-chart (real deviation data), moved down the page
     const concRows=this.basisPct('strategy'); // for the concentration ranking (current basis)
     const concRanked=Object.keys(concRows).map(k=>{ const s=this.STRATS.find(x=>x[0]===k); return {n:s?s[1]:k, color:s?s[2]:'--data-9', p:concRows[k]||0}; }).filter(r=>r.p>0).sort((a,b)=>b.p-a.p);
