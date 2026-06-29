@@ -2300,8 +2300,8 @@ class Component extends DCLogic {
     if(this.curPage().view==='home') return null;
     // Custom-comparison cohort builder — ONLY on the Comparison page, ONLY when "Custom" is the benchmark.
     if(this.controlIsLeverPanel()){
-      const onCompare = this.curPage().view==='compare';
-      /* item 58 — pressing Peers (or Custom) opens this side panel to define & save your own peer group */
+      const onCompare = this.curPage().view==='compare' || this.curPage().view==='sim'; /* item 69 — also on the Target simulator */
+      /* item 58/69 — pressing Peers (or Custom) opens this side panel to define & save your own peer group */
       if(onCompare && (s.cmp==='custom'||s.cmp==='peers') && s.controlOpen){
         return h('aside',{style:{flex:'0 0 auto',width:312,background:'var(--surface)',borderLeft:'1px solid var(--line)',display:'flex',flexDirection:'column',minHeight:0,transition:'width .18s',overflow:'hidden'}},
           h('div',{style:{flex:'0 0 auto',padding:'13px 16px 12px',borderBottom:'1px solid var(--line)',display:'flex',alignItems:'flex-start',gap:10}},
@@ -5493,76 +5493,67 @@ class Component extends DCLogic {
             z.some(x=>Math.abs(x.delta)>=0.5)? this.miniZ(z) : h('div',{style:{fontSize:12,color:'var(--muted)',padding:'20px 0',textAlign:'center'}},'Move a slider to open a gap vs your current mix.')))});
     };
     // ---- one card PER dimension (strategy, region, currency, sector): your target pie + side legend, with a 'compare against' selector under it; Custom opens sliders + numeric % inputs + risk strategies ----
-    const CMP=[['current','You · current'],['model','Model'],['peers','Peers'],['platform','Platform'],['top10','Top 10%'],['custom','Custom']];
+    /* item 67 — only Model / Peers / Platform / Top 10% / Custom (no 'current' here) */
+    const CMP=[['model','Model'],['peers','Peers'],['platform','Platform'],['top10','Top 10%'],['custom','Custom']];
     const dimTargetCard=(d)=>{
       const cats=Object.keys(d.actual);
       const tObj=targets[d.key]||d.target||d.actual;
       const tot=cats.reduce((a,k)=>a+(+tObj[k]||0),0)||1;
       const tgtSlices=cats.map(k=>({color:d.colors[k]||'--data-9',p:+(((+tObj[k]||0)/tot*100)).toFixed(1),n:nm(d.key,k)}));
-      const mode=(s.simCmp&&s.simCmp[d.key])||'current';
-      const compMix = mode==='current'? d.actual : (mode==='custom'? tObj : (mode==='model'? d.target : this.dimBench(d,mode)));
+      const mode=(s.simCmp&&s.simCmp[d.key])||'model'; /* item 67 — default Model, not current */
+      const compMix = mode==='custom'? tObj : (mode==='model'? d.target : this.dimBench(d,mode));
       const compTot=cats.reduce((a,k)=>a+(+compMix[k]||0),0)||1;
-      const compLabel={current:'your current allocation',model:'the Model target',peers:'the Peers’ target',platform:'the Platform target',top10:'the Top 10% target',custom:'your custom target'}[mode];
-      const compShort={current:'Current',model:'Model',peers:'Peers',platform:'Platform',top10:'Top 10%',custom:'Custom'}[mode];
-      // one graph + side legend — numbers pulled out of the pie so small slices are still readable
-      const pieRow=h('div',{style:{display:'flex',gap:22,alignItems:'center',flexWrap:'wrap'}},
-        h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6,flex:'0 0 auto'}},
-          this.donutNamed(tgtSlices,184,'Target',d.label.toLowerCase()),
+      const compSlices=cats.map(k=>({color:d.colors[k]||'--data-9',p:+(((+compMix[k]||0)/compTot*100)).toFixed(1),n:nm(d.key,k)})).filter(x=>x.p>0);
+      const compLabel={model:'the Model target',peers:'the Peers’ target',platform:'the Platform target',top10:'the Top 10% target',custom:'your custom group'}[mode];
+      const compShort={model:'Model',peers:'Peers',platform:'Platform',top10:'Top 10%',custom:'Custom'}[mode];
+      /* item 70 — Z-chart instead of the table */
+      const zRows=cats.map(k=>{ const yv=Math.round((+tObj[k]||0)/tot*100); const cv=Math.round((+compMix[k]||0)/compTot*100); const dd=+(yv-cv).toFixed(1); return {name:nm(d.key,k),delta:dd,color:d.colors[k]||'--data-9',sig:Math.abs(dd)>=2}; }).filter(r=>r.delta!==0).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
+      /* item 68 — left: my target · middle: the comparator · right: the Z-chart */
+      const cols=h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:18,alignItems:'start'}},
+        h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutLabel('Your target'), this.donutNamed(tgtSlices,170,'Target',d.label.toLowerCase()),
           h('div',{style:{fontSize:10,color:'var(--muted)'}},'your '+d.label.toLowerCase()+' target')),
-        h('div',{style:{flex:'1 1 240px',minWidth:220}},
-          h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}},'Target allocation — every bucket'),
-          this.legend(tgtSlices)));
-      // compare selector — directly under the pie
+        h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutLabel(compShort), this.donutNamed(compSlices,170,compShort,d.label.toLowerCase()),
+          h('div',{style:{fontSize:10,color:'var(--muted)'}},compLabel)),
+        h('div',null, h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}},'Your target vs '+compShort+' (pp)'),
+          zRows.length? this.miniZ(zRows): h('div',{style:{fontSize:12,color:'var(--muted)',padding:'18px 0',textAlign:'center'}},'In line with '+compShort+'.')));
+      /* item 67/69 — comparator selector; Peers & Custom open the group editor (same one as the comparison page) */
       const selector=h('div',null,
         h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:7}},'Compare your target against'),
         h('div',{style:{display:'flex',flexWrap:'wrap',gap:6}}, CMP.map(([v,l])=>{ const on=mode===v;
-          return h('button',{key:v,onClick:()=>this.setSimCmp(d.key,v),
-            style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 13px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}}, v==='custom'?'✎ '+l:l); })));
-      let lower;
-      if(mode==='custom'){
-        const riskToggle = d.key==='strategy' ? h('div',{style:{marginBottom:4}},
-          h('div',{style:{fontSize:10.5,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)',marginBottom:6}},'Risk strategy — feeds your target'),
-          h('div',{style:{display:'flex',flexWrap:'wrap',gap:6}}, this.RISKS.map(r=>{ const on=s.riskId===r.id;
-            return h('button',{key:r.id,onClick:()=>this.setState({riskId:r.id,simTargets:null}),title:'PM target '+r.pmTarget+'%',
-              style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 11px',fontSize:11,fontWeight:on?700:500,cursor:'pointer',whiteSpace:'nowrap'}}, r.short); }))) : null;
-        const sliders=cats.map(k=>{ const raw=(tObj[k]!=null?tObj[k]:d.actual[k]); const cur=Math.round(d.actual[k]||0); const tgt=Math.round((+tObj[k]||0)/tot*100);
-          return h('div',{key:k,style:{display:'grid',gridTemplateColumns:'104px 1fr 62px 50px',alignItems:'center',gap:9}},
-            h('div',{style:{display:'flex',alignItems:'center',gap:7,minWidth:0}},
-              h('span',{style:{width:9,height:9,borderRadius:2,background:`var(${d.colors[k]})`,flex:'0 0 9px'}}),
-              h('span',{style:{fontSize:11.5,color:'var(--ink)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},nm(d.key,k))),
-            h('input',{type:'range',min:0,max:100,step:1,value:raw,onChange:e=>this.setSimTarget(d.key,k,e.target.value),style:{width:'100%',accentColor:`var(${d.colors[k]})`,cursor:'pointer'}}),
-            h('div',{style:{display:'flex',alignItems:'center',gap:2,border:'1px solid var(--line)',borderRadius:7,padding:'3px 5px'}},
-              h('input',{type:'number',min:0,max:100,value:Math.round(raw),onChange:e=>this.setSimTarget(d.key,k,Math.max(0,Math.min(100,+e.target.value||0))),style:{width:32,border:'none',outline:'none',background:'transparent',fontSize:12,fontFamily:SF,fontWeight:600,color:'var(--ink)',textAlign:'right'}}),
-              h('span',{style:{fontSize:11,color:'var(--muted)'}},'%')),
-            h('div',{style:{textAlign:'right',fontSize:11,fontFamily:SF,fontWeight:600,color:'var(--muted)'}}, cur+'→'+tgt));
-        });
-        lower=h('div',{style:{marginTop:14,display:'flex',flexDirection:'column',gap:10}}, riskToggle,
-          h('div',{style:{fontSize:10.5,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)'}},'Adjust — drag a slider or type a %'),
-          h('div',{style:{display:'flex',flexDirection:'column',gap:9}}, sliders),
-          h('div',{style:{display:'flex',gap:9,flexWrap:'wrap',marginTop:2}},
-            h('button',{onClick:()=>this.setState({simSuggest:d.key}),style:{border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:9,padding:'8px 13px',fontSize:12,fontWeight:600,cursor:'pointer'}},'✦ Suggest funds'),
-            h('button',{onClick:()=>this.setState({simTargets:null}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:9,padding:'8px 13px',fontSize:12,fontWeight:600,cursor:'pointer'}},'Reset to model')));
-      } else {
-        const rowsC=cats.map(k=>({n:nm(d.key,k),color:d.colors[k],you:Math.round((+tObj[k]||0)/tot*100),cmp:Math.round((+compMix[k]||0)/compTot*100)}))
-          .map(r=>({...r,dd:r.you-r.cmp})).sort((a,b)=>Math.abs(b.dd)-Math.abs(a.dd));
-        lower=h('div',{style:{marginTop:14}},
-          h('div',{style:{display:'grid',gridTemplateColumns:'1fr 58px 58px 50px',gap:8,fontSize:9.5,fontWeight:700,letterSpacing:'.03em',textTransform:'uppercase',color:'var(--muted)',paddingBottom:6,borderBottom:'1px solid var(--line)'}},
-            h('span',null,''),h('span',{style:{textAlign:'right'}},'Your tgt'),h('span',{style:{textAlign:'right'}},compShort),h('span',{style:{textAlign:'right'}},'Δpp')),
-          rowsC.map((r,i)=>h('div',{key:i,style:{display:'grid',gridTemplateColumns:'1fr 58px 58px 50px',gap:8,alignItems:'center',padding:'6px 0',borderBottom:'1px solid var(--line)'}},
-            h('span',{style:{display:'flex',alignItems:'center',gap:7,minWidth:0}}, h('span',{style:{width:9,height:9,borderRadius:2,background:`var(${r.color})`,flex:'0 0 9px'}}), h('span',{style:{fontSize:12,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},r.n)),
-            h('span',{style:{textAlign:'right',fontFamily:SF,fontWeight:600,fontSize:12.5}},r.you+'%'),
-            h('span',{style:{textAlign:'right',fontFamily:SF,fontWeight:600,fontSize:12.5,color:'var(--muted)'}},r.cmp+'%'),
-            h('span',{style:{textAlign:'right',fontFamily:SF,fontWeight:700,fontSize:12.5,color: r.dd===0?'var(--muted)':(r.dd>0?'var(--over)':'var(--under)')}}, (r.dd>0?'+':'')+r.dd))));
-      }
+          return h('button',{key:v,onClick:()=>{ this.setSimCmp(d.key,v); if(v==='peers'||v==='custom') this.setState({cmp:(v==='peers'?'peers':'custom'), controlOpen:true}); },
+            style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 13px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}}, (v==='custom'||v==='peers')?'✎ '+l:l); })));
+      /* item 68 — Adjust-my-target button reveals the sliders inline (any comparator, not only Custom) */
+      const adjOpen=this.dtog('simAdjust_'+d.key,false);
+      const riskToggle = (adjOpen && d.key==='strategy') ? h('div',{style:{marginBottom:4}},
+        h('div',{style:{fontSize:10.5,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)',marginBottom:6}},'Risk strategy — feeds your target'),
+        h('div',{style:{display:'flex',flexWrap:'wrap',gap:6}}, this.RISKS.map(r=>{ const on=s.riskId===r.id;
+          return h('button',{key:r.id,onClick:()=>this.setState({riskId:r.id,simTargets:null}),title:'PM target '+r.pmTarget+'%',
+            style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 11px',fontSize:11,fontWeight:on?700:500,cursor:'pointer',whiteSpace:'nowrap'}}, r.short); }))) : null;
+      const sliders = adjOpen? cats.map(k=>{ const raw=(tObj[k]!=null?tObj[k]:d.actual[k]); const cur=Math.round(d.actual[k]||0); const tgt=Math.round((+tObj[k]||0)/tot*100);
+        return h('div',{key:k,style:{display:'grid',gridTemplateColumns:'104px 1fr 62px 50px',alignItems:'center',gap:9}},
+          h('div',{style:{display:'flex',alignItems:'center',gap:7,minWidth:0}},
+            h('span',{style:{width:9,height:9,borderRadius:2,background:`var(${d.colors[k]})`,flex:'0 0 9px'}}),
+            h('span',{style:{fontSize:11.5,color:'var(--ink)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},nm(d.key,k))),
+          h('input',{type:'range',min:0,max:100,step:1,value:raw,onChange:e=>this.setSimTarget(d.key,k,e.target.value),style:{width:'100%',accentColor:`var(${d.colors[k]})`,cursor:'pointer'}}),
+          h('div',{style:{display:'flex',alignItems:'center',gap:2,border:'1px solid var(--line)',borderRadius:7,padding:'3px 5px'}},
+            h('input',{type:'number',min:0,max:100,value:Math.round(raw),onChange:e=>this.setSimTarget(d.key,k,Math.max(0,Math.min(100,+e.target.value||0))),style:{width:32,border:'none',outline:'none',background:'transparent',fontSize:12,fontFamily:SF,fontWeight:600,color:'var(--ink)',textAlign:'right'}}),
+            h('span',{style:{fontSize:11,color:'var(--muted)'}},'%')),
+          h('div',{style:{textAlign:'right',fontSize:11,fontFamily:SF,fontWeight:600,color:'var(--muted)'}}, cur+'→'+tgt));
+      }) : null;
+      const adjustBlock=h('div',{style:{display:'flex',flexDirection:'column',gap:10}},
+        h('div',{style:{display:'flex',gap:9,flexWrap:'wrap',alignItems:'center'}},
+          h('button',{onClick:()=>this.setDtog('simAdjust_'+d.key,!adjOpen),style:{border:'1px solid var(--brand)',background:adjOpen?'var(--brand-wash)':'var(--surface)',color:'var(--brand-ink)',borderRadius:9,padding:'8px 14px',fontSize:12,fontWeight:700,cursor:'pointer'}}, (adjOpen?'▾ ':'✎ ')+'Adjust my target'),
+          adjOpen? h('button',{onClick:()=>this.setState({simTargets:null}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:9,padding:'8px 13px',fontSize:12,fontWeight:600,cursor:'pointer'}},'Reset to model') : null),
+        adjOpen? h('div',{style:{display:'flex',flexDirection:'column',gap:10,marginTop:2}}, riskToggle, h('div',{style:{display:'flex',flexDirection:'column',gap:9}}, sliders)) : null);
       const savedThis=(s.savedDimMsg===d.key);
       return this.card({title:'Your '+d.label.toLowerCase()+' target',info:true,
         right:h('div',{style:{display:'flex',gap:8,alignItems:'center'}},
           savedThis? h('span',{style:{fontSize:11,color:'var(--over)',fontWeight:700,whiteSpace:'nowrap'}},'✓ Saved') : null,
           h('button',{onClick:()=>this.setState({simSuggest:d.key}),style:{border:'1px solid var(--line)',background:'var(--surface)',borderRadius:8,padding:'6px 12px',fontSize:12,fontWeight:600,color:'var(--brand)',cursor:'pointer'}},'✦ Suggest funds'),
-          /* item 59 — save THIS dimension's target individually, right next to Suggest funds */
+          /* item 59/70 — save THIS dimension's target individually */
           h('button',{onClick:()=>this.saveDimTarget(d.key),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'6px 12px',fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif',whiteSpace:'nowrap'}},'✓ Save '+d.label.toLowerCase()+' target')),
-        children:h('div',null, pieRow, h('div',{style:{borderTop:'1px solid var(--line)',marginTop:14,paddingTop:14,display:'flex',flexDirection:'column',gap:12}}, selector, lower)),
-        caption: mode==='custom'? 'Drag a slider or type a percentage to shape your '+d.label.toLowerCase()+' target — the pie updates live. Pick a risk strategy to re-derive it.' : 'Your '+d.label.toLowerCase()+' target vs '+compLabel+'. Pick Custom to define it yourself with the sliders.'});
+        children:h('div',null, cols, h('div',{style:{borderTop:'1px solid var(--line)',marginTop:14,paddingTop:14,display:'flex',flexDirection:'column',gap:12}}, selector, adjustBlock)),
+        caption:'Left: your '+d.label.toLowerCase()+' target. Middle: '+compLabel+'. Right: the Z-chart (your target − comparator, pp). Press “Adjust my target” to reshape it; Peers/Custom open the group editor.'});
     };
     const grid=h('div',{style:{display:'flex',flexDirection:'column',gap:18}},
       ordered.map(d=>h('div',{key:d.key}, dimTargetCard(d))));
