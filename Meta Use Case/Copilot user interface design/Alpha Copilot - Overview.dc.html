@@ -6092,13 +6092,26 @@ class Component extends DCLogic {
           h('span',{style:{fontFamily:SF,fontSize:13.5,fontWeight:700}},label),
           h('span',{style:{fontSize:11,fontWeight:700,color:on?'var(--brand)':'var(--muted)',border:'1px solid '+(on?'var(--brand)':'var(--line)'),borderRadius:999,padding:'3px 9px'}}, on?'✓ Following':'Follow')),
         h('div',{style:{fontSize:11.5,color:'var(--muted)',marginTop:5,lineHeight:1.45}},desc)); };
+    /* item 72 — saved custom groups (from the Peers editor) can be followed directly */
+    const saved=this.state.savedPeers||[];
+    const savedRow = saved.length? h('div',{style:{marginTop:12}},
+      h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:7}},'Your saved groups'),
+      h('div',{style:{display:'flex',gap:6,flexWrap:'wrap'}}, saved.map((p,i)=>{ const on=g==='custom'&&this.state.followCustomName===p.name;
+        return h('button',{key:i,onClick:()=>this.setState({following:'custom',followCustomName:p.name,fc:{...(p.fc||{})}}),
+          style:{border:'1px solid '+(on?'var(--brand)':'var(--brand-tint-3)'),background:on?'var(--brand)':'var(--brand-wash)',color:on?'#fff':'var(--brand-ink)',fontSize:11.5,fontWeight:600,padding:'5px 11px',borderRadius:999,cursor:'pointer'}}, (on?'✓ ':'★ ')+p.name); }))) : null;
     return this.card({title:'Follow a group', info:true,
       children:h('div',null,
         h('div',{style:{fontSize:12.5,color:'var(--muted)',lineHeight:1.55,marginBottom:12}},'Get notified the moment the investors you follow commit to a fund — then view and act on it in one tap. Notifications appear in the bell, top-right.'),
         h('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}},
           opt('peers','Your peer group','Investors matched to your cohort filters (Levers) — risk class, wealth and profession. Refine the cohort to redefine who you follow.'),
-          opt('top10','Top 10% performers','The best-performing investors on the platform, tracked as a live group.'))),
-      caption: g? ('You’re following '+(g==='top10'?'the top 10% performers':'your peer group')+'. Their new commitments show up under Notifications and as a prompt on each visit.') : 'Pick a group to follow — or turn it off anytime.'});
+          opt('top10','Top 10% performers','The best-performing investors on the platform, tracked as a live group.'),
+          /* item 72 — a fully custom follow group */
+          opt('custom','A custom group','Define exactly who you follow — profession, age, risk, region, horizon, wealth & target. Save it and follow it.')),
+        savedRow,
+        /* item 72 — open the same group editor used for Peers (controlOpen) to customize who you follow */
+        h('button',{onClick:()=>this.setState({following:'custom',cmp:'custom',controlOpen:true}),
+          style:{marginTop:12,border:'1px solid var(--brand)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:10,padding:'10px 14px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'✎ Customize who you follow →')),
+      caption: g? ('You’re following '+(g==='top10'?'the top 10% performers':(g==='custom'?('your custom group'+(this.state.followCustomName?(' · '+this.state.followCustomName):'')):'your peer group'))+'. Their new commitments show up under Notifications and as a prompt on each visit.') : 'Pick a group to follow, build a custom one, or turn it off anytime.'});
   }
   oppStat(label,val,sub,col){ const h=this.h;
     return h('div',{style:{textAlign:'right'}},
