@@ -6276,12 +6276,14 @@ class Component extends DCLogic {
       h('span',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)'}},'Endowments'),
       endowOpts.map(([v,l])=>{ const on=cmp===v; return h('button',{key:v,onClick:()=>this.setState({cmp:v}),
         style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 12px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}}, '🎓 '+l); })) : null;
-    const dimControls=h('div',{style:{display:'flex',gap:10,flexWrap:'wrap',marginBottom:12,alignItems:'center'}}, modeSel, pieMode==='others'? selfSel : null, endowRow);
+    /* review4 items 9-10 — the page 'Benchmark against' section is gone; give this card its own comparator selector in 'others' mode */
+    const dimCmpSel = pieMode==='others'? this.seg([{label:'Peers',value:'peers'},{label:'Model',value:'model'},{label:'Platform',value:'platform'},{label:'Top 10%',value:'top10'},{label:'Custom',value:'custom'}], cmp, v=>this.setComparator(v,false),{sm:true}) : null;
+    const dimControls=h('div',{style:{display:'flex',gap:10,flexWrap:'wrap',marginBottom:12,alignItems:'center'}}, modeSel, pieMode==='others'? selfSel : null, dimCmpSel, endowRow);
     const dimPieCard=this.card({title:dimLabel+' — your mix', right:dimSel,
       children: empty? this.cmpEmpty() : h('div',null, dimControls, dimDonutPair, dimLegend),
       caption: pieMode==='target'
-        ? 'Two pies: your actual '+dimLabel.toLowerCase()+' mix (left) vs your target (right). Switch to “Compare vs others” to pit your actual position or your target against peers, platform, the model, the top 10% or the endowments — set the comparator in “Benchmark against” above.'
-        : 'Your '+(self==='current'?'actual position':'target')+' '+dimLabel.toLowerCase()+' mix (left) vs '+cmpShort+' (right). Change the basis here, or the comparator in “Benchmark against” above.'});
+        ? 'Two pies: your actual '+dimLabel.toLowerCase()+' mix (left) vs your target (right). Switch to “Compare vs others” to pit your actual position or your target against peers, platform, the model, the top 10% or the endowments — pick the comparator in this card.'
+        : 'Your '+(self==='current'?'actual position':'target')+' '+dimLabel.toLowerCase()+' mix (left) vs '+cmpShort+' (right). Change the basis and the comparator in this card.'});
     const dimZRows=dimItems.map(([k,n,c])=>{ const d=+((leftMix[k]||0)-(rightMix[k]||0)).toFixed(1); return {name:n,delta:d,color:c,sig:Math.abs(d)>=2}; }).filter(r=>r.delta!==0).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
     const dimZCard=this.card({title:dimLabel+' · over / under-weight vs '+(pieMode==='target'?'your target':cmpShort),
       children:h('div',{style:{padding:'6px 0'}}, empty? this.cmpEmpty() : this.miniZ(dimZRows)),
@@ -6314,19 +6316,16 @@ class Component extends DCLogic {
         h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',margin:'12px 0 7px'}},'In the pipeline (preview)'),
         h('div',{style:{display:'flex',gap:8,flexWrap:'wrap'}}, _upFunds.map(f=>_fundTile(f,false)))),
       caption:'Funds to close your '+dimLabel.toLowerCase()+' gap — live opportunities plus upcoming pipeline (greyed). Shown per dimension here, not just a button at the bottom.'});
-    /* item 66 — 'Benchmark against' toggle moved down next to the Z-chart (PM-allocation/fill-rate are actual and don't depend on it) so it's visible with the chart it drives, without scrolling back up */
+    /* review4 items 9-10 — 'Benchmark against' section (toggle + strategy-pp Z) and the 'Multi-layer benchmark' table removed */
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
       insightBanner,
       this.twoCol(allocCard, fillCard, '1fr 1fr'),
       youVsTargetHead, /* item 71 */
       pmTargetCard,    /* item 71 — PM allocation actual vs target + Z/gap */
-      this.compareYourselfCard(), /* item 76 — strategy mix + funds underneath vs peers/platform/top10/custom, with watchlist/invest/similar */
-      /* review4 item 7 — Follow-a-group moved to the simulator (next to its title); removed from comparison */
-      this.lifecycleCard(), /* PDF#1 — lifecycle-period comparison vs peers/model/top10 at the same investor stage */
+      this.compareYourselfCard(), /* item 6 — two pies + funds compare vs peers/platform/top10/custom */
+      this.lifecycleCard(), /* item 8 — at-your-stage table */
       this.twoCol(dimPieCard, dimZCard, '1.05fr .95fr'),
-      dimSuggestCard, /* item 74 — suggest funds (current + greyed pipeline) under the selected dimension */
-      h('div',{style:{display:'flex',flexDirection:'column',gap:10,background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:14,padding:'14px 16px'}}, toggleRow, targetCard),
-      this.cmpBenchTable()); /* item 71 — keep the multilayer benchmark */
+      dimSuggestCard); /* item 74 — suggest funds (current + greyed pipeline) under the selected dimension */
   }
   cmpEmpty(){ return this.h('div',{style:{padding:'26px 8px',textAlign:'center',color:'var(--muted)',fontSize:12.5,border:'1px dashed var(--line)',borderRadius:12}},'No data — the database is empty.'); }
   // bottom: proper benchmark table — You · Peers · Model · Top 10%
