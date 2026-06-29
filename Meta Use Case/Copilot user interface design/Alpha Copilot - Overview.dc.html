@@ -4273,7 +4273,7 @@ class Component extends DCLogic {
       const ranked=roster.slice().sort((a,b)=>b.contrib-a.contrib);
       eyebrow='Your portfolio · Net Performance'; title='How your portfolio is performing';
       body=[
-        this.kpiTiles([['Net IRR','11.0%','since inception'],['MOIC','1.80x','net of fees'],['TVPI','2.10x',''],['DPI','2.10x','realised'],['Portfolio value','€16.6m','current NAV'],['Distributions','€2.1m','returned to date']]),
+        this.kpiTiles([['Net IRR','11.0%','since inception'],['MOIC','1.80x','net of fees'],['TVPI','2.10x',''],['DPI','2.10x','realised']]), /* review7 item 7 — removed Portfolio Value (already in hero) + Distributions (lives in cash-flows) */
         /* review3 item 4 — ONE merged Alpha's read: peer comparison + top contributor + what to watch */
         (()=>{ const youIrr=parseFloat((this.DB&&this.DB.portfolio&&this.DB.portfolio.irr)||'11.0')||11.0; const peerIrr=9.4;
           const peerLine = youIrr>=peerIrr
@@ -5420,7 +5420,7 @@ class Component extends DCLogic {
         children:this.gridBars(irrRows,{max:irrMax,ticks:[0,irrMax/2,irrMax],unit:'%',labelW:120,barH:18,gap:8,fmt:v=>v+'%'}),
         caption:'Since-inception net IRR per holding.'});
       content=h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
-        this.kpiTiles([['Net IRR',((this.DB&&this.DB.portfolio&&this.DB.portfolio.irr)||'11.0')+'%','since inception'],['MOIC',(this.DB&&this.DB.portfolio&&this.DB.portfolio.moicTableNet)||'1.80x','net of fees'],['TVPI',(this.DB&&this.DB.portfolio&&this.DB.portfolio.tvpiTableNet)||'2.10x',''],['DPI',(this.DB&&this.DB.portfolio&&this.DB.portfolio.dpiTableNet)||'0.82x','realised'],['Portfolio value',(this.DB&&this.DB.portfolio&&this.DB.portfolio.navText)||'€16.6m','current NAV'],['Distributions',(this.DB&&this.DB.portfolio&&this.DB.portfolio.distributionsText)||'€2.1m','to date']]),
+        this.kpiTiles([['Net IRR',((this.DB&&this.DB.portfolio&&this.DB.portfolio.irr)||'11.0')+'%','since inception'],['MOIC',(this.DB&&this.DB.portfolio&&this.DB.portfolio.moicTableNet)||'1.80x','net of fees'],['TVPI',(this.DB&&this.DB.portfolio&&this.DB.portfolio.tvpiTableNet)||'2.10x',''],['DPI',(this.DB&&this.DB.portfolio&&this.DB.portfolio.dpiTableNet)||'0.82x','realised']]), /* review7 item 7 — removed Portfolio Value + Distributions (Distributions lives on the cash-flows page) */
         this.twoCol(contribChart, irrChart, '1fr 1fr'),
         this.card({title:'The funds you hold', right:this.holdingsMetricToggle(), badge:this.badge('your portfolio','conf'), children:this.holdingsTable(roster)}));
     } else if(scope==='cashflow'){
