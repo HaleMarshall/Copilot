@@ -5972,8 +5972,11 @@ class Component extends DCLogic {
         empty? h('div',{style:{fontSize:13,color:'rgba(234,235,255,.75)'}},'No data — the database is empty.')
         : h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, insights.map((t,i)=>h('div',{key:i,style:{display:'flex',gap:9,alignItems:'flex-start',fontSize:13.5,lineHeight:1.5,color:'rgba(238,239,255,.95)'}},
             h('span',{style:{color:'#8C8DFF',fontWeight:700,flex:'0 0 auto'}},'›'), h('span',null,t)))),
-        h('button',{onClick:()=>this.askFromPage('How do I compare to my peers and the model, and what should I change?'),
-          style:{marginTop:12,border:'1px solid rgba(140,141,255,.5)',background:'rgba(140,141,255,.14)',color:'#cfd0ff',borderRadius:9,padding:'7px 13px',fontSize:12,fontWeight:600,cursor:'pointer'}},'Ask Alpha a follow-up →')));
+        /* item 73 — the comparison page is where insights happen: a row of Ask-Alpha questions about how your set targets actually compare */
+        h('div',{style:{display:'flex',gap:8,flexWrap:'wrap',marginTop:12}},
+          ['How do my targets compare to my actual portfolio?','Where am I furthest off-target?','How do I compare to my peers and the model — what should I change?','Which funds would close my biggest gap?'].map((q,i)=>
+            h('button',{key:i,onClick:()=>this.askFromPage(q),
+              style:{border:'1px solid rgba(140,141,255,.5)',background:'rgba(140,141,255,.14)',color:'#cfd0ff',borderRadius:9,padding:'7px 12px',fontSize:12,fontWeight:600,cursor:'pointer',textAlign:'left'}}, '✦ '+q)))));
 
     // ---- benchmark-against toggle: Peers · Model · Platform · Top 10% · Custom (drives every strategy chart below) ----
     const cmpHint={peers:'n = '+co.n+' investors like you',model:'Moonfare house-view · '+this.riskLabel(),platform:'all '+this.PLATFORM_TOTAL+' platform investors',top10:'top 10% performers on the platform',custom:'n = '+co.n+' · refine the group in the control panel →'}[cmp]||'';
