@@ -4426,16 +4426,27 @@ class Component extends DCLogic {
       style:{flex:`${it.w} 1 0`,background:`var(${it.color})`,borderRadius:7,padding:'9px 10px',color:'#fff',display:'flex',flexDirection:'column',justifyContent:'flex-end',cursor:'pointer',overflow:'hidden',minHeight:0}},
       h('div',{style:{fontSize:11.5,fontWeight:700}},it.n), h('div',{style:{fontFamily:"Inter,system-ui,sans-serif",fontSize:11}},it.w+'%'))));
     const tree=h('div',{style:{display:'flex',gap:4,height:230}},col(cA,sA),col(cB,sB));
+    /* PDF#2 — a tree chart (not a pie) of the AI/tech companies you actually hold through your funds */
+    const heldCos=Object.keys(this.COMPANIES()).map(k=>this.COMPANIES()[k]).filter(c=>c.held&&c.pct).map(c=>({n:c.name,w:parseFloat(c.pct)||0,sector:c.sector,color: /AI|Data/.test(c.sector)?'--data-8':(c.sector==='Fintech'?'--data-3':'--data-5')})).sort((a,b)=>b.w-a.w);
+    const aiTree=h('div',{style:{display:'flex',gap:4,height:150,marginBottom:10}}, heldCos.map(c=>h('div',{key:c.n,onClick:e=>this.openPop(e,{title:c.n,value:c.w+'% look-through economic exposure · '+c.sector,method:'company look-through via fund holdings',cohort:'You',n:1}),
+      style:{flex:`${Math.max(c.w,0.4)} 1 0`,background:`var(${c.color})`,borderRadius:7,padding:'9px 10px',color:'#fff',display:'flex',flexDirection:'column',justifyContent:'flex-end',cursor:'pointer',overflow:'hidden',minWidth:0}},
+      h('div',{style:{fontSize:11.5,fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},c.n), h('div',{style:{fontFamily:"Inter,system-ui,sans-serif",fontSize:11}},c.w+'%'))));
+    /* PDF#2 — button to ask Alpha whether you're invested in a specific company */
+    const companyBtn=h('button',{onClick:()=>this.askFromPage('Am I invested in a specific company? For example: are you invested in Anthropic, OpenAI, Stripe or SpaceX?'),
+      style:{width:'100%',border:'1px solid var(--brand)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:10,padding:'10px 13px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif',marginBottom:12}},'✦ Am I invested in a specific company? →');
     const aiCard=h('div',{style:{background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:12,padding:16}},
-      h('div',{style:{fontSize:13,fontWeight:700,marginBottom:10}},'AI exposure read'),
+      companyBtn,
+      h('div',{style:{fontSize:13,fontWeight:700,marginBottom:8}},'Companies you hold (look-through)'),
+      aiTree,
+      h('div',{style:{fontSize:13,fontWeight:700,margin:'4px 0 10px'}},'AI exposure read'),
       h('div',{style:{display:'flex',gap:18,marginBottom:10}},
         h('div',null,h('div',{style:{fontSize:11,color:'var(--muted)'}},'Stated AI'),h('div',{style:{fontFamily:"Inter,system-ui,sans-serif",fontSize:24,fontWeight:700}},'15%')),
         h('div',{style:{alignSelf:'center',color:'var(--muted)'}},'→'),
         h('div',null,h('div',{style:{fontSize:11,color:'var(--muted)',display:'flex',gap:5,alignItems:'center'}},'Est. economic AI',this.badge('illustrative','synth')),h('div',{style:{fontFamily:"Inter,system-ui,sans-serif",fontSize:24,fontWeight:700,color:'var(--brand)'}},'~28%'))),
       h('div',{style:{fontSize:11.5,color:'var(--muted)',lineHeight:1.5}},'Assumption: embedded AI revenue across portfolio companies counted at estimated economic weight; treat as directional, not verified.'));
     return h('div',{style:{display:'grid',gridTemplateColumns:'1.5fr 1fr',gap:14}},
-      this.card({title:'Sector look-through',badge:this.coverageBadge(61),children:tree,caption:'Tile size = sector weight of the 61% of NAV we can see through. Low coverage is the headline — we never imply 100%.'}),
-      this.card({title:'Hidden concentration',children:aiCard,caption:'Your stated AI sleeve understates true exposure once embedded AI inside portfolio companies is counted.'}));
+      this.card({title:'Sector look-through',badge:this.coverageBadge(61),children:tree,caption:'Tree chart — tile size = sector weight of the 61% of NAV we can see through. Low coverage is the headline — we never imply 100%.'}),
+      this.card({title:'Hidden concentration & companies',children:aiCard,caption:'Ask whether you hold a specific company, see the companies you hold as a tree, and how your stated AI sleeve understates true exposure once embedded AI is counted.'}));
   }
 
   /* ---- S7 Performance ---- */

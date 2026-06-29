@@ -24,7 +24,8 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 76 'Compare Yourself' card: whole pie + strategies listed w/ funds underneath vs peers/platform/top10/custom; drill committed-weight you-vs-comparator; per-fund Watchlist/Invest/Similar (compareYourselfCard)
 - [x] 77 renamed tabs: 'Target simulator' + 'Portfolio comparison'
 - ALL 77 NUMBERED ITEMS COMPLETE.
-- NEXT: PDF additional comments (peer-lifecycle metrics; AI 'invested in company' button + tree chart; Format dimension direct/FoF/secondaries on overview+similar+comparison; move follower to top next to compare yourself)
+- [x] PDF#1 lifecycle-period comparison card (fill rate/PM alloc/commitment size/# deals/hi-lo-avg size/timing vs peers/model/top10 at same stage) (+lifecycle seeded)
+- NEXT: PDF#2 (AI 'invested in a specific company' button + tree chart instead of pie); PDF#3 (Format dimension direct/FoF/secondaries on overview+similar+comparison); PDF#4 (move follower to top next to compare yourself)
 - [x] 1 nudge new-investor guard + liquidity CTA→opportunities
 - [x] 2 TVPI mini-chart in performance (+tvpi seeded)
 - [x] 3 cash-flow: 'Net distributions' not 'Net cash position'
