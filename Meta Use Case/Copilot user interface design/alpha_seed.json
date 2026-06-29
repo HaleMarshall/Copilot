@@ -1648,6 +1648,25 @@
       "USD": 1.083,
       "GBP": 0.848,
       "CHF": 0.962
+    },
+    "recordDate": "Q1 2025",
+    "ratesRecord": {
+      "EUR": 1.0,
+      "USD": 1.041,
+      "GBP": 0.833,
+      "CHF": 0.945
+    },
+    "ratesCall": {
+      "EUR": 1.0,
+      "USD": 1.012,
+      "GBP": 0.861,
+      "CHF": 0.93
+    },
+    "ratesDist": {
+      "EUR": 1.0,
+      "USD": 1.069,
+      "GBP": 0.844,
+      "CHF": 0.957
     }
   }
 }

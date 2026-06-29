@@ -4,7 +4,8 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 46 GP-concentration card in Strategy drill (NAV/Committed toggle, % per fund manager)
 - [x] 47 portfolio-header KPI strip (total value, # funds, # GPs, # companies, # countries) (+companies/countries seeded)
 - [x] 48 currency toggle on total value + conversion-rate note (fx seeded EUR base; server DATASET_KEYS+fx)
-- NEXT: item 49
+- [x] 49 funds-held table inline in performance detail (KPIs+cards+all funds in one view)
+- NEXT: item 50 (multi-currency cluster 50-56: home vs fund-level currency toggle)
 - [x] 1 nudge new-investor guard + liquidity CTA→opportunities
 - [x] 2 TVPI mini-chart in performance (+tvpi seeded)
 - [x] 3 cash-flow: 'Net distributions' not 'Net cash position'

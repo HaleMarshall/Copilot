@@ -3566,6 +3566,29 @@ class Component extends DCLogic {
     {n:'Subscription pack', meta:'PDF · sign to commit', tag:'Onboarding'},
     {n:'ESG & responsible-investment policy', meta:'PDF · 22 pp', tag:'Policy'}
   ]; }
+  /* items 50-56 — multi-currency: home vs fund-level currency, FX impact on metrics & NAV, record-date delta, call/dist reconciliation */
+  fundCcySym(c){ return ({EUR:'€',USD:'$',GBP:'£',CHF:'Fr ',JPY:'¥'})[c]||(c+' '); }
+  fundFxModel(f,m){
+    const fx=(this.DB&&this.DB.fx)||{base:'EUR',rates:{EUR:1}}; const base=fx.base||'EUR'; const ccy=(m&&m.currency)||base;
+    const num=s=>{ const v=parseFloat(String(s||'').replace('−','-').replace(/[^0-9.\-]/g,'')); return isNaN(v)?0:v; };
+    const navEUR=num(f.nav); const moicH=parseFloat(f.moic)||1; const irrH=num(f.irr); const dpiH=parseFloat(f.dpi)||0;
+    const rT=(fx.rates&&fx.rates[ccy])||1, rR=(fx.ratesRecord&&fx.ratesRecord[ccy])||rT, rC=(fx.ratesCall&&fx.ratesCall[ccy])||rT, rD=(fx.ratesDist&&fx.ratesDist[ccy])||rT;
+    const isHome=ccy===base;
+    const navLocal=navEUR*rT;                       /* fund-ccy units */
+    const moicLocal=+(moicH*(rT/rR)).toFixed(2);    /* EUR appreciation (rT>rR) lifts local MOIC above home */
+    const driftPct=+(((rT-rR)/rR)*100).toFixed(1);  /* EUR move vs fund ccy since record date */
+    const irrLocal=+(irrH+driftPct).toFixed(1);     /* strip the FX drag out of the home-reported IRR */
+    const calledEUR=moicH>0?navEUR/moicH:0; const distEUR=calledEUR*dpiH;
+    const callFxAdj=calledEUR*((rT-rC)/rC);         /* calls drawn at rC, marked at rT */
+    const distFxAdj=-distEUR*((rT-rD)/rD);          /* distributions paid at rD */
+    const fxAdjEUR=+(callFxAdj+distFxAdj).toFixed(2);
+    const navNetEUR=+(navEUR+fxAdjEUR).toFixed(1);
+    const irrNet=+(irrH+(navEUR>0?(fxAdjEUR/navEUR)*irrH*0.5:0)).toFixed(1);
+    const defaultView=(!isHome&&moicLocal>moicH)?'fund':'home'; /* item 56 — default to the better number */
+    return {base,ccy,isHome,sym:this.fundCcySym(ccy),baseSym:this.fundCcySym(base),rT,rR,rC,rD,
+      recordDate:fx.recordDate||'the record date',asOf:fx.asOf||'',navEUR,navLocal,moicH,moicLocal,irrH,irrLocal,driftPct,
+      calledEUR:+calledEUR.toFixed(1),distEUR:+distEUR.toFixed(1),fxAdjEUR,navNetEUR,irrNet,defaultView};
+  }
   fundPageBody(){
     const h=this.h; const SF=this.SF; const f=this.fundById(this.state.fundPageId); if(!f) return null;
     const m=(this.HELD_META&&this.HELD_META()[f.id])||{}; const pos=(f.contrib||0)>=0;
@@ -3604,11 +3627,51 @@ class Component extends DCLogic {
     const fundWhyCard=card('Why this · Why not · Compare', h('div',null,
       this.seg([{label:'Why this',value:'why'},{label:'Why not',value:'whynot'},{label:'Compare',value:'compare'}], wt, v=>this.setDtog('fundWhyTab',v),{sm:true}),
       h('div',{style:{marginTop:12}}, whyBody)), this.badge('AI','synth'));
+    /* items 50-56 — currency card (held funds only): home vs fund-level currency + FX impact + reconciliation */
+    const fundFxCard=(()=>{ if(prospect) return null; const x=this.fundFxModel(f,m);
+      const view=this.dtog('fundCcyView',x.defaultView);
+      if(x.isHome){ return card('Currency', h('div',{style:{fontSize:12.5,lineHeight:1.6,color:'var(--muted)'}},
+        'This fund reports in ',h('b',{style:{color:'var(--ink)'}},x.base),' — your home currency. No conversion is applied; every metric above is already in '+x.base+'.'), this.badge('home currency','conf')); }
+      const colHead=(label,on)=>h('div',{style:{textAlign:'right',fontSize:10,fontWeight:700,textTransform:'uppercase',letterSpacing:'.04em',color:on?'var(--brand-ink)':'var(--muted)'}},label);
+      const valCell=(v,on)=>h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:14,fontWeight:on?700:500,color:on?'var(--ink)':'var(--muted)'}},v);
+      const row=(metric,fundV,homeV,impact)=>h('div',{style:{display:'grid',gridTemplateColumns:'1.2fr 1fr 1fr 0.9fr',gap:8,alignItems:'center',padding:'9px 4px',borderTop:'1px solid var(--line)'}},
+        h('span',{style:{fontSize:12.5,fontWeight:600}},metric), valCell(fundV,view==='fund'), valCell(homeV,view==='home'),
+        h('span',{style:{textAlign:'right',fontSize:11.5,fontWeight:700,color:impact.startsWith('−')||impact.startsWith('-')?'var(--under)':'var(--over)'}},impact));
+      const navImpact=(x.navLocal/x.rT - x.navEUR); /* not used directly */
+      const toggle=h('div',{onClick:e=>e.stopPropagation()}, this.seg([{label:'Home ('+x.base+')',value:'home'},{label:'Fund ('+x.ccy+')',value:'fund'}], view, v=>this.setDtog('fundCcyView',v),{sm:true}));
+      const net=this.dtog('fundFxNet',false);
+      return card('Currency — '+x.ccy+' fund, '+x.base+' home', h('div',null,
+        h('div',{style:{fontSize:12.5,lineHeight:1.55,color:'var(--muted)',marginBottom:10}},
+          'This fund reports in ',h('b',{style:{color:'var(--ink)'}},x.ccy),', but your home currency is ',h('b',{style:{color:'var(--ink)'}},x.base),'. Toggle to see the performance impact on each metric and on NAV.'),
+        /* item 50 — impact per metric + NAV, both currencies side by side */
+        h('div',{style:{display:'grid',gridTemplateColumns:'1.2fr 1fr 1fr 0.9fr',gap:8,padding:'0 4px 2px'}},
+          h('span',{style:{fontSize:10,fontWeight:700,textTransform:'uppercase',letterSpacing:'.04em',color:'var(--muted)'}},'Metric'),
+          colHead('Fund · '+x.ccy,view==='fund'), colHead('Home · '+x.base,view==='home'), colHead('FX impact',true)),
+        row('NAV', x.sym+x.navLocal.toFixed(1)+'m', x.baseSym+x.navEUR.toFixed(1)+'m', (x.driftPct>=0?'−':'+')+Math.abs(x.driftPct).toFixed(1)+'%'),
+        row('Net MOIC', x.moicLocal.toFixed(2)+'x', x.moicH.toFixed(2)+'x', (x.moicH-x.moicLocal>=0?'+':'−')+Math.abs(x.moicH-x.moicLocal).toFixed(2)+'x'),
+        row('Net IRR', x.irrLocal.toFixed(1)+'%', x.irrH.toFixed(1)+'%', (x.irrH-x.irrLocal>=0?'+':'−')+Math.abs(x.irrH-x.irrLocal).toFixed(1)+'pp'),
+        /* item 51 — small footnote: the conversion rate used */
+        h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:10,lineHeight:1.5}},
+          'Converted at 1 '+x.base+' = '+x.rT+' '+x.ccy+(x.asOf?(' · rate as of '+x.asOf):''),'.'),
+        /* item 52 — record-date rate + delta to today */
+        h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:3,lineHeight:1.5}},
+          'At the metric record date ('+x.recordDate+') the rate was 1 '+x.base+' = '+x.rR+' '+x.ccy+' — a move of '+(x.driftPct>=0?'+':'')+x.driftPct+'% in '+x.base+' since then.'),
+        /* items 53/54/55 — net home-currency reconciliation, only when the investor asks for it */
+        h('button',{onClick:()=>this.setDtog('fundFxNet',!net),style:{marginTop:12,border:'1px solid var(--line)',background:'var(--surface-2)',color:'var(--brand-ink)',borderRadius:9,padding:'9px 12px',fontSize:12,fontWeight:700,cursor:'pointer',width:'100%'}},
+          (net?'▾ ':'▸ ')+'Show net home-currency impact (calls & distributions)'),
+        net? h('div',{style:{marginTop:10,border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',borderRadius:10,padding:'12px 14px',fontSize:12.5,lineHeight:1.6,color:'var(--ink)'}},
+          'Your capital was called when 1 '+x.base+' ≈ '+x.rC+' '+x.ccy+' and distributions were paid when 1 '+x.base+' ≈ '+x.rD+' '+x.ccy+'. Summing the FX difference across calls ('+x.baseSym+x.calledEUR+'m) and distributions ('+x.baseSym+x.distEUR+'m) versus today’s rate gives a net adjustment of ',
+          h('b',{style:{color:x.fxAdjEUR>=0?'var(--over)':'var(--under)'}},(x.fxAdjEUR>=0?'+':'−')+x.baseSym+Math.abs(x.fxAdjEUR).toFixed(2)+'m'),'. ',
+          /* item 54 — the net home-currency metric */
+          'Adjusted for this, your NAV in '+x.base+' is ',h('b',null,x.baseSym+x.navNetEUR.toFixed(1)+'m'),' and your net IRR in '+x.base+' is ',h('b',null,x.irrNet.toFixed(1)+'%'),'.') : null),
+        toggle);
+    })();
     const main=h('div',null,
       card('About this fund', h('div',{style:{fontSize:13,lineHeight:1.6,color:'var(--ink)'}},
         prospect? (f.by&&(f.by[this.state.following]||f.by.top10)||'') : (f.name+' is one of your '+(f.strat||'').toLowerCase()+' holdings, vintage '+(m.vintage||f.vintage)+', currently '+(f.stage||'').toLowerCase()+'. It has called '+f.called+' of its commitment and is marked at '+f.nav+' NAV — a net MOIC of '+f.moic+' and net IRR of '+f.irr+'. Look-through is primarily '+(m.sector||'diversified')+' companies, '+(m.region||'global')+', '+(m.currency||'multi-currency')+'-denominated.'),
         f.note?h('div',{style:{marginTop:12,background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:10,padding:'11px 13px',fontSize:12.5,lineHeight:1.5}}, h('b',null,'Alpha’s note: '), f.note):null)),
       fundWhyCard,
+      fundFxCard, /* items 50-56 */
       prospect? null : card('Value growth (net MOIC path)', perfBars(), this.badge('illustrative','synth')),
       card('Fund documents', h('div',null, this.FUND_DOCS().map((d,i)=>h('div',{key:i},docRow(d))),
         h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:4}},'Demo — document links are illustrative.'))));
