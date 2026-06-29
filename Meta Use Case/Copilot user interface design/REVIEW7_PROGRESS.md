@@ -45,4 +45,5 @@ Build strictly one at a time, verify (node --check + Playwright render/logicErro
 - [x] 10 alloc order Strategy, Sector, Region, Currency, then Format, Vintage — verified
 - [x] 11 vintage chart follows NAV/Committed basis (NAV-allocated-in-year vs commitments-per-year); +per-fund committed in seed; reseeded — verified
 - [x] 12 (done with item 8 — equalised to largest)
-- NEXT: item 13 (currency graph: show base-currency amount next to each currency)
+- [x] 13/14/15 currency card: base € + native amount per currency + FX-rate note; FX rate also in currency drill detail — verified ($7.2m/£1.3m/Fr1.0m native, 1 EUR=1.083 USD…)
+- NEXT: item 16 (move capital-calls-vs-distributions chart beside cash boxes + per-year numbers)
