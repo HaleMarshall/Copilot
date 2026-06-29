@@ -665,11 +665,11 @@ class Component extends DCLogic {
     const P=(this.DB&&this.DB.peer)||{baseMedian:8.9,wealthDelta:{'25-100M':3.2,'100M+':6.0,'1-5M':-1.6},profDelta:{'Investor/PE':4.2,'Family Office':7.5},top10Delta:5.4,riskMedianFactor:0.25,mixTilt:{ai:4,growth:4,venture:4,credit:-3,infra:-3,realestate:-3}};
     const ct=this.cohortTilt();
     let median=P.baseMedian;
-    Object.keys(P.wealthDelta||{}).forEach(k=>{ if(fc.wealth.includes(k)) median+=P.wealthDelta[k]; });
-    Object.keys(P.profDelta||{}).forEach(k=>{ if(fc.prof.includes(k)) median+=P.profDelta[k]; });
+    Object.keys(P.wealthDelta||{}).forEach(k=>{ if((fc.wealth||[]).includes(k)) median+=P.wealthDelta[k]; }); /* review6 — guard: Custom cohort has a blank fc */
+    Object.keys(P.profDelta||{}).forEach(k=>{ if((fc.prof||[]).includes(k)) median+=P.profDelta[k]; });
     median += ct.median;                                   // region + age tilt
     if(this.state.perf==='top10') median+=(P.top10Delta||0);
-    const rsel=this.RISKS.find(r=>fc.risk.includes(r.id));
+    const rsel=this.RISKS.find(r=>(fc.risk||[]).includes(r.id));
     if(rsel) median += (rsel.pmTarget-15)*(P.riskMedianFactor||0);
     median=Math.max(2,+median.toFixed(1));
     const target=(this.RISKS.find(r=>r.id===this.state.riskId)||{pmTarget:20}).pmTarget;
@@ -763,10 +763,10 @@ class Component extends DCLogic {
   peerBaseMedian(){ if(this.dbEmpty()) return 0; const fc=this.state.fc;
     const P=(this.DB&&this.DB.peer)||{baseMedian:8.9,wealthDelta:{},profDelta:{},riskMedianFactor:0.25};
     let m=P.baseMedian||8.9;
-    Object.keys(P.wealthDelta||{}).forEach(k=>{ if(fc.wealth.includes(k)) m+=P.wealthDelta[k]; });
-    Object.keys(P.profDelta||{}).forEach(k=>{ if(fc.prof.includes(k)) m+=P.profDelta[k]; });
+    Object.keys(P.wealthDelta||{}).forEach(k=>{ if((fc.wealth||[]).includes(k)) m+=P.wealthDelta[k]; }); /* review6 — guard: Custom cohort has a blank fc */
+    Object.keys(P.profDelta||{}).forEach(k=>{ if((fc.prof||[]).includes(k)) m+=P.profDelta[k]; });
     m += this.cohortTilt().median;
-    const rsel=this.RISKS.find(r=>fc.risk.includes(r.id)); if(rsel) m+=(rsel.pmTarget-15)*(P.riskMedianFactor||0.25);
+    const rsel=this.RISKS.find(r=>(fc.risk||[]).includes(r.id)); if(rsel) m+=(rsel.pmTarget-15)*(P.riskMedianFactor||0.25);
     return Math.max(2,+m.toFixed(1));
   }
   benchTable(){ if(this.DB) return this.DB.empty?null:(this.DB.benchTable||this._benchFallback()); return this._benchFallback(); }
