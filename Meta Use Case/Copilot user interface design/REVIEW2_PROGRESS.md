@@ -12,7 +12,8 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 60-61 compare strategy mix vs endowment funds: individual (Harvard/Yale/Princeton) + whole (H+Y+P) in comparison 'vs others'
 - [x] 62 simulator title 'Simulate and compare your targets' + matching description, removed redundant 'Shape your target' heading
 - [x] 63 page tab + eyebrow renamed 'Target simulator'
-- NEXT: item 64 (compare your actual position against others)
+- [x] 64 compare actual position vs others made explicit (relabel current→'Your actual' in pies/Z/captions)
+- NEXT: item 65 (add endowments to PM allocation + fill-rate charts)
 - [x] 1 nudge new-investor guard + liquidity CTA→opportunities
 - [x] 2 TVPI mini-chart in performance (+tvpi seeded)
 - [x] 3 cash-flow: 'Net distributions' not 'Net cash position'

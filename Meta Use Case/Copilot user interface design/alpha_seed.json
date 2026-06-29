@@ -37,7 +37,9 @@
     "target": 20,
     "rank": "Top 18%",
     "rankPos": 111,
-    "rankOf": 2000
+    "rankOf": 2000,
+    "endow": 34,
+    "endowTarget": 36
   },
   "strats": [
     [

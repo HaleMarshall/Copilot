@@ -876,9 +876,12 @@ class Component extends DCLogic {
       {label:'Platform',sub:'actual',v:cold?0:this.PM.platform,color:'--data-9',
         onClick:e=>this.openPop(e,{title:'Platform · PM allocation',value:`${this.PM.platform}% platform mean`,method:'mean %wealth in PM, all investors',cohort:'Platform',n:pd.c.n})},
       {label:'Model',sub:'target',v:this.PM.model,color:'--data-6',
-        onClick:e=>this.openPop(e,{title:'Model · target',value:`${this.PM.model}% house-view target`,method:'Moonfare model for your risk class — modelled benchmark',cohort:'Model',n:0})}
+        onClick:e=>this.openPop(e,{title:'Model · target',value:`${this.PM.model}% house-view target`,method:'Moonfare model for your risk class — modelled benchmark',cohort:'Model',n:0})},
+      /* item 65 — add the endowments to the PM-allocation chart (they sit far higher than retail) */
+      {label:'Endowments',sub:'actual · H+Y+P',v:cold?0:(this.PM.endow||34),color:'--data-2',
+        onClick:e=>this.openPop(e,{title:'Endowments · PM allocation',value:`${this.PM.endow||34}% of assets in private markets (Harvard/Yale/Princeton style)`,method:'representative large-endowment private-markets allocation',cohort:'Endowments',n:3})}
     ];
-    return this.gridBars(rows,{max:20,ticks:[0,4,8,12,16,20],unit:'%',labelW:96,barH:30,gap:12,marker:this.PM.target,markerLabel:'target '+this.PM.target+'%'});
+    return this.gridBars(rows,{max:40,ticks:[0,10,20,30,40],unit:'%',labelW:96,barH:30,gap:12,marker:this.PM.target,markerLabel:'target '+this.PM.target+'%'});
   }
 
   /* ---------- TR chart: Fill Rate (stacked Filled / Remaining) ---------- */
@@ -890,9 +893,11 @@ class Component extends DCLogic {
       {label:'You',sub:'of '+this.PM.target+'% target',ref:this.PM.target,color:'--brand'},
       {label:opts.peerLabel||'Peers',sub:'of peer target',ref:pd.target,color:'--data-4'},
       {label:'Platform',sub:'average',ref:this.PM.platform,color:'--data-9'},
-      {label:'Model target',sub:null,ref:18,color:'--data-6',full:true}
+      {label:'Model target',sub:null,ref:18,color:'--data-6',full:true},
+      /* item 65 — add the endowments to fill-rate: how filled you are against an endowment-style target */
+      {label:'Endowments',sub:'of '+(this.PM.endowTarget||36)+'% target',ref:this.PM.endowTarget||36,color:'--data-2'}
     ];
-    if(opts.noModel) rows=rows.slice(0,3);
+    if(opts.noModel) rows=rows.slice(0,3).concat(rows.slice(4));
     const labelW=110, barH=28, gap=12;
     const legend=h('div',{style:{display:'flex',gap:16,justifyContent:'flex-end',marginBottom:12}},
       [['Filled','var(--brand)'],['Remaining','var(--surface-2)']].map((l,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',gap:6,fontSize:11.5,color:'var(--muted)'}},
