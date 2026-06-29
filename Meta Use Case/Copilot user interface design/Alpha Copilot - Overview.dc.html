@@ -5742,9 +5742,10 @@ class Component extends DCLogic {
     // ---- header + AI build-target action ----
     const header=h('div',{style:{display:'flex',gap:16,alignItems:'flex-start',justifyContent:'space-between',flexWrap:'wrap'}},
       h('div',{style:{minWidth:0}},
-        h('div',{style:{fontSize:10.5,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Target simulator'), /* item 63 */
-        /* review4 item 1 — duplicate 'Simulate and compare your targets' title removed (the use-case header above already shows it); one concise line kept */
-        h('div',{style:{fontSize:13,color:'var(--muted)',lineHeight:1.5,maxWidth:620,marginTop:4}},
+        h('div',{style:{fontSize:10.5,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Shape · Target simulator'), /* item 63 */
+        /* review6 — chrome pagehead is suppressed on this view, so the body owns the single title (no more duplicate intro) */
+        h('div',{style:{fontFamily:SF,fontSize:26,fontWeight:600,margin:'3px 0 2px'}},'Simulate and compare your targets'),
+        h('div',{style:{fontSize:13,color:'var(--muted)',lineHeight:1.5,maxWidth:620}},
           'Set a target per dimension, then simulate it against the group you’re comparing — Custom lets you shape it with the sliders. Save each target individually.')),
       h('div',{style:{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:10,flex:'0 0 auto'}},
         this.followCardCompact(), /* review4 item 7 — Follow-a-group next to the simulator title, right side */
@@ -7770,7 +7771,7 @@ class Component extends DCLogic {
       controlClosed: this.controlIsLeverPanel() && !s.controlOpen, openControl:()=>this.setState({controlOpen:true}),
       stageEyebrow: (()=>{ const u=this.curUC(); const w=this.curWS(); const idx=this.wsUCs(w.id).findIndex(x=>x.id===u.id)+1; return `${w.label} · ${w.verb} · use case ${idx} of ${w.ids.length}`; })(), /* item 157 — clarify '1 of 11' = use cases */
       stageTitle:this.curUC().title, stageSubtitle:this.curUC().meta,
-      showPageHead: this.curPage().view!=='home', /* home/overview body renders its own title + Alpha's read; avoid the duplicate chrome title */
+      showPageHead: this.curPage().view!=='home' && this.curPage().view!=='sim', /* home & target-simulator bodies render their own title row; avoid the duplicate chrome title ('we don't need this twice') */
       showOverview: this.curPage().view==='overview', showOther: this.curPage().view!=='overview', surfaceBody:this.surfaceBody(),
       cohortLabel: this.cohortSummary(),
       welcome:s.welcome, enterApp:()=>{ this.setState({welcome:false,ws:'understand',homeLaunched:false, showOnboardForm:this.obFirstTime()}); },
