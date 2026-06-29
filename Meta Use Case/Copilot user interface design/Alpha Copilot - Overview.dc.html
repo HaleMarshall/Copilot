@@ -5950,8 +5950,8 @@ class Component extends DCLogic {
     const h=this.h; const SF=this.SF; const s=this.state;
     const cmp=(s.cmp==='you'?'peers':s.cmp)||'peers';
     const co=this.cohort(); const empty=this.dbEmpty();
-    const cmpShort={peers:'Peer avg',model:'Model',platform:'Platform',top10:'Top 10%',custom:'Custom group'}[cmp]||'Peer avg';
-    const cmpLong={peers:'your peer group',model:'the Moonfare model',platform:'the platform',top10:'the top 10%',custom:'your custom group'}[cmp]||'your peers';
+    const cmpShort={peers:'Peer avg',model:'Model',platform:'Platform',top10:'Top 10%',custom:'Custom group'}[cmp]||this.cmp2Short(cmp)||'Peer avg'; /* items 60/61 — endowment labels */
+    const cmpLong={peers:'your peer group',model:'the Moonfare model',platform:'the platform',top10:'the top 10%',custom:'your custom group'}[cmp]||(this.cmp2Label(cmp)+' (endowment)')||'your peers';
 
     // ---- Ask Alpha insights (respond to the comparator + cohort filters) ----
     const youFine=this.fineMix('you'); const cFine=this.fineMix(cmp);
@@ -6022,7 +6022,13 @@ class Component extends DCLogic {
         h('span',{style:{flex:1,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},n),
         h('span',{style:{fontFamily:SF,fontWeight:600}}, (leftMix[k]||0)+'%'),
         h('span',{style:{color:'var(--muted)',fontFamily:SF}}, (rightMix[k]||0)+'%'))));
-    const dimControls=h('div',{style:{display:'flex',gap:10,flexWrap:'wrap',marginBottom:12,alignItems:'center'}}, modeSel, pieMode==='others'? selfSel : null);
+    /* items 60/61 — compare against endowment funds: individual (Harvard/Yale/Princeton) + as a whole (H+Y+P). Strategy mix only — that's the data endowments publish. */
+    const endowOpts=[['harvard','Harvard'],['yale','Yale'],['princeton','Princeton'],['hyp','H+Y+P (whole)']];
+    const endowRow = (pieMode==='others' && dimKey==='strategy') ? h('div',{style:{display:'flex',gap:6,flexWrap:'wrap',alignItems:'center'}},
+      h('span',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)'}},'Endowments'),
+      endowOpts.map(([v,l])=>{ const on=cmp===v; return h('button',{key:v,onClick:()=>this.setState({cmp:v}),
+        style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 12px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}}, '🎓 '+l); })) : null;
+    const dimControls=h('div',{style:{display:'flex',gap:10,flexWrap:'wrap',marginBottom:12,alignItems:'center'}}, modeSel, pieMode==='others'? selfSel : null, endowRow);
     const dimPieCard=this.card({title:dimLabel+' — your mix', right:dimSel,
       children: empty? this.cmpEmpty() : h('div',null, dimControls, dimDonutPair, dimLegend),
       caption: pieMode==='target'
