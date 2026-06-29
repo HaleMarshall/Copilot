@@ -5996,6 +5996,13 @@ class Component extends DCLogic {
         onChange:e=>this.setState({oppWeights:{...this.state.oppWeights,[k]:+e.target.value}}),
         style:{width:'100%',accentColor:'var(--brand)',cursor:'pointer'}}));
   }
+  /* review5 item 1/2 — dimension-agnostic current & target mixes for the Distance-from-target section */
+  oppCurrentMix(dim){ if(dim==='strategy') return (this.MIX&&this.MIX.you)||{}; const d=this.HOME_DIMS().find(x=>x.key===dim); return (d&&d.actual)||{}; }
+  oppBaseTarget(dim){ if(dim==='strategy') return this.oppTargetMix(); const d=this.HOME_DIMS().find(x=>x.key===dim); return (d&&d.target)||{}; }
+  oppDimColors(dim){ if(dim==='strategy'){ const o=Object.fromEntries((this.STRATS||[]).map(([k,n,c])=>[k,c])); o.realestate=o.realestate||'--data-6'; return o; } const d=this.HOME_DIMS().find(x=>x.key===dim); return (d&&d.colors)||{}; }
+  oppDimNames(dim){ if(dim==='strategy'){ const o=Object.fromEntries((this.STRATS||[]).map(([k,n])=>[k,n])); o.realestate=o.realestate||'Real Estate'; return o; } const d=this.HOME_DIMS().find(x=>x.key===dim); const o={}; Object.keys((d&&d.actual)||{}).forEach(k=>o[k]=k); return o; }
+  /* item 2 wires the weighting in here; item 1 returns the set target as-is */
+  oppLiveTargetMix(dim){ return this.oppBaseTarget(dim); }
   opportunitiesBody(){
     const h=this.h; const SF=this.SF; const o=this.oppNextActions(); const s=this.state;
     // source picker
@@ -6019,22 +6026,28 @@ class Component extends DCLogic {
           this.oppStat('After top move', o.fitAfter+'', '/100','#7AB89E'))));
           /* expected return removed — it can't be predicted */
 
-    // gap chart
-    /* item 143 — Distance-from-Target across all four dimensions via a toggle (not four charts at once) */
+    // ---- Distance from target (TOP): current + target pies + Z, dimension toggle ----
+    /* review5 item 1 — show CURRENT and TARGET pies side by side with the Z gap-bars; target reflects the set target (live-adjustable via 'What matters most') */
     const distDim=this.dtog('oppDistDim','strategy');
-    const distZ=(()=>{ if(distDim==='strategy') return o.gaps.map(g=>({name:g.name,delta:g.gap,color:g.color,sig:Math.abs(g.gap)>=1}));
-      const d=this.HOME_DIMS().find(x=>x.key===distDim); if(!d||!d.target) return [];
-      return Object.keys(d.actual).map(k=>{ const dl=+(((d.target[k]||0)-(d.actual[k]||0))).toFixed(1); return {name:k,color:d.colors[k],delta:dl,sig:Math.abs(dl)>=1}; }).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta)); })();
     const distToggle=this.seg([{label:'Strategy',value:'strategy'},{label:'Region',value:'region'},{label:'Currency',value:'currency'},{label:'Sector',value:'sector'},{label:'Format',value:'format'}], distDim, v=>this.setDtog('oppDistDim',v),{sm:true}); /* PDF#3 — Format */
-    /* item 145 — represent the selected Distance-from-Target dimension as a donut (C-chart) beside the gap bars */
-    const distSlices=(()=>{ if(distDim==='strategy'){ const mx=this.MIX&&this.MIX.you||{}; return this.STRATS.filter(([k])=>mx[k]>0).map(([k,n,c])=>({n,color:c,p:mx[k]})); }
-      const d=this.HOME_DIMS().find(x=>x.key===distDim); return d? Object.keys(d.actual).filter(k=>d.actual[k]>0).map(k=>({n:k,color:d.colors[k],p:d.actual[k]})):[]; })();
     const distDimLabel={strategy:'Strategy',region:'Region',currency:'Currency',sector:'Sector',format:'Format'}[distDim];
+    const dCur=this.oppCurrentMix(distDim), dTgt=this.oppLiveTargetMix(distDim);
+    const dCol=this.oppDimColors(distDim), dNam=this.oppDimNames(distDim);
+    const dKeys=Array.from(new Set([...Object.keys(dCur),...Object.keys(dTgt)]));
+    const curSlices=dKeys.filter(k=>(dCur[k]||0)>0).map(k=>({n:dNam[k]||k,color:dCol[k]||'--data-9',p:dCur[k]||0}));
+    const tgtSlices=dKeys.filter(k=>(dTgt[k]||0)>0).map(k=>({n:dNam[k]||k,color:dCol[k]||'--data-9',p:dTgt[k]||0}));
+    const distZ=dKeys.map(k=>{ const dl=+(((dTgt[k]||0)-(dCur[k]||0))).toFixed(1); return {name:dNam[k]||k,color:dCol[k]||'--data-9',delta:dl,sig:Math.abs(dl)>=1}; }).filter(r=>r.delta!==0).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
+    const targetSrc = s.oppMode==='single' ? 'your set target, kept as-is' : 'your set target, weighted live below';
+    const distPies=h('div',{style:{display:'flex',gap:'clamp(14px,3vw,34px)',alignItems:'flex-start',flexWrap:'wrap',justifyContent:'center'}},
+      h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutLabel('Current'), this.donutNamed(curSlices,150,distDimLabel,'today')),
+      h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutLabel('Target'), this.donutNamed(tgtSlices,150,distDimLabel,'target')));
     const gapCard=this.card({title:'Distance from target',badge:this.badge('vs your target','synth'),right:distToggle,
-      children:h('div',{style:{display:'flex',gap:18,alignItems:'center',flexWrap:'wrap',padding:'6px 0'}},
-        distSlices.length? h('div',{style:{flex:'0 0 auto'}}, this.donutNamed(distSlices,150,distDimLabel,'your mix')):null,
-        h('div',{style:{flex:'1 1 260px',minWidth:240}}, distZ.length? this.miniZ(distZ) : h('div',{style:{fontSize:12.5,color:'var(--muted)',padding:'14px 0',textAlign:'center'}},'On target across this dimension.'))),
-      caption:'Donut = your current '+distDimLabel.toLowerCase()+' mix; bars = distance to target (right = below target, do more). Toggle the dimension.'});
+      children:h('div',{style:{display:'flex',gap:20,alignItems:'center',flexWrap:'wrap',padding:'6px 0'}},
+        distPies,
+        h('div',{style:{flex:'1 1 300px',minWidth:260}},
+          h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}}, distDimLabel+' · gap to target (pp)'),
+          distZ.length? this.miniZ(distZ) : h('div',{style:{fontSize:12.5,color:'var(--muted)',padding:'14px 0',textAlign:'center'}},'On target across this dimension.'))),
+      caption:'Your CURRENT '+distDimLabel.toLowerCase()+' mix (left) vs your TARGET (middle) — '+targetSrc+'. Bars = gap to target (right = below target, do more). Toggle the dimension top-right.'});
 
     // weighting card
     const wCard=this.card({title:'What matters most to you',
@@ -6170,10 +6183,12 @@ class Component extends DCLogic {
       caption:'Current funds are open now; upcoming funds are greyed previews of what’s likely next — still click any to open its detail.'});
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
       srcRow, head,
-      /* select a strategy step (left) → its suggested fund logos (right) */
-      h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,alignItems:'start'}}, seqCard, pickedFundsCard),
-      h('div',{style:{display:'grid',gridTemplateColumns:'minmax(300px,360px) 1fr',gap:16,alignItems:'start'}}, wCard, gapCard),
-      upcomingCard); /* Secondaries → its own page; 'Missed out on' → missedBody */
+      /* review5 item 1/2 — Distance from target at the TOP (current + target pies + Z), with 'What matters most' beside the pies (live-adjusts the target) */
+      h('div',{style:{display:'grid',gridTemplateColumns:'minmax(0,1fr) minmax(280px,340px)',gap:16,alignItems:'start'}}, gapCard, wCard),
+      /* review5 item 3 — opportunities to close the gap immediately below the distance section */
+      upcomingCard,
+      /* review5 item 4 — recommended sequence + per-strategy reasoning → its suggested funds */
+      h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,alignItems:'start'}}, seqCard, pickedFundsCard)); /* Secondaries → its own page; 'Missed out on' → missedBody */
   }
   /* dedicated Secondaries page — the full Moonfare secondary market (buy-side + sell-side + live stakes) */
   secondariesBody(){
