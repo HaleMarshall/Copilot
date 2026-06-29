@@ -25,7 +25,8 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 77 renamed tabs: 'Target simulator' + 'Portfolio comparison'
 - ALL 77 NUMBERED ITEMS COMPLETE.
 - [x] PDF#1 lifecycle-period comparison card (fill rate/PM alloc/commitment size/# deals/hi-lo-avg size/timing vs peers/model/top10 at same stage) (+lifecycle seeded)
-- NEXT: PDF#2 (AI 'invested in a specific company' button + tree chart instead of pie); PDF#3 (Format dimension direct/FoF/secondaries on overview+similar+comparison); PDF#4 (move follower to top next to compare yourself)
+- [x] PDF#2 AI section: 'Am I invested in a specific company?' button + tree chart of held companies; sector view is a tree chart (not pie)
+- NEXT: PDF#3 (Format dimension direct/FoF/secondaries on overview+similar+comparison); PDF#4 (move follower to top next to compare yourself)
 - [x] 1 nudge new-investor guard + liquidity CTA→opportunities
 - [x] 2 TVPI mini-chart in performance (+tvpi seeded)
 - [x] 3 cash-flow: 'Net distributions' not 'Net cash position'

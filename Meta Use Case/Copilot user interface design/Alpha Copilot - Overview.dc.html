@@ -2728,6 +2728,7 @@ class Component extends DCLogic {
     const meta=this.HELD_META(); const roster=this.HELD_FUNDS();
     const catOf=(f)=> key==='strategy'? (meta[f.id]||{}).strat : (meta[f.id]||{})[key];
     let tot=0; const raw={}; roster.forEach(f=>{ const c=catOf(f); if(c==null) return; const w=this.fundCommitted(f); raw[c]=(raw[c]||0)+w; tot+=w; }); tot=tot||1;
+    if(!Object.keys(raw).length) return actual; /* PDF#3 — dims without committed look-through (e.g. Format) fall back to the NAV split */
     const out={}; Object.keys(actual).forEach(k=>{ out[k]= raw[k]? Math.round(raw[k]/tot*1000)/10 : 0; });
     Object.keys(raw).forEach(k=>{ if(out[k]===undefined) out[k]=Math.round(raw[k]/tot*1000)/10; });
     return out; }
@@ -3957,7 +3958,7 @@ class Component extends DCLogic {
     const h=this.h; const SF=this.SF; const key=this.state.homePop;
     if(!key || this.curPage().view!=='home') return null;
     const meta=this.HELD_META(); const roster=this.HELD_FUNDS();
-    const dimKeys=['strategy','region','currency','sector'];
+    const dimKeys=['strategy','region','currency','sector','format']; /* PDF#3 — Format dimension */
     let eyebrow='Your portfolio', title='Detail', body=[], footer=null;
 
     if(dimKeys.includes(key)){
@@ -4897,6 +4898,8 @@ class Component extends DCLogic {
     const regionRows=Object.keys(rd.actual).map(k=>({label:k, v:rp[k]||0, color:rd.colors[k], onClick:()=>this.openHomePop('region',k)}));
     const cd=dim('currency'); const cp=this.basisPct('currency'); const ccySlices=Object.keys(cd.actual).map(k=>({n:k,p:cp[k]||0,color:cd.colors[k]}));
     const secd=dim('sector'); const secp=this.basisPct('sector'); const secSlices=Object.keys(secd.actual).map(k=>({n:k,p:secp[k]||0,color:secd.colors[k]}));
+    /* PDF#3 — Format breakdown (direct deals / fund of funds / secondaries / primary) */
+    const fmtd=dim('format'); const fmtp=this.basisPct('format'); const fmtSlices=Object.keys(fmtd.actual).map(k=>({n:k,p:fmtp[k]||0,color:fmtd.colors[k]}));
     // A11: € / % unit toggle on the allocation breakdowns (€ derived from the basis total — NAV or Committed)
     const NAV=(P.nav)||0;
     const basisTot= basis==='Committed' ? this.committedTotal() : NAV;
@@ -4933,6 +4936,7 @@ class Component extends DCLogic {
     const ccyNote=h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:8,lineHeight:1.4}}, 'Each figure = that currency’s share of your portfolio'+(allocUnit==='%'?' (% of '+basis+')':' (€m of '+basis+')')+', by fund currency of denomination.');
     const currencyCard=allocBlock('Currency','currency', h('div',null, donutRow(ccySlices,'FX'), ccyNote));
     const sectorCard=allocBlock('Sector','sector', donutRow(secSlices,'Sector'));
+    const formatCard=allocBlock('Format','format', donutRow(fmtSlices,'Format')); /* PDF#3 */
     const vintageCard=allocBlock('Vintage','vintage', h('div',null, vintChart, h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:3,textAlign:'center'}},'NAV by commitment year (€m)')));
 
     // ============ COLUMN 3 — CASH FLOWS (from DB) ============
@@ -5065,7 +5069,7 @@ class Component extends DCLogic {
       alphaReadCard,
       h('div',{style:{display:'grid',gridTemplateColumns:'minmax(0,1.3fr) minmax(0,0.85fr) minmax(0,1.3fr)',gap:16,alignItems:'start'}},
         col([perfCol]),
-        col([allocHeader, strategyCard, regionCard, currencyCard, sectorCard, vintageCard]),
+        col([allocHeader, strategyCard, regionCard, currencyCard, sectorCard, formatCard, vintageCard]),
         col([cashCol, jcurveCard])));
   }
 
@@ -5075,13 +5079,15 @@ class Component extends DCLogic {
     const FB={
       region:{actual:{USA:42,Europe:34,APAC:18,MEA:6},target:{USA:38,Europe:32,APAC:24,MEA:6},colors:{USA:'--data-1',Europe:'--data-5',APAC:'--data-8',MEA:'--data-9'}},
       currency:{actual:{USD:40,EUR:38,GBP:9,CHF:6,JPY:4,Other:3},target:{USD:36,EUR:40,GBP:9,CHF:7,JPY:5,Other:3},colors:{USD:'--data-1',EUR:'--data-5',GBP:'--data-2',CHF:'--data-6',JPY:'--data-3',Other:'--data-9'}},
-      sector:{actual:{Tech:20,AI:14,Healthcare:16,Financials:14,Industrials:18,Consumer:12,Energy:6},target:{Tech:14,AI:8,Healthcare:18,Financials:16,Industrials:20,Consumer:16,Energy:8},colors:{Tech:'--data-9',AI:'--data-8',Healthcare:'--data-2',Financials:'--data-4',Industrials:'--data-5',Consumer:'--data-7',Energy:'--data-6'}}
+      sector:{actual:{Tech:20,AI:14,Healthcare:16,Financials:14,Industrials:18,Consumer:12,Energy:6},target:{Tech:14,AI:8,Healthcare:18,Financials:16,Industrials:20,Consumer:16,Energy:8},colors:{Tech:'--data-9',AI:'--data-8',Healthcare:'--data-2',Financials:'--data-4',Industrials:'--data-5',Consumer:'--data-7',Energy:'--data-6'}},
+      /* PDF#3 — Format dimension: direct deals / fund of funds / secondaries / primary */
+      format:{actual:{'Direct deals':18,'Fund of funds':12,'Secondaries':14,'Primary funds':56},target:{'Direct deals':14,'Fund of funds':10,'Secondaries':18,'Primary funds':58},colors:{'Direct deals':'--data-10','Fund of funds':'--data-5','Secondaries':'--data-6','Primary funds':'--data-1'}}
     };
     const dim=(key,label)=>{ const src= D&&D[key]? D[key] : (empty? {actual:{},target:{},colors:FB[key].colors} : FB[key]); return {key,label,actual:src.actual,target:src.target,colors:src.colors}; };
     return [
       {key:'strategy',label:'Strategy',actual:(this.MIX&&this.MIX.you)||{},target:this.modelMix(),
         colors:Object.fromEntries((this.STRATS||[]).map(([k,n,c])=>[k,c]))},
-      dim('region','Region'), dim('currency','Currency'), dim('sector','Sector')
+      dim('region','Region'), dim('currency','Currency'), dim('sector','Sector'), dim('format','Format') /* PDF#3 */
     ];
   }
   /* item 47 — 'Suggest funds to fill the gaps' must always be present on every breakdown view */
@@ -5137,7 +5143,7 @@ class Component extends DCLogic {
   fundsListBody(scope){
     const h=this.h; const SF=this.SF; const meta=this.HELD_META(); const roster=this.HELD_FUNDS();
     const back=h('button',{onClick:()=>this.setState({homeFundsList:null}),style:{alignSelf:'flex-start',display:'inline-flex',alignItems:'center',gap:6,border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:9,padding:'7px 13px',fontSize:12,fontWeight:600,cursor:'pointer'}},'‹ Back to overview');
-    const dimKeys=['strategy','region','currency','sector'];
+    const dimKeys=['strategy','region','currency','sector','format']; /* PDF#3 — Format dimension */
     let title='All funds you hold', sub='Every fund in your portfolio · '+roster.length+' funds', content;
     if(dimKeys.includes(scope)){
       const d=this.HOME_DIMS().find(x=>x.key===scope);
@@ -5721,11 +5727,11 @@ class Component extends DCLogic {
     const distZ=(()=>{ if(distDim==='strategy') return o.gaps.map(g=>({name:g.name,delta:g.gap,color:g.color,sig:Math.abs(g.gap)>=1}));
       const d=this.HOME_DIMS().find(x=>x.key===distDim); if(!d||!d.target) return [];
       return Object.keys(d.actual).map(k=>{ const dl=+(((d.target[k]||0)-(d.actual[k]||0))).toFixed(1); return {name:k,color:d.colors[k],delta:dl,sig:Math.abs(dl)>=1}; }).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta)); })();
-    const distToggle=this.seg([{label:'Strategy',value:'strategy'},{label:'Region',value:'region'},{label:'Currency',value:'currency'},{label:'Sector',value:'sector'}], distDim, v=>this.setDtog('oppDistDim',v),{sm:true});
+    const distToggle=this.seg([{label:'Strategy',value:'strategy'},{label:'Region',value:'region'},{label:'Currency',value:'currency'},{label:'Sector',value:'sector'},{label:'Format',value:'format'}], distDim, v=>this.setDtog('oppDistDim',v),{sm:true}); /* PDF#3 — Format */
     /* item 145 — represent the selected Distance-from-Target dimension as a donut (C-chart) beside the gap bars */
     const distSlices=(()=>{ if(distDim==='strategy'){ const mx=this.MIX&&this.MIX.you||{}; return this.STRATS.filter(([k])=>mx[k]>0).map(([k,n,c])=>({n,color:c,p:mx[k]})); }
       const d=this.HOME_DIMS().find(x=>x.key===distDim); return d? Object.keys(d.actual).filter(k=>d.actual[k]>0).map(k=>({n:k,color:d.colors[k],p:d.actual[k]})):[]; })();
-    const distDimLabel={strategy:'Strategy',region:'Region',currency:'Currency',sector:'Sector'}[distDim];
+    const distDimLabel={strategy:'Strategy',region:'Region',currency:'Currency',sector:'Sector',format:'Format'}[distDim];
     const gapCard=this.card({title:'Distance from target',badge:this.badge('vs your target','synth'),right:distToggle,
       children:h('div',{style:{display:'flex',gap:18,alignItems:'center',flexWrap:'wrap',padding:'6px 0'}},
         distSlices.length? h('div',{style:{flex:'0 0 auto'}}, this.donutNamed(distSlices,150,distDimLabel,'your mix')):null,
@@ -6012,11 +6018,11 @@ class Component extends DCLogic {
       caption:'Your current mix above (left) or below (right) '+cmpLong+'. Use the toggle above to benchmark against your peers, the Moonfare model, the whole platform or the top 10%.'});
 
     // ---- row 3 (items 57/64) — two pies per dimension: YOU current vs YOUR target, or switch to compare your chosen basis against others ----
-    const dimKey=s.cmpDim||'strategy'; const dimLabel={strategy:'Strategy',region:'Region',currency:'Currency',sector:'Sector'}[dimKey]||'Strategy';
+    const dimKey=s.cmpDim||'strategy'; const dimLabel={strategy:'Strategy',region:'Region',currency:'Currency',sector:'Sector',format:'Format'}[dimKey]||'Strategy';
     const pieMode=s.cmpPieMode||'others';          /* item 75 — default to comparing your CURRENT portfolio portions vs peers/platform/top10 ('others'); target view stays available via the toggle */
     const self=s.cmpSelf||'current';               /* which of your pies to compare against others */
     const dsize='min(180px, 20vh)';
-    const dimSel=this.seg([{label:'Strategy',value:'strategy'},{label:'Region',value:'region'},{label:'Currency',value:'currency'},{label:'Sector',value:'sector'}], dimKey, v=>this.setState({cmpDim:v}),{sm:true});
+    const dimSel=this.seg([{label:'Strategy',value:'strategy'},{label:'Region',value:'region'},{label:'Currency',value:'currency'},{label:'Sector',value:'sector'},{label:'Format',value:'format'}], dimKey, v=>this.setState({cmpDim:v}),{sm:true}); /* PDF#3 — Format */
     const modeSel=this.seg([{label:'You vs your target',value:'target'},{label:'Compare vs others',value:'others'}], pieMode, v=>this.setState({cmpPieMode:v}),{sm:true});
     /* item 64 — 'current' = your actual position; label it as such so comparing your actual position against others is explicit */
     const selfSel=this.seg([{label:'Your actual',value:'current'},{label:'Your target',value:'target'}], self, v=>this.setState({cmpSelf:v}),{sm:true});

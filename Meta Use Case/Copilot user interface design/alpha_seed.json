@@ -198,6 +198,26 @@
         "Consumer": "--data-7",
         "Energy": "--data-6"
       }
+    },
+    "format": {
+      "actual": {
+        "Direct deals": 18,
+        "Fund of funds": 12,
+        "Secondaries": 14,
+        "Primary funds": 56
+      },
+      "target": {
+        "Direct deals": 14,
+        "Fund of funds": 10,
+        "Secondaries": 18,
+        "Primary funds": 58
+      },
+      "colors": {
+        "Direct deals": "--data-10",
+        "Fund of funds": "--data-5",
+        "Secondaries": "--data-6",
+        "Primary funds": "--data-1"
+      }
     }
   },
   "cashflows": {
