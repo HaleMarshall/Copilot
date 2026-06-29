@@ -6008,14 +6008,15 @@ class Component extends DCLogic {
     const dsize='min(180px, 20vh)';
     const dimSel=this.seg([{label:'Strategy',value:'strategy'},{label:'Region',value:'region'},{label:'Currency',value:'currency'},{label:'Sector',value:'sector'}], dimKey, v=>this.setState({cmpDim:v}),{sm:true});
     const modeSel=this.seg([{label:'You vs your target',value:'target'},{label:'Compare vs others',value:'others'}], pieMode, v=>this.setState({cmpPieMode:v}),{sm:true});
-    const selfSel=this.seg([{label:'Your current',value:'current'},{label:'Your target',value:'target'}], self, v=>this.setState({cmpSelf:v}),{sm:true});
+    /* item 64 — 'current' = your actual position; label it as such so comparing your actual position against others is explicit */
+    const selfSel=this.seg([{label:'Your actual',value:'current'},{label:'Your target',value:'target'}], self, v=>this.setState({cmpSelf:v}),{sm:true});
     const leftWhich = pieMode==='target' ? 'current' : self;
     const rightWhich = pieMode==='target' ? 'target' : cmp;
-    const leftLabel = pieMode==='target' ? 'You · current' : (self==='current'?'You · current':'You · target');
+    const leftLabel = pieMode==='target' ? 'You · actual' : (self==='current'?'You · actual':'You · target');
     const rightLabel = pieMode==='target' ? 'You · target' : cmpShort;
     const leftMix=this.cmpDimMix(dimKey,leftWhich); const rightMix=this.cmpDimMix(dimKey,rightWhich); const dimItems=this.cmpDimItems(dimKey);
     const dimDonutPair=h('div',{style:{display:'flex',gap:'clamp(40px,8vw,110px)',justifyContent:'center',alignItems:'center',flexWrap:'wrap'}},
-      h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center'}}, this.donutLabel(leftLabel), this.donutNamed(this.cmpDimSlices(dimKey,leftWhich),dsize,leftLabel.split(' ')[0],leftWhich==='current'?'now':'mix')),
+      h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center'}}, this.donutLabel(leftLabel), this.donutNamed(this.cmpDimSlices(dimKey,leftWhich),dsize,leftLabel.split(' ')[0],leftWhich==='current'?'actual':'mix')),
       h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center'}}, this.donutLabel(rightLabel), this.donutNamed(this.cmpDimSlices(dimKey,rightWhich),dsize,rightLabel.split(' ')[0],'mix')));
     const dimLegend=h('div',{style:{width:'100%',marginTop:12,display:'grid',gridTemplateColumns:'1fr 1fr',gap:'5px 22px'}},
       dimItems.filter(([k])=>(leftMix[k]||0)>0||(rightMix[k]||0)>0).map(([k,n,c])=>h('div',{key:k,style:{display:'flex',alignItems:'center',gap:7,fontSize:12,lineHeight:1.2}},
@@ -6033,12 +6034,12 @@ class Component extends DCLogic {
     const dimPieCard=this.card({title:dimLabel+' — your mix', right:dimSel,
       children: empty? this.cmpEmpty() : h('div',null, dimControls, dimDonutPair, dimLegend),
       caption: pieMode==='target'
-        ? 'Two pies: your current '+dimLabel.toLowerCase()+' mix (left) vs your target (right). Switch to “Compare vs others” to pit your current or target against peers, platform, the model or the top 10% — set the comparator in “Benchmark against” above.'
-        : 'Your '+(self==='current'?'current':'target')+' '+dimLabel.toLowerCase()+' mix (left) vs '+cmpShort+' (right). Change the basis here, or the comparator in “Benchmark against” above.'});
+        ? 'Two pies: your actual '+dimLabel.toLowerCase()+' mix (left) vs your target (right). Switch to “Compare vs others” to pit your actual position or your target against peers, platform, the model, the top 10% or the endowments — set the comparator in “Benchmark against” above.'
+        : 'Your '+(self==='current'?'actual position':'target')+' '+dimLabel.toLowerCase()+' mix (left) vs '+cmpShort+' (right). Change the basis here, or the comparator in “Benchmark against” above.'});
     const dimZRows=dimItems.map(([k,n,c])=>{ const d=+((leftMix[k]||0)-(rightMix[k]||0)).toFixed(1); return {name:n,delta:d,color:c,sig:Math.abs(d)>=2}; }).filter(r=>r.delta!==0).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
     const dimZCard=this.card({title:dimLabel+' · over / under-weight vs '+(pieMode==='target'?'your target':cmpShort),
       children:h('div',{style:{padding:'6px 0'}}, empty? this.cmpEmpty() : this.miniZ(dimZRows)),
-      caption:(pieMode==='target'?'Your current minus your target':'You ('+(self==='current'?'current':'target')+') minus '+cmpShort)+', in percentage points. Follows the pies beside it.'});
+      caption:(pieMode==='target'?'Your actual minus your target':'You ('+(self==='current'?'actual':'target')+') minus '+cmpShort)+', in percentage points. Follows the pies beside it.'});
 
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
       insightBanner, toggleRow,
