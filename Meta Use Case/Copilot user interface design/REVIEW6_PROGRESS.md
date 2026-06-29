@@ -14,13 +14,18 @@ Brief: re-verify all 3 PDFs (Opportunities, portfolio overview, simulate) built 
 - Overview: performance page shows ONE Alpha's read (merge done).
 - Overview: Alpha's read to right of title ✓; base currency BASE EUR + toggle + KPI cards ✓; asset-allocation grid below performance/cashflows ✓.
 
-## Remaining to audit/verify next (one at a time, Playwright)
-- Overview: funds-you-hold top-3 + open full Performance page (strategy-like, full table)
-- Overview: full Cash-flows page (full investment list + J-curve part) + quick summary top-3
-- Overview: full breakdown by Format includes investments
-- Overview: Format large breakdown = tree diagram
-- Overview: Ask-Alpha → quick info view shifts to middle aligned with chat edge
-- Overview: strategy page large-number overflow doesn't break the graph
-- Simulate: Peers comparator auto-selects this investor's peers; Custom stays blank
-- Opportunities: donut/element sizing alignment vs rest (the 'too large' complaint)
-- General: sweep each section for any element 'too large / not in line'
+## Verified built + aligned this pass (Playwright screenshots/measure)
+- Overview: full Performance page (KPIs + contribution + IRR charts + full table) ✓ built, aligned
+- Overview: full Cash-flows page (KPIs + calls/dist chart + full list) ✓ built, aligned
+- Overview: Format large breakdown = tree diagram + investments below ✓ (L4115/4127)
+- Overview: top-3 quick summaries → full pages ✓
+- Simulate: Peers auto-selects investor (age 50-65/risk innovation_ai_alpha/wealth 5-25M/DACH/Investor-PE); Custom blank ✓ (verified fc)
+- Opportunities: distance donuts 150px consistent; page proportionate ✓
+
+## Fix C (real bug found via audit)
+- [x] C. peerData()/peerBaseMedian() crashed when Custom cohort selected (fc={} → fc.wealth/prof/risk .includes on undefined). Guarded with ||[]. Verified: 0 console errors across compare/sim/home custom path; direct calls no throw. (25d78eb)
+
+## Remaining (subtle, verify next pass)
+- Overview: strategy page large-number handling (graph axis should scale / not break)
+- Overview: Ask-Alpha open → quick-info panel aligns to chat edge
+- Final: clean per-page console sweep (0 errors) across every section
