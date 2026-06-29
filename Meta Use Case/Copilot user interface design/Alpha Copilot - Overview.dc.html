@@ -3676,11 +3676,13 @@ class Component extends DCLogic {
       h('span',{style:{fontSize:12.5,color:'var(--muted)'}},l), h('span',{style:{fontSize:12.5,fontWeight:600,color:link?'var(--brand-ink)':'var(--ink)',textAlign:'right'}},v));
     const rail=h('div',{style:{position:'sticky',top:0,border:'1px solid var(--line)',borderRadius:16,background:'var(--surface)',padding:'16px 18px',boxShadow:'0 10px 30px -20px rgba(0,0,0,.25)'}},
       h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}},
-        h('span',{style:{display:'inline-flex',alignItems:'center',gap:7,fontSize:11.5,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--over)'}}, h('span',{style:{width:9,height:9,borderRadius:'50%',background:'var(--over)'}}), prospect||featured?'Open':'Held'),
+        h('span',{style:{display:'inline-flex',alignItems:'center',gap:7,fontSize:11.5,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:f.closed?'var(--muted)':'var(--over)'}}, h('span',{style:{width:9,height:9,borderRadius:'50%',background:f.closed?'var(--muted)':'var(--over)'}}), f.closed?'Closed':(prospect||featured?'Open':'Held')),
         h('span',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--brand-ink)'}},'Investment process')),
       h('div',null, railFacts.map(railRow)),
       h('button',{onClick:()=>this.toggleCmp&&this.toggleCmp({kind:'fund',id:f.id,label:f.name}),style:{width:'100%',marginTop:14,border:'1px solid var(--brand)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:11,padding:'11px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'⇄ Compare Fund'),
-      h('button',{onClick:()=>this.addToCart(f.name,f.strat),style:{width:'100%',marginTop:9,border:'none',background:'var(--brand)',color:'#fff',borderRadius:11,padding:'12px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}}, (featured||prospect)?'Request Allocation':'Invest more'));
+      f.closed
+        ? h('button',{onClick:()=>this.toggleWatch(f.name),style:{width:'100%',marginTop:9,border:'1px solid var(--line)',background:'var(--surface-2)',color:'var(--muted)',opacity:.8,borderRadius:11,padding:'12px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}}, (this.state.watchlist||[]).includes(f.name)?'🔔 On the waitlist':'🔒 Closed · Join the waitlist')
+        : h('button',{onClick:()=>this.addToCart(f.name,f.strat),style:{width:'100%',marginTop:9,border:'none',background:'var(--brand)',color:'#fff',borderRadius:11,padding:'12px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}}, (featured||prospect)?'Request Allocation':'Invest more'));
     // ---------- hero + KPIs ----------
     const heroImg=h('div',{style:{position:'relative',flex:'1 1 300px',minWidth:240,minHeight:200,borderRadius:14,overflow:'hidden',background:'radial-gradient(circle at 40% 36%, #34343a 0%, #1a1a1c 40%, #0a0a0b 72%)',display:'flex',alignItems:'flex-start',padding:18}},
       h('img',{src:'assets/moonfare_logo_white.png',alt:'',onError:e=>{e.target.style.display='none';},style:{height:26,opacity:.95}}));
@@ -3769,7 +3771,7 @@ class Component extends DCLogic {
             h('div',{style:{border:'1px solid var(--synthetic)',background:'var(--synthetic-wash)',borderRadius:14,padding:'13px 14px'}},
               h('div',{style:{fontSize:11,fontWeight:700,color:'var(--synthetic)',marginBottom:5}},'⚑ What to watch'),
               h('div',{style:{fontSize:12,color:'var(--ink)',lineHeight:1.5}}, this.fundFitModel(f,m).watch)))),
-        h('div',{style:{marginTop:16}}, this.fundActions(f.name,false,f.strat)));
+        h('div',{style:{marginTop:16}}, this.fundActions(f.name,false,f.strat,f.closed)));
     } else if(tabValid==='seed' && C){
       const slices=[{n:'Core managers',p:75,color:'--data-1'},{n:'Alpha companies',p:25,color:'--data-8'}];
       const layerList=(title,arr)=>h('div',{style:{flex:'1 1 240px'}}, h('div',{style:{fontSize:13,fontWeight:700,marginBottom:8}},title),
@@ -3862,14 +3864,18 @@ class Component extends DCLogic {
   removeFromCart(name){ this.setState({cart:(this.state.cart||[]).filter(x=>x.name!==name)}); }
   setCartTicket(name,v){ this.setState({cart:(this.state.cart||[]).map(x=>x.name===name?{...x,ticket:Math.max(50,v)}:x)}); }
   /* reusable: Add-to-portfolio + Watchlist + Buy(cart) — shown wherever a fund appears */
-  fundActions(name,sm,strat){ const h=this.h; const inW=(this.state.watchlist||[]).includes(name); const inP=(this.state.portfolioAdds||[]).includes(name); const inC=this.inCart(name); const held=this.isHeld(name);
+  fundActions(name,sm,strat,closed){ const h=this.h; const inW=(this.state.watchlist||[]).includes(name); const inP=(this.state.portfolioAdds||[]).includes(name); const inC=this.inCart(name); const held=this.isHeld(name);
     const pad=sm?'6px 10px':'9px 14px'; const fs=sm?11.5:12.5;
     return h('div',{style:{display:'flex',gap:8,flexWrap:'wrap'}},
       held
         ? h('button',{onClick:e=>{e.stopPropagation();this.suggestSimilar(name,strat);},title:'You already hold this fund — see comparable funds on the platform',
             style:{border:'none',borderRadius:9,padding:pad,fontSize:fs,fontWeight:700,cursor:'pointer',background:'var(--brand)',color:'#fff',fontFamily:'Inter,system-ui,sans-serif'}}, '✨ Suggest similar funds')
+        : closed
+        /* closed funds: the action is greyed out where the CTA would be, with a waitlist instead */
+        ? h('button',{onClick:e=>{e.stopPropagation();this.toggleWatch(name);},title:'This fund is closed — join the waitlist to be notified when it reopens',
+            style:{border:'1px solid var(--line)',borderRadius:9,padding:pad,fontSize:fs,fontWeight:700,cursor:'pointer',background:'var(--surface-2)',color:'var(--muted)',opacity:.75,fontFamily:'Inter,system-ui,sans-serif'}}, inW?'🔔 On the waitlist':'🔒 Closed · Join the waitlist')
         : h('button',{onClick:e=>{e.stopPropagation();this.addToCart(name,strat);},
-            style:{border:'none',borderRadius:9,padding:pad,fontSize:fs,fontWeight:700,cursor:'pointer',background:inC?'var(--over)':'var(--brand)',color:'#fff',fontFamily:'Inter,system-ui,sans-serif'}}, inC?'💼 Added':'💼 Buy now'),
+            style:{border:'none',borderRadius:9,padding:pad,fontSize:fs,fontWeight:700,cursor:'pointer',background:inC?'var(--over)':'var(--brand)',color:'#fff',fontFamily:'Inter,system-ui,sans-serif'}}, inC?'✓ Added':'✦ Seize the opportunity'),
       held?null:h('button',{onClick:e=>{e.stopPropagation();this.addToPortfolio(name);},
         style:{border:'1px solid '+(inP?'var(--over)':'var(--brand-tint-3)'),borderRadius:9,padding:pad,fontSize:fs,fontWeight:600,cursor:'pointer',background:inP?'var(--over-wash)':'var(--surface)',color:inP?'var(--over)':'var(--brand-ink)',fontFamily:'Inter,system-ui,sans-serif'}}, inP?'✓ In portfolio plan':'＋ Portfolio plan'),
       held?null:h('button',{onClick:e=>{e.stopPropagation();this.toggleWatch(name);},
@@ -4276,7 +4282,7 @@ class Component extends DCLogic {
       h('div',{style:{display:'flex',gap:8,flexWrap:'wrap',marginBottom:14}}, chip('Fund size',f.size), chip('Target net',f.tgt), chip('Minimum',f.min), chip('Closes',f.close)),
       h('div',{style:{fontFamily:SF,fontSize:13.5,fontWeight:700,margin:'2px 0 9px'}},'Why '+gl.toLowerCase()+' like this fund'),
       h('div',{style:{display:'flex',flexDirection:'column',gap:9,marginBottom:16}}, (f.why||[]).map((w,i)=>h('div',{key:i,style:{display:'flex',gap:9,alignItems:'flex-start',fontSize:12.5,lineHeight:1.5}}, h('span',{style:{flex:'0 0 16px',color:'var(--brand)',fontWeight:700}},'›'), h('span',null,w)))),
-      this.fundActions(f.name,false,f.strat),
+      this.fundActions(f.name,false,f.strat,f.closed),
       h('div',{style:{display:'flex',gap:10,marginTop:12}},
         h('button',{onClick:()=>this.openFundPage(f.id),style:{flex:1,display:'inline-flex',alignItems:'center',justifyContent:'center',gap:7,border:'1px solid var(--brand)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:10,padding:'10px',fontSize:12.5,fontWeight:700,cursor:'pointer'}},h('span',null,'⤢'),'Open full fund page'),
         h('button',{onClick:()=>this.askFromPage('Tell me more about '+f.name+' and whether it fits my portfolio.'),style:{flex:1,border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:10,padding:'10px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},'Ask Alpha →')));
@@ -6293,7 +6299,7 @@ class Component extends DCLogic {
             style:{border:'1px solid '+(inW?'var(--brand)':'var(--line)'),background:inW?'var(--brand-wash)':'var(--surface)',color:inW?'var(--brand-ink)':'var(--muted)',borderRadius:8,padding:'5px 10px',fontSize:11,fontWeight:600,cursor:'pointer'}}, inW?'♥ Watchlisted':'♡ Watchlist'),
           /* invest — only if currently on the platform */
           live? h('button',{onClick:e=>{e.stopPropagation();this.addToCart(name,label);},
-            style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'5px 10px',fontSize:11,fontWeight:700,cursor:'pointer'}},'💼 Invest')
+            style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'5px 10px',fontSize:11,fontWeight:700,cursor:'pointer'}},'✦ Seize the opportunity')
             : h('span',{style:{fontSize:10.5,color:'var(--muted)',alignSelf:'center'}},'not investable now'),
           /* similar — everywhere */
           h('button',{onClick:e=>{e.stopPropagation();this.suggestSimilar(name,label);},
@@ -6577,21 +6583,21 @@ class Component extends DCLogic {
   ]; }
   /* items 199/204/207/208/215/219 — manager-level profile metadata (domicile, listed status, firm history, since-inception KPIs, scores, top-quartile, current offering) */
   MGR_META(){ return {
-    eqt:        {country:'Sweden',     demonym:'Swedish',  listed:true,  est:1994, since:18.1, avgDpi:1.9, nFunds:24, topQ:18, scores:{consistency:88,delivery:85,markup:82}, offering:'EQT XI (Buyout)'},
-    kkr:        {country:'USA',        demonym:'American', listed:true,  est:1976, since:16.8, avgDpi:1.85,nFunds:22, topQ:15, scores:{consistency:85,delivery:83,markup:80}, offering:'KKR North America XIV'},
-    blackstone: {country:'USA',        demonym:'American', listed:true,  est:1985, since:17.5, avgDpi:2.0, nFunds:30, topQ:22, scores:{consistency:84,delivery:86,markup:83}, offering:'Blackstone Capital X'},
-    carlyle:    {country:'USA',        demonym:'American', listed:true,  est:1987, since:14.2, avgDpi:1.7, nFunds:26, topQ:14, scores:{consistency:76,delivery:75,markup:72}, offering:null},
-    ares:       {country:'USA',        demonym:'American', listed:true,  est:1997, since:12.9, avgDpi:1.5, nFunds:18, topQ:11, scores:{consistency:87,delivery:84,markup:80}, offering:'Ares Private Credit V'},
-    cvc:        {country:'Luxembourg', demonym:'European', listed:true,  est:1981, since:18.9, avgDpi:2.1, nFunds:14, topQ:11, scores:{consistency:83,delivery:82,markup:84}, offering:null},
-    cinven:     {country:'UK',         demonym:'British',  listed:false, est:1977, since:16.1, avgDpi:1.8, nFunds:12, topQ:8,  scores:{consistency:80,delivery:79,markup:77}, offering:null},
-    genatl:     {country:'USA',        demonym:'American', listed:false, est:1980, since:20.4, avgDpi:2.2, nFunds:16, topQ:12, scores:{consistency:82,delivery:80,markup:79}, offering:'GA Growth XIII'},
-    thomabravo: {country:'USA',        demonym:'American', listed:false, est:2008, since:24.1, avgDpi:2.4, nFunds:15, topQ:13, scores:{consistency:89,delivery:88,markup:86}, offering:'Thoma Bravo XVI'},
-    hg:         {country:'UK',         demonym:'British',  listed:false, est:2000, since:22.7, avgDpi:2.3, nFunds:18, topQ:16, scores:{consistency:90,delivery:89,markup:87}, offering:'Hg Saturn 4'},
-    antin:      {country:'France',     demonym:'French',   listed:true,  est:2007, since:14.8, avgDpi:1.6, nFunds:9,  topQ:7,  scores:{consistency:85,delivery:83,markup:81}, offering:null},
-    lexington:  {country:'USA',        demonym:'American', listed:false, est:1994, since:13.7, avgDpi:1.7, nFunds:22, topQ:15, scores:{consistency:88,delivery:85,markup:84}, offering:null},
-    insight:    {country:'USA',        demonym:'American', listed:false, est:1995, since:18.0, avgDpi:1.9, nFunds:13, topQ:9,  scores:{consistency:78,delivery:77,markup:75}, offering:'Insight Partners XIII'},
-    thrive:     {country:'USA',        demonym:'American', listed:false, est:2010, since:26.5, avgDpi:2.1, nFunds:9,  topQ:7,  scores:{consistency:74,delivery:76,markup:73}, offering:'Thrive Capital IX'},
-    index:      {country:'UK',         demonym:'British',  listed:false, est:1996, since:23.1, avgDpi:2.0, nFunds:12, topQ:9,  scores:{consistency:80,delivery:81,markup:78}, offering:null}
+    eqt:        {country:'Sweden',     demonym:'Swedish',  listed:true,  est:1994, aum:'€232bn', moic:2.4, since:18.1, avgDpi:1.9, nFunds:24, topQ:18, scores:{consistency:88,delivery:85,markup:82}, offering:'EQT XI (Buyout)'},
+    kkr:        {country:'USA',        demonym:'American', listed:true,  est:1976, aum:'$638bn', moic:2.3, since:16.8, avgDpi:1.85,nFunds:22, topQ:15, scores:{consistency:85,delivery:83,markup:80}, offering:'KKR North America XIV'},
+    blackstone: {country:'USA',        demonym:'American', listed:true,  est:1985, aum:'$1.1tn', moic:2.5, since:17.5, avgDpi:2.0, nFunds:30, topQ:22, scores:{consistency:84,delivery:86,markup:83}, offering:'Blackstone Capital X'},
+    carlyle:    {country:'USA',        demonym:'American', listed:true,  est:1987, aum:'$447bn', moic:2.1, since:14.2, avgDpi:1.7, nFunds:26, topQ:14, scores:{consistency:76,delivery:75,markup:72}, offering:null},
+    ares:       {country:'USA',        demonym:'American', listed:true,  est:1997, aum:'$484bn', moic:1.9, since:12.9, avgDpi:1.5, nFunds:18, topQ:11, scores:{consistency:87,delivery:84,markup:80}, offering:'Ares Private Credit V'},
+    cvc:        {country:'Luxembourg', demonym:'European', listed:true,  est:1981, aum:'€193bn', moic:2.6, since:18.9, avgDpi:2.1, nFunds:14, topQ:11, scores:{consistency:83,delivery:82,markup:84}, offering:null},
+    cinven:     {country:'UK',         demonym:'British',  listed:false, est:1977, aum:'€40bn', moic:2.2, since:16.1, avgDpi:1.8, nFunds:12, topQ:8,  scores:{consistency:80,delivery:79,markup:77}, offering:null},
+    genatl:     {country:'USA',        demonym:'American', listed:false, est:1980, aum:'$100bn', moic:2.7, since:20.4, avgDpi:2.2, nFunds:16, topQ:12, scores:{consistency:82,delivery:80,markup:79}, offering:'GA Growth XIII'},
+    thomabravo: {country:'USA',        demonym:'American', listed:false, est:2008, aum:'$160bn', moic:2.9, since:24.1, avgDpi:2.4, nFunds:15, topQ:13, scores:{consistency:89,delivery:88,markup:86}, offering:'Thoma Bravo XVI'},
+    hg:         {country:'UK',         demonym:'British',  listed:false, est:2000, aum:'$75bn', moic:2.8, since:22.7, avgDpi:2.3, nFunds:18, topQ:16, scores:{consistency:90,delivery:89,markup:87}, offering:'Hg Saturn 4'},
+    antin:      {country:'France',     demonym:'French',   listed:true,  est:2007, aum:'€31bn', moic:2.0, since:14.8, avgDpi:1.6, nFunds:9,  topQ:7,  scores:{consistency:85,delivery:83,markup:81}, offering:null},
+    lexington:  {country:'USA',        demonym:'American', listed:false, est:1994, aum:'$70bn', moic:2.1, since:13.7, avgDpi:1.7, nFunds:22, topQ:15, scores:{consistency:88,delivery:85,markup:84}, offering:null},
+    insight:    {country:'USA',        demonym:'American', listed:false, est:1995, aum:'$90bn', moic:2.4, since:18.0, avgDpi:1.9, nFunds:13, topQ:9,  scores:{consistency:78,delivery:77,markup:75}, offering:'Insight Partners XIII'},
+    thrive:     {country:'USA',        demonym:'American', listed:false, est:2010, aum:'$25bn', moic:2.6, since:26.5, avgDpi:2.1, nFunds:9,  topQ:7,  scores:{consistency:74,delivery:76,markup:73}, offering:'Thrive Capital IX'},
+    index:      {country:'UK',         demonym:'British',  listed:false, est:1996, aum:'$13bn', moic:2.5, since:23.1, avgDpi:2.0, nFunds:12, topQ:9,  scores:{consistency:80,delivery:81,markup:78}, offering:null}
   }; }
   mgrMeta(m){ const id=typeof m==='string'?m:m.id; return this.MGR_META()[id]||{}; }
   /* brand assets from the first Copilot iteration — manager logos + hero backgrounds */
@@ -6633,6 +6639,9 @@ class Component extends DCLogic {
   // a manager's IRR within a given asset class (for sort-by-asset-class), or all-time when 'All'
   mgrIrrFor(m,ac){ if(ac==='All') return this.mgrAllTimeIrr(m); const c=m.classes.find(x=>x.ac===ac); return c?c.irr:null; }
   mgrConsFor(m,ac){ if(ac==='All') return this.mgrCons(m); const c=m.classes.find(x=>x.ac===ac); return c?c.cons:null; }
+  /* MOIC + AUM must accompany IRR on the managers page */
+  mgrMoic(m){ const md=this.mgrMeta(m); return md.moic!=null? md.moic : +(((md.avgDpi||1.5)+0.5).toFixed(1)); }
+  mgrAum(m){ const md=this.mgrMeta(m); return md.aum||'—'; }
   // chosen specific fund for a manager (item 193) — defaults to the first fund in the active asset class
   mgrChosenFund(m){ const ac=this.state.mgrAC; const pool = ac==='All'? m.classes.flatMap(c=>c.funds) : (m.classes.find(c=>c.ac===ac)||{funds:[]}).funds;
     const chosen=this.state.mgrCase[m.id]; return pool.find(f=>f.id===chosen) || pool[0] || null; }
@@ -6701,7 +6710,7 @@ class Component extends DCLogic {
         style:{display:'inline-flex',alignItems:'center',gap:8,border:'1px solid '+(following?'var(--over)':'var(--line)'),background:following?'rgba(45,143,111,.1)':'var(--surface)',color:following?'var(--over)':'var(--ink)',borderRadius:10,padding:'11px 16px',fontSize:12.5,fontWeight:700,cursor:'pointer'}},
         following?'🔔 You’ll be notified of the next offering':'🔔 Notify me on next platform offering'),
       md.offering? h('button',{onClick:()=>this.askFromPage('I want to commit to '+md.offering+' from '+m.name+'. Walk me through it.'),
-        style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'11px 18px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'💼 Buy now — '+md.offering)
+        style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'11px 18px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'✦ Seize the opportunity — '+md.offering)
         : h('span',{style:{fontSize:11.5,color:'var(--muted)'}},'No current offering on the platform — follow to be alerted.'));
     // ---- best vs worst fund (item 207) ----
     const fundRow=(f,isBest)=>h('div',{style:{flex:'1 1 220px',minWidth:200,border:'1px solid '+(isBest?'var(--over)':'var(--line)'),borderRadius:12,padding:'13px 15px',background:'var(--surface)'}},
@@ -6819,6 +6828,36 @@ class Component extends DCLogic {
     region:'North America, Global', ac:'Venture Capital', tags:['Information Technology','Broad'],
     kpis:[['$100 million','Target Fund Size¹'],['>3.0x','Target Net MOIC²'],['June 2026','Expected Initial Close³'],['$100,000','Min. investment']],
     seed:['Accel','a16z','Lightspeed','Founders Fund','Databricks'] }; }
+  /* closed funds you can join a waitlist for — bottom of the Funds & Managers page */
+  WAITLIST_FUNDS(){ return (this.DB&&!this.dbEmpty()&&this.DB.waitlist) || [
+    {id:'wl-lexxi', name:'Lexington Capital Partners XI', mgr:'Lexington Partners', logo:'lexington-partners',
+     eyebrow:'Access Feeder A111 SCSp investing in', region:'Global', ac:'Secondaries', tags:['Broad'], closed:true,
+     desc:'Lexington Capital Partners XI ("LCP XI" or "the Fund") seeks to construct a diversified portfolio of interests in global private investment funds through negotiated secondary market purchases.',
+     kpis:[['$20bn','Target Fund Size¹'],['16%','Lexington Capital Partners Agg…²'],['1.5x','Lexington Capital Partners Agg…²'],['$125,000','Min. investment']]}
+  ]; }
+  waitlistCard(f){
+    const h=this.h, SF=this.SF; const onW=(this.state.watchlist||[]).includes(f.name);
+    const chip=(icon,txt)=>h('span',{style:{display:'inline-flex',alignItems:'center',gap:6,fontSize:12.5,fontWeight:600,color:'var(--ink)'}}, h('span',{style:{color:'var(--brand)'}},icon), txt);
+    const left=h('div',{style:{position:'relative',flex:'0 0 160px',minWidth:130,minHeight:170,background:'linear-gradient(135deg,#2b2b2f,#121214)',display:'flex',alignItems:'flex-end',padding:14}},
+      h('div',{style:{position:'absolute',inset:0,backgroundImage:'url('+this.landscapeUrl(f.id||f.name)+')',backgroundSize:'cover',backgroundPosition:'center',opacity:.5}}),
+      h('div',{style:{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(10,12,20,.25),rgba(10,12,20,.7))'}}),
+      f.logo? h('img',{src:'assets/logos/'+f.logo+'.png',alt:'',onError:e=>{e.target.style.display='none';e.target.parentNode.appendChild(document.createTextNode(f.mgr));},style:{position:'relative',maxWidth:'80%',maxHeight:46,objectFit:'contain',filter:'brightness(0) invert(1)'}})
+        : h('div',{style:{position:'relative',color:'#fff',fontFamily:SF,fontWeight:700,fontSize:16}},f.mgr));
+    const kpiRow=h('div',{style:{display:'flex',flexWrap:'wrap',marginTop:6,borderTop:'1px solid var(--line)',paddingTop:12}}, (f.kpis||[]).map((k,i)=>
+      h('div',{key:i,style:{flex:'1 1 auto',minWidth:120,paddingLeft:i?16:0,paddingRight:16,borderLeft:i?'1px solid var(--line)':'none'}},
+        h('div',{style:{fontFamily:SF,fontSize:16,fontWeight:700,color:'var(--ink)',lineHeight:1.1}},k[0]),
+        h('div',{style:{fontSize:10.5,color:'var(--muted)',lineHeight:1.3,marginTop:3}},k[1]))));
+    const mid=h('div',{style:{flex:'1 1 360px',minWidth:280,padding:'18px 22px',display:'flex',flexDirection:'column',gap:9}},
+      h('div',{style:{fontSize:12,color:'var(--muted)'}}, f.eyebrow||(f.name+' investing in')),
+      h('div',{style:{fontFamily:SF,fontSize:23,fontWeight:700,color:'var(--ink)',lineHeight:1.1}}, f.name),
+      h('div',{style:{fontSize:13.5,color:'var(--ink)',lineHeight:1.5,maxWidth:560}}, f.desc),
+      h('div',{style:{display:'flex',gap:22,flexWrap:'wrap',marginTop:2}}, chip('🌐',f.region), chip('💼',f.ac)),
+      h('div',{style:{display:'flex',gap:8,flexWrap:'wrap'}}, (f.tags||[]).map(t=>h('span',{key:t,style:{fontSize:11.5,color:'var(--muted)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:7,padding:'4px 11px'}},t))),
+      kpiRow);
+    const right=h('div',{style:{flex:'0 0 220px',minWidth:170,display:'flex',alignItems:'center',justifyContent:'center',padding:'18px 20px'}},
+      h('button',{onClick:()=>this.toggleWatch(f.name),style:{border:'none',background:onW?'var(--over)':'var(--brand)',color:'#fff',borderRadius:11,padding:'12px 18px',fontSize:13.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif',display:'inline-flex',alignItems:'center',gap:8}}, h('span',null,'🔔'), onW?'On the waitlist':'Join the Waitlist'));
+    return h('div',{key:f.id,style:{display:'flex',flexWrap:'wrap',border:'1px solid var(--line)',borderRadius:16,overflow:'hidden',background:'var(--surface)',opacity:.92,boxShadow:'0 10px 30px -22px rgba(0,0,0,.3)'}}, left, mid, right);
+  }
   featuredFundCard(){
     const h=this.h, SF=this.SF; const f=this.FEATURED_FUND(); if(!f) return null;
     const chip=(icon,txt)=>h('span',{style:{display:'inline-flex',alignItems:'center',gap:6,fontSize:12.5,fontWeight:600,color:'var(--ink)'}}, h('span',{style:{color:'var(--brand)'}},icon), txt);
@@ -6928,7 +6967,7 @@ class Component extends DCLogic {
       const chosen=this.mgrChosenFund(m);
       const acPool = s.mgrAC==='All'? m.classes : m.classes.filter(c=>c.ac===s.mgrAC);
       const fundPool = acPool.flatMap(c=>c.funds);
-      return h('div',{key:m.id,style:{display:'grid',gridTemplateColumns:'30px 1.5fr 1.4fr .8fr .8fr 1.4fr',gap:12,alignItems:'center',padding:'12px 14px',borderRadius:12,border:'1px solid '+(sel?'var(--brand)':'var(--line)'),background:sel?'var(--brand-wash)':'var(--surface)',marginBottom:8}},
+      return h('div',{key:m.id,style:{display:'grid',gridTemplateColumns:'26px 1.4fr 1fr .6fr .6fr .7fr 1.25fr',gap:12,alignItems:'center',padding:'12px 14px',borderRadius:12,border:'1px solid '+(sel?'var(--brand)':'var(--line)'),background:sel?'var(--brand-wash)':'var(--surface)',marginBottom:8}},
         // item 191 — select managers to compare
         h('input',{type:'checkbox',checked:sel,onChange:()=>this.toggleMgrSel(m.id),style:{width:16,height:16,accentColor:'var(--brand)',cursor:'pointer'}}),
         h('div',{style:{display:'flex',alignItems:'center',gap:10,minWidth:0}},
@@ -6938,8 +6977,10 @@ class Component extends DCLogic {
             h('button',{onClick:()=>this.openManagerProfile(m.id),title:'Open '+m.name+' profile',style:{border:'none',background:'none',padding:0,cursor:'pointer',textAlign:'left',fontFamily:SF,fontSize:15,fontWeight:600,color:'var(--brand-ink)'}}, m.name+' ›'),
             h('div',{style:{fontSize:10.5,color:'var(--muted)'}},m.hq+' · '+this.mgrNFunds(m)+' funds'))),
         h('div',{style:{display:'flex',flexWrap:'wrap',gap:5}}, m.classes.map(c=>h('span',{key:c.ac,style:{fontSize:10,fontWeight:600,color: (s.mgrAC===c.ac?'#fff':'var(--muted)'),background:(s.mgrAC===c.ac?'var(--brand)':'var(--surface-2)'),border:'1px solid var(--line)',borderRadius:999,padding:'2px 8px'}},c.ac))),
-        h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:16,fontWeight:700,color:'var(--ink)'}}, irr!=null?irr+'%':'—'), h('div',{style:{fontSize:9.5,color:'var(--muted)'}}, s.mgrAC==='All'?'all-time IRR':s.mgrAC+' IRR')),
-        h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:15,fontWeight:700,color: cons>=85?'var(--over)':'var(--ink)'}}, cons!=null?cons:'—'), h('div',{style:{fontSize:9.5,color:'var(--muted)'}},'consistency')),
+        h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:15,fontWeight:700,color:'var(--ink)'}}, irr!=null?irr+'%':'—'), h('div',{style:{fontSize:9,color:'var(--muted)'}}, s.mgrAC==='All'?'all-time IRR':s.mgrAC+' IRR')),
+        /* MOIC + AUM accompany IRR */
+        h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:15,fontWeight:700,color:'var(--ink)'}}, this.mgrMoic(m)+'x'), h('div',{style:{fontSize:9,color:'var(--muted)'}},'net MOIC')),
+        h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:14,fontWeight:700,color:'var(--ink)'}}, this.mgrAum(m)), h('div',{style:{fontSize:9,color:'var(--muted)'}},'AUM')),
         h('div',{style:{display:'flex',flexDirection:'column',gap:6}},
           // item 193 — pick the specific fund/case for the comparison
           fundPool.length>1? h('select',{value:chosen?chosen.id:'',onChange:e=>this.setState({mgrCase:{...s.mgrCase,[m.id]:e.target.value}}),
@@ -6947,7 +6988,7 @@ class Component extends DCLogic {
             fundPool.map(f=>h('option',{key:f.id,value:f.id},f.name+' · '+f.irr+'%'))) : h('div',{style:{fontSize:11,color:'var(--muted)'}},chosen?chosen.name:'—'),
           h('div',{style:{display:'flex',gap:6}},
             // item 194 — buy & simulate into the portfolio; open the real fund page when the case is in the catalogue, else hand off to Alpha
-            h('button',{onClick:()=>{ if(!chosen) return; if(this.fundById && this.fundById(chosen.id)) this.openFundPage(chosen.id); else this.askFromPage('I want to commit to '+chosen.name+' from '+m.name+'. Walk me through it.'); },style:{flex:1,border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:8,padding:'6px',fontSize:11,fontWeight:600,cursor:'pointer'}},'💼 Buy'),
+            h('button',{onClick:()=>{ if(!chosen) return; if(this.fundById && this.fundById(chosen.id)) this.openFundPage(chosen.id); else this.askFromPage('I want to commit to '+chosen.name+' from '+m.name+'. Walk me through it.'); },style:{flex:1,border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:8,padding:'6px',fontSize:11,fontWeight:600,cursor:'pointer'}},'✦ Seize the opportunity'),
             h('button',{onClick:()=>{ if(this.fundById && chosen && this.fundById(chosen.id)) this.addFundToSim(chosen.id); else this.setState({ws:'shape',uc:'sim',page:'sim',simShowDials:true,deepLink:null,ask:{...s.ask,state:'min'}}); },style:{flex:1,border:'1px solid var(--line)',background:'var(--surface)',color:'var(--ink)',borderRadius:8,padding:'6px',fontSize:11,fontWeight:600,cursor:'pointer'}},'✦ Simulate')),
           // items 200/218 — add this GP (and optionally its chosen fund) to the side-by-side comparison list
           h('div',{style:{display:'flex',gap:6}},
@@ -6958,8 +6999,8 @@ class Component extends DCLogic {
     };
     const listCard=this.card({title: s.mgrAC==='All'?'Managers on the Moonfare platform':s.mgrAC+' managers on the platform', info:true,
       children: list.length? h('div',null,
-        h('div',{style:{display:'grid',gridTemplateColumns:'30px 1.5fr 1.4fr .8fr .8fr 1.4fr',gap:12,padding:'0 14px 8px',fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)'}},
-          h('span',null,''),h('span',null,'Manager'),h('span',null,'Asset classes'),h('span',{style:{textAlign:'right'}},'IRR'),h('span',{style:{textAlign:'right'}},'Score'),h('span',null,'Case & actions')),
+        h('div',{style:{display:'grid',gridTemplateColumns:'26px 1.4fr 1fr .6fr .6fr .7fr 1.25fr',gap:12,padding:'0 14px 8px',fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)'}},
+          h('span',null,''),h('span',null,'Manager'),h('span',null,'Asset classes'),h('span',{style:{textAlign:'right'}},'IRR'),h('span',{style:{textAlign:'right'}},'MOIC'),h('span',{style:{textAlign:'right'}},'AUM'),h('span',null,'Case & actions')),
         list.map(row))
         : h('div',{style:{padding:'24px',textAlign:'center',color:'var(--muted)',fontSize:13}},'No managers match — broaden the asset class or clear the search.'),
       caption:'Manager-level view (a manager like KKR spans several asset classes). Pick an asset class to rank within it, choose a specific fund as the case, then Buy or Simulate it into your portfolio.'});
@@ -7003,20 +7044,23 @@ class Component extends DCLogic {
       return true;
     }).sort((a,b)=> s.mgrSort==='name'? a.name.localeCompare(b.name) : s.mgrSort==='cons'? (b.vintage-a.vintage) : (b.irr-a.irr));
     const fundRow=(f)=>{ const det=this.fundDetail(f);
-      return h('div',{key:f.id,style:{display:'grid',gridTemplateColumns:'44px 1.7fr 1fr .7fr .7fr 1fr',gap:12,alignItems:'center',padding:'11px 14px',borderRadius:12,border:'1px solid var(--line)',background:'var(--surface)',marginBottom:8}},
+      const fmoic = det.pipeline? '—' : Math.max(1.0, +(1.1+((f.irr||10)-8)*0.05).toFixed(1))+'x';
+      const faum = this.mgrAum(this.mgrById(f.mgrId));
+      return h('div',{key:f.id,style:{display:'grid',gridTemplateColumns:'44px 1.4fr .8fr .5fr .5fr .6fr .85fr',gap:12,alignItems:'center',padding:'11px 14px',borderRadius:12,border:'1px solid var(--line)',background:'var(--surface)',marginBottom:8}},
         this.mgrTile(f.logo,f.mgr,f.mgrId||f.mgr||f.id,40), /* logo over a nature/city landscape */
         h('div',{style:{minWidth:0}},
-          h('button',{onClick:()=>this.openFundResearch(f.id),title:'Open '+f.name,style:{border:'none',background:'none',padding:0,cursor:'pointer',textAlign:'left',fontFamily:SF,fontSize:14.5,fontWeight:600,color:'var(--brand-ink)'}}, f.name+' ›'),
+          h('button',{onClick:()=>this.openFundResearch(f.id),title:'Open '+f.name,style:{border:'none',background:'none',padding:0,cursor:'pointer',textAlign:'left',fontFamily:SF,fontSize:14,fontWeight:600,color:'var(--brand-ink)'}}, f.name+' ›'),
           h('div',{style:{fontSize:10.5,color:'var(--muted)'}}, f.mgr+' · vintage '+f.vintage)),
         h('span',{style:{justifySelf:'start',fontSize:10.5,fontWeight:600,color:'var(--muted)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:999,padding:'2px 9px'}},f.ac),
-        h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:14,fontWeight:700,color: det.pipeline?'var(--muted)':'var(--ink)'}}, det.pipeline?'—':f.irr+'%'), h('div',{style:{fontSize:9,color:'var(--muted)'}}, det.pipeline?'in pipeline':'net IRR')),
-        h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:14,fontWeight:700}}, det.pipeline?'—':det.dpi+'x'), h('div',{style:{fontSize:9,color:'var(--muted)'}},'DPI')),
+        h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:13.5,fontWeight:700,color: det.pipeline?'var(--muted)':'var(--ink)'}}, det.pipeline?'—':f.irr+'%'), h('div',{style:{fontSize:9,color:'var(--muted)'}}, det.pipeline?'pipeline':'IRR')),
+        h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:13.5,fontWeight:700}}, fmoic), h('div',{style:{fontSize:9,color:'var(--muted)'}},'MOIC')),
+        h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:13,fontWeight:700}}, faum), h('div',{style:{fontSize:9,color:'var(--muted)'}},'AUM')),
         h('button',{onClick:()=>this.toggleCmp({kind:'fund',id:f.id,label:f.name}),style:{justifySelf:'end',border:'1px solid '+(this.inCmp('fund',f.id)?'var(--brand)':'var(--line)'),background:this.inCmp('fund',f.id)?'var(--brand-wash)':'var(--surface)',color:this.inCmp('fund',f.id)?'var(--brand-ink)':'var(--muted)',borderRadius:8,padding:'6px 11px',fontSize:11,fontWeight:600,cursor:'pointer'}}, (this.inCmp('fund',f.id)?'✓ ':'＋ ')+'compare'));
     };
     const fundsListCard=this.card({title: (s.mgrAC==='All'?'Funds on the Moonfare platform':s.mgrAC+' funds on the platform'), info:true,
       children: funds.length? h('div',null,
-        h('div',{style:{display:'grid',gridTemplateColumns:'44px 1.7fr 1fr .7fr .7fr 1fr',gap:12,padding:'0 14px 8px',fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)'}},
-          h('span',null,''),h('span',null,'Fund'),h('span',null,'Asset class'),h('span',{style:{textAlign:'right'}},'IRR'),h('span',{style:{textAlign:'right'}},'DPI'),h('span',null,'')),
+        h('div',{style:{display:'grid',gridTemplateColumns:'44px 1.4fr .8fr .5fr .5fr .6fr .85fr',gap:12,padding:'0 14px 8px',fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)'}},
+          h('span',null,''),h('span',null,'Fund'),h('span',null,'Asset class'),h('span',{style:{textAlign:'right'}},'IRR'),h('span',{style:{textAlign:'right'}},'MOIC'),h('span',{style:{textAlign:'right'}},'AUM'),h('span',null,'')),
         funds.map(fundRow))
         : h('div',{style:{padding:'24px',textAlign:'center',color:'var(--muted)',fontSize:13}},'No funds match — broaden the asset class or clear the search.'),
       caption:'Individual funds (e.g. EQT IX) — sortable by asset class. New funds still in the pipeline show no returns yet. Click any fund for its full detail.'});
@@ -7025,6 +7069,11 @@ class Component extends DCLogic {
     const featuredHead=h('div',{style:{display:'flex',alignItems:'baseline',gap:10}},
       h('span',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--brand)'}},'★ Highlighted fund'),
       h('span',{style:{fontSize:11.5,color:'var(--muted)'}},'Featured on the platform right now'));
+    /* waitlist (closed) funds — bottom of the page */
+    const wl=this.WAITLIST_FUNDS()||[];
+    const waitlistSection = wl.length? h('div',{style:{display:'flex',flexDirection:'column',gap:12,marginTop:8}},
+      h('div',{style:{fontFamily:SF,fontSize:20,fontWeight:700}},'Waitlist Funds ('+wl.length+')'),
+      wl.map(f=>this.waitlistCard(f))) : null;
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
       hero,
       featuredHead, this.featuredFundCard(), /* highlight Moonfare Technology Fund at the top */
@@ -7033,7 +7082,8 @@ class Component extends DCLogic {
       h('div',{style:{display:'flex',gap:16,justifyContent:'space-between',flexWrap:'wrap',alignItems:'center'}}, viewToggle, sortRow),
       acRow,
       filterRow,
-      isFunds? fundsListCard : h('div',{style:{display:'flex',flexDirection:'column',gap:16}}, stratAdd, cmpBanner, listCard, compareCard));
+      isFunds? fundsListCard : h('div',{style:{display:'flex',flexDirection:'column',gap:16}}, stratAdd, cmpBanner, listCard, compareCard),
+      waitlistSection); /* waitlist at the bottom */
   }
   /* ====================== APPLE-STYLE COMPARISON (items 200-214) ====================== */
   MGR_METRIC_EXPL(){ return {
