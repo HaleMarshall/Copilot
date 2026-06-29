@@ -5574,19 +5574,37 @@ class Component extends DCLogic {
 
     // funds grouped, focused bucket first + highlighted
     const fundRows=rows.filter(r=>byCat[r.k]&&byCat[r.k].length).sort((a,b)=>(a.k===focus?-1:b.k===focus?1:0));
-    const fundsCard=this.card({title:'View the investments you hold by '+d.label.toLowerCase(),badge:this.badge('your portfolio','conf'), /* items 21/22 — table at the bottom, 'investments' */
-      children:h('div',{style:{display:'flex',flexDirection:'column',gap:14}},
+    /* review7 item 23 — NAV-weighted aggregate metrics for a subgroup of funds */
+    const _n=(s)=>parseFloat(String(s==null?'':s).replace(/[^0-9.\-]/g,''))||0;
+    const subAgg=(funds)=>{ let w=0; const a={IRR:0,DPI:0,TVPI:0,MOIC:0,DVPI:0,NAV:0}; funds.forEach(f=>{ const nav=((meta[f.id]||{}).nav)||_n(f.nav)||0; a.NAV+=nav; w+=nav; a.IRR+=_n(f.irr)*nav; a.DPI+=_n(f.dpi)*nav; a.TVPI+=_n(f.tvpi)*nav; a.MOIC+=_n(f.moic)*nav; a.DVPI+=_n(f.dvpi)*nav; }); if(w>0)['IRR','DPI','TVPI','MOIC','DVPI'].forEach(k=>a[k]=a[k]/w); return a; };
+    const subMetric=(lab,val)=>h('div',{key:lab,style:{textAlign:'right',minWidth:44}}, h('div',{style:{fontSize:8,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.03em'}},lab), h('div',{style:{fontFamily:SF,fontSize:12,fontWeight:700}},val));
+    /* review7 item 22 — investments collapsed under their subgroups by default; click a subgroup to expand. item 23 — aggregate IRR/DPI/TVPI/MOIC/DVPI/NAV shown on the collapsed header. */
+    const fundsCard=this.card({title:'View the investments you hold by '+d.label.toLowerCase(),badge:this.badge('your portfolio','conf'),
+      children:h('div',{style:{display:'flex',flexDirection:'column',gap:10}},
         h('div',{style:{display:'flex',justifyContent:'flex-end'}}, this.holdingsMetricToggle()),
-        fundRows.map((r,i)=>{ const on=r.k===focus;
-          return h('div',{key:i,style:{padding:on?'11px 12px':'0',borderRadius:on?12:0,background:on?'var(--brand-wash)':'transparent',border:on?'1px solid var(--brand-tint-3)':'1px solid transparent'}},
-          h('div',{style:{display:'flex',alignItems:'center',gap:9,marginBottom:9}},
-            h('span',{style:{width:12,height:12,borderRadius:3,background:`var(${r.color})`}}),
-            h('span',{style:{fontFamily:SF,fontWeight:on?700:600,fontSize:15}},r.n),
-            h('span',{style:{fontSize:12,color:'var(--muted)'}},r.you+'% of '+basis+' · '+byCat[r.k].length+' fund'+(byCat[r.k].length>1?'s':'')),
-            on?h('span',{style:{marginLeft:'auto',fontSize:10.5,fontWeight:700,color:'var(--brand)'}},'SELECTED'):null),
-          this.holdingsTable(byCat[r.k])); }),
+        fundRows.map((r,i)=>{
+          /* review7 item 24 — region (and every non-strategy dimension) stays EXACTLY as before: header + full table, always expanded, no collapse, no aggregate row */
+          if(key!=='strategy'){ const on=r.k===focus;
+            return h('div',{key:i,style:{padding:on?'11px 12px':'0',borderRadius:on?12:0,background:on?'var(--brand-wash)':'transparent',border:on?'1px solid var(--brand-tint-3)':'1px solid transparent'}},
+              h('div',{style:{display:'flex',alignItems:'center',gap:9,marginBottom:9}},
+                h('span',{style:{width:12,height:12,borderRadius:3,background:`var(${r.color})`}}),
+                h('span',{style:{fontFamily:SF,fontWeight:on?700:600,fontSize:15}},r.n),
+                h('span',{style:{fontSize:12,color:'var(--muted)'}},r.you+'% of '+basis+' · '+byCat[r.k].length+' fund'+(byCat[r.k].length>1?'s':'')),
+                on?h('span',{style:{marginLeft:'auto',fontSize:10.5,fontWeight:700,color:'var(--brand)'}},'SELECTED'):null),
+              this.holdingsTable(byCat[r.k])); }
+          /* review7 items 22/23 — STRATEGY only: collapsed under subgroups by default with aggregate metrics on the header */
+          const openKey='drillSub_'+key+'_'+r.k; const open=this.dtog(openKey, r.k===focus); const a=subAgg(byCat[r.k]);
+          return h('div',{key:i,style:{border:'1px solid '+(open?'var(--brand-tint-3)':'var(--line)'),borderRadius:12,overflow:'hidden',background:open?'var(--brand-wash)':'var(--surface)'}},
+          h('div',{onClick:()=>this.setDtog(openKey,!open),style:{display:'flex',alignItems:'center',gap:10,padding:'11px 13px',cursor:'pointer',flexWrap:'wrap'}},
+            h('span',{style:{width:12,height:12,borderRadius:3,background:`var(${r.color})`,flex:'0 0 12px'}}),
+            h('span',{style:{fontFamily:SF,fontWeight:700,fontSize:14.5}},r.n),
+            h('span',{style:{fontSize:11.5,color:'var(--muted)'}},r.you+'% of '+basis+' · '+byCat[r.k].length+' fund'+(byCat[r.k].length>1?'s':'')),
+            h('div',{style:{marginLeft:'auto',display:'flex',gap:13,alignItems:'center',flexWrap:'wrap'}},
+              subMetric('IRR',a.IRR.toFixed(1)+'%'), subMetric('DPI',a.DPI.toFixed(2)+'x'), subMetric('TVPI',a.TVPI.toFixed(2)+'x'), subMetric('MOIC',a.MOIC.toFixed(2)+'x'), subMetric('DVPI',a.DVPI.toFixed(2)+'x'), subMetric('NAV','€'+a.NAV.toFixed(1)+'m'),
+              h('span',{style:{fontSize:13,color:open?'var(--brand)':'var(--muted)',marginLeft:2,width:14,textAlign:'center'}}, open?'▾':'▸'))),
+          open? h('div',{style:{padding:'0 13px 13px'}}, this.holdingsTable(byCat[r.k])) : null); }),
         empty.length? h('div',{style:{fontSize:12.5,color:'var(--muted)',fontStyle:'italic',lineHeight:1.5}}, 'No direct holdings in '+empty.map(r=>r.n).join(', ')+'.'):null),
-      caption:'A pure reporting view of which funds sit in each '+d.label.toLowerCase()+' — switch the metric toggle to query IRR · DPI · TVPI · MOIC · DVPI per investment. Click any fund for detail.'});
+      caption: key==='strategy'? 'Investments are grouped by strategy and collapsed by default — each header shows that bucket’s aggregate IRR · DPI · TVPI · MOIC · DVPI · NAV. Click a bucket to expand the funds; switch the metric toggle to re-rank.' : 'A pure reporting view of which funds sit in each '+d.label.toLowerCase()+' — switch the metric toggle to query IRR · DPI · TVPI · MOIC · DVPI per investment. Click any fund for detail.'});
 
     // #4 — AI summary side panel that fills the right-hand whitespace
     const allFunds=roster.filter(f=>catOf(f)!=null);

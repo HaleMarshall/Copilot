@@ -52,4 +52,7 @@ Build strictly one at a time, verify (node --check + Playwright render/logicErro
 - [x] 19 named the merged card "Investments, Committed, Called, and Performance" — verified
 - [x] 20 relabelled CTAs to opportunity language (shopBtn Buy→Seize, View fund→See opportunity, Open full fund page→See full opportunity, View detail(s)→See opportunity); body text untouched — verified
 - [x] 21 go-bigger chart shown by default (drillBig default true) in portfolio-at-a-glance / strategy detail — verified
-- NEXT: item 22 (strategy detail: investments-by-strategy collapsed under subgroups by default, click to expand)
+- [x] 22 strategy detail: investments collapsed under subgroups by default, click to expand (strategy only) — verified
+- [x] 23 collapsed subgroup header shows aggregate IRR/DPI/TVPI/MOIC/DVPI/NAV (NAV-weighted) — verified
+- [x] 24 region (and other non-strategy dims) kept exactly as-is (no collapse) — verified 0 chevrons, funds expanded
+- NEXT: item 25 (portfolio-at-a-glance options clickable to unselect)
