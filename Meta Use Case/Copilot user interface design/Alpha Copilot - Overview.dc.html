@@ -745,6 +745,14 @@ class Component extends DCLogic {
     if(key==='harvard'||key==='yale'||key==='princeton'||key==='hyp') return this.ENDOWMENTS()[key]||{};
     return this.fineFromCoarse(this.peerData().mix); // peers · custom
   }
+  /* items 57/64 — generic per-dimension comparison mixes: current, target, or any comparator group (peers/platform/top10/model/custom/endowments) */
+  cmpDimDef(k){ return this.HOME_DIMS().find(d=>d.key===k)||this.HOME_DIMS()[0]; }
+  cmpDimItems(k){ if(k==='strategy') return this.FINE_STRATS(); const d=this.cmpDimDef(k); return Object.keys(d.actual||{}).map((kk)=>[kk,kk,(d.colors&&d.colors[kk])||'--data-9']); }
+  cmpDimMix(k,which){
+    if(k==='strategy'){ if(which==='current') return this.fineMix('you'); if(which==='target') return this.modelFineMix(); return this.fineMix(which); }
+    const d=this.cmpDimDef(k); if(which==='current') return d.actual||{}; if(which==='target') return d.target||{}; return this.dimBench(d,which);
+  }
+  cmpDimSlices(k,which){ const mix=this.cmpDimMix(k,which)||{}; return this.cmpDimItems(k).map(([kk,n,c])=>({n,color:c,p:+(mix[kk]||0)})).filter(x=>x.p>0); }
   cmp2Label(key){ return {peers:'Peers',platform:'Platform avg',model:'Model ('+this.riskLabel()+')',harvard:'Harvard endowment',yale:'Yale endowment',princeton:'Princeton endowment',hyp:'H+Y+P aggregate'}[key]||'Peers'; }
   cmp2Short(key){ return {peers:'Peer avg',platform:'Platform',model:'Model',harvard:'Harvard',yale:'Yale',princeton:'Princeton',hyp:'H+Y+P'}[key]||'Peers'; }
   // peer PM-allocation median ignoring the perf toggle (so the table can show Peers AND Top 10% side by side)
@@ -5962,33 +5970,44 @@ class Component extends DCLogic {
       children:h('div',{style:{padding:'6px 0'}}, empty? this.cmpEmpty() : this.miniZ(this.zDeltas(cmp).map(r=>({name:r.name,delta:r.delta,color:r.color,sig:r.sig})))),
       caption:'Your current mix above (left) or below (right) '+cmpLong+'. Use the toggle above to benchmark against your peers, the Moonfare model, the whole platform or the top 10%.'});
 
-    // ---- row 3: strategy-mix donuts (fine) · over/under (fine) — both follow the same comparator ----
-    const fineSlices=(mix)=>this.FINE_STRATS().map(([k,n,c])=>({n,color:c,p:mix[k]||0})).filter(x=>x.p>0);
+    // ---- row 3 (items 57/64) — two pies per dimension: YOU current vs YOUR target, or switch to compare your chosen basis against others ----
+    const dimKey=s.cmpDim||'strategy'; const dimLabel={strategy:'Strategy',region:'Region',currency:'Currency',sector:'Sector'}[dimKey]||'Strategy';
+    const pieMode=s.cmpPieMode||'target';          /* 'target' = you vs your target · 'others' = your basis vs comparator */
+    const self=s.cmpSelf||'current';               /* which of your pies to compare against others */
     const dsize='min(180px, 20vh)';
-    const donutPair=h('div',{style:{display:'flex',gap:'clamp(40px,8vw,110px)',justifyContent:'center',alignItems:'center',flexWrap:'wrap'}},
-      h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center'}}, this.donutLabel('Your portfolio'), this.donutNamed(fineSlices(youFine),dsize,'You','mix')),
-      h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center'}}, this.donutLabel(cmpShort), this.donutNamed(fineSlices(cFine),dsize,cmpShort,'mix')));
-    // local comparator toggle on the strategy-mix card — also drives the over/under Z-chart (both read s.cmp)
-    const stratToggle=this.seg([{label:'Peers',value:'peers'},{label:'Platform',value:'platform'},{label:'Top 10%',value:'top10'},{label:'Custom',value:'custom'}], (cmp==='model'?'peers':cmp), v=>this.setState({cmp:v, controlOpen:v==='custom'?true:this.state.controlOpen}),{sm:true});
-    const fineLegend=h('div',{style:{width:'100%',marginTop:12,display:'grid',gridTemplateColumns:'1fr 1fr',gap:'5px 22px'}},
-      this.FINE_STRATS().map(([k,n,c])=>h('div',{key:k,style:{display:'flex',alignItems:'center',gap:7,fontSize:12,lineHeight:1.2}},
+    const dimSel=this.seg([{label:'Strategy',value:'strategy'},{label:'Region',value:'region'},{label:'Currency',value:'currency'},{label:'Sector',value:'sector'}], dimKey, v=>this.setState({cmpDim:v}),{sm:true});
+    const modeSel=this.seg([{label:'You vs your target',value:'target'},{label:'Compare vs others',value:'others'}], pieMode, v=>this.setState({cmpPieMode:v}),{sm:true});
+    const selfSel=this.seg([{label:'Your current',value:'current'},{label:'Your target',value:'target'}], self, v=>this.setState({cmpSelf:v}),{sm:true});
+    const leftWhich = pieMode==='target' ? 'current' : self;
+    const rightWhich = pieMode==='target' ? 'target' : cmp;
+    const leftLabel = pieMode==='target' ? 'You · current' : (self==='current'?'You · current':'You · target');
+    const rightLabel = pieMode==='target' ? 'You · target' : cmpShort;
+    const leftMix=this.cmpDimMix(dimKey,leftWhich); const rightMix=this.cmpDimMix(dimKey,rightWhich); const dimItems=this.cmpDimItems(dimKey);
+    const dimDonutPair=h('div',{style:{display:'flex',gap:'clamp(40px,8vw,110px)',justifyContent:'center',alignItems:'center',flexWrap:'wrap'}},
+      h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center'}}, this.donutLabel(leftLabel), this.donutNamed(this.cmpDimSlices(dimKey,leftWhich),dsize,leftLabel.split(' ')[0],leftWhich==='current'?'now':'mix')),
+      h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center'}}, this.donutLabel(rightLabel), this.donutNamed(this.cmpDimSlices(dimKey,rightWhich),dsize,rightLabel.split(' ')[0],'mix')));
+    const dimLegend=h('div',{style:{width:'100%',marginTop:12,display:'grid',gridTemplateColumns:'1fr 1fr',gap:'5px 22px'}},
+      dimItems.filter(([k])=>(leftMix[k]||0)>0||(rightMix[k]||0)>0).map(([k,n,c])=>h('div',{key:k,style:{display:'flex',alignItems:'center',gap:7,fontSize:12,lineHeight:1.2}},
         h('span',{style:{width:9,height:9,borderRadius:2,background:'var('+c+')',flex:'0 0 9px'}}),
         h('span',{style:{flex:1,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},n),
-        h('span',{style:{fontFamily:SF,fontWeight:600}}, (youFine[k]||0)+'%'),
-        h('span',{style:{color:'var(--muted)',fontFamily:SF}}, (cFine[k]||0)+'%'))));
-    const stratMixCard=this.card({title:'Strategy mix · You vs '+cmpShort, right:stratToggle,
-      children:h('div',null, empty? this.cmpEmpty() : h('div',null, donutPair, fineLegend)),
-      caption:'Your portfolio on the left, '+cmpShort+' on the right. Switch the comparator here — it also updates the over/under chart beside it.'});
-    const fineZ=this.FINE_STRATS().map(([k,n,c])=>{ const d=+((youFine[k]||0)-(cFine[k]||0)).toFixed(1); return {name:n,delta:d,color:c,sig:Math.abs(d)>=2}; }).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
-    const stratZCard=this.card({title:'Strategy · over / under-weight vs '+cmpShort,
-      children:h('div',{style:{padding:'6px 0'}}, empty? this.cmpEmpty() : this.miniZ(fineZ)),
-      caption:'You minus '+cmpShort+', in percentage points — fine-grained buckets. Follows the comparator toggle.'});
+        h('span',{style:{fontFamily:SF,fontWeight:600}}, (leftMix[k]||0)+'%'),
+        h('span',{style:{color:'var(--muted)',fontFamily:SF}}, (rightMix[k]||0)+'%'))));
+    const dimControls=h('div',{style:{display:'flex',gap:10,flexWrap:'wrap',marginBottom:12,alignItems:'center'}}, modeSel, pieMode==='others'? selfSel : null);
+    const dimPieCard=this.card({title:dimLabel+' — your mix', right:dimSel,
+      children: empty? this.cmpEmpty() : h('div',null, dimControls, dimDonutPair, dimLegend),
+      caption: pieMode==='target'
+        ? 'Two pies: your current '+dimLabel.toLowerCase()+' mix (left) vs your target (right). Switch to “Compare vs others” to pit your current or target against peers, platform, the model or the top 10% — set the comparator in “Benchmark against” above.'
+        : 'Your '+(self==='current'?'current':'target')+' '+dimLabel.toLowerCase()+' mix (left) vs '+cmpShort+' (right). Change the basis here, or the comparator in “Benchmark against” above.'});
+    const dimZRows=dimItems.map(([k,n,c])=>{ const d=+((leftMix[k]||0)-(rightMix[k]||0)).toFixed(1); return {name:n,delta:d,color:c,sig:Math.abs(d)>=2}; }).filter(r=>r.delta!==0).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
+    const dimZCard=this.card({title:dimLabel+' · over / under-weight vs '+(pieMode==='target'?'your target':cmpShort),
+      children:h('div',{style:{padding:'6px 0'}}, empty? this.cmpEmpty() : this.miniZ(dimZRows)),
+      caption:(pieMode==='target'?'Your current minus your target':'You ('+(self==='current'?'current':'target')+') minus '+cmpShort)+', in percentage points. Follows the pies beside it.'});
 
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
       insightBanner, toggleRow,
       this.twoCol(allocCard, fillCard, '1fr 1fr'),
       targetCard,
-      this.twoCol(stratMixCard, stratZCard, '1.05fr .95fr'),
+      this.twoCol(dimPieCard, dimZCard, '1.05fr .95fr'),
       this.cmpBenchTable(),
       this.followCard());
   }
