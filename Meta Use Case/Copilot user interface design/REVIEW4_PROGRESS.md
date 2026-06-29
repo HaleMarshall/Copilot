@@ -19,4 +19,5 @@ FUTURE
 - [x] 4 comparison your-target PM allocation = user actual 35% (myPmTarget)
 - [x] 5 fill rate lifecycle-matched (stage + projection; endowments rolling)
 - [x] 6 Compare Yourself redesign (two actual pies + dim toggle + Z + funds compare; no endowments)
-- NEXT: item 7 (Follow-a-group smaller, next to simulator title right side)
+- [x] 7 compact Follow-a-group next to simulator title; removed from comparison
+- NEXT: item 8 (At your stage trimmed table: commit size, # deals, avg invest, hi/lo/avg × peers/model/top10/custom)

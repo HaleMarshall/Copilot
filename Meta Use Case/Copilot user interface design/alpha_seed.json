@@ -1731,7 +1731,8 @@
         "you": 120,
         "peers": 95,
         "model": 110,
-        "top10": 165
+        "top10": 165,
+        "custom": 130
       },
       {
         "k": "numDeals",
@@ -1740,7 +1741,8 @@
         "you": 8,
         "peers": 6,
         "model": 7,
-        "top10": 12
+        "top10": 12,
+        "custom": 9
       },
       {
         "k": "avgInvest",
@@ -1749,7 +1751,8 @@
         "you": 118,
         "peers": 92,
         "model": 108,
-        "top10": 160
+        "top10": 160,
+        "custom": 128
       }
     ],
     "sizeRange": {
@@ -1772,6 +1775,11 @@
         "hi": 640,
         "lo": 75,
         "avg": 160
+      },
+      "custom": {
+        "hi": 520,
+        "lo": 60,
+        "avg": 128
       }
     },
     "timing": {
