@@ -3962,9 +3962,12 @@ class Component extends DCLogic {
             h('div',{style:{fontSize:13,lineHeight:1.6,color:'rgba(255,255,255,.95)'}}, h('strong',{style:{color:'#fff'}},ranked[0].name),' is your top contributor this period (',h('strong',{style:{color:'#fff'}},(ranked[0].contrib>=0?'+':'')+ranked[0].contrib+'pp'),') and leads on IRR at ',h('strong',{style:{color:'#fff'}},this.metricVal(ranked[0],'IRR')),'.'),
             h('div',{style:{fontSize:12.5,lineHeight:1.55,color:'rgba(255,255,255,.85)'}}, 'Additional insight: your top three positions drive most of the return — strong, but keep an eye on single-name concentration. ',h('strong',{style:{color:'#fff'}},ranked[ranked.length-1].name),' is the main laggard to review.')),
           caption:'Who’s driving your return — and what to watch.'}),
-        /* funds moved off the performance summary to a dedicated all-funds detail page */
+        /* item 49 — show the funds you hold inline (everything in one detailed view, not a substitute page) */
+        h('div',{key:'funds'}, this.panelSection('The funds you hold','full performance detail · '+roster.length+' funds'),
+          h('div',{style:{marginBottom:10}}, this.holdingsMetricToggle()),
+          this.holdingsTable(roster)),
         h('div',{key:'f'}, h('button',{onClick:()=>this.setState({homePop:null,homeFundsList:'performance'}),
-          style:{width:'100%',border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:10,padding:'12px',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'View all '+roster.length+' funds — full detail  →'))
+          style:{width:'100%',border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:10,padding:'12px',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'Open the full-page funds view  →'))
       ];
     } else if(key==='cashflow'){
       const ranked=roster.slice().sort((a,b)=>parseFloat(b.called)-parseFloat(a.called));
