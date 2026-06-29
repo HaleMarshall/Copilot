@@ -4192,6 +4192,30 @@ class Component extends DCLogic {
       vals.map((v,ci)=>h('div',{key:ci,title:name+' '+years[ci]+': '+v,style:{flex:1,height:22,borderRadius:3,background:'var(--data-1)',opacity:Math.min(1,0.06+v/55)}}))));
     return h('div',null, header, grid);
   }
+  /* review7 item 28 — real vintage × dimension heatmap from actual holdings, with dimension + NAV/Committed toggles */
+  vintageHeatmapDim(){
+    const h=this.h; const meta=this.HELD_META(); const roster=this.HELD_FUNDS();
+    const dim=this.dtog('vintDim','strategy'); const basis=this.dtog('vintBasis','NAV');
+    const years=['2019','2020','2021','2022','2023','2024'];
+    const catOf=(f)=> dim==='strategy'? (meta[f.id]||{}).strat : (meta[f.id]||{})[dim];
+    const valOf=(f)=>{ const m=meta[f.id]||{}; return basis==='Committed'? (m.committed!=null?m.committed:(m.nav||0)) : (m.nav||0); };
+    const M={}, cats=[]; roster.forEach(f=>{ const c=catOf(f); if(c==null)return; const y=String((meta[f.id]||{}).vintage); if(!cats.includes(c))cats.push(c); M[c]=M[c]||{}; M[c][y]=(M[c][y]||0)+valOf(f); });
+    let mx=0.0001; cats.forEach(c=>years.forEach(y=>{ mx=Math.max(mx,M[c][y]||0); }));
+    const nameOf=(c)=> dim==='strategy'? ((this.STRATS.find(s=>s[0]===c)||[0,c])[1]) : c;
+    const dimSeg=this.seg([{label:'Strategy',value:'strategy'},{label:'Region',value:'region'},{label:'Sector',value:'sector'},{label:'Currency',value:'currency'},{label:'Format',value:'format'}], dim, v=>this.setDtog('vintDim',v),{sm:true});
+    const basisSeg=this.seg([{label:'NAV',value:'NAV'},{label:'Committed',value:'Committed'}], basis, v=>this.setDtog('vintBasis',v),{sm:true});
+    const labelW=124;
+    const headerRow=h('div',{style:{display:'flex',gap:4,marginBottom:5,paddingLeft:labelW}}, years.map((y,i)=>h('div',{key:i,style:{flex:1,textAlign:'center',fontSize:10.5,color:'var(--muted)',fontWeight:600}}, y)));
+    const grid=cats.map((c,ri)=>h('div',{key:ri,style:{display:'flex',alignItems:'center',gap:4,marginBottom:4}},
+      h('div',{style:{flex:`0 0 ${labelW}px`,display:'flex',alignItems:'center',gap:7,fontSize:12,color:'var(--ink)',whiteSpace:'nowrap',overflow:'hidden'}}, dim==='strategy'? h('span',{style:{width:9,height:9,borderRadius:3,background:'var('+((this.STRATS.find(s=>s[0]===c)||[0,0,'--data-1'])[2])+')',flex:'0 0 9px'}}):null, h('span',{style:{overflow:'hidden',textOverflow:'ellipsis'}},nameOf(c))),
+      years.map((y,ci)=>{ const v=M[c][y]||0; const op=v>0?(0.14+0.86*v/mx):0;
+        return h('div',{key:ci,title:nameOf(c)+' · '+y+': €'+v.toFixed(1)+'m',style:{flex:1,height:34,borderRadius:5,background: v>0?('rgba(44,45,254,'+op.toFixed(2)+')'):'var(--surface-2)',display:'flex',alignItems:'center',justifyContent:'center'}},
+          v>0? h('span',{style:{fontSize:10.5,fontWeight:700,color: op>0.55?'#fff':'var(--brand-ink)'}}, '€'+v.toFixed(1)) : null); })));
+    return this.card({title:'Vintage × '+(dim==='strategy'?'strategy':dim)+' heatmap',badge:this.badge('your portfolio','conf'),
+      right:h('div',{style:{display:'flex',gap:8,flexWrap:'wrap',justifyContent:'flex-end'}}, dimSeg, basisSeg),
+      children:h('div',{style:{padding:'4px 0',overflowX:'auto'}}, headerRow, grid),
+      caption:'Each cell = '+(basis==='Committed'?'committed capital':'NAV')+' (€m) for that '+(dim==='strategy'?'strategy':dim)+' in that vintage year — darker = more. Toggle the dimension and NAV / Committed at the top right.'});
+  }
   /* item 35 — top THREE performing investments; item 36 — click into IRR/DPI/TVPI/MOIC/DVPI to rank by it */
   topFivePerformers(key){ const h=this.h; const SF=this.SF;
     const metric=this.dtog('topPerfMetric','IRR');
@@ -5365,7 +5389,8 @@ class Component extends DCLogic {
         : {border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:10,padding:'11px 16px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},
       '✦ Suggest opportunities to fill the gaps  →'); } /* item 30 — opportunities, not funds */
   vintageDrillBody(){
-    const h=this.h; const SF=this.SF; const vint=this.VINTAGES().slice(-5); /* item 86 — last five years of commitments only */ const meta=this.HELD_META(); const roster=this.HELD_FUNDS();
+    const h=this.h; const SF=this.SF; const vbasis=this.dtog('vintBasis','NAV'); /* review7 item 28 — NAV/Committed toggle drives the chart + heatmap */ const vint=this.VINTAGES(vbasis).slice(-5); const meta=this.HELD_META(); const roster=this.HELD_FUNDS();
+    const vBasisSeg=h('div',{onClick:e=>e.stopPropagation()}, this.seg([{label:'NAV',value:'NAV'},{label:'Committed',value:'Committed'}], vbasis, v=>this.setDtog('vintBasis',v),{sm:true}));
     const byYr={}; roster.forEach(f=>{ const y=(meta[f.id]||{}).vintage; (byYr[y]=byYr[y]||[]).push(f); });
     const top=vint.slice().sort((a,b)=>b.v-a.v)[0]; const vmax=Math.max(...vint.map(x=>x.v),1)*1.2;
     const years=vint.filter(x=>byYr[x.y]&&byYr[x.y].length);
@@ -5375,8 +5400,8 @@ class Component extends DCLogic {
         h('div',{style:{fontSize:18,fontFamily:SF,fontWeight:700,marginBottom:6,color:'var(--ink)'}}, '€'+x.v+'m'),
         h('div',{title:x.y,style:{width:'62%',maxWidth:52,height:(x.v/vmax*100)+'%',background:'var(--data-3)',borderRadius:'6px 6px 0 0',minHeight:3}}),
         h('div',{style:{fontSize:13,fontWeight:600,color:'var(--ink)',marginTop:8}}, x.y))));
-    const mixCard=this.card({title:'Your vintage exposure (NAV by commitment year)',badge:this.badge('your portfolio','conf'),style:{height:'100%'},
-      children:chart, caption:'How your committed capital is spread across vintage years — diversification here is what smooths your cash-flow J-curve.'});
+    const mixCard=this.card({title: vbasis==='Committed'?'Commitments by vintage (€m)':'Your vintage exposure (NAV by commitment year)',badge:this.badge('your portfolio','conf'),right:vBasisSeg,style:{height:'100%'},
+      children:chart, caption:'How your '+(vbasis==='Committed'?'committed capital':'NAV')+' is spread across vintage years — diversification here is what smooths your cash-flow J-curve. Toggle NAV / Committed top-right.'});
     const insightCard=this.card({title:'Where your capital sits',style:{height:'100%'},
       children:h('div',{style:{display:'flex',flexDirection:'column',gap:12}},
         h('div',{style:{fontSize:13.5,lineHeight:1.6}},'Most of your NAV is in the ',h('strong',null,top.y),' vintage (€'+top.v+'m). You have committed across ',h('strong',null,years.length+' of '+vint.length+' years'),' — ',(years.length>=5?'a healthy spread.':'somewhat concentrated; spreading future commitments would smooth your J-curve.')),
@@ -5404,7 +5429,9 @@ class Component extends DCLogic {
     const vZr=this.navVsCommittedDeltas('vintage'); /* item 79 — vintage deviation Z-chart */
     const vZCard= vZr.length? this.card({title:'Allocated vs committed — vintage',badge:this.badge('your portfolio','conf'),
       children:this.miniZ(vZr), caption:'Deviation between NAV and committed exposure by vintage year. Actual data — not simulated.'}):null;
-    return h('div',{style:{display:'flex',flexDirection:'column',gap:16}}, this.twoCol(mixCard,insightCard,'1.3fr 1fr'), vZCard, this.twoCol(fundsCard,gapCard,'1.7fr 1fr'));
+    /* review7 items 26/28 — full vintage × dimension heatmap with its own dimension + NAV/Committed toggles */
+    const heatCard=this.vintageHeatmapDim();
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:16}}, this.twoCol(mixCard,insightCard,'1.3fr 1fr'), heatCard, vZCard, this.twoCol(fundsCard,gapCard,'1.7fr 1fr'));
   }
   /* dedicated all-funds detail page (reached from the detail panels / breakdown) — lists every fund you hold, grouped by the chosen dimension */
   /* review3 item 6 — each investment on the J-curve (shared by the quick summary and the full cash-flows page) */

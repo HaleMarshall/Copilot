@@ -56,4 +56,5 @@ Build strictly one at a time, verify (node --check + Playwright render/logicErro
 - [x] 23 collapsed subgroup header shows aggregate IRR/DPI/TVPI/MOIC/DVPI/NAV (NAV-weighted) — verified
 - [x] 24 region (and other non-strategy dims) kept exactly as-is (no collapse) — verified 0 chevrons, funds expanded
 - [x] 25 at-a-glance buckets toggle — click again unselects (homeFocusCat toggles to null) — verified
-- NEXT: item 26+28 (detailed vintage page: commitments-by-vintage + vintage-by-strategy heatmap, committed/nav + dim toggles, table)
+- [x] 26+28 detailed vintage page: commitments-by-vintage chart (NAV/Committed toggle) + Vintage×dim heatmap (Strategy/Region/Sector/Currency/Format + NAV/Committed) + funds-by-vintage table — verified
+- NEXT: item 27 (remove the 2nd / bottom top-three-performers table; keep the top one)
