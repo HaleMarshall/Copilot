@@ -40,4 +40,5 @@ Build strictly one at a time, verify (node --check + Playwright render/logicErro
 - [x] 5 blendedFxRate() helper + hero shows underlying currency mix line + "blended across your mix ≈ X" on the FX line (USD 1.069 vs 1.083 spot) — verified
 - [x] 6 "Performance" section → "Net Performance" (overview card + full page + pop eyebrow); IRR/DPI/TVPI/MOIC left un-prefixed — verified
 - [x] 7 removed Portfolio Value + Distributions from performance (pop + full page); Distributions kept on cash-flows — verified
-- NEXT: item 8 (row-by-row equal sizing of asset-allocation cards)
+- [x] 8 + 12 strategy/region/currency/sector equalised to one 4-col row (395x323 each, stretched to tallest); format+vintage own row — verified
+- NEXT: item 9 (MEA -> Rest of World)
