@@ -26,7 +26,8 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - ALL 77 NUMBERED ITEMS COMPLETE.
 - [x] PDF#1 lifecycle-period comparison card (fill rate/PM alloc/commitment size/# deals/hi-lo-avg size/timing vs peers/model/top10 at same stage) (+lifecycle seeded)
 - [x] PDF#2 AI section: 'Am I invested in a specific company?' button + tree chart of held companies; sector view is a tree chart (not pie)
-- NEXT: PDF#3 (Format dimension direct/FoF/secondaries on overview+similar+comparison); PDF#4 (move follower to top next to compare yourself)
+- [x] PDF#3 Format dimension (direct deals/FoF/secondaries/primary) on overview (card+drill), comparison (selector+pies+Z), opportunities distribution (+dims.format seeded)
+- NEXT: PDF#4 (move follower function to top next to 'compare yourself')
 - [x] 1 nudge new-investor guard + liquidity CTA→opportunities
 - [x] 2 TVPI mini-chart in performance (+tvpi seeded)
 - [x] 3 cash-flow: 'Net distributions' not 'Net cash position'

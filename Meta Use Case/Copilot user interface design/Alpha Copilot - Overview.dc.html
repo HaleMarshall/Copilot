@@ -6091,12 +6091,12 @@ class Component extends DCLogic {
       youVsTargetHead, /* item 71 */
       pmTargetCard,    /* item 71 — PM allocation actual vs target + Z/gap */
       this.compareYourselfCard(), /* item 76 — strategy mix + funds underneath vs peers/platform/top10/custom, with watchlist/invest/similar */
+      this.followCard(), /* PDF#4 — follower function moved up to sit right next to 'Compare Yourself' */
       this.lifecycleCard(), /* PDF#1 — lifecycle-period comparison vs peers/model/top10 at the same investor stage */
       this.twoCol(dimPieCard, dimZCard, '1.05fr .95fr'),
       dimSuggestCard, /* item 74 — suggest funds (current + greyed pipeline) under the selected dimension */
       h('div',{style:{display:'flex',flexDirection:'column',gap:10,background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:14,padding:'14px 16px'}}, toggleRow, targetCard),
-      this.cmpBenchTable(), /* item 71 — keep the multilayer benchmark */
-      this.followCard());
+      this.cmpBenchTable()); /* item 71 — keep the multilayer benchmark */
   }
   cmpEmpty(){ return this.h('div',{style:{padding:'26px 8px',textAlign:'center',color:'var(--muted)',fontSize:12.5,border:'1px dashed var(--line)',borderRadius:12}},'No data — the database is empty.'); }
   // bottom: proper benchmark table — You · Peers · Model · Top 10%
