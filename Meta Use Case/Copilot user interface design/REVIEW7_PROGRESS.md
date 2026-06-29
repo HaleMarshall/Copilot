@@ -42,4 +42,5 @@ Build strictly one at a time, verify (node --check + Playwright render/logicErro
 - [x] 7 removed Portfolio Value + Distributions from performance (pop + full page); Distributions kept on cash-flows — verified
 - [x] 8 + 12 strategy/region/currency/sector equalised to one 4-col row (395x323 each, stretched to tallest); format+vintage own row — verified
 - [x] 9 region MEA -> "Rest of World" (seed dims.region + HOME_DIMS fallback + region-name map; reseeded) — verified
-- NEXT: item 10 (alloc order: Strategy, Sector, Region, Currency, Format, Vintage)
+- [x] 10 alloc order Strategy, Sector, Region, Currency, then Format, Vintage — verified
+- NEXT: item 11 (vintage NAV/Committed toggle = NAV-allocated-in-year vs commitments-per-year)
