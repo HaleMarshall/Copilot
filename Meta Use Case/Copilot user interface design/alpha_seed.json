@@ -421,7 +421,8 @@
       "sector": "Industrials",
       "strat": "buyout",
       "vintage": 2019,
-      "nav": 4.6
+      "nav": 4.6,
+      "format": "Primary funds"
     },
     "thrive8": {
       "currency": "USD",
@@ -429,7 +430,8 @@
       "sector": "AI",
       "strat": "ai",
       "vintage": 2021,
-      "nav": 3.1
+      "nav": 3.1,
+      "format": "Primary funds"
     },
     "ga": {
       "currency": "USD",
@@ -437,7 +439,8 @@
       "sector": "Tech",
       "strat": "growth",
       "vintage": 2020,
-      "nav": 2.4
+      "nav": 2.4,
+      "format": "Primary funds"
     },
     "cvc9": {
       "currency": "EUR",
@@ -445,7 +448,8 @@
       "sector": "Industrials",
       "strat": "buyout",
       "vintage": 2022,
-      "nav": 2.0
+      "nav": 2.0,
+      "format": "Primary funds"
     },
     "arespcs": {
       "currency": "USD",
@@ -453,7 +457,8 @@
       "sector": "Financials",
       "strat": "credit",
       "vintage": 2023,
-      "nav": 1.5
+      "nav": 1.5,
+      "format": "Primary funds"
     },
     "cinven8": {
       "currency": "EUR",
@@ -461,7 +466,8 @@
       "sector": "Healthcare",
       "strat": "buyout",
       "vintage": 2021,
-      "nav": 1.8
+      "nav": 1.8,
+      "format": "Secondaries"
     },
     "northwind": {
       "currency": "EUR",
@@ -469,7 +475,8 @@
       "sector": "Energy",
       "strat": "infra",
       "vintage": 2024,
-      "nav": 0.7
+      "nav": 0.7,
+      "format": "Fund of funds"
     },
     "meridian": {
       "currency": "GBP",
@@ -477,7 +484,8 @@
       "sector": "Tech",
       "strat": "growth",
       "vintage": 2024,
-      "nav": 0.5
+      "nav": 0.5,
+      "format": "Direct deals"
     }
   },
   "modelCoarse": {

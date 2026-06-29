@@ -12,4 +12,5 @@
 - [x] 1-3 overview restructure (Alpha read right of title; total-value hero + base ccy + KPI cards; allocation below perf+cash, vertical)
 - [x] 4 merged the two Alpha reads in performance detail into one
 - [x] 5 perf quick summary top-3 + full Performance page (KPIs, contribution+IRR charts, full table)
-- NEXT: item 6 (full cashflows page; quick summary top 3 J-curve)
+- [x] 6 cashflow quick summary top-3 J-curve + full cash-flows page (KPIs, calls/dist chart, full J-curve, committed/called table)
+- NEXT: item 7 (format full breakdown: include investments list)
