@@ -19,7 +19,8 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 71 comparison 'You — actual vs your target' section: PM-alloc actual-vs-target (bars+gap) + strategy/sector/currency pies (target mode) w/ Z; multilayer benchmark kept
 - [x] 72 customize follow group: custom-group option + 'Customize who you follow' (opens cohort editor) + follow saved peer groups
 - [x] 73 Ask Alpha on comparison page strengthened: insights banner + target-vs-actual question chips
-- NEXT: item 74 (per-dimension suggest funds on comparison: current platform + greyed pipeline, under each strategy/region/currency/sector)
+- [x] 74 per-dimension Suggest funds on comparison (current platform + greyed pipeline) under selected strategy/region/currency/sector
+- NEXT: item 75 (comparison under simulator: compare current portfolio portions to peers/platform/top10)
 - [x] 1 nudge new-investor guard + liquidity CTA→opportunities
 - [x] 2 TVPI mini-chart in performance (+tvpi seeded)
 - [x] 3 cash-flow: 'Net distributions' not 'Net cash position'
