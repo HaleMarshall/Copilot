@@ -15,7 +15,8 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 64 compare actual position vs others made explicit (relabel current→'Your actual' in pies/Z/captions)
 - [x] 65 endowments added to PM-allocation (34%, axis→40%) + fill-rate (36% target) charts (+pm.endow/endowTarget seeded)
 - [x] 66 'Benchmark against' toggle moved down, grouped with the Z-chart it drives (no scroll-back)
-- NEXT: items 67-71 (target-comparison layout: compare target vs model/peers/platform/top10/custom; left=target middle=comparator+Z; custom opens on Peers; save individually, remove table)
+- [x] 67-70 target-card redesign: comparator Model/Peers/Platform/Top10/Custom only; left target/middle comparator/right Z; Adjust-my-target button; Peers/Custom open group editor on sim; table removed
+- NEXT: item 71 (comparison: me-actual vs my-target for PM alloc/strategy/sector/currency w/ Z, like 'strategy mix you vs peer avg'; keep multilayer benchmark)
 - [x] 1 nudge new-investor guard + liquidity CTA→opportunities
 - [x] 2 TVPI mini-chart in performance (+tvpi seeded)
 - [x] 3 cash-flow: 'Net distributions' not 'Net cash position'
