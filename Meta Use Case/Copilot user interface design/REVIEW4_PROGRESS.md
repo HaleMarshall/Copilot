@@ -16,4 +16,5 @@ FUTURE
 - [x] 1 removed duplicate simulator title
 - [x] 2 Peers auto-selects investor profile; Custom clears
 - [x] 3 clarity: simulating against the comparator group target (banner + labels)
-- NEXT: item 4 (comparison PM-allocation target = user actual 35%)
+- [x] 4 comparison your-target PM allocation = user actual 35% (myPmTarget)
+- NEXT: item 5 (fill rate lifecycle-aware: peers/model/platform at same stage + projection; endowments rolling)

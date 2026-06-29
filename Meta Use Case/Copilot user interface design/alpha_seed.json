@@ -1779,6 +1779,23 @@
       "peers": "Peers at your stage front-loaded 2021–22 (vintage bunching).",
       "model": "The model paces evenly across vintages.",
       "top10": "The top 10% paced evenly and added in dislocations (2020, 2023)."
+    },
+    "fill": {
+      "stage": {
+        "you": 78,
+        "peers": 64,
+        "model": 80,
+        "platform": 58,
+        "top10": 88
+      },
+      "proj": {
+        "you": 100,
+        "peers": 90,
+        "model": 100,
+        "platform": 84,
+        "top10": 100
+      },
+      "endowment": 96
     }
   },
   "featured": {

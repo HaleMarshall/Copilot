@@ -887,6 +887,32 @@ class Component extends DCLogic {
     return this.gridBars(rows,{max:40,ticks:[0,10,20,30,40],unit:'%',labelW:96,barH:30,gap:12,marker:this.myPmTarget(),markerLabel:'your target '+this.myPmTarget()+'%'});
   }
 
+  /* review4 item 5 — lifecycle-aware fill rate: where peers/model/platform were at THIS investor's stage (+ projection to maturity); endowments shown rolling (deployed over decades) */
+  fillRateLifecycle(){
+    const h=this.h, SF=this.SF; const L=(this.DB&&this.DB.lifecycle)||{}; const F=L.fill||{stage:{},proj:{}};
+    const yrs=L.yearsIn||7; const stage=F.stage||{}; const proj=F.proj||{};
+    const rows=[
+      {k:'you',label:'You',color:'--brand'},
+      {k:'peers',label:'Peers',color:'--data-4'},
+      {k:'model',label:'Model',color:'--data-6'},
+      {k:'platform',label:'Platform',color:'--data-9'},
+      {k:'top10',label:'Top 10%',color:'--data-1'}];
+    const ticks=[0,25,50,75,100];
+    const bar=(r)=>{ const now=Math.min(stage[r.k]||0,100); const pj=Math.min(Math.max(proj[r.k]||now,now),100); const projExt=pj-now;
+      return h('div',{key:r.k,style:{display:'flex',alignItems:'center',gap:10,marginBottom:10}},
+        h('div',{style:{flex:'0 0 96px',textAlign:'right',paddingRight:8}}, h('div',{style:{fontSize:12,fontWeight:500}},r.label), h('div',{style:{fontSize:9.5,color:'var(--muted)'}}, r.k==='you'?'at year '+yrs:'at their year '+yrs)),
+        h('div',{style:{flex:1,position:'relative',height:22,background:'var(--surface-2)',borderRadius:6,overflow:'hidden'}},
+          h('div',{style:{position:'absolute',left:0,top:0,bottom:0,width:now+'%',background:`var(${r.color})`,display:'flex',alignItems:'center',justifyContent:now>=14?'center':'flex-start',paddingLeft:now>=14?0:6}}, now>=8? h('span',{style:{fontSize:11.5,fontWeight:700,color:'#fff',textShadow:'0 1px 2px rgba(0,0,0,.25)'}},now+'%'):null),
+          projExt>0? h('div',{title:'projected to '+pj+'%',style:{position:'absolute',left:now+'%',top:0,bottom:0,width:projExt+'%',background:`var(${r.color})`,opacity:.32}}):null),
+        h('span',{style:{flex:'0 0 70px',textAlign:'right',fontSize:10.5,color:'var(--muted)'}}, '→ '+pj+'% proj')); };
+    const endow=h('div',{style:{display:'flex',alignItems:'center',gap:10,marginTop:6,paddingTop:10,borderTop:'1px solid var(--line)'}},
+      h('div',{style:{flex:'0 0 96px',textAlign:'right',paddingRight:8}}, h('div',{style:{fontSize:12,fontWeight:500}},'Endowments'), h('div',{style:{fontSize:9.5,color:'var(--muted)'}},'rolling · decades')),
+      h('div',{style:{flex:1,position:'relative',height:22,background:'var(--surface-2)',borderRadius:6,overflow:'hidden'}},
+        h('div',{style:{position:'absolute',left:0,top:0,bottom:0,width:(F.endowment||96)+'%',background:'repeating-linear-gradient(90deg,var(--data-8),var(--data-8) 9px,rgba(255,255,255,.25) 9px,rgba(255,255,255,.25) 12px)',display:'flex',alignItems:'center',justifyContent:'center'}}, h('span',{style:{fontSize:11.5,fontWeight:700,color:'#fff'}},(F.endowment||96)+'%'))),
+      h('span',{style:{flex:'0 0 70px',textAlign:'right',fontSize:10.5,color:'var(--muted)'}},'fully ramped'));
+    const legend=h('div',{style:{display:'flex',gap:16,justifyContent:'flex-end',marginBottom:12}}, [['Filled at your stage',1],['Projected to maturity',.32]].map((l,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',gap:6,fontSize:11.5,color:'var(--muted)'}}, h('span',{style:{width:11,height:11,borderRadius:3,background:'var(--brand)',opacity:l[1]}}), l[0])));
+    return h('div',null, legend, rows.map(bar), endow);
+  }
   /* ---------- TR chart: Fill Rate (stacked Filled / Remaining) ---------- */
   trChart(opts){
     opts=opts||{};
@@ -6211,9 +6237,9 @@ class Component extends DCLogic {
       children:h('div',{style:{paddingTop:6}}, empty? this.cmpEmpty() : this.tlChart()),
       caption:'Actual share of investable wealth in private markets — You / Peers / Platform are real and move with your cohort filters; Model · target is the Moonfare house-view for your risk class.'});
     const fillCard=this.card({title:'Fill rate', info:true,
-      right:h('span',{style:{fontSize:11.5,color:'var(--muted)'}},'Your target: '+this.myPmTarget()+'% · your input'),
-      children:h('div',{style:{paddingTop:6}}, empty? this.cmpEmpty() : this.trChart()),
-      caption:'Deployment vs target — what share of each group’s private-markets target is already filled. The target % is a modelled assumption from profession/risk, so fill-rate is illustrative, not a measured figure.'});
+      right:h('span',{style:{fontSize:11.5,color:'var(--muted)'}},'At your stage · year '+(((this.DB&&this.DB.lifecycle&&this.DB.lifecycle.yearsIn)||7))),
+      children:h('div',{style:{paddingTop:6}}, empty? this.cmpEmpty() : this.fillRateLifecycle()),
+      caption:'Lifecycle-matched: where peers, the model and the platform were at the SAME point in their journey as you (year '+(((this.DB&&this.DB.lifecycle&&this.DB.lifecycle.yearsIn)||7))+'), plus a faded projection to maturity. Endowments are shown rolling — they’ve deployed continuously over decades, so they sit fully ramped.'});
 
     // ---- row 2: You vs [comparator] — strategy (pp), toggle-driven (the headline comparison chart) ----
     const targetCard=this.card({title:'You vs '+cmpLong+' — strategy (pp)', badge:this.badge('vs '+cmpShort,'synth'),
