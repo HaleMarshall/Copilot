@@ -5726,9 +5726,9 @@ class Component extends DCLogic {
       const cols=h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:18,alignItems:'start'}},
         h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutLabel('Your target'), this.donutNamed(tgtSlices,170,'Target',d.label.toLowerCase()),
           h('div',{style:{fontSize:10,color:'var(--muted)'}},'your '+d.label.toLowerCase()+' target')),
-        h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutLabel(compShort), this.donutNamed(compSlices,170,compShort,d.label.toLowerCase()),
+        h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutLabel(compShort+' · target'), this.donutNamed(compSlices,170,compShort,d.label.toLowerCase()),
           h('div',{style:{fontSize:10,color:'var(--muted)'}},compLabel)),
-        h('div',null, h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}},'Your target vs '+compShort+' (pp)'),
+        h('div',null, h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}},'Your target vs '+compShort+'’s target (pp)'),
           zRows.length? this.miniZ(zRows): h('div',{style:{fontSize:12,color:'var(--muted)',padding:'18px 0',textAlign:'center'}},'In line with '+compShort+'.')));
       /* item 67/69 — comparator selector; Peers & Custom open the group editor (same one as the comparison page) */
       const selector=h('div',null,
@@ -5766,8 +5766,12 @@ class Component extends DCLogic {
           h('button',{onClick:()=>this.setState({simSuggest:d.key}),style:{border:'1px solid var(--line)',background:'var(--surface)',borderRadius:8,padding:'6px 12px',fontSize:12,fontWeight:600,color:'var(--brand)',cursor:'pointer'}},'✦ Suggest funds'),
           /* item 59/70 — save THIS dimension's target individually */
           h('button',{onClick:()=>this.saveDimTarget(d.key),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'6px 12px',fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif',whiteSpace:'nowrap'}},'✓ Save '+d.label.toLowerCase()+' target')),
-        children:h('div',null, cols, h('div',{style:{borderTop:'1px solid var(--line)',marginTop:14,paddingTop:14,display:'flex',flexDirection:'column',gap:12}}, selector, adjustBlock)),
-        caption:'Left: your '+d.label.toLowerCase()+' target. Middle: '+compLabel+'. Right: the Z-chart (your target − comparator, pp). Press “Adjust my target” to reshape it; Peers/Custom open the group editor.'});
+        children:h('div',null,
+          /* review4 item 3 — make it absolutely clear: simulating YOUR target against the comparator GROUP'S target */
+          h('div',{style:{display:'flex',gap:8,alignItems:'center',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:10,padding:'9px 12px',marginBottom:12,fontSize:12,color:'var(--brand-ink)',lineHeight:1.45}},
+            h('span',{style:{flex:'0 0 auto'}},'◧'), h('span',null,'Simulating ',h('b',null,'your '+d.label.toLowerCase()+' target'),' against ',h('b',null,compLabel),' — target vs target, so you can shape toward where '+compShort+' aim to be.')),
+          cols, h('div',{style:{borderTop:'1px solid var(--line)',marginTop:14,paddingTop:14,display:'flex',flexDirection:'column',gap:12}}, selector, adjustBlock)),
+        caption:'Your '+d.label.toLowerCase()+' target vs '+compLabel+' — target against target. The Z-chart shows your target minus theirs. Press “Adjust my target” to reshape it; Peers/Custom open the group editor.'});
     };
     const grid=h('div',{style:{display:'flex',flexDirection:'column',gap:18}},
       ordered.map(d=>h('div',{key:d.key}, dimTargetCard(d))));
