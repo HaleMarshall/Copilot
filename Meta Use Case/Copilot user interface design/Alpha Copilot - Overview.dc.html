@@ -4113,7 +4113,7 @@ class Component extends DCLogic {
     const ranked=rows.filter(r=>byCat[r.k]&&byCat[r.k].length)
       .sort((a,b)=> (byCat[b.k].length-byCat[a.k].length) || (b.you-a.you));
     if(!ranked.length) return null;
-    const big=this.dtog('drillBig',false);
+    const big=this.dtog('drillBig',true); /* review7 item 21 — go-bigger chart shown by default (portfolio-at-a-glance + strategy detail) */
     const top=ranked[0];
     const toggleBtn=h('button',{onClick:()=>this.setDtog('drillBig',!big),
       style:{marginLeft:'auto',border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:9,padding:'6px 12px',fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},
