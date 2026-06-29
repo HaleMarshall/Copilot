@@ -5281,7 +5281,7 @@ class Component extends DCLogic {
       h('div',{style:{fontFamily:SF,fontSize:44,fontWeight:700,lineHeight:1}}, _totalVal),
       h('div',{style:{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}},
         h('span',{style:{display:'inline-flex',alignItems:'center',gap:6,background:'rgba(255,255,255,.16)',borderRadius:8,padding:'4px 10px',fontSize:12.5,fontWeight:700}},'▲ '+(_P.tvpi||'2.1')+'x TVPI'),
-        h('span',{style:{fontSize:12.5,color:'rgba(255,255,255,.9)'}}, _aboveCalled+' above called capital')),
+        h('span',{style:{fontSize:12.5,color:'rgba(255,255,255,.9)'}}, _aboveCalled+' net gain')), /* review7 item 3 — was 'above called capital' (confusing; called=16.6m). 3.6 = NAV − paid-in = net gain (Nettgewinn) */
       h('div',{style:{fontSize:12.5,color:'#fff',fontWeight:600}}, '▲ '+(_P.qoqAbs||'+€0.6m')+' ('+(_P.qoqPct||'+3.7%')+') vs. last quarter'),
       h('div',{style:{fontSize:11,color:'rgba(255,255,255,.7)'}}, _P.reporting||(_nFunds+' funds reporting')));
     const _miniCard=(l,v)=>h('div',{style:{flex:'1 1 110px',minWidth:100,background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:14,padding:'14px 16px'}},

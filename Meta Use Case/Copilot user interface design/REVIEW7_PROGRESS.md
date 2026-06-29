@@ -33,4 +33,7 @@ Build strictly one at a time, verify (node --check + Playwright render/logicErro
 30. Funds & Managers: all funds use the Moonfare-Technology-Fund style (logo bottom-left + background image)
 31. Download many background images (city skyscrapers + landscapes US/Europe/worldwide), similar format
 
-- NEXT: item 1
+- [x] 1 Alpha's read card shrunk to ~half (concise read + CTA) — fd1075d
+- [x] 2 renamed → "Alpha's read on your Portfolio" + portfolio-wide content — 483ae8f
+- [x] 3 "€3.6m above called capital" → "€3.6m net gain" (Nettgewinn = NAV−paid-in; action-items mistranslated to 'net distribution') — verified visible
+- NEXT: item 4
