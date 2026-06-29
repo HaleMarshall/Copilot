@@ -2226,11 +2226,11 @@ class Component extends DCLogic {
     this._uc[0].items.unshift(HOME);
     // Simulator hub — landing for the Shape workspace
     /* item 183 — clearer title: 'Compare yourself' with the two modes made explicit (compare your actual investment vs where you want to be) */
-    const SIM=mk('sim',0,'Compare yourself','Two ways to compare: your actual investment — where you are today, vs peers, platform and the model — and your target — where you want to be. Shape a better portfolio, then see how you stack up.',
+    const SIM=mk('sim',0,'Simulate and compare your targets','Set a target for each dimension — strategy, region, currency and sector — then compare it against your current mix, the Moonfare model, peers, the platform, the top 10% or the endowments. Save each target individually and hand the winner to Opportunities.',
       ['What if I invest like the next risk class up?','What happens to my return if I shift Buyout into Growth?','How do I compare to peers like me?'],
       ['Adjust-yourself dials','Per-metric impact','Target vs peer vs platform','Multi-layer peer benchmark'],
       [S[4],S[0],S[2],'Outcomes across similar clients'],
-      [{id:'sim',label:'Simulator',view:'sim'},{id:'compare',label:'Comparison',view:'compare'},{id:'future',label:'Future',view:'future'}]);
+      [{id:'sim',label:'Target simulator',view:'sim'},{id:'compare',label:'Comparison',view:'compare'},{id:'future',label:'Future',view:'future'}]);
     SIM.tier=0;
     this._uc[0].items.push(SIM);
     // Opportunities hub — landing for the Act workspace; turns a saved simulation into ranked next actions
@@ -5424,10 +5424,11 @@ class Component extends DCLogic {
     // ---- header + AI build-target action ----
     const header=h('div',{style:{display:'flex',gap:16,alignItems:'flex-start',justifyContent:'space-between',flexWrap:'wrap'}},
       h('div',{style:{minWidth:0}},
-        h('div',{style:{fontSize:10.5,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Shape · Simulator'),
-        h('div',{style:{fontFamily:SF,fontSize:26,fontWeight:600,margin:'3px 0 2px'}},'Shape your target'),
+        h('div',{style:{fontSize:10.5,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Target simulator'), /* item 63 */
+        /* item 62 — single title 'Simulate and compare your targets'; the redundant 'Shape your target' heading removed */
+        h('div',{style:{fontFamily:SF,fontSize:26,fontWeight:600,margin:'3px 0 2px'}},'Simulate and compare your targets'),
         h('div',{style:{fontSize:13,color:'var(--muted)',lineHeight:1.5,maxWidth:620}},
-          'One target pie per dimension — strategy, region, currency and sector. Compare each against your current, the model, peers, the platform or the top 10% — or pick Custom to shape it with the sliders.')),
+          'One target pie per dimension — strategy, region, currency and sector. Compare each against your current mix, the model, peers, the platform, the top 10% or the endowments — or pick Custom to shape it with the sliders, then save each target individually.')),
       h('div',{style:{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:6,flex:'0 0 auto'}},
         h('button',{onClick:()=>this.aiBuildTarget(),style:{display:'inline-flex',alignItems:'center',gap:8,background:'linear-gradient(135deg,#2C2DFE,#5B5CFF)',color:'#fff',border:'none',borderRadius:11,padding:'12px 18px',fontSize:13,fontWeight:700,cursor:'pointer',boxShadow:'0 8px 22px -10px rgba(44,45,254,.6)',fontFamily:'Inter,system-ui,sans-serif'}},'✦ Build my target with Alpha'),
         h('div',{style:{fontSize:10.5,color:'var(--muted)'}},'New here? Let Alpha propose a starting target.')));

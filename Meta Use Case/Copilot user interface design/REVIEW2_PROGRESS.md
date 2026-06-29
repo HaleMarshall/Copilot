@@ -9,7 +9,8 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 57 comparison two-pies (current vs target) + switch current/target vs others; generalized to strategy/region/currency/sector + paired Z (cmpDimMix/cmpDimSlices helpers)
 - [x] 58 Peers opens side panel to define own peers (prof/age/risk/region/horizon/wealth/target) + save/re-apply named groups; default actual peers (savePeers/applyPeers)
 - [x] 59 save target per dimension individually (Save … target button per card, removed save-all; saveDimTarget/savedDimTargets)
-- NEXT: item 60-61 (compare against endowment funds — whole + individual)
+- [x] 60-61 compare strategy mix vs endowment funds: individual (Harvard/Yale/Princeton) + whole (H+Y+P) in comparison 'vs others'
+- NEXT: item 62 (sim title 'Simulate and compare your targets', drop 'shape your targets')
 - [x] 1 nudge new-investor guard + liquidity CTA→opportunities
 - [x] 2 TVPI mini-chart in performance (+tvpi seeded)
 - [x] 3 cash-flow: 'Net distributions' not 'Net cash position'
