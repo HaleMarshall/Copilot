@@ -6046,10 +6046,11 @@ class Component extends DCLogic {
       children:h('div',{style:{padding:'6px 0'}}, empty? this.cmpEmpty() : this.miniZ(dimZRows)),
       caption:(pieMode==='target'?'Your actual minus your target':'You ('+(self==='current'?'actual':'target')+') minus '+cmpShort)+', in percentage points. Follows the pies beside it.'});
 
+    /* item 66 — 'Benchmark against' toggle moved down next to the Z-chart (PM-allocation/fill-rate are actual and don't depend on it) so it's visible with the chart it drives, without scrolling back up */
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
-      insightBanner, toggleRow,
+      insightBanner,
       this.twoCol(allocCard, fillCard, '1fr 1fr'),
-      targetCard,
+      h('div',{style:{display:'flex',flexDirection:'column',gap:10,background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:14,padding:'14px 16px'}}, toggleRow, targetCard),
       this.twoCol(dimPieCard, dimZCard, '1.05fr .95fr'),
       this.cmpBenchTable(),
       this.followCard());

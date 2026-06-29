@@ -13,7 +13,8 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 62 simulator title 'Simulate and compare your targets' + matching description, removed redundant 'Shape your target' heading
 - [x] 63 page tab + eyebrow renamed 'Target simulator'
 - [x] 64 compare actual position vs others made explicit (relabel current→'Your actual' in pies/Z/captions)
-- NEXT: item 65 (add endowments to PM allocation + fill-rate charts)
+- [x] 65 endowments added to PM-allocation (34%, axis→40%) + fill-rate (36% target) charts (+pm.endow/endowTarget seeded)
+- NEXT: item 66 (move 'benchmark against' toggles down to the Z-chart)
 - [x] 1 nudge new-investor guard + liquidity CTA→opportunities
 - [x] 2 TVPI mini-chart in performance (+tvpi seeded)
 - [x] 3 cash-flow: 'Net distributions' not 'Net cash position'
