@@ -11,4 +11,5 @@
 10. Format large breakdown: tree diagram of formats
 - [x] 1-3 overview restructure (Alpha read right of title; total-value hero + base ccy + KPI cards; allocation below perf+cash, vertical)
 - [x] 4 merged the two Alpha reads in performance detail into one
-- NEXT: item 5 (funds-you-hold top 3 + full Performance page)
+- [x] 5 perf quick summary top-3 + full Performance page (KPIs, contribution+IRR charts, full table)
+- NEXT: item 6 (full cashflows page; quick summary top 3 J-curve)
