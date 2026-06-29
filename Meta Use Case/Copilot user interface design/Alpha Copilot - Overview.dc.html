@@ -4334,8 +4334,9 @@ class Component extends DCLogic {
             h('div',{style:{fontSize:12.5,lineHeight:1.55,color:'rgba(255,255,255,.88)'}},'Your cash-flow profile is very typical for someone with your investment behaviour and risk profile. €3.9m remains uncalled across your younger funds — that’s normal and your liquidity buffer covers it comfortably.')),
           caption:'In plain terms: are you okay, and where you are on the J-curve.'}),
         /* review3 item 6 — quick summary shows only the top 3 J-curve positions; full list moves to a dedicated cash-flows page */
-        h('div',{key:'jpos'}, this.panelSection('Where your top investments sit on the J-curve','top 3 by NAV'),
-          h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, this.jCurveRows(roster.slice(),3))),
+        /* review7 item 17 — default overview shows every fund's logo on the actual J-curve graph */
+        h('div',{key:'jpos'}, this.panelSection('Where your funds sit on the J-curve','every fund · click a logo'),
+          this.jCurveGraph(roster.slice(), this.state.jcSel)),
         h('div',{key:'f'}, h('button',{onClick:()=>this.setState({homePop:null,homeFundsList:'cashflow'}),
           style:{width:'100%',border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'12px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'Open the full cash-flows page — all investments & J-curve  →'))
       ];
@@ -5414,6 +5415,28 @@ class Component extends DCLogic {
         h('div',{style:{minWidth:0}}, h('div',{style:{fontFamily:SF,fontSize:13,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},f.name), h('div',{style:{fontSize:11,color:'var(--muted)'}},f.strat+' · DPI '+(f.dpi||'—'))),
         h('div',{style:{display:'flex',alignItems:'center',gap:10,flex:'0 0 auto'}}, h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:13,fontWeight:600}},f.nav||'—'), h('div',{style:{fontSize:10,color:'var(--muted)'}},'NAV')), h('span',{style:{fontSize:11,fontWeight:700,color:posv?'var(--over)':'var(--under)',whiteSpace:'nowrap'}}, posv?'▲ net positive':'▼ in J-curve'))); });
   }
+  /* review7 items 17/18 — actual J-curve GRAPH: every held fund's logo plotted by maturity (x = years since first close) and net cash returned (y = DPI − 1, breakeven at 0); click a logo (or a table row) to highlight its point */
+  jCurveGraph(funds, selId){
+    const h=this.h; const num=(s)=>parseFloat(String(s||'').replace(/[^0-9.]/g,''))||0;
+    const NOW=2026; const W=560,H=300,padL=46,padR=16,padT=16,padB=40;
+    const ages=funds.map(f=>Math.max(0,NOW-(f.vintage||NOW))); const maxAge=Math.max(8,Math.max.apply(null,ages.concat([0])));
+    const nets=funds.map(f=>+(num(f.dpi)-1).toFixed(2)); const yMin=Math.min(-1,Math.min.apply(null,nets.concat([0]))), yMax=Math.max(1.3,Math.max.apply(null,nets.concat([0])));
+    const sx=a=>padL+(a/maxAge)*(W-padL-padR); const sy=v=>H-padB-((v-yMin)/((yMax-yMin)||1))*(H-padT-padB);
+    const E=[];
+    [-1,-0.5,0,0.5,1].filter(t=>t>=yMin-0.01&&t<=yMax+0.01).forEach((t,i)=>{ const y=sy(t); E.push(h('line',{key:'g'+i,x1:padL,y1:y,x2:W-padR,y2:y,stroke:'var(--line)',strokeWidth:1,strokeOpacity:t===0?0.95:0.4}));
+      E.push(h('text',{key:'yl'+i,x:padL-8,y:y+3.5,textAnchor:'end',style:{fontSize:9.5,fill:'var(--muted)',fontFamily:'Inter,system-ui,sans-serif'}}, (t>0?'+':'')+t.toFixed(1)+'x')); });
+    for(let a=0;a<=maxAge;a+=2){ E.push(h('text',{key:'xl'+a,x:sx(a),y:H-16,textAnchor:'middle',style:{fontSize:9.5,fill:'var(--muted)',fontFamily:'Inter,system-ui,sans-serif'}}, a+'y')); }
+    E.push(h('text',{key:'xt',x:(padL+(W-padR))/2,y:H-3,textAnchor:'middle',style:{fontSize:9,fill:'var(--muted)'}},'Years since first close'));
+    const ref=[[0,-0.55],[1,-0.62],[2,-0.5],[3,-0.28],[4,-0.02],[5,0.28],[6,0.6],[7,0.92],[8,1.2]].filter(p=>p[0]<=maxAge);
+    E.push(h('path',{key:'ref',d:ref.map((p,i)=>(i?'L':'M')+sx(p[0])+','+sy(p[1])).join(' '),fill:'none',stroke:'var(--brand-tint-2)',strokeWidth:2,strokeDasharray:'5 5'}));
+    E.push(h('text',{key:'zl',x:W-padR,y:sy(0)-4,textAnchor:'end',style:{fontSize:9,fill:'var(--muted)'}},'breakeven · DPI 1.0x'));
+    const svg=h('svg',{viewBox:'0 0 '+W+' '+H,style:{width:'100%',height:'auto',display:'block'}}, E);
+    const markers=funds.map(f=>{ const age=Math.max(0,NOW-(f.vintage||NOW)); const net=+(num(f.dpi)-1).toFixed(2); const lx=sx(age)/W*100, ly=sy(net)/H*100; const on=selId===f.id; const dim=selId&&!on;
+      return h('button',{key:f.id,onClick:()=>this.setState({jcSel:on?null:f.id}),title:f.name+' · DPI '+(f.dpi||'—'),
+        style:{position:'absolute',left:lx+'%',top:ly+'%',transform:'translate(-50%,-50%)',width:on?34:26,height:on?34:26,borderRadius:9,background:'#fff',border:'2px solid '+(on?'var(--brand)':'var(--line)'),boxShadow:on?'0 6px 18px -6px var(--brand)':'0 2px 6px -2px rgba(0,0,0,.3)',padding:3,cursor:'pointer',opacity:dim?0.45:1,transition:'all .15s',zIndex:on?3:2}},
+        h('img',{src:'assets/logos/'+(f.logo||'eqt')+'.png',alt:f.name,onError:e=>{e.target.style.display='none';},style:{width:'100%',height:'100%',objectFit:'contain'}})); });
+    return h('div',{style:{position:'relative',width:'100%'}}, svg, h('div',{style:{position:'absolute',inset:0}}, markers));
+  }
   fundsListBody(scope){
     const h=this.h; const SF=this.SF; const meta=this.HELD_META(); const roster=this.HELD_FUNDS();
     const back=h('button',{onClick:()=>this.setState({homeFundsList:null}),style:{alignSelf:'flex-start',display:'inline-flex',alignItems:'center',gap:6,border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:9,padding:'7px 13px',fontSize:12,fontWeight:600,cursor:'pointer'}},'‹ Back to overview');
@@ -5470,16 +5493,21 @@ class Component extends DCLogic {
           cashTile('Net distributions','+€0.9m','distributions − calls','var(--over)'))});
       content=h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
         h('div',{style:{display:'grid',gridTemplateColumns:'minmax(0,1fr) minmax(0,1.05fr)',gap:16,alignItems:'stretch'}}, cashBoxesCard, cfChart),
-        this.card({title:'Each investment on the J-curve',badge:this.badge('your portfolio','conf'),children:h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, this.jCurveRows(roster.slice()))}),
-        this.card({title:'Investments — committed, called & performance',badge:this.badge('your portfolio','conf'),children:h('div',null,
-          h('div',{style:{display:'grid',gridTemplateColumns:'1.5fr 0.8fr 0.9fr 0.7fr',gap:8,padding:'0 12px 6px',fontSize:9.5,fontWeight:700,letterSpacing:'.03em',textTransform:'uppercase',color:'var(--muted)'}},
-            h('span',null,'Investment'),h('span',{style:{textAlign:'right'}},'Committed'),h('span',{style:{textAlign:'right'}},'Called'),h('span',{style:{textAlign:'right'}},'IRR')),
-          h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, ranked.map(f=>{ const navN=parseFloat(String(f.nav||'').replace(/[^0-9.]/g,''))||0; const moicN=parseFloat(f.moic)||1; const calledPct=parseFloat(f.called)||0; const calledEur=moicN>0?navN/moicN:0; const committedEur=calledPct>0?calledEur/(calledPct/100):calledEur;
-            return h('div',{key:f.id,onClick:()=>this.openFund(f.id),style:{display:'grid',gridTemplateColumns:'1.5fr 0.8fr 0.9fr 0.7fr',gap:8,alignItems:'center',border:'1px solid var(--line)',borderRadius:10,padding:'9px 12px',cursor:'pointer'}},
-              h('div',{style:{minWidth:0}}, h('div',{style:{fontFamily:SF,fontSize:13,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},f.name), h('div',{style:{fontSize:11,color:'var(--muted)'}},f.stage)),
-              h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:12.5,fontWeight:600}},'€'+committedEur.toFixed(1)+'m'),
-              h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:12.5,fontWeight:600}},'€'+calledEur.toFixed(1)+'m'), h('div',{style:{fontSize:9.5,color:'var(--muted)'}},(f.called||'')+' called')),
-              h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:12.5,fontWeight:700,color:'var(--over)'}},f.irr||'—')); })))}));
+        /* review7 items 18/19 — MERGED view named 'Investments, Committed, Called, and Performance': the table and the J-curve graph in one card; click a row to highlight that fund's logo on the curve (right); default shows every fund's logo */
+        (()=>{ const sel=this.state.jcSel;
+          const tbl=h('div',null,
+            h('div',{style:{display:'grid',gridTemplateColumns:'1.5fr 0.8fr 0.95fr 0.8fr',gap:8,padding:'0 12px 6px',fontSize:9.5,fontWeight:700,letterSpacing:'.03em',textTransform:'uppercase',color:'var(--muted)'}},
+              h('span',null,'Investment'),h('span',{style:{textAlign:'right'}},'Committed'),h('span',{style:{textAlign:'right'}},'Called'),h('span',{style:{textAlign:'right'}},'Performance')),
+            h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, ranked.map(f=>{ const navN=parseFloat(String(f.nav||'').replace(/[^0-9.]/g,''))||0; const moicN=parseFloat(f.moic)||1; const calledPct=parseFloat(f.called)||0; const calledEur=moicN>0?navN/moicN:0; const committedEur=calledPct>0?calledEur/(calledPct/100):calledEur; const on=sel===f.id; const posv=(parseFloat(f.dpi)||0)>=0.4;
+              return h('div',{key:f.id,onClick:()=>this.setState({jcSel:on?null:f.id}),title:'Highlight on the J-curve',style:{display:'grid',gridTemplateColumns:'1.5fr 0.8fr 0.95fr 0.8fr',gap:8,alignItems:'center',border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',borderRadius:10,padding:'9px 12px',cursor:'pointer'}},
+                h('div',{style:{minWidth:0,display:'flex',alignItems:'center',gap:8}}, h('img',{src:'assets/logos/'+(f.logo||'eqt')+'.png',alt:'',onError:e=>{e.target.style.display='none';},style:{width:22,height:22,borderRadius:6,background:'#fff',border:'1px solid var(--line)',padding:2,objectFit:'contain',flex:'0 0 auto'}}), h('button',{onClick:e=>{e.stopPropagation();this.openFund(f.id);},style:{minWidth:0,textAlign:'left',border:'none',background:'none',padding:0,cursor:'pointer'}}, h('div',{style:{fontFamily:SF,fontSize:13,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',color:'var(--brand-ink)'}},f.name+' ↗'), h('div',{style:{fontSize:11,color:'var(--muted)'}},f.stage))),
+                h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:12.5,fontWeight:600}},'€'+committedEur.toFixed(1)+'m'),
+                h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:12.5,fontWeight:600}},'€'+calledEur.toFixed(1)+'m'), h('div',{style:{fontSize:9.5,color:'var(--muted)'}},(f.called||'')+' called')),
+                h('div',{style:{textAlign:'right'}}, h('div',{style:{fontFamily:SF,fontSize:12.5,fontWeight:700,color:'var(--over)'}},f.irr||'—'), h('div',{style:{fontSize:9,fontWeight:700,color:posv?'var(--over)':'var(--under)'}}, posv?'net positive':'in J-curve'))); })));
+          const graph=h('div',null, this.jCurveGraph(ranked, sel), h('div',{style:{display:'flex',gap:16,justifyContent:'center',marginTop:6,fontSize:10.5,color:'var(--muted)'}}, h('span',null,'● each logo = a fund'), h('span',null,'– – breakeven / reference J-curve')));
+          return this.card({title:'Investments, Committed, Called, and Performance',badge:this.badge('your portfolio','conf'),
+            children:h('div',{style:{display:'grid',gridTemplateColumns:'minmax(0,1.05fr) minmax(0,1fr)',gap:18,alignItems:'start'}}, tbl, graph),
+            caption:'Investments, committed, called and performance in one view — click any investment to highlight where it sits on the J-curve (right). The graph plots every fund’s logo by maturity and net cash returned.'}); })());
     } else if(dimKeys.includes(scope)){
       const d=this.HOME_DIMS().find(x=>x.key===scope);
       const nm=(k)=>scope==='strategy'?(this.STRATS.find(s=>s[0]===k)||[null,k])[1]:k;

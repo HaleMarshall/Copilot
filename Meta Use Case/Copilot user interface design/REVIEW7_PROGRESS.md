@@ -47,4 +47,7 @@ Build strictly one at a time, verify (node --check + Playwright render/logicErro
 - [x] 12 (done with item 8 — equalised to largest)
 - [x] 13/14/15 currency card: base € + native amount per currency + FX-rate note; FX rate also in currency drill detail — verified ($7.2m/£1.3m/Fr1.0m native, 1 EUR=1.083 USD…)
 - [x] 16 cash boxes beside calls-vs-distributions chart (side by side) + per-year € numbers on bars — verified
-- NEXT: item 17 (J-curve as actual graph on right; click fund -> its point; default shows all fund logos on the J-curve)
+- [x] 17 J-curve as actual graph (fund logos plotted by maturity x net-cash; click highlights point; all logos by default; also in cash pop) — verified
+- [x] 18 merged the investments/committed/called/performance table WITH the J-curve graph in one card; row click highlights logo — verified
+- [x] 19 named the merged card "Investments, Committed, Called, and Performance" — verified
+- NEXT: item 20 (see fund/see investment/buy now -> see opportunity / invest in opportunity)
