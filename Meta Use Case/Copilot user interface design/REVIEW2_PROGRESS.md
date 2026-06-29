@@ -6,7 +6,8 @@ Coworker snapshot (8790/cloudflared) SEPARATE — untouched.
 - [x] 48 currency toggle on total value + conversion-rate note (fx seeded EUR base; server DATASET_KEYS+fx)
 - [x] 49 funds-held table inline in performance detail (KPIs+cards+all funds in one view)
 - [x] 50-56 fund-page multi-currency (home/fund toggle, per-metric+NAV FX impact, conv-rate footnote, record-date delta, call/dist FX reconciliation, net home metric on click, default to better number) (+fx history seeded)
-- NEXT: item 57 (two pies you-vs-target + switch to compare others, all dims)
+- [x] 57 comparison two-pies (current vs target) + switch current/target vs others; generalized to strategy/region/currency/sector + paired Z (cmpDimMix/cmpDimSlices helpers)
+- NEXT: item 58 (Peers side-panel: profession/age/risk/region/horizon/wealth/target, save custom peers)
 - [x] 1 nudge new-investor guard + liquidity CTA→opportunities
 - [x] 2 TVPI mini-chart in performance (+tvpi seeded)
 - [x] 3 cash-flow: 'Net distributions' not 'Net cash position'

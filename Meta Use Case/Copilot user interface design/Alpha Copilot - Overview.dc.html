@@ -1146,10 +1146,24 @@ class Component extends DCLogic {
         h('div',{style:{fontSize:11.5,fontWeight:700}},'🔒 Only for paid viewers'),
         h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:2,marginBottom:8}},'Contact your sales associate · '+co.total.toLocaleString()+' total investors'),
         h('button',{onClick:()=>this.loosen(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:999,padding:'6px 13px',fontSize:11.5,fontWeight:600,cursor:'pointer'}},'Loosen filters')):null,
-      h('div',{key:'algebra',style:{fontSize:10.5,color:'var(--brand-ink)',background:'var(--brand-wash)',borderRadius:8,padding:'8px 10px',marginTop:4,lineHeight:1.4}},
+      /* item 58 — investment horizon + target so the user can fully define their own peers */
+      section('Investment horizon','one', chips('horizon',['<5y','5-10y','10-15y','15y+'])),
+      section('Target PM allocation','one', chips('target',['10%','15%','20%','25%','30%'])),
+      /* item 58 — save the defined group as a named custom peer set (default = your actual peers) */
+      (()=>{ const saved=this.state.savedPeers||[];
+        const sChip=(p,i)=>h('button',{key:i,onClick:()=>this.applyPeers(p),style:{border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',color:'var(--brand-ink)',fontSize:11.5,fontWeight:600,padding:'5px 10px',borderRadius:999,cursor:'pointer'}},'★ '+p.name);
+        return h('div',{key:'savepeers',style:{marginTop:6}},
+          h('div',{style:{fontSize:11,fontWeight:700,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.06em',marginBottom:8}},'Saved peer groups'),
+          saved.length? h('div',{style:{display:'flex',flexWrap:'wrap',gap:6,marginBottom:9}}, saved.map(sChip)) : h('div',{style:{fontSize:11,color:'var(--muted)',marginBottom:9,lineHeight:1.45}},'None yet — by default you’re compared against your actual peers. Define a group above and save it.'),
+          h('button',{onClick:()=>this.savePeers(),style:{width:'100%',border:'none',background:'var(--brand)',color:'#fff',borderRadius:9,padding:'9px',fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'✦ Save these peers'),
+          this.state.savedPeersMsg? h('div',{style:{fontSize:11,color:'var(--over)',marginTop:7,fontWeight:600}}, '✓ '+this.state.savedPeersMsg) : null); })(),
+      h('div',{key:'algebra',style:{fontSize:10.5,color:'var(--brand-ink)',background:'var(--brand-wash)',borderRadius:8,padding:'8px 10px',marginTop:10,lineHeight:1.4}},
         'Values within a filter widen the group (union); filters across rows narrow it (intersect). Editing any filter switches the benchmark to Custom.')
     ];
   }
+  /* item 58 — save / re-apply a user-defined peer group */
+  savePeers(){ const list=(this.state.savedPeers||[]).slice(); const name='My peers '+(list.length+1); list.push({name, fc:{...(this.state.fc||{})}}); this.setState({savedPeers:list, savedPeersMsg:name+' saved'}); }
+  applyPeers(p){ this.setState({fc:{...(p&&p.fc||{})}, cmp:'custom', controlOpen:true, savedPeersMsg:(p&&p.name)+' applied'}); }
 
   /* ---------- Ask Alpha ---------- */
   askAlpha(){
@@ -2282,11 +2296,12 @@ class Component extends DCLogic {
     // Custom-comparison cohort builder — ONLY on the Comparison page, ONLY when "Custom" is the benchmark.
     if(this.controlIsLeverPanel()){
       const onCompare = this.curPage().view==='compare';
-      if(onCompare && s.cmp==='custom' && s.controlOpen){
+      /* item 58 — pressing Peers (or Custom) opens this side panel to define & save your own peer group */
+      if(onCompare && (s.cmp==='custom'||s.cmp==='peers') && s.controlOpen){
         return h('aside',{style:{flex:'0 0 auto',width:312,background:'var(--surface)',borderLeft:'1px solid var(--line)',display:'flex',flexDirection:'column',minHeight:0,transition:'width .18s',overflow:'hidden'}},
           h('div',{style:{flex:'0 0 auto',padding:'13px 16px 12px',borderBottom:'1px solid var(--line)',display:'flex',alignItems:'flex-start',gap:10}},
             h('div',{style:{flex:1,minWidth:0}},
-              h('div',{style:{fontSize:9.5,letterSpacing:'.1em',textTransform:'uppercase',color:'var(--muted)'}},'Custom comparison'),
+              h('div',{style:{fontSize:9.5,letterSpacing:'.1em',textTransform:'uppercase',color:'var(--muted)'}}, s.cmp==='peers'?'Define your peers':'Custom comparison'),
               h('div',{style:{fontSize:16,fontWeight:600,fontFamily:this.SF}}, this.cohortSummary())),
             h('span',{style:{fontFamily:this.SF,fontWeight:600,fontSize:18,color:'var(--brand)',flex:'0 0 auto'}}, 'n = '+(co.gated?'—':co.n)),
             h('button',{onClick:()=>this.setState({controlOpen:false}),title:'Hide panel',style:{border:'1px solid var(--line)',background:'var(--surface-2)',color:'var(--muted)',width:24,height:24,borderRadius:7,cursor:'pointer',fontSize:13,flex:'0 0 auto'}},'›')),
@@ -5952,7 +5967,7 @@ class Component extends DCLogic {
     const cmpHint={peers:'n = '+co.n+' investors like you',model:'Moonfare house-view · '+this.riskLabel(),platform:'all '+this.PLATFORM_TOTAL+' platform investors',top10:'top 10% performers on the platform',custom:'n = '+co.n+' · refine the group in the control panel →'}[cmp]||'';
     const toggleRow=h('div',{style:{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}},
       h('span',{style:{fontSize:11,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)'}},'Benchmark against'),
-      this.seg([{label:'Peers',value:'peers'},{label:'Model',value:'model'},{label:'Platform',value:'platform'},{label:'Top 10%',value:'top10'},{label:'Custom',value:'custom'}], cmp, v=>this.setState({cmp:v, controlOpen:v==='custom'?true:s.controlOpen}),{sm:true}),
+      this.seg([{label:'Peers',value:'peers'},{label:'Model',value:'model'},{label:'Platform',value:'platform'},{label:'Top 10%',value:'top10'},{label:'Custom',value:'custom'}], cmp, v=>this.setState({cmp:v, controlOpen:(v==='custom'||v==='peers')?true:s.controlOpen}),{sm:true}),
       h('span',{style:{fontSize:11.5,color:'var(--muted)'}}, cmpHint));
 
     // ---- row 1 (STATIC — never changes with the toggle): Private Markets allocation · Fill rate ----
