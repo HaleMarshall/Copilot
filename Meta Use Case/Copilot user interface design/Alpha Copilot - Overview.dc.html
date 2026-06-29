@@ -4209,9 +4209,11 @@ class Component extends DCLogic {
     if(!footer) footer=h('button',{onClick:()=>this.askFromPage('Tell me more about my '+key+' in detail.'),style:{width:'100%',background:'var(--brand)',color:'#fff',border:'none',borderRadius:10,padding:'12px',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'Ask Alpha about this  →');
 
     const close=()=>this.closeHomePop();
+    /* review3 item 8 — when Ask Alpha is open, shift the quick-info panel right to align with the chat's edge so both are visible */
+    const askOpen=!!(this.state.ask && this.state.ask.state==='open'); const dockLeft=askOpen?392:52; /* 52 spine + 340 Ask Alpha chat */
     return h('div',{style:{display:'contents'}},
-      h('div',{onClick:close,style:{position:'fixed',top:109,left:52,right:0,bottom:0,background:'rgba(8,9,18,.20)',zIndex:44,animation:'alphaIn .14s ease'}}),
-      h('aside',{style:{position:'fixed',top:109,left:52,bottom:0,width:'min(440px, calc(100vw - 52px))',background:'var(--surface)',borderRight:'1px solid var(--line)',boxShadow:'12px 0 44px -18px rgba(8,9,18,.45)',zIndex:45,display:'flex',flexDirection:'column',animation:'alphaIn .16s ease'}},
+      h('div',{onClick:close,style:{position:'fixed',top:109,left:dockLeft,right:0,bottom:0,background:'rgba(8,9,18,.20)',zIndex:44,animation:'alphaIn .14s ease'}}),
+      h('aside',{style:{position:'fixed',top:109,left:dockLeft,bottom:0,width:'min(440px, calc(100vw - '+dockLeft+'px))',background:'var(--surface)',borderRight:'1px solid var(--line)',boxShadow:'12px 0 44px -18px rgba(8,9,18,.45)',zIndex:45,display:'flex',flexDirection:'column',animation:'alphaIn .16s ease',transition:'left .18s ease'}},
         h('div',{style:{flex:'0 0 auto',display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:12,padding:'16px 18px 14px',borderBottom:'1px solid var(--line)'}},
           h('div',{style:{minWidth:0}},
             h('div',{style:{fontSize:10.5,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},eyebrow),
