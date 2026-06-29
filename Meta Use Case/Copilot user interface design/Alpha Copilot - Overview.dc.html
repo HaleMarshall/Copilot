@@ -845,10 +845,11 @@ class Component extends DCLogic {
       h('div',{style:{position:'absolute',inset:0,zIndex:0}}, ticks.map((t,i)=>
         h('div',{key:i,style:{position:'absolute',left:(t/max*100)+'%',top:0,bottom:0,width:1,background:'var(--line)',opacity:t===0?1:.55}}))),
       h('div',{style:{position:'relative',zIndex:1,display:'flex',flexDirection:'column',gap}}, rows.map((r,i)=>{
-        const wpc=Math.max(r.v/max*100,0); const ghost=r.v<=0;
+        /* review3 item 9 — clamp the bar to the axis so a value above max never overflows the plot (the number stays correct, the bar just maxes out) */
+        const wpc=Math.min(Math.max(r.v/max*100,0),100); const over=r.v>max+1e-9; const ghost=r.v<=0;
         const label=fmt(r.v);
-        /* items 98/99/100 — if the value won't fit inside a short bar, render it OUTSIDE to the right in BLACK (not clipped white) */
-        const inside = !ghost && wpc >= (label.length>5?22:16);
+        /* items 98/99/100 — if the value won't fit inside a short bar, render it OUTSIDE to the right in BLACK (not clipped white); an over-max bar always keeps its label INSIDE so it can't run off the page */
+        const inside = over || (!ghost && wpc >= (label.length>5?22:16));
         return h('div',{key:i,style:{height:barH,position:'relative',display:'flex',alignItems:'center'}},
           h('div',{onClick:r.onClick||null,
             style:{height:'100%',width:wpc+'%',minWidth:ghost?0:3,background:ghost?'transparent':`var(${r.color})`,border:ghost?'1.5px dashed var(--line)':'none',borderRadius:5,display:'flex',alignItems:'center',justifyContent:'flex-end',paddingRight:inside?11:0,boxSizing:'border-box',cursor:r.onClick?'pointer':'default',transition:'width .3s ease',flex:'0 0 auto'}},

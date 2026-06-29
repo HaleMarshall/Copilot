@@ -14,4 +14,5 @@
 - [x] 5 perf quick summary top-3 + full Performance page (KPIs, contribution+IRR charts, full table)
 - [x] 6 cashflow quick summary top-3 J-curve + full cash-flows page (KPIs, calls/dist chart, full J-curve, committed/called table)
 - [x] 7 format full breakdown lists investments (heldMeta.format assigned)
-- NEXT: item 8 (Ask Alpha open -> detail panel shifts toward middle aligned with chat)
+- [x] 8 detail panel shifts (left 52->392) to align with Ask Alpha chat when open
+- NEXT: item 9 (strategy graph large-number overflow fix)
