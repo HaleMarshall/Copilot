@@ -4169,12 +4169,11 @@ class Component extends DCLogic {
                 h('span',{style:{fontSize:12,color:'var(--muted)'}},'your private-markets outperformance vs the S&P 500'))),
             caption:'Public-market-equivalent (PME): what the same cash flows would have earned in the S&P 500 total-return index. Your PE programme returned +'+spread+'pp a year above the index. MOIC and peer benchmarks aren’t shown here — too few comparable data points.'}); })(),
         /* review3 item 4 — second Alpha's read merged into the one above */
-        /* item 49 — show the funds you hold inline (everything in one detailed view, not a substitute page) */
-        h('div',{key:'funds'}, this.panelSection('The funds you hold','full performance detail · '+roster.length+' funds'),
-          h('div',{style:{marginBottom:10}}, this.holdingsMetricToggle()),
-          this.holdingsTable(roster)),
+        /* review3 item 5 — quick summary shows only the top 3 performing positions; full table moves to a dedicated Performance page */
+        h('div',{key:'funds'}, this.panelSection('The funds you hold','top 3 performing positions'),
+          this.holdingsTable(this.sortHoldings(roster).slice(0,3))),
         h('div',{key:'f'}, h('button',{onClick:()=>this.setState({homePop:null,homeFundsList:'performance'}),
-          style:{width:'100%',border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:10,padding:'12px',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'Open the full-page funds view  →'))
+          style:{width:'100%',border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'12px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'Open the full performance page — table & graphs  →'))
       ];
     } else if(key==='cashflow'){
       const ranked=roster.slice().sort((a,b)=>parseFloat(b.called)-parseFloat(a.called));
@@ -5271,7 +5270,28 @@ class Component extends DCLogic {
     const back=h('button',{onClick:()=>this.setState({homeFundsList:null}),style:{alignSelf:'flex-start',display:'inline-flex',alignItems:'center',gap:6,border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:9,padding:'7px 13px',fontSize:12,fontWeight:600,cursor:'pointer'}},'‹ Back to overview');
     const dimKeys=['strategy','region','currency','sector','format']; /* PDF#3 — Format dimension */
     let title='All funds you hold', sub='Every fund in your portfolio · '+roster.length+' funds', content;
-    if(dimKeys.includes(scope)){
+    if(scope==='performance'){
+      /* review3 item 5 — full Performance page: KPIs + contribution & IRR graphs + the full holdings table */
+      const ranked=roster.slice().sort((a,b)=>(b.contrib||0)-(a.contrib||0));
+      title='Performance — all your investments'; sub='Full performance detail · '+roster.length+' funds';
+      const cmax=Math.max.apply(null,ranked.map(f=>Math.abs(f.contrib||0)).concat([1]));
+      const contribChart=this.card({title:'Contribution to this quarter (pp)',badge:this.badge('your portfolio','conf'),
+        children:h('div',{style:{display:'flex',flexDirection:'column',gap:9,padding:'4px 0'}}, ranked.map(f=>{ const v=f.contrib||0; const pos=v>=0;
+          return h('div',{key:f.id,style:{display:'flex',alignItems:'center',gap:10}},
+            h('span',{style:{width:120,flex:'0 0 120px',fontSize:12.5,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},f.name),
+            h('div',{style:{flex:1,position:'relative',height:18,display:'flex',justifyContent:pos?'flex-start':'flex-end'}}, h('div',{style:{width:(Math.abs(v)/cmax*100)+'%',height:'100%',background:pos?'var(--over)':'var(--under)',borderRadius:4}})),
+            h('span',{style:{width:54,flex:'0 0 54px',textAlign:'right',fontFamily:SF,fontWeight:600,fontSize:12.5,color:pos?'var(--over)':'var(--under)'}},(pos?'+':'')+v+'pp')); })),
+        caption:'Each holding’s contribution to this quarter’s NAV move.'});
+      const irrRows=ranked.slice().sort((a,b)=>this.metricNum(b,'IRR')-this.metricNum(a,'IRR')).map(f=>({label:f.name,v:this.metricNum(f,'IRR'),color:'--data-1'}));
+      const irrMax=Math.max(5,Math.ceil(Math.max.apply(null,irrRows.map(r=>r.v).concat([0]))/5)*5);
+      const irrChart=this.card({title:'Net IRR by investment',badge:this.badge('your portfolio','conf'),
+        children:this.gridBars(irrRows,{max:irrMax,ticks:[0,irrMax/2,irrMax],unit:'%',labelW:120,barH:18,gap:8,fmt:v=>v+'%'}),
+        caption:'Since-inception net IRR per holding.'});
+      content=h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
+        this.kpiTiles([['Net IRR',((this.DB&&this.DB.portfolio&&this.DB.portfolio.irr)||'11.0')+'%','since inception'],['MOIC',(this.DB&&this.DB.portfolio&&this.DB.portfolio.moicTableNet)||'1.80x','net of fees'],['TVPI',(this.DB&&this.DB.portfolio&&this.DB.portfolio.tvpiTableNet)||'2.10x',''],['DPI',(this.DB&&this.DB.portfolio&&this.DB.portfolio.dpiTableNet)||'0.82x','realised'],['Portfolio value',(this.DB&&this.DB.portfolio&&this.DB.portfolio.navText)||'€16.6m','current NAV'],['Distributions',(this.DB&&this.DB.portfolio&&this.DB.portfolio.distributionsText)||'€2.1m','to date']]),
+        this.twoCol(contribChart, irrChart, '1fr 1fr'),
+        this.card({title:'The funds you hold', right:this.holdingsMetricToggle(), badge:this.badge('your portfolio','conf'), children:this.holdingsTable(roster)}));
+    } else if(dimKeys.includes(scope)){
       const d=this.HOME_DIMS().find(x=>x.key===scope);
       const nm=(k)=>scope==='strategy'?(this.STRATS.find(s=>s[0]===k)||[null,k])[1]:k;
       const catOf=(f)=> scope==='strategy'? (meta[f.id]||{}).strat : (meta[f.id]||{})[scope];

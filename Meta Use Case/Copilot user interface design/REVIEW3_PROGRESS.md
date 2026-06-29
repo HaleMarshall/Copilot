@@ -10,4 +10,5 @@
 9. Strategy graph: large numbers overflow the page -> fix label placement/scaling
 10. Format large breakdown: tree diagram of formats
 - [x] 1-3 overview restructure (Alpha read right of title; total-value hero + base ccy + KPI cards; allocation below perf+cash, vertical)
-- NEXT: item 4 (merge two Alpha reads in performance detail)
+- [x] 4 merged the two Alpha reads in performance detail into one
+- NEXT: item 5 (funds-you-hold top 3 + full Performance page)
