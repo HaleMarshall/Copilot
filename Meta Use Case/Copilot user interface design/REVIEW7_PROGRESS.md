@@ -50,4 +50,5 @@ Build strictly one at a time, verify (node --check + Playwright render/logicErro
 - [x] 17 J-curve as actual graph (fund logos plotted by maturity x net-cash; click highlights point; all logos by default; also in cash pop) — verified
 - [x] 18 merged the investments/committed/called/performance table WITH the J-curve graph in one card; row click highlights logo — verified
 - [x] 19 named the merged card "Investments, Committed, Called, and Performance" — verified
-- NEXT: item 20 (see fund/see investment/buy now -> see opportunity / invest in opportunity)
+- [x] 20 relabelled CTAs to opportunity language (shopBtn Buy→Seize, View fund→See opportunity, Open full fund page→See full opportunity, View detail(s)→See opportunity); body text untouched — verified
+- NEXT: item 21 (portfolio-at-a-glance + strategy detail: show the go-bigger chart by default)
