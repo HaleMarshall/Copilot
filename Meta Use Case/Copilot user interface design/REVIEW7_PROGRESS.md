@@ -38,4 +38,5 @@ Build strictly one at a time, verify (node --check + Playwright render/logicErro
 - [x] 3 "€3.6m above called capital" → "€3.6m net gain" (Nettgewinn = NAV−paid-in; action-items mistranslated to 'net distribution') — verified visible
 - [x] 4 hero currency switch now shows FX rate line ("FX 1 EUR = 1.0830 USD · as of …") on non-base ccy — verified
 - [x] 5 blendedFxRate() helper + hero shows underlying currency mix line + "blended across your mix ≈ X" on the FX line (USD 1.069 vs 1.083 spot) — verified
-- NEXT: item 6 (Performance → "Net Performance" title; do NOT prefix IRR/DPI/TVPI/MOIC)
+- [x] 6 "Performance" section → "Net Performance" (overview card + full page + pop eyebrow); IRR/DPI/TVPI/MOIC left un-prefixed — verified
+- NEXT: item 7 (remove Portfolio Value + Distributions from performance; add distributions to cash-flows detail)

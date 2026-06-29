@@ -4271,7 +4271,7 @@ class Component extends DCLogic {
       ];
     } else if(key==='performance'){
       const ranked=roster.slice().sort((a,b)=>b.contrib-a.contrib);
-      eyebrow='Your portfolio · Performance'; title='How your portfolio is performing';
+      eyebrow='Your portfolio · Net Performance'; title='How your portfolio is performing';
       body=[
         this.kpiTiles([['Net IRR','11.0%','since inception'],['MOIC','1.80x','net of fees'],['TVPI','2.10x',''],['DPI','2.10x','realised'],['Portfolio value','€16.6m','current NAV'],['Distributions','€2.1m','returned to date']]),
         /* review3 item 4 — ONE merged Alpha's read: peer comparison + top contributor + what to watch */
@@ -5110,7 +5110,7 @@ class Component extends DCLogic {
           ticks.slice().reverse().map((t,i)=>h('div',{key:i},t))),
         h('div',{style:{flex:'0 0 64px',position:'relative',borderLeft:'1px solid var(--line)',borderBottom:'1px solid var(--line)',display:'flex',alignItems:'flex-end',justifyContent:'center'}},
           h('div',{style:{width:48,height:(frac*100)+'%',background:col,borderRadius:'4px 4px 0 0',transition:'height .55s cubic-bezier(.4,0,.2,1)'}}))));
-    const perfCol=this.card({title:'Performance',info:true,big:true,right:detailsHint,onClick:()=>this.openHomePop('performance'),
+    const perfCol=this.card({title:'Net Performance',info:true,big:true,right:detailsHint,onClick:()=>this.openHomePop('performance'), /* review7 item 6 — section title 'Net Performance' (individual IRR/DPI/TVPI/MOIC stay un-prefixed) */
       children:h('div',{style:{flex:1,display:'flex',flexDirection:'column'}},
         h('div',{style:{display:'flex',gap:6,flex:1,minHeight:150}},
           yAxis('Return · multiple'),
@@ -5405,7 +5405,7 @@ class Component extends DCLogic {
     if(scope==='performance'){
       /* review3 item 5 — full Performance page: KPIs + contribution & IRR graphs + the full holdings table */
       const ranked=roster.slice().sort((a,b)=>(b.contrib||0)-(a.contrib||0));
-      title='Performance — all your investments'; sub='Full performance detail · '+roster.length+' funds';
+      title='Net Performance — all your investments'; sub='Full performance detail · '+roster.length+' funds';
       const cmax=Math.max.apply(null,ranked.map(f=>Math.abs(f.contrib||0)).concat([1]));
       const contribChart=this.card({title:'Contribution to this quarter (pp)',badge:this.badge('your portfolio','conf'),
         children:h('div',{style:{display:'flex',flexDirection:'column',gap:9,padding:'4px 0'}}, ranked.map(f=>{ const v=f.contrib||0; const pos=v>=0;
