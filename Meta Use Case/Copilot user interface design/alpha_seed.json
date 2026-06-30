@@ -4044,6 +4044,22 @@
             "sub": "Detail"
           },
           "tag": "→ Performance"
+        },
+        {
+          "t": "Currency / FX exposure",
+          "jump": {
+            "tab": "Comparison",
+            "sub": "Currency"
+          },
+          "tag": "→ Comparison · Currency"
+        },
+        {
+          "t": "Vintage exposure",
+          "jump": {
+            "tab": "Comparison",
+            "sub": "Vintage"
+          },
+          "tag": "→ Comparison · Vintage"
         }
       ],
       "script": "Here's your portfolio as it stands today — performance, allocation and cash-flow."
@@ -4083,12 +4099,28 @@
       "crumb": "Compare › Multi-comparison",
       "cfa": [
         {
+          "t": "Compare your region",
+          "jump": {
+            "tab": "Comparison",
+            "sub": "Region"
+          },
+          "tag": "→ Comparison · Region"
+        },
+        {
+          "t": "Compare your sector",
+          "jump": {
+            "tab": "Comparison",
+            "sub": "Sector"
+          },
+          "tag": "→ Comparison · Sector"
+        },
+        {
           "t": "Add the top-10% lens",
           "jump": {
             "tab": "Comparison",
             "sub": "Top 10%"
           },
-          "tag": "→ Comparison"
+          "tag": "→ Comparison · Top 10%"
         },
         {
           "t": "Add endowments lens",
@@ -4096,7 +4128,7 @@
             "tab": "Comparison",
             "sub": "Endowments"
           },
-          "tag": "→ Comparison"
+          "tag": "→ Comparison · Endowments"
         }
       ],
       "script": "Let's see how you stack up — against peers, our platform, the model, and even the endowments."
@@ -4111,7 +4143,23 @@
             "tab": "Comparison",
             "sub": "Gap"
           },
-          "tag": "→ Comparison"
+          "tag": "→ Comparison · Gap"
+        },
+        {
+          "t": "Compare by region",
+          "jump": {
+            "tab": "Comparison",
+            "sub": "Region"
+          },
+          "tag": "→ Comparison · Region"
+        },
+        {
+          "t": "Compare by currency",
+          "jump": {
+            "tab": "Comparison",
+            "sub": "Currency"
+          },
+          "tag": "→ Comparison · Currency"
         }
       ],
       "script": "Here's the suggested portfolio against what you hold today — the deltas are the conversation."
@@ -4150,6 +4198,14 @@
             "sub": "Deal"
           },
           "tag": "→ Opportunities"
+        },
+        {
+          "t": "Show the strategy gap first",
+          "jump": {
+            "tab": "Comparison",
+            "sub": "Strategy"
+          },
+          "tag": "→ Comparison · Strategy"
         }
       ],
       "script": "Here's the sequence I'd suggest. Let's start with the building block that matters most for you."
