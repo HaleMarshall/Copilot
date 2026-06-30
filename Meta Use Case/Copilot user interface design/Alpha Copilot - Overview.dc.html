@@ -517,6 +517,7 @@ class Component extends DCLogic {
       /* ===== PE cash-flow model (from PE_CashFlow_Tool_v15.xlsx) ===== */
       cfPct:'75', cfMethod:'Catch-Up', cfCommitM:10, cfPaceYears:4, cfStratFocus:null, cfShowBands:true, cfScope:'combined',
       displayCcy:'EUR', /* L3 global currency — converts every €-figure in the rendered DOM */
+      cfGP:'MID', /* GP near-term distribution override: LOW / MID / HIGH */
       fProducts:{buyout:34,growth:14,credit:12,infra:10,secondaries:14,semiliquid:8,venture:4,directs:4},
       simMode:'adjust', simPreset:'like-you', simDetail:false, /* item 172 — pro full-allocation view collapsed by default */
       simShowDials:false, /* item 174 — target-adjustment dials hidden by default; pie is the hero, dials open via a bottom toggle */
@@ -7773,29 +7774,37 @@ class Component extends DCLogic {
      (2) Expected TVPI blend, (3) terminal top-up. Percentile bands 25–90.
      ============================================================ */
   peM(){ return (this.DB&&this.DB.peModel)||null; }
-  peCurveFor(strat,pct){ const M=this.peM(); if(!M) return null; const sk=M.strategyMap[strat]||M.strategyMap[String(strat).toLowerCase()]||(M.curves[strat]?strat:'Buyout'); const cur=M.curves[sk]||M.curves.Buyout; return {sk,years:cur.years,cc:cur.cc[pct]||cur.cc['75'],cd:cur.cd[pct]||cur.cd['75'],term:(M.terminalTVPI[sk]||{})[pct]}; }
-  peForecast(o){ const M=this.peM(); if(!M) return null; const pct=o.pct||'75',method=o.method||'Catch-Up',commit=+o.commitment||0,age=Math.max(0,Math.round(o.ageYears||0));
-    const c=this.peCurveFor(o.strategy,pct); if(!c||!commit) return null; const N=c.years.length-1, cc=c.cc, cd=c.cd, benchT=c.term||cd[N];
+  peCurveFor(strat,pct){ const M=this.peM(); if(!M) return null; const sk=M.strategyMap[strat]||M.strategyMap[String(strat).toLowerCase()]||((M.curvesQ&&M.curvesQ[strat])?strat:'Buyout');
+    const Q=M.curvesQ&&(M.curvesQ[sk]||M.curvesQ.Buyout); if(Q) return {sk,q:true,tsi:Q.tsi,cc:Q.cc[pct]||Q.cc['75'],cd:Q.cd[pct]||Q.cd['75'],term:(M.terminalTVPI[sk]||{})[pct]};
+    const cur=M.curves[sk]||M.curves.Buyout; return {sk,q:false,years:cur.years,cc:cur.cc[pct]||cur.cc['75'],cd:cur.cd[pct]||cur.cd['75'],term:(M.terminalTVPI[sk]||{})[pct]}; }
+  /* quarterly engine (60 steps): Layer-1 curve + Catch-Up/Scale, Layer-2 Expected-TVPI, Layer-3 terminal top-up,
+     + GP near-term override (LOW/MID/HIGH over the first N quarters). Outputs annual arrays (year 0 = today). */
+  peForecast(o){ const M=this.peM(); if(!M) return null; const pct=o.pct||'75',method=o.method||'Catch-Up',commit=+o.commitment||0;
+    const c=this.peCurveFor(o.strategy,pct); if(!c||!commit) return null; const cc=c.cc, cd=c.cd, N=cc.length-1, benchT=c.term||cd[N];
+    const perStep=c.q?0.25:1; const aq=Math.max(0,Math.min(N,Math.round((o.ageYears||0)/perStep)));
     const sfCap=M.settings.sfCap||2, sfFloor=M.settings.sfFloor||0.3;
-    const actCalledM=o.actualCalledPct!=null?o.actualCalledPct:cc[Math.min(age,N)];
-    const actDistM=o.actualDistMult!=null?o.actualDistMult:cd[Math.min(age,N)];
+    const actCalledM=o.actualCalledPct!=null?o.actualCalledPct:cc[aq];
+    const actDistM=o.actualDistMult!=null?o.actualDistMult:cd[aq];
     const actTVPI=o.actualTVPI!=null?o.actualTVPI:(actCalledM>0?actDistM/actCalledM:benchT);
-    const yrsRem=Math.max(0,15-age); const expTVPI=Math.max(actTVPI, actTVPI+(benchT-actTVPI)*yrsRem/15);
-    let sf=1; if(method!=='Catch-Up'&&age>0&&cd[age]>0) sf=Math.min(sfCap,Math.max(sfFloor,actDistM/cd[age]));
-    const cumDM=[]; for(let t=0;t<=N;t++){ if(t<age){cumDM.push(cd[t]);continue;} if(method==='Catch-Up') cumDM.push(Math.max(actDistM,cd[t])); else cumDM.push(actDistM+(cd[t]-cd[age])*sf); }
-    const gap=Math.max(0,expTVPI-cumDM[N]); const rem=N-age; const topup=rem>0?gap/rem:0;
-    const out={years:[],contrib:[],dist:[],cumCalled:[],cumDist:[],nav:[],netCF:[],cumNet:[]};
-    for(let t=age;t<=N;t++){ const anchor=(t===age);
-      /* forward-only flows: the anchor (current age) emits no new cash; future = curve increments beyond the anchor */
+    const yrsRem=Math.max(0,15-aq*perStep); const expTVPI=Math.max(actTVPI, actTVPI+(benchT-actTVPI)*yrsRem/15);
+    let sf=1; if(method!=='Catch-Up'&&aq>0&&cd[aq]>0) sf=Math.min(sfCap,Math.max(sfFloor,actDistM/cd[aq]));
+    const GP={LOW:0.5,MID:1,HIGH:1.5}; const gpf=GP[o.gpNear||'MID']||1; const gpSteps=(o.gpQ!=null?o.gpQ:4)*(c.q?1:0.25);
+    const cumDM=[]; for(let t=0;t<=N;t++){ if(t<aq){cumDM.push(cd[t]);continue;} if(method==='Catch-Up') cumDM.push(Math.max(actDistM,cd[t])); else cumDM.push(actDistM+(cd[t]-cd[aq])*sf); }
+    const gap=Math.max(0,expTVPI-cumDM[N]); const rem=N-aq; const topup=rem>0?gap/rem:0;
+    const stepsPerYr=c.q?4:1; const nY=Math.ceil((N-aq)/stepsPerYr);
+    const contrib=Array(nY+1).fill(0), dist=Array(nY+1).fill(0);
+    for(let t=aq;t<=N;t++){ const anchor=(t===aq);
       const callInc=anchor?0:Math.max(0,(cc[t]-cc[t-1]))*commit;
       let distInc=anchor?0:Math.max(0,(cumDM[t]-cumDM[t-1]))*commit; if(!anchor) distInc+=topup*commit;
-      /* cumulative = actuals at anchor + future curve increments (handles actual-vs-curve offset for existing funds) */
-      const cumC=commit*(actCalledM+(cc[t]-cc[age])), cumD=commit*(cumDM[t]+topup*(t-age));
-      out.years.push(t-age); out.contrib.push(+callInc.toFixed(3)); out.dist.push(+distInc.toFixed(3)); out.cumCalled.push(+cumC.toFixed(3)); out.cumDist.push(+cumD.toFixed(3));
-      const deploy=cc[N]>0?cc[t]/cc[N]:1; out.nav.push(+Math.max(0,commit*expTVPI*deploy-cumD).toFixed(3)); out.netCF.push(+(distInc-callInc).toFixed(3)); out.cumNet.push(+(cumD-cumC).toFixed(3)); }
-    out.expTVPI=+expTVPI.toFixed(3); out.benchT=+benchT.toFixed(3); out.dpi=+(out.cumDist[out.cumDist.length-1]/Math.max(0.0001,out.cumCalled[out.cumCalled.length-1])).toFixed(3); out.tvpi=out.expTVPI; return out; }
-  pePortfolio(commitments,pct,method,H){ H=H||16; const agg={contrib:Array(H).fill(0),dist:Array(H).fill(0),cumNet:Array(H).fill(0)}; let totCommit=0,totDistEnd=0,totCalledEnd=0,wTVPI=0,startNet=0;
-    (commitments||[]).forEach(cm=>{ const f=this.peForecast({commitment:cm.commitment,strategy:cm.strategy,pct:pct,method:method,ageYears:cm.ageYears,actualCalledPct:cm.actualCalledPct,actualDistMult:cm.actualDistMult,actualTVPI:cm.actualTVPI}); if(!f) return; totCommit+=cm.commitment; const off=Math.max(0,(cm.commitYear||1)-1);
+      if(!anchor && (t-aq)<=gpSteps) distInc*=gpf;            /* GP near-term override */
+      const yr=Math.ceil((t-aq)/stepsPerYr); contrib[yr]+=callInc; dist[yr]+=distInc; }
+    const out={years:[],contrib:[],dist:[],cumCalled:[],cumDist:[],nav:[],netCF:[],cumNet:[]};
+    let cC=commit*actCalledM, cD=commit*actDistM;
+    for(let y=0;y<=nY;y++){ cC+=contrib[y]; cD+=dist[y]; const navv=Math.max(0,commit*expTVPI*(Math.min(1,(actCalledM+0)/(cc[N]||1)))-cD);
+      out.years.push(y); out.contrib.push(+contrib[y].toFixed(3)); out.dist.push(+dist[y].toFixed(3)); out.cumCalled.push(+cC.toFixed(3)); out.cumDist.push(+cD.toFixed(3)); out.nav.push(+navv.toFixed(3)); out.netCF.push(+(dist[y]-contrib[y]).toFixed(3)); out.cumNet.push(+(cD-cC).toFixed(3)); }
+    out.expTVPI=+expTVPI.toFixed(3); out.benchT=+benchT.toFixed(3); out.dpi=+(cD/Math.max(0.0001,cC)).toFixed(3); out.tvpi=out.expTVPI; return out; }
+  pePortfolio(commitments,pct,method,H,gpNear){ H=H||16; const agg={contrib:Array(H).fill(0),dist:Array(H).fill(0),cumNet:Array(H).fill(0)}; let totCommit=0,totDistEnd=0,totCalledEnd=0,wTVPI=0,startNet=0;
+    (commitments||[]).forEach(cm=>{ const f=this.peForecast({commitment:cm.commitment,strategy:cm.strategy,pct:pct,method:cm.method||method,gpNear:cm.gpNear||gpNear,ageYears:cm.ageYears,actualCalledPct:cm.actualCalledPct,actualDistMult:cm.actualDistMult,actualTVPI:cm.actualTVPI}); if(!f) return; totCommit+=cm.commitment; const off=Math.max(0,(cm.commitYear||1)-1);
       /* existing funds: seed the J-curve at today's net cash position (Σ distributions − called already happened) */
       if(cm.actualCalledPct!=null||cm.actualDistMult!=null) startNet += cm.commitment*((cm.actualDistMult||0)-(cm.actualCalledPct||0));
       for(let t=0;t<f.years.length;t++){ const i=t+off; if(i>=0&&i<H){ agg.contrib[i]+=f.contrib[t]; agg.dist[i]+=f.dist[t]; } }
@@ -7819,8 +7828,9 @@ class Component extends DCLogic {
     const scope=opts.forceScope||this.state.cfScope||'combined';
     const heldC=this.cfHeldCommitments(); const newC=this.cfCommitments(mix,total,pace); const hasHeld=heldC.length>0;
     const commitments = scope==='existing'?heldC : (scope==='new'?newC : (hasHeld?heldC.concat(newC):newC));
-    const base=this.pePortfolio(commitments,pct,method,16), b50=this.pePortfolio(commitments,'50',method,16), b90=this.pePortfolio(commitments,'90',method,16);
-    const ex=hasHeld?this.pePortfolio(heldC,pct,method,16):null; const nw=this.pePortfolio(newC,pct,method,16);
+    const gp=this.state.cfGP||'MID';
+    const base=this.pePortfolio(commitments,pct,method,16,gp), b50=this.pePortfolio(commitments,'50',method,16,gp), b90=this.pePortfolio(commitments,'90',method,16,gp);
+    const ex=hasHeld?this.pePortfolio(heldC,pct,method,16,gp):null; const nw=this.pePortfolio(newC,pct,method,16,gp);
     const combinedView=(scope==='combined'&&hasHeld);
     const years=base.contrib.map((_,i)=>String(2026+i)); /* calendar years (Excel basis 2026–) */
     const seg=(o,v,on)=>this.seg(o,v,on,{sm:true});
@@ -7831,6 +7841,7 @@ class Component extends DCLogic {
     if(L==='L3') ctls.push(ctlRow('Percentile', seg([{label:'25th',value:'25'},{label:'50th',value:'50'},{label:'75th',value:'75'},{label:'90th',value:'90'}],pct,v=>this.setState({cfPct:v}))));
     else if(L==='L2') ctls.push(ctlRow('Percentile', seg([{label:'50th',value:'50'},{label:'75th',value:'75'},{label:'90th',value:'90'}],pct,v=>this.setState({cfPct:v}))));
     if(L!=='L1') ctls.push(ctlRow('Distribution method', seg([{label:'Catch-Up',value:'Catch-Up'},{label:'Scale factor',value:'Scale'}],method,v=>this.setState({cfMethod:v}))));
+    if(L==='L3') ctls.push(ctlRow('GP near-term', seg([{label:'Low',value:'LOW'},{label:'Mid',value:'MID'},{label:'High',value:'HIGH'}],gp,v=>this.setState({cfGP:v}))));
     if(L==='L3') ctls.push(ctlRow('Display currency', h('select',{value:this.state.displayCcy,onChange:e=>this.setState({displayCcy:e.target.value}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--ink)',borderRadius:8,padding:'5px 10px',fontSize:12,fontWeight:600,cursor:'pointer'}}, this.ccyList().map(cc=>h('option',{key:cc,value:cc},cc+' '+this.ccySym(cc).trim())))));
     const commitSlider=slider('Annual commitment',total,1,50,1,v=>'€'+v+'m',v=>this.setState({cfCommitM:v}));
     const paceSlider=slider('Deploy over (years)',pace,1,5,1,v=>v+'y',v=>this.setState({cfPaceYears:v}));
