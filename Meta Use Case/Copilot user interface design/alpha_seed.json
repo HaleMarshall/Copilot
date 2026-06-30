@@ -3271,5 +3271,422 @@
       61,
       55
     ]
-  }
+  },
+  "managerTree": [
+    {
+      "id": "eqt",
+      "name": "EQT",
+      "hq": "Stockholm",
+      "classes": [
+        {
+          "ac": "Buyout",
+          "irr": 19.2,
+          "cons": 88,
+          "funds": [
+            {
+              "id": "eqt-ix",
+              "name": "EQT IX",
+              "irr": 21,
+              "vintage": 2021
+            },
+            {
+              "id": "eqt-x",
+              "name": "EQT X",
+              "irr": 18.4,
+              "vintage": 2023
+            },
+            {
+              "id": "eqt-xi",
+              "name": "EQT XI",
+              "irr": 0,
+              "vintage": 2025
+            }
+          ]
+        },
+        {
+          "ac": "Infrastructure",
+          "irr": 15.1,
+          "cons": 82,
+          "funds": [
+            {
+              "id": "eqt-infra-v",
+              "name": "EQT Infrastructure V",
+              "irr": 15.1,
+              "vintage": 2021
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kkr",
+      "name": "KKR",
+      "hq": "New York",
+      "classes": [
+        {
+          "ac": "Buyout",
+          "irr": 17.8,
+          "cons": 85,
+          "funds": [
+            {
+              "id": "kkr-na-xiii",
+              "name": "KKR North America XIII",
+              "irr": 18.2,
+              "vintage": 2021
+            },
+            {
+              "id": "kkr-eu-vi",
+              "name": "KKR Europe VI",
+              "irr": 17.1,
+              "vintage": 2022
+            },
+            {
+              "id": "kkr-na-xiv",
+              "name": "KKR North America XIV",
+              "irr": 0,
+              "vintage": 2025
+            }
+          ]
+        },
+        {
+          "ac": "Private Credit",
+          "irr": 11.2,
+          "cons": 79,
+          "funds": [
+            {
+              "id": "kkr-credit-iv",
+              "name": "KKR Private Credit IV",
+              "irr": 11.2,
+              "vintage": 2022
+            }
+          ]
+        },
+        {
+          "ac": "Infrastructure",
+          "irr": 13.9,
+          "cons": 80,
+          "funds": [
+            {
+              "id": "kkr-infra-v",
+              "name": "KKR Global Infra V",
+              "irr": 13.9,
+              "vintage": 2022
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "blackstone",
+      "name": "Blackstone",
+      "hq": "New York",
+      "classes": [
+        {
+          "ac": "Buyout",
+          "irr": 18.5,
+          "cons": 84,
+          "funds": [
+            {
+              "id": "bx-cap-ix",
+              "name": "Blackstone Capital IX",
+              "irr": 18.5,
+              "vintage": 2022
+            }
+          ]
+        },
+        {
+          "ac": "Real Estate",
+          "irr": 16.2,
+          "cons": 86,
+          "funds": [
+            {
+              "id": "bx-re-xi",
+              "name": "Blackstone Real Estate XI",
+              "irr": 16.2,
+              "vintage": 2023
+            }
+          ]
+        },
+        {
+          "ac": "Secondaries",
+          "irr": 14,
+          "cons": 83,
+          "funds": [
+            {
+              "id": "bx-strat-ix",
+              "name": "Strategic Partners IX",
+              "irr": 14,
+              "vintage": 2022
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "carlyle",
+      "name": "Carlyle",
+      "hq": "Washington",
+      "classes": [
+        {
+          "ac": "Buyout",
+          "irr": 15.4,
+          "cons": 76,
+          "funds": [
+            {
+              "id": "cg-viii",
+              "name": "Carlyle Partners VIII",
+              "irr": 15.4,
+              "vintage": 2022
+            }
+          ]
+        },
+        {
+          "ac": "Private Credit",
+          "irr": 10.1,
+          "cons": 72,
+          "funds": [
+            {
+              "id": "cg-credit-iii",
+              "name": "Carlyle Credit III",
+              "irr": 10.1,
+              "vintage": 2021
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ares",
+      "name": "Ares",
+      "hq": "Los Angeles",
+      "classes": [
+        {
+          "ac": "Private Credit",
+          "irr": 12.6,
+          "cons": 87,
+          "funds": [
+            {
+              "id": "ares-pc-iv",
+              "name": "Ares Private Credit IV",
+              "irr": 12.6,
+              "vintage": 2022
+            }
+          ]
+        },
+        {
+          "ac": "Secondaries",
+          "irr": 13.3,
+          "cons": 81,
+          "funds": [
+            {
+              "id": "ares-sec-ii",
+              "name": "Ares Secondaries II",
+              "irr": 13.3,
+              "vintage": 2021
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cvc",
+      "name": "CVC",
+      "hq": "Luxembourg",
+      "classes": [
+        {
+          "ac": "Buyout",
+          "irr": 18.9,
+          "cons": 83,
+          "funds": [
+            {
+              "id": "cvc-ix",
+              "name": "CVC Capital IX",
+              "irr": 18.9,
+              "vintage": 2023
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cinven",
+      "name": "Cinven",
+      "hq": "London",
+      "classes": [
+        {
+          "ac": "Buyout",
+          "irr": 16.1,
+          "cons": 80,
+          "funds": [
+            {
+              "id": "cinven-viii",
+              "name": "Cinven VIII",
+              "irr": 16.1,
+              "vintage": 2022
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "genatl",
+      "name": "General Atlantic",
+      "hq": "New York",
+      "classes": [
+        {
+          "ac": "Growth",
+          "irr": 20.4,
+          "cons": 82,
+          "funds": [
+            {
+              "id": "ga-growth-xii",
+              "name": "General Catalyst Growth XII",
+              "irr": 20.4,
+              "vintage": 2022
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "thomabravo",
+      "name": "Thoma Bravo",
+      "hq": "Chicago",
+      "classes": [
+        {
+          "ac": "Buyout",
+          "irr": 24.1,
+          "cons": 89,
+          "funds": [
+            {
+              "id": "tb-xvi",
+              "name": "Thoma Bravo XVI",
+              "irr": 24.1,
+              "vintage": 2023
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hg",
+      "name": "Hg",
+      "hq": "London",
+      "classes": [
+        {
+          "ac": "Buyout",
+          "irr": 22.7,
+          "cons": 90,
+          "funds": [
+            {
+              "id": "hg-saturn-4",
+              "name": "Hg Saturn 4",
+              "irr": 22.7,
+              "vintage": 2023
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "antin",
+      "name": "Antin",
+      "hq": "Paris",
+      "classes": [
+        {
+          "ac": "Infrastructure",
+          "irr": 14.8,
+          "cons": 85,
+          "funds": [
+            {
+              "id": "antin-v",
+              "name": "Antin Infrastructure V",
+              "irr": 14.8,
+              "vintage": 2022
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lexington",
+      "name": "Lexington",
+      "hq": "New York",
+      "classes": [
+        {
+          "ac": "Secondaries",
+          "irr": 13.7,
+          "cons": 88,
+          "funds": [
+            {
+              "id": "lex-xi",
+              "name": "Lexington Capital XI",
+              "irr": 13.7,
+              "vintage": 2022
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "insight",
+      "name": "Insight Partners",
+      "hq": "New York",
+      "classes": [
+        {
+          "ac": "Growth",
+          "irr": 18,
+          "cons": 78,
+          "funds": [
+            {
+              "id": "insight-xiii",
+              "name": "Insight Partners XIII",
+              "irr": 18,
+              "vintage": 2022
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "thrive",
+      "name": "Thrive Capital",
+      "hq": "New York",
+      "classes": [
+        {
+          "ac": "Venture",
+          "irr": 26.5,
+          "cons": 74,
+          "funds": [
+            {
+              "id": "thrive-ix",
+              "name": "Thrive Capital IX",
+              "irr": 26.5,
+              "vintage": 2023
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "index",
+      "name": "Index Ventures",
+      "hq": "London",
+      "classes": [
+        {
+          "ac": "Venture",
+          "irr": 23.1,
+          "cons": 80,
+          "funds": [
+            {
+              "id": "index-xii",
+              "name": "Index Ventures XII",
+              "irr": 23.1,
+              "vintage": 2022
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

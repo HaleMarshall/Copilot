@@ -7024,7 +7024,8 @@ class Component extends DCLogic {
   /* ====================== MANAGER RESEARCH (items 191-198) ====================== */
   /* manager-level dataset — each manager spans one or more asset classes, with all-time (since-inception) net IRR,
      a consistency score and the concrete funds behind it (so a specific case can be picked for a comparison) */
-  MANAGERS(){ return [
+  MANAGERS(){ if(this.DB&&Array.isArray(this.DB.managerTree)&&this.DB.managerTree.length) return this.DB.managerTree; /* review8 — manager firm→funds tree now from the DB `managerTree` atom; inline kept as fallback */
+   return [
     {id:'eqt',name:'EQT',hq:'Stockholm',classes:[
       {ac:'Buyout',irr:19.2,cons:88,funds:[{id:'eqt-ix',name:'EQT IX',irr:21.0,vintage:2021},{id:'eqt-x',name:'EQT X',irr:18.4,vintage:2023},{id:'eqt-xi',name:'EQT XI',irr:0,vintage:2025}]},
       {ac:'Infrastructure',irr:15.1,cons:82,funds:[{id:'eqt-infra-v',name:'EQT Infrastructure V',irr:15.1,vintage:2021}]}]},
