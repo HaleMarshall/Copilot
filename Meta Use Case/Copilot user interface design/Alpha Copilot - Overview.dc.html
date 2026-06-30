@@ -484,6 +484,15 @@ class Component extends DCLogic {
       persona2:'pro', controlOpen:true, navExpanded:false,
       targetMode:'model', optimiseFor:'TVPI', macro:'none',
       welcome:true, actingAs:null, fb:{}, advFlow:'proactive', /* item 225 — advisor Entry Trigger: which of the three flows the advisor is in */
+      /* ===== Advisor flow cockpit (L1/L2/L3 × lifecycle) ===== */
+      advView:'desk',        /* desk (book) → prep (per-client briefing) → cockpit (in-call flow) */
+      advClientId:null,      /* selected investor from advisorBook */
+      advStage:'new', advLevel:'L2', advStep:0, /* lifecycle stage · advice level · step index into the flow */
+      advReact:{},           /* per-call call-for-action reactions {cfaKey:'done'|'skip'} */
+      advCFAextra:0,         /* 'I need more' counter */
+      advPrepGoals:null,     /* editable 3-goal list in the prep view (null = use stage defaults) */
+      advPrepMode:'preset',  /* prepare-for-call input: 'preset' | 'prompt' */
+      advPrepPrompt:'',
       s2strat:'buyout', s2cmp:'peers',
       s3cmp:'peers', s4cmp:'peers', s6cmp:'peers', s7cmp:'peers',
       fvfSel:['eqtx','arespcs'], fvfSearch:'', fvfDensity:'detailed', fvfImpact:'eqtx', fvfPickerOpen:false,
@@ -5311,12 +5320,16 @@ class Component extends DCLogic {
     /* review7 item 1 — condensed to ~half size; item 2 — retitled to the whole Portfolio and content generalised (value, return, allocation target, concentration), not a single strategy */
     const _Pr=(this.DB&&this.DB.portfolio)||{}; const _navTxt=_Pr.navText||'€16.6m'; const _tvpi=_Pr.tvpi||'2.1'; const _qoq=_Pr.qoqPct||'+3.7%';
     const _pmYou=(this.PM&&this.PM.you)||15.7; const _pmTgt=this.myPmTarget();
-    const alphaReadCard=this.card({title:'Alpha’s read on your Portfolio',badge:this.badge('AI','synth'),tone:'alpha',
-      children:h('div',{style:{display:'flex',flexDirection:'column',gap:9}},
-        h('div',{style:{fontSize:12.5,lineHeight:1.5,color:'rgba(255,255,255,.92)'}},
-          'Your book is worth ',h('strong',{key:'v',style:{color:'#fff'}},_navTxt),' at ',h('strong',{key:'t',style:{color:'#fff'}},_tvpi+'x TVPI'),' ('+_qoq+' this quarter), and you’ve filled ',h('strong',{key:'p',style:{color:'#fff'}},_pmYou+'%'),' of your '+_pmTgt+'% private-markets target. Across the book your largest gap is ',h('strong',{key:'u',style:{color:'#fff'}},_under.n+' ('+Math.abs(_under.d)+'pp under)'),' and '+_topHold.n+' is your biggest concentration at '+_topHold.p+'%.'),
-        this.gapCTA('strategy',true)),
-      caption:'A portfolio-wide read — value, return, allocation and concentration — plus a concrete next move.'});
+    /* review8 — Alpha's read condensed to a thin inline banner (was a tall card): one blue band with the read + a standalone suggest button, all in the page header row */
+    const alphaBanner=h('div',{style:{flex:'3 1 480px',minWidth:300,background:'var(--brand)',borderRadius:14,padding:'11px 18px',color:'#fff',display:'flex',flexDirection:'column',justifyContent:'center',gap:5,boxShadow:'0 10px 26px -16px rgba(44,45,254,.65)'}},
+      h('div',{style:{display:'flex',alignItems:'center',gap:8}},
+        h('span',{style:{fontFamily:SF,fontSize:13,fontWeight:600,color:'#fff'}},'Alpha’s read on your Portfolio'),
+        h('span',{style:{fontSize:9,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',background:'rgba(255,255,255,.22)',borderRadius:5,padding:'1px 6px',lineHeight:1.5}},'AI')),
+      h('div',{style:{fontSize:11.5,lineHeight:1.45,color:'rgba(255,255,255,.9)'}},
+        'Your book is worth ',h('strong',{key:'v',style:{color:'#fff'}},_navTxt),' at ',h('strong',{key:'t',style:{color:'#fff'}},_tvpi+'x TVPI'),' ('+_qoq+' this quarter), and you’ve filled ',h('strong',{key:'p',style:{color:'#fff'}},_pmYou+'%'),' of your '+_pmTgt+'% private-markets target. Across the book your largest gap is ',h('strong',{key:'u',style:{color:'#fff'}},_under.n+' ('+Math.abs(_under.d)+'pp under)'),' and '+_topHold.n+' is your biggest concentration at '+_topHold.p+'%.'));
+    const suggestBtn=h('button',{onClick:()=>this.setState({homeDrill:null,homeFocusCat:null,simSuggest:'strategy'}),
+      style:{flex:'1 1 220px',minWidth:200,border:'none',background:'var(--brand)',color:'#fff',borderRadius:14,padding:'12px 20px',fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif',boxShadow:'0 10px 26px -16px rgba(44,45,254,.65)',display:'flex',alignItems:'center',justifyContent:'center',gap:6,textAlign:'center'}},
+      '✦ Suggest opportunities to fill the gaps  →');
     // item 71 — 'Where you're concentrated' box + allocated-vs-committed Z-chart (real deviation data), moved down the page
     const concRows=this.basisPct('strategy'); // for the concentration ranking (current basis)
     const concRanked=Object.keys(concRows).map(k=>{ const s=this.STRATS.find(x=>x[0]===k); return {n:s?s[1]:k, color:s?s[2]:'--data-9', p:concRows[k]||0}; }).filter(r=>r.p>0).sort((a,b)=>b.p-a.p);
@@ -5364,11 +5377,11 @@ class Component extends DCLogic {
       _miniCard('Companies',String(_P.companies||'—')), _miniCard('Countries',String(_P.countries||'—')));
     const portfolioHero=h('div',{style:{display:'flex',gap:14,flexWrap:'wrap',alignItems:'stretch'}}, heroLeft, heroRight);
     /* item 1 (review3) — title with Alpha's read on strategy to its right */
-    const titleBlock=h('div',{style:{flex:'1 1 240px',minWidth:200}},
-      h('div',{style:{fontSize:10.5,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Understand · Portfolio Overview'),
-      h('div',{style:{fontFamily:SF,fontSize:26,fontWeight:600,margin:'3px 0 2px'}},'Portfolio Overview'),
-      h('div',{style:{fontSize:12.5,color:'var(--muted)',lineHeight:1.5,maxWidth:340}},'Your portfolio at a glance — performance, allocation and cash-flow, measured against your own targets.'));
-    const headerRow=h('div',{style:{display:'flex',gap:16,alignItems:'stretch',flexWrap:'wrap'}}, titleBlock, h('div',{style:{flex:'1 1 460px',minWidth:300}}, alphaReadCard));
+    const titleBlock=h('div',{style:{flex:'1 1 230px',minWidth:200,display:'flex',flexDirection:'column',justifyContent:'center'}},
+      h('div',{style:{fontSize:10,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Understand · Portfolio Overview'),
+      h('div',{style:{fontFamily:SF,fontSize:20,fontWeight:600,margin:'2px 0 2px'}},'Portfolio Overview'),
+      h('div',{style:{fontSize:11.5,color:'var(--muted)',lineHeight:1.45,maxWidth:300}},'Your portfolio at a glance — performance, allocation and cash-flow, measured against your own targets.'));
+    const headerRow=h('div',{style:{display:'flex',gap:14,alignItems:'stretch',flexWrap:'wrap'}}, titleBlock, alphaBanner, suggestBtn);
     const col=(children)=>h('div',{style:{display:'flex',flexDirection:'column',gap:16,minWidth:0}}, children);
     /* item 3 (review3) — performance & cash flows on top, asset-allocation charts moved below (vertical, full-width grid) */
     const topTwo=h('div',{style:{display:'grid',gridTemplateColumns:'minmax(0,1fr) minmax(0,1fr)',gap:16,alignItems:'start'}},
@@ -7733,7 +7746,258 @@ class Component extends DCLogic {
     return h('div',{style:{display:'flex',gap:6,flexWrap:'wrap',marginTop:11}}, opts.map(o=>{ const on=sel===o;
       return h('button',{key:o,onClick:()=>this.setFb(id,o),style:{fontSize:11,padding:'4px 10px',borderRadius:999,border:`1px solid ${on?'var(--brand)':'var(--line)'}`,background:on?'var(--brand)':'var(--surface)',color:on?'#fff':'var(--muted)',cursor:'pointer'}}, (o==='Helpful'&&on?'✓ ':'')+o); })); }
   churnPill(c){ const h=this.h; const map={high:['--under','High'],med:['--synthetic','Medium'],low:['--over','Low']}[c]; return h('span',{style:{display:'inline-flex',alignItems:'center',gap:5,fontSize:11,fontWeight:600,color:`var(${map[0]})`}}, h('span',{style:{width:7,height:7,borderRadius:'50%',background:`var(${map[0]})`}}), map[1]); }
-  advisorBody(){
+  /* ============================================================
+     ADVISOR FLOW COCKPIT — L1/L2/L3 × lifecycle, DB-driven flows
+     (entry: desk → prep → in-call cockpit; every page level-gated)
+     ============================================================ */
+  advBook(){ return (this.DB&&Array.isArray(this.DB.advisorBook)&&this.DB.advisorBook)||[]; }
+  advClient(){ const id=this.state.advClientId; return this.advBook().find(c=>c.id===id)||null; }
+  advSelf(){ return (this.DB&&this.DB.advisorSelf)||{name:'Advisor',init:'AD',role:'Relationship Manager'}; }
+  advFlowKey(){ return this.state.advStage+'|'+this.state.advLevel; }
+  advSeq(){ const f=(this.DB&&this.DB.advisorFlows)||{}; return f[this.advFlowKey()]||['execSummary','intake','setTarget','aiThinking','modelPortfolio','future','nextBest','seize']; }
+  advStageMeta(){ const m=(this.DB&&this.DB.advisorMeta)||{}; return m[this.state.advStage]||{objective:'',goals:[]}; }
+  advGoals(){ return this.state.advPrepGoals || this.advStageMeta().goals || []; }
+  advPageMeta(k){ const p=(this.DB&&this.DB.advisorPages)||{}; return p[k]||{title:k,crumb:'',cfa:[],script:''}; }
+  advCurKey(){ const s=this.advSeq(); return s[Math.max(0,Math.min(this.state.advStep,s.length-1))]; }
+  advLvl(a,b,c){ const l=this.state.advLevel; return l==='L1'?a:(l==='L3'?c:b); }
+  /* ---- controls ---- */
+  advOpenClient(id){ const c=this.advBook().find(x=>x.id===id); this.setState({advClientId:id, advStage:(c&&c.stage)||'new', advLevel:(c&&c.level)||'L2', advView:'prep', advPrepGoals:null, advStep:0, advReact:{}, advCFAextra:0, advPrepPrompt:'', advPrepMode:'preset'}); }
+  advEnterCockpit(){ this.setState({advView:'cockpit', advStep:0, advReact:{}, advCFAextra:0}); }
+  advExit(){ this.setState({advView:'desk', advClientId:null}); }
+  advToPrep(){ this.setState({advView:'prep'}); }
+  advStepTo(i){ const s=this.advSeq(); this.setState({advStep:Math.max(0,Math.min(i,s.length-1))}); }
+  advNext(){ this.advStepTo(this.state.advStep+1); }
+  advPrev(){ this.advStepTo(this.state.advStep-1); }
+  advSetLevel(l){ const cur=this.advCurKey(); const f=(this.DB&&this.DB.advisorFlows)||{}; const ns=f[this.state.advStage+'|'+l]||[]; let i=ns.indexOf(cur); if(i<0) i=Math.min(this.state.advStep, Math.max(0,ns.length-1)); this.setState({advLevel:l, advStep:Math.max(0,i)}); }
+  advSetStage(st){ const cur=this.advCurKey(); const f=(this.DB&&this.DB.advisorFlows)||{}; const ns=f[st+'|'+this.state.advLevel]||[]; let i=ns.indexOf(cur); if(i<0) i=0; this.setState({advStage:st, advStep:Math.max(0,i)}); }
+  advReactCFA(k,v){ const r=Object.assign({}, this.state.advReact); r[k]=(r[k]===v?null:v); this.setState({advReact:r}); }
+  advNeedMore(){ this.setState({advCFAextra:this.state.advCFAextra+1}); }
+  advGoalDelete(i){ const g=this.advGoals().slice(); g.splice(i,1); this.setState({advPrepGoals:g}); }
+  advGoalAdd(){ const pool=this.advExtraGoals(); const g=this.advGoals().slice(); const nxt=pool.find(x=>g.indexOf(x)<0); if(nxt){ g.push(nxt); this.setState({advPrepGoals:g}); } }
+  advExtraGoals(){ return ['Introduce the follower / market-news feed','Surface one timely, conviction opportunity','Confirm liquidity headroom for the next call','Position a secondaries allocation','Agree a recurring commitment pace']; }
+  advisorBody(){ const v=this.state.advView; if(v==='cockpit') return this.advCockpit(); if(v==='prep') return this.advPrepView(); return this.advDesk(); }
+  advDesk(){
+    const h=this.h; const SF=this.SF; const self=this.advSelf();
+    const book=this.advBook().slice().sort((a,b)=>(((a.lead&&a.lead.priority)||9)-((b.lead&&b.lead.priority)||9)));
+    const levelChip=(l)=>h('span',{style:{fontSize:10.5,fontWeight:700,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:6,padding:'1px 7px'}},l);
+    const stageChip=(s)=>h('span',{style:{fontSize:10.5,fontWeight:600,color:'var(--muted)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:6,padding:'1px 7px',textTransform:'capitalize'}},s);
+    const kindIcon=(k)=>k==='fund'?'⭐':(k==='news'?'📰':'📊');
+    const av=(x)=>h('div',{style:{width:40,height:40,flex:'0 0 40px',borderRadius:'50%',background:'var(--brand)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:700}},x.init);
+    const row=(x)=>h('div',{key:x.id,style:{display:'flex',gap:14,alignItems:'flex-start',background:'var(--surface)',border:'1px solid var(--line)',borderRadius:13,padding:'15px 16px'}},
+      av(x),
+      h('div',{style:{flex:1,minWidth:0}},
+        h('div',{style:{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap',marginBottom:4}},
+          h('span',{style:{fontFamily:SF,fontSize:15,fontWeight:600}},x.name),
+          x.badge?h('span',{style:{fontSize:10,fontWeight:700,letterSpacing:'.06em',color:'#fff',background:'var(--brand)',borderRadius:5,padding:'1px 7px'}},x.badge):null,
+          levelChip(x.level), stageChip(x.stage),
+          h('span',{style:{fontSize:11.5,color:'var(--muted)'}},x.occupation+' · '+x.investable)),
+        h('div',{style:{fontSize:13,color:'var(--ink)',lineHeight:1.5}}, h('b',{style:{color:'var(--brand)'}},kindIcon(x.lead&&x.lead.kind)+' Why now: '), (x.lead&&x.lead.reason)||'Due a check-in.')),
+      h('button',{onClick:()=>this.advOpenClient(x.id),style:{flex:'0 0 auto',alignSelf:'center',background:'var(--brand)',color:'#fff',border:'none',borderRadius:9,padding:'10px 16px',fontSize:12.5,fontWeight:700,cursor:'pointer'}},'Prepare for call →'));
+    return h('div',{style:{maxWidth:1080,margin:'0 auto',padding:'22px 24px 48px'}},
+      h('div',{style:{display:'flex',alignItems:'baseline',justifyContent:'space-between',gap:12,marginBottom:18,flexWrap:'wrap'}},
+        h('div',null,
+          h('div',{style:{fontSize:10.5,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Advisor · '+self.role),
+          h('div',{style:{fontFamily:SF,fontSize:26,fontWeight:600,margin:'3px 0 2px'}},'Your investor book'),
+          h('div',{style:{fontSize:12.5,color:'var(--muted)',maxWidth:560,lineHeight:1.5}},'Leads needing attention first — a fund they watch-listed opened, a news signal, or a gap to act on. Open one to prepare the call.')),
+        h('div',{style:{display:'flex',alignItems:'center',gap:9}}, h('span',{style:{fontSize:12.5,color:'var(--muted)'}},self.name), h('div',{style:{width:34,height:34,borderRadius:'50%',background:'var(--brand-wash)',color:'var(--brand)',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:700}},self.init))),
+      h('div',{style:{display:'flex',flexDirection:'column',gap:12}}, book.map(row)));
+  }
+  advPrepView(){
+    const h=this.h; const SF=this.SF; const c=this.advClient(); if(!c) return this.advDesk();
+    const meta=this.advStageMeta(); const goals=this.advGoals();
+    const av=h('div',{style:{width:52,height:52,borderRadius:'50%',background:'var(--brand)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontSize:18,fontWeight:700}},c.init);
+    const field=(l,v)=>h('div',{style:{flex:'1 1 120px'}},h('div',{style:{fontSize:10.5,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em'}},l),h('div',{style:{fontFamily:SF,fontSize:15,fontWeight:600,marginTop:2}},v));
+    const presets=['Onboard & first commitment','Annual portfolio review','Reactivate — timely deal','Upsell the next commitment'];
+    const goalCard=(g,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',gap:10,background:'var(--surface)',border:'1px solid var(--line)',borderRadius:10,padding:'11px 13px'}},
+      h('div',{style:{width:22,height:22,flex:'0 0 22px',borderRadius:'50%',background:'var(--brand)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:700}},String(i+1)),
+      h('div',{style:{flex:1,fontSize:13,color:'var(--ink)'}},g),
+      h('button',{onClick:()=>this.advGoalDelete(i),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:7,width:26,height:26,cursor:'pointer',fontSize:13}},'×'));
+    const left=h('div',{style:{flex:'1 1 340px',minWidth:300,display:'flex',flexDirection:'column',gap:14}},
+      this.card({title:'Profile',children:h('div',null,
+        h('div',{style:{display:'flex',gap:14,alignItems:'center',marginBottom:14}}, av, h('div',null,
+          h('div',{style:{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}}, h('span',{style:{fontFamily:SF,fontSize:18,fontWeight:600}},c.name), c.badge?h('span',{style:{fontSize:10,fontWeight:700,color:'#fff',background:'var(--brand)',borderRadius:5,padding:'1px 7px'}},c.badge):null),
+          h('div',{style:{fontSize:12.5,color:'var(--muted)',marginTop:2}},c.occupation+(c.company&&c.company!=='—'?' · '+c.company:'')))),
+        h('div',{style:{display:'flex',gap:16,flexWrap:'wrap'}}, field('Investable',c.investable), field('Age',c.age), field('Risk',c.risk), field('Region',c.region), field('Suggested level',c.level)))}),
+      this.card({title:'Recent call notes',badge:this.badge('AI + advisor','synth'),children:h('div',{style:{display:'flex',flexDirection:'column',gap:8}}, (c.notes||[]).map((n,i)=>h('div',{key:i,style:{display:'flex',gap:8,fontSize:12.5,color:'var(--ink)',lineHeight:1.45}}, h('span',{style:{color:'var(--brand)'}},'•'), n))),caption:'Captured from prior calls and the Ask-Alpha chat.'}));
+    const right=h('div',{style:{flex:'1 1 340px',minWidth:300,display:'flex',flexDirection:'column',gap:14}},
+      this.card({title:'Prepare for call',children:h('div',null,
+        h('div',{style:{marginBottom:10}}, this.seg([{label:'Use a preset',value:'preset'},{label:'Ask Alpha',value:'prompt'}], this.state.advPrepMode, v=>this.setState({advPrepMode:v}),{sm:true})),
+        this.state.advPrepMode==='prompt'
+          ? h('input',{value:this.state.advPrepPrompt,onInput:e=>this.setState({advPrepPrompt:e.target.value}),placeholder:'What is this call for?',style:{width:'100%',boxSizing:'border-box',border:'1px solid var(--line)',borderRadius:9,padding:'10px 12px',fontSize:13}})
+          : h('div',{style:{display:'flex',gap:8,flexWrap:'wrap'}}, presets.map((p,i)=>h('button',{key:i,onClick:()=>this.setState({advPrepPrompt:p}),style:{border:'1px solid '+(this.state.advPrepPrompt===p?'var(--brand)':'var(--line)'),background:this.state.advPrepPrompt===p?'var(--brand-wash)':'var(--surface)',color:'var(--ink)',borderRadius:999,padding:'7px 12px',fontSize:12,cursor:'pointer'}},p)))),
+        caption:'Sales prep: '+(c.prep||'')}),
+      this.card({title:'Top 3 goals for this call',badge:this.badge('Ask Alpha','synth'),right:h('div',{style:{display:'flex',gap:6}}, h('button',{onClick:()=>this.advGoalAdd(),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:8,padding:'5px 10px',fontSize:11.5,fontWeight:600,cursor:'pointer'}},'+ Suggest'), h('button',{onClick:()=>this.setState({advPrepGoals:null}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:8,padding:'5px 10px',fontSize:11.5,cursor:'pointer'}},'Reset')),
+        children:h('div',{style:{display:'flex',flexDirection:'column',gap:8}}, goals.map(goalCard)),
+        caption:'Keep the ones you like, delete the rest and Alpha suggests more. Objective: '+meta.objective}));
+    return h('div',{style:{maxWidth:1040,margin:'0 auto',padding:'20px 24px 48px'}},
+      h('div',{style:{display:'flex',alignItems:'center',gap:10,marginBottom:14}},
+        h('button',{onClick:()=>this.advExit(),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:8,padding:'7px 12px',fontSize:12.5,cursor:'pointer'}},'← Book'),
+        h('div',{style:{fontFamily:SF,fontSize:22,fontWeight:600}},'Call preparation')),
+      h('div',{style:{display:'flex',gap:16,flexWrap:'wrap',marginBottom:16}}, left, right),
+      h('button',{onClick:()=>this.advEnterCockpit(),style:{width:'100%',border:'none',background:'var(--brand)',color:'#fff',borderRadius:12,padding:'15px',fontSize:15,fontWeight:700,cursor:'pointer',boxShadow:'0 12px 30px -16px rgba(44,45,254,.7)'}},'Enter investor view →'));
+  }
+  advCFAextraItems(){ return [{t:'Surface a timely opportunity',tag:'→ Opportunities · Deal'},{t:'Position the follower feed',tag:'→ Follower · Opt-in'},{t:'Check liquidity headroom',tag:'→ Profile · Liquidity'}]; }
+  advCockpit(){
+    const h=this.h; const SF=this.SF; const c=this.advClient()||{name:'Investor',init:'IN'}; const self=this.advSelf();
+    const seq=this.advSeq(); const step=Math.max(0,Math.min(this.state.advStep,seq.length-1)); const key=seq[step]; const pm=this.advPageMeta(key); const meta=this.advStageMeta(); const goals=this.advGoals();
+    const topChip=(t)=>h('span',{style:{fontSize:11,color:'rgba(255,255,255,.82)',background:'rgba(255,255,255,.1)',border:'1px solid rgba(255,255,255,.16)',borderRadius:6,padding:'2px 8px'}},t);
+    const dseg=(opts,val,on)=>h('div',{style:{display:'inline-flex',background:'rgba(255,255,255,.08)',border:'1px solid rgba(255,255,255,.16)',borderRadius:9,padding:2}}, opts.map(o=>h('button',{key:o.value,onClick:()=>on(o.value),style:{border:'none',background:val===o.value?'var(--brand)':'transparent',color:val===o.value?'#fff':'rgba(255,255,255,.7)',borderRadius:7,padding:'5px 11px',fontSize:11.5,fontWeight:700,cursor:'pointer'}},o.label)));
+    const labelled=(l,el)=>h('div',{style:{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:3}}, h('span',{style:{fontSize:9,letterSpacing:'.1em',textTransform:'uppercase',color:'rgba(255,255,255,.5)'}},l), el);
+    const topbar=h('div',{style:{height:62,flex:'0 0 62px',background:'var(--navy)',color:'#fff',display:'flex',alignItems:'center',gap:16,padding:'0 18px',borderBottom:'1px solid rgba(255,255,255,.1)'}},
+      h('div',{style:{display:'flex',alignItems:'center',gap:9}}, h('div',{style:{width:30,height:30,borderRadius:8,background:'var(--brand)',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:700,fontSize:12}},'Aα'), h('div',null, h('div',{style:{fontSize:13,fontWeight:700,fontFamily:SF}},'AskAlpha'), h('div',{style:{fontSize:9,letterSpacing:'.1em',color:'rgba(255,255,255,.55)'}},'ADVISOR COCKPIT'))),
+      h('div',{style:{width:1,height:30,background:'rgba(255,255,255,.14)'}}),
+      h('div',{style:{display:'flex',alignItems:'center',gap:10,minWidth:0}}, h('div',{style:{width:34,height:34,borderRadius:'50%',background:'var(--brand)',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:700,fontSize:13}},c.init),
+        h('div',{style:{minWidth:0}}, h('div',{style:{display:'flex',alignItems:'center',gap:7,flexWrap:'wrap'}}, h('span',{style:{fontFamily:SF,fontSize:14,fontWeight:700}},c.name), c.badge?h('span',{style:{fontSize:9,fontWeight:700,color:'#fff',background:'var(--over)',borderRadius:4,padding:'1px 6px'}},c.badge):null, h('span',{style:{fontSize:11,color:'rgba(255,255,255,.7)'}},'Investable '+(c.investable||'—'))),
+          h('div',{style:{display:'flex',gap:6,marginTop:3,flexWrap:'wrap'}}, topChip('Age '+(c.age||'—')), topChip('Risk: '+(c.risk||'—')), c.occupation?topChip(c.occupation):null, c.region?topChip(c.region):null))),
+      h('div',{style:{marginLeft:'auto',display:'flex',alignItems:'center',gap:16}},
+        h('div',{style:{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:2,background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.14)',borderRadius:8,padding:'5px 10px'}}, h('span',{style:{fontSize:8.5,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(255,255,255,.45)'}},'Grounded'), h('span',{style:{fontSize:11,fontWeight:600,color:'rgba(255,255,255,.85)'}},'snap_8f3c · live data')),
+        labelled('Journey', dseg([{label:'Pre Gate',value:'pregate'},{label:'New',value:'new'},{label:'Existing',value:'existing'},{label:'Inactive',value:'inactive'}], this.state.advStage, v=>this.advSetStage(v))),
+        labelled('Advice level', dseg([{label:'L1',value:'L1'},{label:'L2',value:'L2'},{label:'L3',value:'L3'}], this.state.advLevel, v=>this.advSetLevel(v))),
+        h('div',{style:{width:1,height:30,background:'rgba(255,255,255,.14)'}}),
+        h('div',{style:{textAlign:'right'}}, h('div',{style:{fontSize:12.5,fontWeight:600}},self.name), h('div',{style:{fontSize:10,color:'rgba(255,255,255,.55)'}},self.role)),
+        h('button',{onClick:()=>this.advToPrep(),style:{border:'1px solid rgba(255,255,255,.3)',background:'rgba(255,255,255,.1)',color:'#fff',borderRadius:8,padding:'6px 11px',fontSize:11.5,cursor:'pointer'}},'Exit')));
+    const goalsBox=h('div',{style:{background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:12,padding:'13px 14px',marginBottom:12}},
+      h('div',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--brand-ink)',marginBottom:8}},'Top 3 goals for this call'),
+      h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, goals.slice(0,3).map((g,i)=>h('div',{key:i,style:{display:'flex',gap:8,alignItems:'flex-start',fontSize:12,color:'var(--ink)',lineHeight:1.35}}, h('span',{style:{width:17,height:17,flex:'0 0 17px',borderRadius:'50%',background:'var(--brand)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700}},String(i+1)), g))));
+    const objChip=h('div',{style:{display:'flex',alignItems:'center',gap:7,marginBottom:12,flexWrap:'wrap'}}, h('span',{style:{fontSize:9,fontWeight:700,letterSpacing:'.06em',color:'#fff',background:'var(--brand)',borderRadius:5,padding:'2px 7px'}},'OBJECTIVE'), h('span',{style:{fontSize:12,color:'var(--ink)',lineHeight:1.35}},meta.objective));
+    const prog=(step+1)/seq.length;
+    const stepBox=h('div',{style:{marginBottom:12}},
+      h('div',{style:{fontSize:10,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)'}},'Step '+(step+1)+' of '+seq.length+' · '+this.state.advStage.toUpperCase()),
+      h('div',{style:{fontFamily:SF,fontSize:18,fontWeight:600,margin:'2px 0 8px'}},pm.title),
+      h('div',{style:{height:5,background:'var(--line)',borderRadius:3,overflow:'hidden'}}, h('div',{style:{width:(prog*100)+'%',height:'100%',background:'var(--brand)'}})));
+    const navBtns=h('div',{style:{display:'flex',gap:8,marginBottom:14}},
+      h('button',{onClick:()=>this.advPrev(),style:{flex:'0 0 auto',border:'1px solid var(--line)',background:'var(--surface)',color:step===0?'var(--line)':'var(--ink)',borderRadius:9,padding:'10px 14px',fontSize:14,cursor:step===0?'default':'pointer'}},'←'),
+      h('button',{onClick:()=>this.advNext(),style:{flex:1,border:'none',background:'var(--brand)',color:'#fff',borderRadius:9,padding:'10px',fontSize:13.5,fontWeight:700,cursor:step===seq.length-1?'default':'pointer',opacity:step===seq.length-1?.5:1}},'Next  →'));
+    const cfaList=(pm.cfa||[]).concat(this.advCFAextraItems().slice(0,this.state.advCFAextra));
+    const cfaCard=(cf,i)=>{ const kk=key+':'+i; const r=this.state.advReact[kk];
+      return h('div',{key:i,style:{border:'1px solid '+(r==='done'?'var(--over)':'var(--line)'),background:'var(--surface)',borderRadius:11,padding:'11px 12px',marginBottom:9,opacity:r==='skip'?.55:1}},
+        h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8}}, h('span',{style:{fontSize:12.5,fontWeight:600,color:'var(--ink)'}},cf.t), h('span',{style:{fontSize:13,color:'var(--muted)'}},'›')),
+        cf.tag?h('div',{style:{fontSize:10.5,color:'var(--brand-ink)',marginTop:4}},cf.tag):null,
+        h('div',{style:{display:'flex',alignItems:'center',gap:6,marginTop:8}}, h('span',{style:{fontSize:10.5,color:'var(--muted)',marginRight:'auto'}},'Reaction?'),
+          h('button',{onClick:()=>this.advReactCFA(kk,'skip'),style:{border:'1px solid var(--line)',background:r==='skip'?'var(--surface-2)':'var(--surface)',color:'var(--under)',borderRadius:7,width:28,height:26,cursor:'pointer'}},'✕'),
+          h('button',{onClick:()=>this.advReactCFA(kk,'done'),style:{border:'1px solid '+(r==='done'?'var(--over)':'var(--line)'),background:r==='done'?'var(--over)':'var(--surface)',color:r==='done'?'#fff':'var(--over)',borderRadius:7,width:28,height:26,cursor:'pointer'}},'+'))); };
+    const cfaSection=h('div',{style:{marginBottom:14}},
+      h('div',{style:{display:'flex',alignItems:'baseline',justifyContent:'space-between',marginBottom:8}}, h('span',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Calls for action'), h('span',{style:{fontSize:9.5,color:'var(--muted)'}},'tap to open · mark ✕ / +')),
+      cfaList.length?cfaList.map(cfaCard):h('div',{style:{fontSize:12,color:'var(--muted)',padding:'4px 0 8px'}},'No calls for action on this step.'),
+      h('button',{onClick:()=>this.advNeedMore(),style:{width:'100%',border:'1px dashed var(--brand-tint-3)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:9,padding:'9px',fontSize:12,fontWeight:600,cursor:'pointer',marginTop:2}},'I need more (+1)'));
+    const scriptBox=h('div',null,
+      h('div',{style:{display:'flex',alignItems:'center',gap:7,marginBottom:7,flexWrap:'wrap'}}, h('span',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Advisor script'), h('span',{style:{fontSize:9,fontWeight:700,color:'var(--over)',background:'rgba(45,143,111,.12)',borderRadius:5,padding:'1px 6px'}},'COMPLIANCE-NEUTRALISED')),
+      h('div',{style:{fontSize:12.5,color:'var(--ink)',lineHeight:1.55,fontStyle:'italic'}},pm.script));
+    const rail=h('div',{style:{flex:'0 0 320px',width:320,background:'var(--surface)',borderRight:'1px solid var(--line)',height:'100%',overflow:'auto',padding:'16px 16px 28px'}},
+      h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14}}, h('span',{style:{fontFamily:SF,fontSize:15,fontWeight:700}},'Moonfare'), h('span',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.06em',color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:5,padding:'2px 7px'}},'ADVISOR')),
+      goalsBox, objChip, stepBox, navBtns, h('div',{style:{height:1,background:'var(--line)',margin:'2px 0 14px'}}), cfaSection, h('div',{style:{height:1,background:'var(--line)',margin:'2px 0 14px'}}), scriptBox);
+    const crumb=h('div',{style:{display:'flex',alignItems:'center',gap:8,fontSize:11.5,color:'var(--muted)',marginBottom:16,flexWrap:'wrap'}}, h('span',{style:{fontFamily:SF,fontWeight:600,color:'var(--ink)'}},'Moonfare'), h('span',{style:{color:'var(--over)'}},'●'), h('span',null,'Canvas · '+this.state.advLevel+'  ·  '+pm.crumb));
+    const canvas=h('div',{style:{flex:1,minWidth:0,height:'100%',overflow:'auto',background:'var(--bg)',padding:'18px 26px 48px'}}, crumb, this.advPageRender(key));
+    return h('div',{style:{position:'fixed',inset:0,zIndex:60,display:'flex',flexDirection:'column',background:'var(--bg)'}}, topbar, h('div',{style:{flex:1,display:'flex',minHeight:0}}, rail, canvas));
+  }
+  advPageRender(key){
+    const h=this.h; const SF=this.SF; const c=this.advClient()||{}; const L=this.state.advLevel; const lvl=(a,b,cc)=>this.advLvl(a,b,cc);
+    const P=(this.DB&&this.DB.portfolio)||{}; const pm=this.advPageMeta(key);
+    const wrap=(kids)=>h('div',{style:{maxWidth:1000,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}, kids);
+    const head=(t,s)=>h('div',null, h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:600,letterSpacing:'-.01em'}},t), s?h('div',{style:{fontSize:13,color:'var(--muted)',marginTop:3,lineHeight:1.5,maxWidth:680}},s):null);
+    const lvlNote=(t)=>h('div',{style:{fontSize:11,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:8,padding:'7px 11px',display:'inline-block'}},t);
+    const strat=this.STRATS||[]; const mixYou=(this.MIX&&this.MIX.you)||{}; const mixModel=this.modelMix()||{}; const mixPlat=(this.DB&&this.DB.mix&&this.DB.mix.platform)||{};
+    const toSlices=(mix)=>strat.map(kv=>({name:kv[1],p:mix[kv[0]]||0,color:kv[2]})).filter(s=>s.p>0);
+    const catLabels=strat.map(kv=>kv[1]); const catVals=(mix)=>strat.map(kv=>mix[kv[0]]||0);
+    switch(key){
+      case 'execSummary': {
+        const args=[{t:'Investable wealth likely understated',d:'A profile like '+(c.name||'this client')+'’s typically treats more as investable — worth confirming.'},
+          {t:'Behind on private-markets allocation',d:'Filled '+(this.PM&&this.PM.you||15.7)+'% vs a '+(this.myPmTarget())+'% target — clear room to deploy.'},
+          {t:'Lagging the peer group',d:'Comparable investors allocate more to private markets — a concrete, motivating gap.'},
+          {t:'No / low AI & Tech exposure',d:'A timely theme the client has signalled interest in.'},
+          {t:'Strong on currency/region — lead with a win',d:'Well-positioned here; open on strength before the gaps.'}];
+        const show=Math.min(3+this.state.advCFAextra, args.length);
+        return wrap([ head('Executive summary — what to achieve','For you, not the client. Lead with the strongest case the data makes. Objective: '+this.advStageMeta().objective+'.'),
+          this.card({title:'The case, in three moves',badge:this.badge('AI · advisor-only','synth'),children:h('div',{style:{display:'flex',flexDirection:'column',gap:9}}, args.slice(0,show).map((a,i)=>h('div',{key:i,style:{display:'flex',gap:11,alignItems:'flex-start',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:10,padding:'11px 13px'}}, h('span',{style:{width:22,height:22,flex:'0 0 22px',borderRadius:'50%',background:'var(--brand)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:700}},String(i+1)), h('div',null, h('div',{style:{fontSize:13.5,fontWeight:600}},a.t), h('div',{style:{fontSize:12,color:'var(--muted)',marginTop:2,lineHeight:1.45}},a.d))))),
+            caption:'Compliance-neutralised — these are check-list prompts, not advice. Use “I need more” in the rail to reveal additional arguments.'}) ]);
+      }
+      case 'intake': case 'intakeMin': {
+        const minimal=key==='intakeMin';
+        const fields=[['Investable wealth',c.investable||'—'],['Age band',c.age||'—'],['Risk class',c.risk||'—']].concat(minimal?[]:[['Region',c.region||'—'],['Profession',c.occupation||'—'],['Private-markets target',this.myPmTarget()+'%']]);
+        return wrap([ head(pm.title, minimal?'Just enough to show a tailored model — the rest comes after accreditation.':'Most of this is prefilled from onboarding — confirm it and capture what’s missing (region & profession).'),
+          this.card({title:'Profile',children:h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))',gap:14}}, fields.map((f,i)=>h('div',{key:i},h('div',{style:{fontSize:10.5,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em'}},f[0]),h('div',{style:{fontFamily:SF,fontSize:16,fontWeight:600,marginTop:3}},f[1]))))}),
+          (c.notes&&c.notes.length)?this.card({title:'Notes from our conversation',badge:this.badge('AI','synth'),children:h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, c.notes.map((n,i)=>h('div',{key:i,style:{display:'flex',gap:8,fontSize:13,lineHeight:1.45}},h('span',{style:{color:'var(--brand)'}},'•'),n))),caption:'Captured by Ask Alpha — the client sees these too, so they know they were heard.'}):null ]);
+      }
+      case 'setTarget': case 'confirmTarget': {
+        const confirm=key==='confirmTarget';
+        return wrap([ head(pm.title, confirm?'Prefilled from what we know — confirm nothing’s changed before we model.':'The private-markets target we’d suggest for this profile.'),
+          h('div',{style:{display:'flex',gap:16,flexWrap:'wrap'}},
+            this.card({title:'Private-markets target',style:{flex:'1 1 260px'},children:h('div',{style:{display:'flex',alignItems:'baseline',gap:10}}, h('div',{style:{fontFamily:SF,fontSize:46,fontWeight:700,color:'var(--brand)'}},this.myPmTarget()+'%'), h('div',{style:{fontSize:12.5,color:'var(--muted)'}},'of investable wealth')),caption:'Set from age, risk, horizon, wealth & profession.'}),
+            this.card({title:'Suggested strategy mix',style:{flex:'1 1 320px'},children:this.donutNamed(toSlices(mixModel),150,'Model','mix')})),
+          lvl(lvlNote('L1 · Euro only · strategy-level only — keep it simple.'), lvlNote('L2 · strategy + region/currency/sector adjustable in the simulator.'), lvlNote('L3 · all dimensions open, full simulator toggles.')) ]);
+      }
+      case 'aiThinking': return h('div',{style:{maxWidth:680,margin:'40px auto',textAlign:'center',display:'flex',flexDirection:'column',alignItems:'center',gap:18}},
+        h('div',{style:{width:74,height:74,borderRadius:'50%',border:'4px solid var(--brand-wash)',borderTopColor:'var(--brand)',animation:'spin 1s linear infinite'}}),
+        h('style',null,'@keyframes spin{to{transform:rotate(360deg)}}'),
+        h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:600}},'Building your tailored model…'),
+        h('div',{style:{fontSize:13.5,color:'var(--muted)',lineHeight:1.55,maxWidth:460}},'This is you — and this is what we think your tailored target portfolio should look like, based on your profile, risk and horizon.'),
+        h('button',{onClick:()=>this.advNext(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'11px 20px',fontSize:13.5,fontWeight:700,cursor:'pointer'}},'See the model  →'));
+      case 'modelPortfolio': return wrap([ head('Your tailored model portfolio','Diversified across the strategies that fit your profile.'),
+        h('div',{style:{display:'flex',gap:16,flexWrap:'wrap'}}, this.card({title:'Strategy mix',style:{flex:'1 1 320px'},children:this.donutNamed(toSlices(mixModel),160,'Model','mix')}),
+          this.card({title:'At a glance',style:{flex:'1 1 240px'},children:this.kpiTiles([['Strategies',String(toSlices(mixModel).length)],['PM target',this.myPmTarget()+'%'],['Horizon',(c.age?'long':'long')+'-term']])})) ]);
+      case 'modelExisting': return wrap([ head('Model vs your portfolio today','The gaps between the two are exactly what we can act on.'),
+        h('div',{style:{display:'flex',gap:16,flexWrap:'wrap'}}, this.card({title:'You today',style:{flex:'1 1 300px'},children:this.donutNamed(toSlices(mixYou),150,'You','mix')}), this.card({title:'Recommended model',style:{flex:'1 1 300px'},children:this.donutNamed(toSlices(mixModel),150,'Model','mix')})) ]);
+      case 'overview': {
+        const tiles=this.kpiTiles([['Portfolio value',P.navText||'€16.6m'],['TVPI',(P.tvpi||'2.1')+'x'],['Committed',P.committed||'€20.5m'],['Funds',String(P.fundsHeld||8)]]);
+        const dims=lvl(
+          [],
+          [['Strategy',mixYou],['Platform',mixPlat]].map(([t,m],i)=>this.card({key:i,title:t+' mix',style:{flex:'1 1 240px'},children:this.donutNamed(toSlices(m),130,t,'mix')})),
+          [['Strategy',mixYou],['Platform',mixPlat],['Model',mixModel]].map(([t,m],i)=>this.card({key:i,title:t+' mix',style:{flex:'1 1 220px'},children:this.donutNamed(toSlices(m),120,t,'mix')})));
+        return wrap([ head('Your portfolio — as it stands', lvl('A clean summary — no deep detail.','Strategy, sector, region & currency — the dimensions that matter.','Full detail: funds, companies, countries, GPs and currency exposure.')),
+          this.card({title:'Headline',children:tiles}),
+          dims.length?h('div',{style:{display:'flex',gap:16,flexWrap:'wrap'}}, dims):null,
+          L==='L3'?lvlNote('L3 · drill into funds, underlying companies, countries, GPs and FX — the Bloomberg view.'):null ]);
+      }
+      case 'changesSince': return wrap([ head('Since our last conversation','The highlights worth walking through.'),
+        this.card({title:'What’s changed',badge:this.badge('talking points','synth'),children:h('div',{style:{display:'flex',flexDirection:'column',gap:10}}, [['📈','Databricks marked up','An outperformer in your book drove a quarter-on-quarter gain.'],['🤖','Heavy activity in AI & Tech','Several peers and top performers added exposure this quarter.'],['💶','Distribution received','Capital returned that we can put back to work.']].map((x,i)=>h('div',{key:i,style:{display:'flex',gap:11,alignItems:'flex-start'}}, h('span',{style:{fontSize:18}},x[0]), h('div',null, h('div',{style:{fontSize:13.5,fontWeight:600}},x[1]), h('div',{style:{fontSize:12,color:'var(--muted)',marginTop:2,lineHeight:1.45}},x[2])))))}) ]);
+      case 'peerComparison': return wrap([ head('You vs your peers','People with a profile like yours typically allocate quite differently.'),
+        this.card({title:'Private-markets allocation',children:this.groupedBars(['You','Peers','Your target'],[{name:'%',color:'--data-1',vals:[(this.PM&&this.PM.you)||15.7,(this.DB&&this.DB.peer&&this.DB.peer.baseMedian)||8.9,this.myPmTarget()]}]),caption:'Where you sit against comparable investors — and your own target.'}) ]);
+      case 'multiComparison': { const series=[{name:'You',color:'--data-1',vals:catVals(mixYou)},{name:'Platform',color:'--data-7',vals:catVals(mixPlat)},{name:'Model',color:'--data-5',vals:catVals(mixModel)}]; if(L==='L3'){ const endow=(this.DB&&this.DB.endowments&&this.DB.endowments.harvard)||{}; series.push({name:'Endowments',color:'--data-8',vals:strat.map(kv=>endow[kv[0]]||0)}); }
+        return wrap([ head('Compare — peers, platform, model'+(L==='L3'?', endowments':''), lvl('','You against the platform and our model.','The full lens: platform, model, endowments and top-10% — the institutional view.')),
+          this.card({title:'Strategy allocation (%)',children:this.groupedBars(catLabels,series),caption:'Higher bars = more weight to that strategy.'}) ]); }
+      case 'compareToCurrent': { const rows=strat.map(kv=>({label:kv[1],value:+(((mixModel[kv[0]]||0)-(mixYou[kv[0]]||0)).toFixed(1)),color:kv[2]})).filter(r=>Math.abs(r.value)>=1).sort((a,b)=>Math.abs(b.value)-Math.abs(a.value));
+        return wrap([ head('Suggested vs your current portfolio','The deltas are the conversation — positive = the model wants more.'),
+          this.card({title:'Gap to model (pp)',children:this.miniZ(rows.map(r=>({l:r.label,v:r.value,color:r.color}))),caption:'Where you’re under- or over-weight versus the recommended model.'}) ]); }
+      case 'future': return wrap([ head('Your future — commitments & J-curve','If we commit at this pace, here’s how the portfolio builds and pays out.'),
+        h('div',{style:{display:'flex',gap:16,flexWrap:'wrap'}},
+          this.card({title:'Commitment plan',style:{flex:'1 1 300px'},children:this.kpiTiles([['Per year',c.investable&&c.investable.indexOf('5m')>=0?'€0.25m':'€1.25m'],['Over','10 yrs'],['Recycle','100%']]),caption:'Plan your commitments, recycle rate and horizon.'}),
+          this.card({title:'Potential returns',style:{flex:'1 1 320px'},children:this.fAxisLine([{name:'Net cash',color:'--data-1',main:true,vals:this.vz(0,[-0.6,-1.0,-0.7,-0.1,0.6,1.4,2.4])}],['Y1','Y2','Y3','Y4','Y5','Y6','Y7'],{H:170,fmt:v=>'€'+v+'m'}),caption:'The J-curve — early calls, later distributions.'})) ]);
+      case 'nextBest': case 'nextBestHints': { const hints=key==='nextBestHints'; const items=[['1','Buy-out — the core building block','Start here: the largest, most proven block of a private-markets portfolio.'],['2','AI & Tech','A timely theme you signalled interest in — don’t miss the cycle.'],['3','Anthropic IPO access','A capacity-constrained opportunity we can offer right now.']];
+        return wrap([ head(hints?'A few ideas to get started':'Next best action — recommended sequence', hints?'Once your account’s set up, this is roughly the sequence we’d walk through.':'The sequence I’d suggest — start with what matters most for you.'),
+          h('div',{style:{display:'flex',flexDirection:'column',gap:12}}, items.map((it,i)=>this.card({key:i,title:it[1],children:h('div',{style:{fontSize:13,color:'var(--ink)',lineHeight:1.5}},it[2]),
+            right: hints?null:h('button',{onClick:()=>this.advStepTo(this.state.advStep+1),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'8px 13px',fontSize:12,fontWeight:700,cursor:'pointer'}},'Open  →')}))),
+          lvl(lvlNote('L1 · portfolio products only — no individual funds or direct deals.'), lvlNote('L2 · portfolio products + individual funds (toggle).'), lvlNote('L3 · full universe incl. direct deals & co-invest.')) ]);
+      }
+      case 'simTarget': case 'simExisting': case 'simFull': case 'targetSimulator': return wrap([ head(pm.title, lvl('Nudge the strategy mix and watch your portfolio update — strategy level only.','Adjust strategy, region, currency & sector and compare against peers/model.','Every dimension open — strategy, region, currency, sector, vintage — full toggles.')),
+        h('div',{style:{display:'flex',gap:16,flexWrap:'wrap'}}, this.card({title:'Adjusted mix',style:{flex:'1 1 320px'},children:this.donutNamed(toSlices(mixModel),150,'Target','mix')}),
+          this.card({title:'Dimensions',style:{flex:'1 1 240px'},children:h('div',{style:{display:'flex',flexWrap:'wrap',gap:7}}, lvl(['Strategy'],['Strategy','Region','Currency','Sector'],['Strategy','Region','Currency','Sector','Vintage','Format']).map((d,i)=>h('span',{key:i,style:{fontSize:12,fontWeight:600,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:999,padding:'5px 11px'}},d))),caption:lvl('Strategy only at L1.','Comparison world open at L2.','All dimensions at L3.')})) ]);
+      case 'managerComparison': { const M=(this.DB&&this.DB.managers)||{}; const rows=Object.keys(M).slice(0,8).map(k=>Object.assign({id:k},M[k]));
+        const th=(t)=>h('th',{style:{textAlign:'left',padding:'8px 10px',fontSize:10.5,textTransform:'uppercase',letterSpacing:'.04em',color:'var(--muted)',borderBottom:'2px solid var(--line)'}},t);
+        const td=(v)=>h('td',{style:{padding:'9px 10px',borderBottom:'1px solid var(--line)',fontSize:12.5}},v);
+        return wrap([ head('Manager comparison','For your level — managers head-to-head on IRR, consistency, delivery and DPI.'),
+          this.card({title:'Manager universe',children:h('table',{style:{width:'100%',borderCollapse:'collapse'}}, h('thead',null,h('tr',null,th('Manager'),th('AUM'),th('MOIC'),th('Avg DPI'),th('Top-Q %'),th('Funds'))), h('tbody',null, rows.map(r=>h('tr',{key:r.id}, td(h('b',null,(r.offering||r.id).split(' (')[0])), td(r.aum||'—'), td((r.moic||'—')+'x'), td(r.avgDpi||'—'), td((r.topQ||'—')+'%'), td(String(r.nFunds||'—'))))))}) ]); }
+      case 'fundComparison': { const O=(this.DB&&this.DB.offerings)||[];
+        const th=(t)=>h('th',{style:{textAlign:'left',padding:'8px 10px',fontSize:10.5,textTransform:'uppercase',letterSpacing:'.04em',color:'var(--muted)',borderBottom:'2px solid var(--line)'}},t);
+        const td=(v)=>h('td',{style:{padding:'9px 10px',borderBottom:'1px solid var(--line)',fontSize:12.5}},v);
+        return wrap([ head('Fund comparison','The specific funds head-to-head — the detail you’d expect.'),
+          this.card({title:'Open & pipeline funds',children:h('table',{style:{width:'100%',borderCollapse:'collapse'}}, h('thead',null,h('tr',null,th('Fund'),th('Manager'),th('Strategy'),th('Size'),th('Min'),th('Status'))), h('tbody',null, O.slice(0,8).map(f=>h('tr',{key:f.id}, td(h('b',null,f.name)), td(f.mgr), td(f.strat), td(f.size||'—'), td(f.min||'—'), td(h('span',{style:{fontSize:11,fontWeight:700,color:f.status==='open'?'var(--over)':'var(--muted)'}},(f.status||'').toUpperCase()))))))}) ]); }
+      case 'opportunities': case 'missedOut': { const O=(this.DB&&this.DB.offerings)||[]; const missed=key==='missedOut';
+        const cardOf=(f)=>this.card({key:f.id,title:f.name,style:{flex:'1 1 300px'},badge:this.badge((f.status||'open').toUpperCase(),f.status==='open'?'conf':'synth'),children:h('div',{style:{fontSize:12.5,color:'var(--ink)',lineHeight:1.5}}, f.mgr+' · '+f.strat+' · '+(f.region||''), h('div',{style:{marginTop:6,color:'var(--muted)'}},'Size '+(f.size||'—')+' · Min '+(f.min||'—'))),
+          right:h('button',{onClick:()=>this.advStepTo(this.state.advStep+1),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'7px 12px',fontSize:12,fontWeight:700,cursor:'pointer'}},missed?'Catch up →':'Seize →')});
+        return wrap([ head(missed?'What you missed — and what’s next':'Opportunities to act on now', missed?'You’ve been away a while — here’s what moved, and what’s live right now.':'Curated, conviction opportunities — the best of the platform.'),
+          missed?this.card({title:'Recently closed (missed)',children:h('div',{style:{fontSize:13,color:'var(--ink)',lineHeight:1.6}},'Databricks · Anthropic early access — both strong, both now closed. Let’s make sure you don’t miss the next one.'),tone:'alpha'}):null,
+          h('div',{style:{display:'flex',gap:16,flexWrap:'wrap'}}, O.slice(0,4).map(cardOf)) ]); }
+      case 'seize': return wrap([ head('Seize this opportunity','Reserve interest now — you’ll be first in line when it opens. No commitment yet.'),
+        this.card({title:'Reserve of interest',tone:'alpha',children:h('div',{style:{display:'flex',flexDirection:'column',gap:12}}, h('div',{style:{fontSize:14,lineHeight:1.55,color:'rgba(255,255,255,.92)'}},'Shall I reserve your interest? You’ll get a note the moment the allocation opens — and we’ll line up the paperwork so you don’t miss the window.'),
+          h('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}}, h('button',{onClick:()=>this.advNext(),style:{border:'none',background:'#fff',color:'var(--brand-ink)',borderRadius:9,padding:'11px 18px',fontSize:13.5,fontWeight:700,cursor:'pointer'}},'Reserve interest →'), h('button',{onClick:()=>this.advNext(),style:{border:'1px solid rgba(255,255,255,.5)',background:'transparent',color:'#fff',borderRadius:9,padding:'11px 18px',fontSize:13.5,fontWeight:600,cursor:'pointer'}},'Request allocation')))}) ]);
+      case 'follower': return wrap([ head('Follow what matters','Stay close between calls — the best way to keep the relationship warm.'),
+        this.card({title:'Opt-in',children:h('div',{style:{display:'flex',flexDirection:'column',gap:10}}, [['Your peer group','See what comparable investors are committing to.'],['Top-10% performers','Follow the platform’s strongest allocators.'],['Market & fund news','Alerts on your funds and timely themes.']].map((x,i)=>h('label',{key:i,style:{display:'flex',gap:11,alignItems:'flex-start',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:10,padding:'11px 13px',cursor:'pointer'}}, h('input',{type:'checkbox',defaultChecked:i<2,style:{marginTop:3}}), h('div',null,h('div',{style:{fontSize:13.5,fontWeight:600}},x[0]),h('div',{style:{fontSize:12,color:'var(--muted)',marginTop:2}},x[1]))))),caption:'Subscription to the follower feed — our most reliable way to keep nudging.'}) ]);
+      case 'backToKyc': return wrap([ head('Continue on Moonfare','To actually invest, the next step is a quick accreditation.'),
+        this.card({title:'Accreditation',tone:'alpha',children:h('div',{style:{display:'flex',flexDirection:'column',gap:12}}, h('div',{style:{fontSize:14,lineHeight:1.55,color:'rgba(255,255,255,.92)'}},'You’ve seen the tailored model and where you’d sit. The next step is a short accreditation on Moonfare — shall I take you straight there?'), h('button',{style:{alignSelf:'flex-start',border:'none',background:'#fff',color:'var(--brand-ink)',borderRadius:9,padding:'11px 18px',fontSize:13.5,fontWeight:700,cursor:'pointer'}},'Go to Moonfare accreditation →'))}) ]);
+      default: return wrap([ head(pm.title||key, pm.crumb), this.card({title:'Coming soon',children:h('div',{style:{fontSize:13,color:'var(--muted)'}},'This step (“'+(pm.title||key)+'”) is wired into the flow and will be built out next.')}) ]);
+    }
+  }
+  advDeskLegacy(){
     const h=this.h; const CL=this.CLIENTS(); const queue=CL.filter(c=>c.priority);
     const initAv=(c)=>h('div',{style:{width:36,height:36,flex:'0 0 36px',borderRadius:'50%',background:'var(--brand-wash)',color:'var(--brand)',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:this.SF,fontWeight:700}},c.init);
     const stat=(l,v,col)=>h('div',null,h('div',{style:{fontSize:10,color:'var(--muted)'}},l),h('div',{style:{fontFamily:this.SF,fontSize:14,fontWeight:600,color:col||'var(--ink)'}},v));

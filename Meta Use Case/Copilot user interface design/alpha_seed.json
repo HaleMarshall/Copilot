@@ -3689,5 +3689,775 @@
         }
       ]
     }
-  ]
+  ],
+  "advisorFlows": {
+    "new|L1": [
+      "execSummary",
+      "intake",
+      "setTarget",
+      "aiThinking",
+      "modelPortfolio",
+      "future",
+      "nextBest",
+      "simTarget",
+      "seize"
+    ],
+    "new|L2": [
+      "execSummary",
+      "intake",
+      "setTarget",
+      "aiThinking",
+      "modelPortfolio",
+      "multiComparison",
+      "future",
+      "nextBest",
+      "simTarget",
+      "seize",
+      "follower"
+    ],
+    "new|L3": [
+      "execSummary",
+      "intake",
+      "setTarget",
+      "aiThinking",
+      "modelPortfolio",
+      "multiComparison",
+      "future",
+      "nextBest",
+      "managerComparison",
+      "fundComparison",
+      "simTarget",
+      "seize",
+      "follower"
+    ],
+    "existing|L1": [
+      "execSummary",
+      "intake",
+      "confirmTarget",
+      "aiThinking",
+      "modelExisting",
+      "overview",
+      "changesSince",
+      "compareToCurrent",
+      "future",
+      "nextBest",
+      "simExisting",
+      "seize"
+    ],
+    "existing|L2": [
+      "execSummary",
+      "intake",
+      "confirmTarget",
+      "aiThinking",
+      "modelExisting",
+      "overview",
+      "changesSince",
+      "compareToCurrent",
+      "multiComparison",
+      "future",
+      "nextBest",
+      "simExisting",
+      "seize",
+      "follower"
+    ],
+    "existing|L3": [
+      "execSummary",
+      "intake",
+      "confirmTarget",
+      "simFull",
+      "overview",
+      "changesSince",
+      "targetSimulator",
+      "compareToCurrent",
+      "future",
+      "nextBest",
+      "managerComparison",
+      "fundComparison",
+      "seize",
+      "follower"
+    ],
+    "pregate|L1": [
+      "execSummary",
+      "intakeMin",
+      "aiThinking",
+      "modelPortfolio",
+      "peerComparison",
+      "future",
+      "nextBestHints",
+      "backToKyc"
+    ],
+    "pregate|L2": [
+      "execSummary",
+      "intakeMin",
+      "aiThinking",
+      "modelPortfolio",
+      "peerComparison",
+      "future",
+      "nextBestHints",
+      "backToKyc"
+    ],
+    "pregate|L3": [
+      "execSummary",
+      "intakeMin",
+      "aiThinking",
+      "modelPortfolio",
+      "peerComparison",
+      "future",
+      "nextBestHints",
+      "backToKyc"
+    ],
+    "inactive|L1": [
+      "execSummary",
+      "opportunities",
+      "missedOut",
+      "seize",
+      "intake",
+      "confirmTarget",
+      "aiThinking",
+      "modelExisting",
+      "overview",
+      "changesSince",
+      "future",
+      "nextBest",
+      "seize"
+    ],
+    "inactive|L2": [
+      "execSummary",
+      "opportunities",
+      "missedOut",
+      "seize",
+      "intake",
+      "confirmTarget",
+      "aiThinking",
+      "modelExisting",
+      "overview",
+      "changesSince",
+      "compareToCurrent",
+      "future",
+      "nextBest",
+      "simExisting",
+      "seize"
+    ],
+    "inactive|L3": [
+      "execSummary",
+      "opportunities",
+      "missedOut",
+      "seize",
+      "intake",
+      "confirmTarget",
+      "aiThinking",
+      "modelExisting",
+      "overview",
+      "changesSince",
+      "compareToCurrent",
+      "future",
+      "nextBest",
+      "managerComparison",
+      "seize"
+    ]
+  },
+  "advisorMeta": {
+    "new": {
+      "objective": "Onboard & place the first portfolio product",
+      "goals": [
+        "Confirm the profile & investable wealth",
+        "Agree the target allocation & first commitment",
+        "Secure the follow-up & market-news opt-in"
+      ]
+    },
+    "existing": {
+      "objective": "Deepen the relationship & secure the next commitment",
+      "goals": [
+        "Review since last talk & confirm the profile",
+        "Close the gap to target with the next commitment",
+        "Opt-in to follower & market-news"
+      ]
+    },
+    "inactive": {
+      "objective": "Reactivate with a timely, concrete opportunity",
+      "goals": [
+        "Re-engage on a missed / live deal",
+        "Reserve interest on the open opportunity",
+        "Book a structured portfolio review"
+      ]
+    },
+    "pregate": {
+      "objective": "Tease the tailored model & route to accreditation",
+      "goals": [
+        "Capture the minimum intake",
+        "Show the tailored model & peer position",
+        "Drive to Moonfare accreditation"
+      ]
+    }
+  },
+  "advisorPages": {
+    "execSummary": {
+      "title": "Executive summary — what to achieve",
+      "crumb": "Pre-flow › Advisor briefing",
+      "cfa": [],
+      "script": "This briefing is for you, not the client. Lead with the strongest case the data makes — keep it to three moves."
+    },
+    "intake": {
+      "title": "Intake — confirm the profile",
+      "crumb": "Pre-flow › Onboarding form + Profile",
+      "cfa": [
+        {
+          "t": "Confirm investable wealth",
+          "jump": {
+            "tab": "Profile",
+            "sub": "Wealth"
+          },
+          "tag": "→ Profile · Wealth"
+        },
+        {
+          "t": "Confirm the risk class",
+          "jump": {
+            "tab": "Profile",
+            "sub": "Risk"
+          },
+          "tag": "→ Profile · Risk"
+        },
+        {
+          "t": "Capture region & profession for peer matching",
+          "jump": {
+            "tab": "Profile",
+            "sub": "Cohort"
+          },
+          "tag": "→ Profile · Cohort"
+        }
+      ],
+      "script": "Before we look at any numbers, let me confirm a few things so the model is right for you. Are you still comfortable treating roughly this amount as investable?"
+    },
+    "intakeMin": {
+      "title": "Minimum intake — three quick questions",
+      "crumb": "Pre-flow › Minimum intake",
+      "cfa": [
+        {
+          "t": "Capture investable wealth",
+          "jump": {
+            "tab": "Profile",
+            "sub": "Wealth"
+          },
+          "tag": "→ Profile · Wealth"
+        },
+        {
+          "t": "Capture risk appetite",
+          "jump": {
+            "tab": "Profile",
+            "sub": "Risk"
+          },
+          "tag": "→ Profile · Risk"
+        }
+      ],
+      "script": "Just a couple of quick questions and I can show you what a tailored portfolio could look like — no account needed yet."
+    },
+    "setTarget": {
+      "title": "Set the target allocation",
+      "crumb": "Shape › Set target",
+      "cfa": [
+        {
+          "t": "Agree the private-markets target",
+          "jump": {
+            "tab": "Target",
+            "sub": "PM target"
+          },
+          "tag": "→ Target"
+        },
+        {
+          "t": "Note any strategy preference",
+          "jump": {
+            "tab": "Target",
+            "sub": "Tilt"
+          },
+          "tag": "→ Target · tilt"
+        }
+      ],
+      "script": "Based on your profile, here is the private-markets target we'd suggest. Does that proportion feel right to you?"
+    },
+    "confirmTarget": {
+      "title": "Confirm the target — still right?",
+      "crumb": "Shape › Confirm target",
+      "cfa": [
+        {
+          "t": "Re-confirm investable wealth",
+          "jump": {
+            "tab": "Profile",
+            "sub": "Wealth"
+          },
+          "tag": "→ Profile · Wealth"
+        },
+        {
+          "t": "Re-confirm risk class",
+          "jump": {
+            "tab": "Profile",
+            "sub": "Risk"
+          },
+          "tag": "→ Profile · Risk"
+        }
+      ],
+      "script": "We haven't spoken in a while — let me make sure nothing's changed. Is this still your investable wealth and risk appetite?"
+    },
+    "aiThinking": {
+      "title": "Building your tailored model…",
+      "crumb": "Pre-flow › AI thinking",
+      "cfa": [],
+      "script": "Give me one moment — I'm tailoring a model portfolio to exactly your profile."
+    },
+    "modelPortfolio": {
+      "title": "Your tailored model portfolio",
+      "crumb": "Shape › Model portfolio",
+      "cfa": [
+        {
+          "t": "Walk the strategy mix",
+          "jump": {
+            "tab": "Simulator",
+            "sub": "Strategy"
+          },
+          "tag": "→ Simulator"
+        }
+      ],
+      "script": "This is the portfolio we'd build for someone with your profile. Notice it's diversified across the strategies that fit you."
+    },
+    "modelExisting": {
+      "title": "Model vs your portfolio today",
+      "crumb": "Understand › Model + holdings",
+      "cfa": [
+        {
+          "t": "Show the gap to model",
+          "jump": {
+            "tab": "Comparison",
+            "sub": "Gap"
+          },
+          "tag": "→ Comparison"
+        }
+      ],
+      "script": "Here's where you are today against the model we'd recommend — the gaps are exactly what we can act on."
+    },
+    "overview": {
+      "title": "Your portfolio — as it stands",
+      "crumb": "Understand › Portfolio Overview",
+      "cfa": [
+        {
+          "t": "Open performance detail",
+          "jump": {
+            "tab": "Performance",
+            "sub": "Detail"
+          },
+          "tag": "→ Performance"
+        }
+      ],
+      "script": "Here's your portfolio as it stands today — performance, allocation and cash-flow."
+    },
+    "changesSince": {
+      "title": "Since our last conversation",
+      "crumb": "Understand › Changes since last talk",
+      "cfa": [
+        {
+          "t": "Open the standout mover",
+          "jump": {
+            "tab": "Performance",
+            "sub": "Mover"
+          },
+          "tag": "→ Performance"
+        }
+      ],
+      "script": "A lot has happened since we last spoke — let me walk you through the highlights."
+    },
+    "peerComparison": {
+      "title": "You vs your peers",
+      "crumb": "Compare › Peers",
+      "cfa": [
+        {
+          "t": "Open the peer gap",
+          "jump": {
+            "tab": "Comparison",
+            "sub": "Peers"
+          },
+          "tag": "→ Comparison"
+        }
+      ],
+      "script": "People with a profile like yours typically allocate quite differently — let me show you."
+    },
+    "multiComparison": {
+      "title": "Compare — peers, platform, model, endowments",
+      "crumb": "Compare › Multi-comparison",
+      "cfa": [
+        {
+          "t": "Add the top-10% lens",
+          "jump": {
+            "tab": "Comparison",
+            "sub": "Top 10%"
+          },
+          "tag": "→ Comparison"
+        },
+        {
+          "t": "Add endowments lens",
+          "jump": {
+            "tab": "Comparison",
+            "sub": "Endowments"
+          },
+          "tag": "→ Comparison"
+        }
+      ],
+      "script": "Let's see how you stack up — against peers, our platform, the model, and even the endowments."
+    },
+    "compareToCurrent": {
+      "title": "Suggested vs your current portfolio",
+      "crumb": "Compare › Target vs current",
+      "cfa": [
+        {
+          "t": "Open the largest gap",
+          "jump": {
+            "tab": "Comparison",
+            "sub": "Gap"
+          },
+          "tag": "→ Comparison"
+        }
+      ],
+      "script": "Here's the suggested portfolio against what you hold today — the deltas are the conversation."
+    },
+    "future": {
+      "title": "Your future — commitments & J-curve",
+      "crumb": "Plan › Future",
+      "cfa": [
+        {
+          "t": "Set the commitment pace",
+          "jump": {
+            "tab": "Future",
+            "sub": "Pace"
+          },
+          "tag": "→ Future"
+        },
+        {
+          "t": "Set the recycle rate",
+          "jump": {
+            "tab": "Future",
+            "sub": "Recycle"
+          },
+          "tag": "→ Future"
+        }
+      ],
+      "script": "If we commit at this pace, here's how your portfolio builds and pays out over time."
+    },
+    "nextBest": {
+      "title": "Next best action — recommended sequence",
+      "crumb": "Act › Next best action",
+      "cfa": [
+        {
+          "t": "Open the recommended deal",
+          "jump": {
+            "tab": "Opportunities",
+            "sub": "Deal"
+          },
+          "tag": "→ Opportunities"
+        }
+      ],
+      "script": "Here's the sequence I'd suggest. Let's start with the building block that matters most for you."
+    },
+    "nextBestHints": {
+      "title": "A few ideas to get started",
+      "crumb": "Act › Hints",
+      "cfa": [],
+      "script": "Once your account's set up, this is roughly the sequence we'd walk through together."
+    },
+    "simTarget": {
+      "title": "Simulate your target portfolio",
+      "crumb": "Shape › Simulator",
+      "cfa": [
+        {
+          "t": "Adjust the strategy mix",
+          "jump": {
+            "tab": "Simulator",
+            "sub": "Strategy"
+          },
+          "tag": "→ Simulator"
+        }
+      ],
+      "script": "Want to adjust anything? We can nudge the mix and you'll see your portfolio update instantly."
+    },
+    "simExisting": {
+      "title": "Simulate — target + your holdings",
+      "crumb": "Shape › Simulator",
+      "cfa": [
+        {
+          "t": "Adjust the mix",
+          "jump": {
+            "tab": "Simulator",
+            "sub": "Strategy"
+          },
+          "tag": "→ Simulator"
+        }
+      ],
+      "script": "Let's model adding to your book and see what it does to your overall shape."
+    },
+    "simFull": {
+      "title": "Simulator — full toggles",
+      "crumb": "Shape › Simulator (Pro)",
+      "cfa": [
+        {
+          "t": "Open every dimension",
+          "jump": {
+            "tab": "Simulator",
+            "sub": "All dims"
+          },
+          "tag": "→ Simulator"
+        }
+      ],
+      "script": "All dimensions are open here — strategy, region, currency, sector, vintage."
+    },
+    "targetSimulator": {
+      "title": "Target simulator",
+      "crumb": "Shape › Target simulator",
+      "cfa": [
+        {
+          "t": "Adjust the target",
+          "jump": {
+            "tab": "Simulator",
+            "sub": "Target"
+          },
+          "tag": "→ Simulator"
+        }
+      ],
+      "script": "Let's fine-tune the target itself, then compare it against where you are."
+    },
+    "managerComparison": {
+      "title": "Manager comparison",
+      "crumb": "Research › Managers",
+      "cfa": [
+        {
+          "t": "Open a manager profile",
+          "jump": {
+            "tab": "Funds & Managers",
+            "sub": "Manager"
+          },
+          "tag": "→ Funds & Managers"
+        }
+      ],
+      "script": "For someone at your level — here's how the managers compare on IRR, consistency and delivery."
+    },
+    "fundComparison": {
+      "title": "Fund comparison",
+      "crumb": "Research › Funds",
+      "cfa": [
+        {
+          "t": "Open a fund profile",
+          "jump": {
+            "tab": "Funds & Managers",
+            "sub": "Fund"
+          },
+          "tag": "→ Funds & Managers"
+        }
+      ],
+      "script": "And here are the specific funds head-to-head — the detail you'd expect."
+    },
+    "opportunities": {
+      "title": "Opportunities to act on now",
+      "crumb": "Act › Opportunities",
+      "cfa": [
+        {
+          "t": "Open the live deal",
+          "jump": {
+            "tab": "Opportunities",
+            "sub": "Deal"
+          },
+          "tag": "→ Opportunities"
+        }
+      ],
+      "script": "Look at this — this is exactly the kind of opportunity worth coming back for."
+    },
+    "missedOut": {
+      "title": "What you missed — and what's next",
+      "crumb": "Act › Missed out on",
+      "cfa": [
+        {
+          "t": "Open the missed deal",
+          "jump": {
+            "tab": "Opportunities",
+            "sub": "Missed"
+          },
+          "tag": "→ Opportunities"
+        }
+      ],
+      "script": "You've been away a while and missed a couple of strong ones — but here's what's live right now."
+    },
+    "seize": {
+      "title": "Seize this opportunity",
+      "crumb": "Act › Reserve / request allocation",
+      "cfa": [
+        {
+          "t": "Reserve interest",
+          "jump": {
+            "tab": "Opportunities",
+            "sub": "Reserve"
+          },
+          "tag": "→ Opportunities"
+        }
+      ],
+      "script": "Shall I reserve your interest? You'll get a note the moment it opens — no commitment yet."
+    },
+    "follower": {
+      "title": "Follow what matters",
+      "crumb": "Act › Follower opt-in",
+      "cfa": [
+        {
+          "t": "Opt-in to peers feed",
+          "jump": {
+            "tab": "Follower",
+            "sub": "Peers"
+          },
+          "tag": "→ Follower"
+        },
+        {
+          "t": "Opt-in to market news",
+          "jump": {
+            "tab": "Follower",
+            "sub": "News"
+          },
+          "tag": "→ Follower"
+        }
+      ],
+      "script": "Want to know what your peers and the top performers are doing? I can keep you posted."
+    },
+    "backToKyc": {
+      "title": "Continue on Moonfare",
+      "crumb": "Pre-flow › Accreditation",
+      "cfa": [],
+      "script": "To actually invest, the next step is a quick accreditation on Moonfare — shall I send you straight there?"
+    }
+  },
+  "advisorBook": [
+    {
+      "id": "reuter",
+      "name": "Dr. A. Reuter",
+      "init": "AR",
+      "badge": "NEW CLIENT",
+      "occupation": "Founder · recent exit",
+      "company": "Reuter Ventures",
+      "investable": "€40m",
+      "age": "50–59",
+      "risk": "Growth",
+      "region": "US / USD",
+      "ccy": "USD",
+      "level": "L3",
+      "stage": "new",
+      "lead": {
+        "priority": 1,
+        "kind": "news",
+        "reason": "Recent exit — large investable cash; mentioned wanting heavy AI/Tech exposure."
+      },
+      "notes": [
+        "Sold his SaaS company Q1 2026 — liquidity event ~€40m.",
+        "Said in onboarding chat: 'I want to be heavy in AI, light on European exposure.'",
+        "Prefers concrete deals over theory."
+      ],
+      "prep": "Brand-new, sophisticated. Onboard cleanly, agree a target, place a first portfolio product, lock the follow-up."
+    },
+    {
+      "id": "coburger",
+      "name": "M. Coburger",
+      "init": "MC",
+      "badge": "EXISTING",
+      "occupation": "Lawyer",
+      "company": "Coburger & Partner",
+      "investable": "€20m",
+      "age": "40–49",
+      "risk": "Balanced",
+      "region": "DE / EUR",
+      "ccy": "EUR",
+      "level": "L2",
+      "stage": "existing",
+      "lead": {
+        "priority": 2,
+        "kind": "data",
+        "reason": "Only 15.7% in private markets vs 35% target — well behind peers."
+      },
+      "notes": [
+        "Wants to keep it simple — no jargon.",
+        "Cautious risk class; revisit whether still right.",
+        "Likes peer comparisons."
+      ],
+      "prep": "Behind peers and target. Use the gap + peers to justify the next commitment; secure follower opt-in."
+    },
+    {
+      "id": "meier",
+      "name": "H. Meier",
+      "init": "HM",
+      "badge": "INACTIVE",
+      "occupation": "Family office",
+      "company": "Meier Family Office",
+      "investable": "€50m",
+      "age": "60–69",
+      "risk": "Conservative",
+      "region": "CH / CHF",
+      "ccy": "CHF",
+      "level": "L3",
+      "stage": "inactive",
+      "lead": {
+        "priority": 1,
+        "kind": "fund",
+        "reason": "Lexington Secondary he watch-listed just opened — and he missed Databricks & Anthropic."
+      },
+      "notes": [
+        "Hasn't logged in for ~8 months.",
+        "Watch-listed Lexington Capital Partners — now open.",
+        "Reactivate with the deal, not a profile loop."
+      ],
+      "prep": "Catch with the live deal first (Lexington), reference what he missed, then book a structured review."
+    },
+    {
+      "id": "weber",
+      "name": "S. Weber",
+      "init": "SW",
+      "badge": "NEW CLIENT",
+      "occupation": "Physician",
+      "company": "—",
+      "investable": "€5m",
+      "age": "40–49",
+      "risk": "Cautious",
+      "region": "DE / EUR",
+      "ccy": "EUR",
+      "level": "L1",
+      "stage": "new",
+      "lead": {
+        "priority": 3,
+        "kind": "data",
+        "reason": "First-time private-markets investor — ready for a starter portfolio product."
+      },
+      "notes": [
+        "New to private markets — keep it very simple.",
+        "Euro only, portfolio products, no individual funds."
+      ],
+      "prep": "Keep it basic. Show the model, the J-curve, and place a single portfolio product."
+    },
+    {
+      "id": "lindqvist",
+      "name": "E. Lindqvist",
+      "init": "EL",
+      "badge": "EXISTING",
+      "occupation": "PE executive",
+      "company": "Nordkap Capital",
+      "investable": "€50m",
+      "age": "50–59",
+      "risk": "Aggressive",
+      "region": "SE / EUR",
+      "ccy": "EUR",
+      "level": "L3",
+      "stage": "existing",
+      "lead": {
+        "priority": 2,
+        "kind": "news",
+        "reason": "Pro investor — asking for manager/fund-level detail and secondaries exposure."
+      },
+      "notes": [
+        "Full professional — 'don't come to me with a strategy bucket, I want vintage detail.'",
+        "Interested in secondaries and co-invest."
+      ],
+      "prep": "Go deep: manager & fund comparison, secondaries, full simulator. This is the L3 showcase."
+    }
+  ],
+  "advisorSelf": {
+    "name": "Lena Sørensen",
+    "init": "LS",
+    "role": "Relationship Manager"
+  }
 }
