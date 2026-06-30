@@ -1971,7 +1971,13 @@
       "EUR": 1,
       "USD": 1.083,
       "GBP": 0.848,
-      "CHF": 0.962
+      "CHF": 0.962,
+      "JPY": 171.5,
+      "SGD": 1.46,
+      "AUD": 1.64,
+      "CAD": 1.47,
+      "HKD": 8.46,
+      "AED": 3.98
     },
     "recordDate": "Q1 2025",
     "ratesRecord": {
@@ -1991,6 +1997,18 @@
       "USD": 1.069,
       "GBP": 0.844,
       "CHF": 0.957
+    },
+    "symbols": {
+      "EUR": "€",
+      "USD": "$",
+      "GBP": "£",
+      "CHF": "Fr ",
+      "JPY": "¥",
+      "SGD": "S$",
+      "AUD": "A$",
+      "CAD": "C$",
+      "HKD": "HK$",
+      "AED": "AED "
     }
   },
   "lifecycle": {

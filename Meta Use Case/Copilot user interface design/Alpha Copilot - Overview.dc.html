@@ -437,7 +437,10 @@ class Component extends DCLogic {
   constructor(props){
     super(props);
     const h = React.createElement;
-    this.h = h;
+    /* L3 global currency: convert €-figures to the chosen currency at vdom-creation time,
+       so React's diff stays correct in both directions (no stuck-conversion from DOM mutation). */
+    { const _h=h; const self=this; const conv=(x)=>{ if(typeof x==='string') return self.ccyConv(x); if(Array.isArray(x)) return x.map(conv); return x; };
+      this.h=function(tag,props){ const a=[]; for(let i=2;i<arguments.length;i++) a.push(conv(arguments[i])); return _h.apply(null,[tag,props].concat(a)); }; }
     this.STRATS = [
       ['buyout','Buyout','--data-1'],['growth','Growth','--data-2'],['venture','Venture','--data-3'],
       ['credit','Private Credit','--data-4'],['infra','Infrastructure','--data-5'], /* item 18 — real estate removed (none held) */
@@ -513,6 +516,7 @@ class Component extends DCLogic {
       fCommitYears:10, fRecycleYear:8, fRecycleRate:100, fExecution:'topq', /* items 106-109 — Programme Inputs (Michael Blome) */
       /* ===== PE cash-flow model (from PE_CashFlow_Tool_v15.xlsx) ===== */
       cfPct:'75', cfMethod:'Catch-Up', cfCommitM:10, cfPaceYears:4, cfStratFocus:null, cfShowBands:true, cfScope:'combined',
+      displayCcy:'EUR', /* L3 global currency — converts every €-figure in the rendered DOM */
       fProducts:{buyout:34,growth:14,credit:12,infra:10,secondaries:14,semiliquid:8,venture:4,directs:4},
       simMode:'adjust', simPreset:'like-you', simDetail:false, /* item 172 — pro full-allocation view collapsed by default */
       simShowDials:false, /* item 174 — target-adjustment dials hidden by default; pie is the hero, dials open via a bottom toggle */
@@ -7754,6 +7758,16 @@ class Component extends DCLogic {
       return h('button',{key:o,onClick:()=>this.setFb(id,o),style:{fontSize:11,padding:'4px 10px',borderRadius:999,border:`1px solid ${on?'var(--brand)':'var(--line)'}`,background:on?'var(--brand)':'var(--surface)',color:on?'#fff':'var(--muted)',cursor:'pointer'}}, (o==='Helpful'&&on?'✓ ':'')+o); })); }
   churnPill(c){ const h=this.h; const map={high:['--under','High'],med:['--synthetic','Medium'],low:['--over','Low']}[c]; return h('span',{style:{display:'inline-flex',alignItems:'center',gap:5,fontSize:11,fontWeight:600,color:`var(${map[0]})`}}, h('span',{style:{width:7,height:7,borderRadius:'50%',background:`var(${map[0]})`}}), map[1]); }
   /* ============================================================
+     GLOBAL CURRENCY (L3) — convert every €-figure to the chosen currency
+     ============================================================ */
+  ccyRate(c){ const fx=(this.DB&&this.DB.fx)||{rates:{}}; return (fx.rates&&fx.rates[c])||1; }
+  ccySym(c){ const fx=(this.DB&&this.DB.fx)||{}; return (fx.symbols&&fx.symbols[c]) || ({USD:'$',GBP:'£',CHF:'Fr ',JPY:'¥',EUR:'€'}[c]) || (c+' '); }
+  ccyList(){ const fx=(this.DB&&this.DB.fx)||{rates:{EUR:1}}; return Object.keys(fx.rates||{EUR:1}); }
+  ccyConv(s){ const cur=this.state&&this.state.displayCcy; if(!cur||cur==='EUR'||typeof s!=='string'||s.indexOf('€')<0) return s; const rate=this.ccyRate(cur), sym=this.ccySym(cur), order=['k','m','bn'];
+    return s.replace(/€\s?(-?\d[\d.,]*)\s?(bn|m|k)?/g,(mm,num,suf)=>{ let v=parseFloat(String(num).replace(/,/g,''))*rate; if(!isFinite(v)) return mm; let idx=order.indexOf(suf||'');
+      if(idx<0){ return sym+(Math.abs(v)>=1000?Math.round(v).toLocaleString('en-US'):(+v).toFixed(2)); }
+      while(Math.abs(v)>=1000 && idx<order.length-1){ v/=1000; idx++; } const dec=Math.abs(v)<100?1:0; return sym+(+v).toFixed(dec)+order[idx]; }); }
+  /* ============================================================
      PE CASH-FLOW FORECAST ENGINE — ported from PE_CashFlow_Tool_v15.xlsx
      3 layers: (1) PitchBook distribution curves + Catch-Up/Scale method,
      (2) Expected TVPI blend, (3) terminal top-up. Percentile bands 25–90.
@@ -7808,7 +7822,7 @@ class Component extends DCLogic {
     const base=this.pePortfolio(commitments,pct,method,16), b50=this.pePortfolio(commitments,'50',method,16), b90=this.pePortfolio(commitments,'90',method,16);
     const ex=hasHeld?this.pePortfolio(heldC,pct,method,16):null; const nw=this.pePortfolio(newC,pct,method,16);
     const combinedView=(scope==='combined'&&hasHeld);
-    const years=base.contrib.map((_,i)=>'Y'+(i+1));
+    const years=base.contrib.map((_,i)=>String(2026+i)); /* calendar years (Excel basis 2026–) */
     const seg=(o,v,on)=>this.seg(o,v,on,{sm:true});
     const ctlRow=(lbl,el)=>h('div',{style:{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}}, h('span',{style:{fontSize:11,color:'var(--muted)',minWidth:120}},lbl), el);
     const slider=(lbl,val,min,max,step,fmt,on)=>h('div',{style:{flex:'1 1 220px'}}, h('div',{style:{display:'flex',justifyContent:'space-between',fontSize:11,color:'var(--muted)'}}, h('span',null,lbl), h('span',{style:{fontFamily:SF,fontWeight:700,color:'var(--ink)'}},fmt(val))), h('input',{type:'range',min:min,max:max,step:step,value:val,onInput:e=>on(+e.target.value),style:{width:'100%'}}));
@@ -7817,10 +7831,12 @@ class Component extends DCLogic {
     if(L==='L3') ctls.push(ctlRow('Percentile', seg([{label:'25th',value:'25'},{label:'50th',value:'50'},{label:'75th',value:'75'},{label:'90th',value:'90'}],pct,v=>this.setState({cfPct:v}))));
     else if(L==='L2') ctls.push(ctlRow('Percentile', seg([{label:'50th',value:'50'},{label:'75th',value:'75'},{label:'90th',value:'90'}],pct,v=>this.setState({cfPct:v}))));
     if(L!=='L1') ctls.push(ctlRow('Distribution method', seg([{label:'Catch-Up',value:'Catch-Up'},{label:'Scale factor',value:'Scale'}],method,v=>this.setState({cfMethod:v}))));
+    if(L==='L3') ctls.push(ctlRow('Display currency', h('select',{value:this.state.displayCcy,onChange:e=>this.setState({displayCcy:e.target.value}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--ink)',borderRadius:8,padding:'5px 10px',fontSize:12,fontWeight:600,cursor:'pointer'}}, this.ccyList().map(cc=>h('option',{key:cc,value:cc},cc+' '+this.ccySym(cc).trim())))));
     const commitSlider=slider('Annual commitment',total,1,50,1,v=>'€'+v+'m',v=>this.setState({cfCommitM:v}));
     const paceSlider=slider('Deploy over (years)',pace,1,5,1,v=>v+'y',v=>this.setState({cfPaceYears:v}));
     /* charts */
-    const cfBars=this.groupedBars(years.slice(0,12),[{name:'Contributions',color:'--data-1',vals:base.contrib.slice(0,12)},{name:'Distributions',color:'--data-6',vals:base.dist.slice(0,12)}]);
+    const _cCur=this.state.displayCcy||'EUR'; const _cRate=this.ccyRate(_cCur); const _cSym=(_cCur==='EUR'?'€':this.ccySym(_cCur).trim()); const _sc=v=>+(v*_cRate).toFixed(2);
+    const cfBars=this.groupedBars(years.slice(0,12),[{name:'Contributions',color:'--data-1',vals:base.contrib.slice(0,12).map(_sc)},{name:'Distributions',color:'--data-6',vals:base.dist.slice(0,12).map(_sc)}]);
     let jSeries=[];
     if(combinedView){ jSeries=[{name:'Existing',color:'--data-7',dash:true,vals:ex.cumNet},{name:'New commitments',color:'--data-3',dash:true,vals:nw.cumNet},{name:'Combined',color:'--data-1',main:true,vals:base.cumNet}]; }
     else { if(L!=='L1'&&this.state.cfShowBands){ jSeries.push({name:'90th pct',color:'--data-3',dash:true,vals:b90.cumNet}); jSeries.push({name:'50th pct',color:'--data-7',dash:true,vals:b50.cumNet}); } jSeries.push({name:pct+'th pct (selected)',color:'--data-1',main:true,vals:base.cumNet}); }
@@ -7839,7 +7855,7 @@ class Component extends DCLogic {
       ctls.length?h('div',{style:{display:'flex',flexDirection:'column',gap:8}}, ctls):null,
       perf,
       h('div',{style:{display:'flex',gap:14,flexWrap:'wrap'}},
-        this.card({title:'Contributions vs distributions (€m / yr)',style:{flex:'1 1 360px'},children:cfBars,caption:'Capital calls (early) then distributions (later) — the engine of the J-curve.'}),
+        this.card({title:'Contributions vs distributions ('+_cSym+'m / yr)',style:{flex:'1 1 360px'},children:cfBars,caption:'Capital calls (early) then distributions (later) — the engine of the J-curve.'}),
         this.card({title:'Cumulative net cash flow — the J-curve',style:{flex:'1 1 360px'},children:jcurve,caption: combinedView?'Existing portfolio + new commitments = combined ('+pct+'th percentile). Existing funds anchored at their real age.':(L==='L1'?'Your projected net position over 15 years.':'Selected '+pct+'th percentile with 50th/90th bands. Toggle percentile above.')})),
       grid,
       this.card({title:'How this is modelled',tight:true,children:methodNote}));
@@ -7964,6 +7980,7 @@ class Component extends DCLogic {
         h('div',{style:{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:2,background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.14)',borderRadius:8,padding:'5px 10px'}}, h('span',{style:{fontSize:8.5,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(255,255,255,.45)'}},'Grounded'), h('span',{style:{fontSize:11,fontWeight:600,color:'rgba(255,255,255,.85)'}},'snap_8f3c · live data')),
         labelled('Journey', dseg([{label:'Pre Gate',value:'pregate'},{label:'New',value:'new'},{label:'Existing',value:'existing'},{label:'Inactive',value:'inactive'}], this.state.advStage, v=>this.advSetStage(v))),
         labelled('Advice level', dseg([{label:'L1',value:'L1'},{label:'L2',value:'L2'},{label:'L3',value:'L3'}], this.state.advLevel, v=>this.advSetLevel(v))),
+        this.state.advLevel==='L3'? labelled('Currency', h('select',{value:this.state.displayCcy,onChange:e=>this.setState({displayCcy:e.target.value}),style:{background:'rgba(255,255,255,.1)',color:'#fff',border:'1px solid rgba(255,255,255,.22)',borderRadius:7,padding:'5px 8px',fontSize:11.5,fontWeight:700,cursor:'pointer'}}, this.ccyList().map(c=>h('option',{key:c,value:c,style:{color:'#111'}},c)))) : null,
         h('div',{style:{width:1,height:30,background:'rgba(255,255,255,.14)'}}),
         h('div',{style:{textAlign:'right'}}, h('div',{style:{fontSize:12.5,fontWeight:600}},self.name), h('div',{style:{fontSize:10,color:'rgba(255,255,255,.55)'}},self.role)),
         h('button',{onClick:()=>this.advToPrep(),style:{border:'1px solid rgba(255,255,255,.3)',background:'rgba(255,255,255,.1)',color:'#fff',borderRadius:8,padding:'6px 11px',fontSize:11.5,cursor:'pointer'}},'Exit')));
