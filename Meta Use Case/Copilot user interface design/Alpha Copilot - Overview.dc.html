@@ -7766,9 +7766,12 @@ class Component extends DCLogic {
   ccySym(c){ const fx=(this.DB&&this.DB.fx)||{}; return (fx.symbols&&fx.symbols[c]) || ({USD:'$',GBP:'£',CHF:'Fr ',JPY:'¥',EUR:'€'}[c]) || (c+' '); }
   ccyList(){ const fx=(this.DB&&this.DB.fx)||{rates:{EUR:1}}; return Object.keys(fx.rates||{EUR:1}); }
   ccyConv(s){ const cur=this.state&&this.state.displayCcy; if(!cur||cur==='EUR'||typeof s!=='string'||s.indexOf('€')<0) return s; const rate=this.ccyRate(cur), sym=this.ccySym(cur), order=['k','m','bn'];
-    return s.replace(/€\s?(-?\d[\d.,]*)\s?(bn|m|k)?/g,(mm,num,suf)=>{ let v=parseFloat(String(num).replace(/,/g,''))*rate; if(!isFinite(v)) return mm; let idx=order.indexOf(suf||'');
+    let out=s.replace(/€\s?(-?\d[\d.,]*)\s?(bn|m|k)?/g,(mm,num,suf)=>{ let v=parseFloat(String(num).replace(/,/g,''))*rate; if(!isFinite(v)) return mm; let idx=order.indexOf(suf||'');
       if(idx<0){ return sym+(Math.abs(v)>=1000?Math.round(v).toLocaleString('en-US'):(+v).toFixed(2)); }
-      while(Math.abs(v)>=1000 && idx<order.length-1){ v/=1000; idx++; } const dec=Math.abs(v)<100?1:0; return sym+(+v).toFixed(dec)+order[idx]; }); }
+      while(Math.abs(v)>=1000 && idx<order.length-1){ v/=1000; idx++; } const dec=Math.abs(v)<100?1:0; return sym+(+v).toFixed(dec)+order[idx]; });
+    /* unit/axis labels with no number (e.g. "€ millions", "€m / yr", "€k") — swap the symbol only; leave "EUR €" (no unit) untouched */
+    out=out.replace(/€(\s?)(millions?|thousands?|billions?|bn|m|k)\b/gi,(mm,sp,u)=>sym.trim()+sp+u);
+    return out; }
   /* ============================================================
      PE CASH-FLOW FORECAST ENGINE — ported from PE_CashFlow_Tool_v15.xlsx
      3 layers: (1) PitchBook distribution curves + Catch-Up/Scale method,
