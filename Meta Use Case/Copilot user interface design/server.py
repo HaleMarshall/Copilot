@@ -23,7 +23,7 @@ PORT = int(os.environ.get("PORT", "8731"))
 DATASET_KEYS = ["portfolio", "pm", "strats", "mix", "dims", "cashflows",
                 "heldFunds", "heldMeta", "modelCoarse", "modelFine", "followFunds", "scorecards",
                 "peer", "platform", "endowments", "benchTable", "fx", "lifecycle", "featured",
-                "bank", "scenario", "managers", "offerings"]
+                "bank", "scenario", "managers", "offerings", "viz"]
 
 
 def ensure_tables():
