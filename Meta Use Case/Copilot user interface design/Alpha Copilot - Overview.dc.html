@@ -1411,7 +1411,7 @@ class Component extends DCLogic {
       const slices=Object.keys(d.actual).map(k=>({n:(type==='strategy'?(this.STRATS.find(s=>s[0]===k)||[null,k])[1]:k),p:d.actual[k],color:d.colors[k]})).filter(s=>s.p>0);
       return h('div',{style:{display:'flex',alignItems:'center',gap:14,marginTop:10,flexWrap:'wrap'}}, this.donutNamed(slices,118,'Mix','live'), h('div',{style:{flex:1,minWidth:150}}, this.legend(slices))); }
     if(type==='gap') return h('div',{style:{marginTop:10}}, this.miniZ(this.zDeltas('model').map(r=>({name:r.name,delta:r.delta,color:r.color,sig:r.sig}))));
-    if(type==='cashflow'){ const CF=(this.DB&&this.DB.cashflows)||{cats:[],calls:[],distributions:[]}; return h('div',{style:{marginTop:10}}, this.groupedBars(CF.cats,[{name:'Calls',color:'--data-2',vals:CF.calls},{name:'Distributions',color:'--data-5',vals:CF.distributions}])); }
+    if(type==='cashflow'){ const CF=(this.DB&&this.DB.cashflows)||{cats:[],calls:[],distributions:[]}; return h('div',{style:{marginTop:10}}, this.groupedBars(CF.cats,[{name:'Calls',color:'--data-2',vals:CF.calls},{name:'Distributions',color:'--data-5',vals:CF.distributions}],{unit:'m'})); }
     return null;
   }
   askSend(q){
@@ -2693,8 +2693,8 @@ class Component extends DCLogic {
     if(viz==='capacity') return this.scFromDB('capacity',[{l:'Uncalled commitments',you:'€3.4m',peer:'—',up:false},{l:'Liquidity headroom',you:'€1.1m',peer:'—',up:true},{l:'Illiquidity carried',you:'62%',peer:'48%',up:false},{l:'Safe new commitment',you:'€0.8m',peer:'—',up:true}]);
     if(viz==='consistency') return this.scFromDB('consistency',[{l:'Consistency score',you:'8.4/10',peer:'6.1/10',up:true},{l:'Distribution stability',you:'High',peer:'Med',up:true},{l:'Markup quality',you:'Good',peer:'Fair',up:true},{l:'Dispersion (3 funds)',you:'Low',peer:'Med',up:true}]);
     if(viz==='demand') return this.scFromDB('demand',[{l:'Fills fastest',you:'EQT X',peer:'—',up:true},{l:'Median time-to-fill',you:'18 days',peer:'31 days',up:true},{l:'Oversubscription',you:'2.4×',peer:'1.6×',up:false},{l:'Your alloc. likelihood',you:'78%',peer:'—',up:true}]);
-    if(viz==='pacing') return this.groupedBars(['2026','2027','2028','2029','2030'],[{name:'You (plan)',color:'--data-1',vals:this.vz(0,[2.4, 1.8, 2.1, 1.6, 1.4])},{name:'Peer median',color:'--data-7',vals:this.vz(1,[2.1, 2.0, 1.9, 1.8, 1.7])}]);
-    if(viz==='callfc') return this.groupedBars(['Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8'],[{name:'Calls',color:'--data-8',vals:this.vz(2,[0.6, 0.5, 0.7, 0.4, 0.5, 0.3, 0.4, 0.3])},{name:'Distributions',color:'--data-5',vals:this.vz(3,[0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 0.9, 1.1])}]);
+    if(viz==='pacing') return this.groupedBars(['2026','2027','2028','2029','2030'],[{name:'You (plan)',color:'--data-1',vals:this.vz(0,[2.4, 1.8, 2.1, 1.6, 1.4])},{name:'Peer median',color:'--data-7',vals:this.vz(1,[2.1, 2.0, 1.9, 1.8, 1.7])}],{unit:'m'});
+    if(viz==='callfc') return this.groupedBars(['Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8'],[{name:'Calls',color:'--data-8',vals:this.vz(2,[0.6, 0.5, 0.7, 0.4, 0.5, 0.3, 0.4, 0.3])},{name:'Distributions',color:'--data-5',vals:this.vz(3,[0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 0.9, 1.1])}],{unit:'m'});
     if(viz==='managers') return this.groupedBars(['Ops focus','Buy-&-build','Sector spec.','Team stability','Loss ratio'],[{name:'Top quartile',color:'--data-1',vals:this.vz(4,[82, 74, 68, 91, 12])},{name:'Rest',color:'--data-9',vals:this.vz(5,[54, 49, 44, 63, 28])}]);
     if(viz==='fitlist') return this.fitList();
     if(viz==='nba') return h('div',{style:{display:'flex',flexDirection:'column',gap:12}},
@@ -3298,12 +3298,12 @@ class Component extends DCLogic {
           this.scFromDB('sc4',[{l:'Safe new commitment',you:'€0.8m',peer:'—',up:true},{l:'Buffer in Stress',you:'€0.6m',peer:'—',up:true},{l:'Buffer in Severe',you:'−€1.3m',peer:'—',up:false},{l:'Fix',you:'Slow pacing / secondaries',peer:'—',up:true}])),
           caption:'Pacing a little slower next year, or adding a secondaries sleeve, lifts resilience above the severe-scenario line.'})),
       't1-4:ticket':()=>this.twoCol(
-        this.card({title:'Ticket pacing',children:this.groupedBars(['2026','2027','2028','2029','2030'],[{name:'Avg ticket (€k)',color:'--data-1',vals:this.vz(21,[150, 160, 150, 170, 160])}]),caption:'Roughly constant tickets keep diligence quality high across vintages.'}),
+        this.card({title:'Ticket pacing',children:this.groupedBars(['2026','2027','2028','2029','2030'],[{name:'Avg ticket (€k)',color:'--data-1',vals:this.vz(21,[150, 160, 150, 170, 160])}],{unit:'k'}),caption:'Roughly constant tickets keep diligence quality high across vintages.'}),
         this.card({title:'Discipline check',children:this.scFromDB('sc5',[{l:'Avg ticket',you:'€158k',peer:'€128k',up:true},{l:'Ticket spread',you:'±€20k',peer:'±€55k',up:true},{l:'Commitments / yr',you:'2.4',peer:'2.1',up:true},{l:'Bunching',you:'low',peer:'med',up:true}]),caption:'Disciplined, near-equal annual deployment — the best-performer pattern.'})),
       // ---- Peer Benchmarking: ticket & count vs each peer layer ----
       't1-5:ticket':()=>this.twoCol(
         this.card({title:'Average ticket size by peer group (€k)',children:h('div',null,
-          this.groupedBars(['You','Cohort','Profession','Best perf.'],[{name:'Avg ticket',color:'--data-1',vals:this.vz(22,[158, 128, 176, 210])}]),
+          this.groupedBars(['You','Cohort','Profession','Best perf.'],[{name:'Avg ticket',color:'--data-1',vals:this.vz(22,[158, 128, 176, 210])}],{unit:'k'}),
           h('div',{style:{fontSize:11.5,color:'var(--muted)',marginTop:8,lineHeight:1.5}},'You write larger tickets than your cohort, but PE-professional peers and best performers concentrate into fewer, bigger positions.')),
           caption:'How big a cheque people like you typically write — and how the strongest investors differ.'}),
         this.card({title:'Number of investments by peer group',children:h('div',null,
@@ -3372,7 +3372,7 @@ class Component extends DCLogic {
       't1-12:call':()=>{ const qs=['Q3','Q4','Q1','Q2','Q3','Q4','Q1','Q2'];
         return this.stack([
           this.twoCol(
-            this.card({title:'Capital called this quarter, by fund (€k)',badge:this.badge('your portfolio','conf'),children:h('div',{style:{paddingTop:6}},this.groupedBars(['EQT IX','Thrive VIII','CVC IX','Ares PCS','Northwind'],[{name:'Called (€k)',color:'--data-1',vals:this.vz(28,[180, 140, 120, 90, 60])}])),caption:'Which funds drew capital this quarter. Newer funds (Ares, Northwind) are still deploying and call the most relative to their size.'}),
+            this.card({title:'Capital called this quarter, by fund (€k)',badge:this.badge('your portfolio','conf'),children:h('div',{style:{paddingTop:6}},this.groupedBars(['EQT IX','Thrive VIII','CVC IX','Ares PCS','Northwind'],[{name:'Called (€k)',color:'--data-1',vals:this.vz(28,[180, 140, 120, 90, 60])}],{unit:'k'})),caption:'Which funds drew capital this quarter. Newer funds (Ares, Northwind) are still deploying and call the most relative to their size.'}),
             this.card({title:'Upcoming capital calls — next 8 quarters (€m)',badge:this.badge('illustrative','synth'),children:h('div',null,this.scenarioSvg([{name:'Projected calls',color:'--under',main:true,vals:this.vz(29,[0.7, 0.6, 0.5, 0.6, 0.4, 0.4, 0.3, 0.3])},{name:'Projected distributions',color:'--over',vals:this.vz(30,[0.2, 0.3, 0.4, 0.5, 0.7, 0.9, 1.1, 1.3])}],qs),this.lineLegend([{name:'Projected calls',color:'--under'},{name:'Projected distributions',color:'--over'}])),caption:'Calls dominate for ~4 quarters, then distributions overtake as your 2019–21 funds harvest. Keep ~€1.1m liquid to cover the near-term gap.'}),
             '1.6fr 1fr'),
           this.card({title:'Net capital call pressure vs peers, by strategy (pp)',children:h('div',{style:{padding:'8px 0'}},this.miniZ([{name:'Private Credit',delta:2.1,sig:true,color:'--data-4'},{name:'Infrastructure',delta:1.3,sig:true,color:'--data-5'},{name:'Buyout',delta:0.4,sig:false,color:'--data-1'},{name:'Growth',delta:-0.6,sig:true,color:'--data-2'},{name:'Secondaries',delta:-1.4,sig:true,color:'--data-7'}])),caption:'Where your near-term call pressure runs heavier (right) or lighter (left) than peers. Your credit and infra sleeves are mid-deployment, so they call more; secondaries relieve pressure because they buy already-funded NAV.'})]);
@@ -3438,7 +3438,7 @@ class Component extends DCLogic {
         this.card({title:'Distance to model',children:this.scFromDB('sc16',[{l:'Total drift',you:'34pp',peer:'—',up:false},{l:'Strategies off',you:'5 / 9',peer:'—',up:false},{l:'Biggest gap',you:'Credit −12',peer:'—',up:false},{l:'Closest fund',you:'Ares PCS',peer:'—',up:true}]),caption:'How far, where, and what closes it fastest.'})),
       't2-2:drift':()=>this.card({title:'Drift from the model over time (pp)',badge:this.badge('illustrative','synth'),children:h('div',null,this.scenarioSvg([{name:'band',color:'--brand',band:{up:[10,14,20,28,34,34],down:[10,9,9,10,11,12]},vals:this.vz(39,[10, 12, 16, 22, 28, 31])},{name:'drift',color:'--data-1',main:true,vals:this.vz(40,[10, 12, 16, 22, 28, 31])}],['2021','2022','2023','2024','2025','Now']),this.lineLegend([{name:'Total drift (pp)',color:'--data-1'}])),caption:'Your drift from the model widened as newer vintages concentrated — rebalancing future commitments closes it without selling.'}),
       't2-3:ticket':()=>this.twoCol(
-        this.card({title:'Average ticket by group (€k)',children:this.groupedBars(['You','Cohort','PE pros','Family off.','Best perf.'],[{name:'Avg ticket',color:'--data-1',vals:this.vz(41,[158, 128, 310, 240, 240])}]),caption:'You write larger tickets than your cohort, smaller than professionals and family offices.'}),
+        this.card({title:'Average ticket by group (€k)',children:this.groupedBars(['You','Cohort','PE pros','Family off.','Best perf.'],[{name:'Avg ticket',color:'--data-1',vals:this.vz(41,[158, 128, 310, 240, 240])}],{unit:'k'}),caption:'You write larger tickets than your cohort, smaller than professionals and family offices.'}),
         this.card({title:'Behaviour vs peers',children:this.scorecard(),caption:'Tickets, cadence, vintages and diversification versus the peer median.'})),
       't2-3:counts':()=>this.twoCol(
         this.card({title:'Investments per year by group',children:this.groupedBars(['You','Cohort','PE pros','Family off.'],[{name:'Deals / yr',color:'--data-3',vals:this.vz(42,[2.4, 2.1, 1.8, 3.6])}]),caption:'You deploy a little faster than your cohort; family offices spread across more deals.'}),
@@ -5271,7 +5271,7 @@ class Component extends DCLogic {
     const barCol=(c,ci)=>h('div',{key:ci,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',height:'100%'}},
       h('div',{style:{flex:1,display:'flex',alignItems:'flex-end',gap:4,width:'100%',justifyContent:'center'}},
         cfSeries.map((s,si)=>h('div',{key:si,style:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-end',height:'100%'}},
-          h('div',{style:{fontSize:8.5,fontFamily:SF,fontWeight:600,color:'var(--muted)',marginBottom:2,whiteSpace:'nowrap'}}, s.vals[ci]),
+          h('div',{style:{fontSize:8.5,fontFamily:SF,fontWeight:600,color:'var(--muted)',marginBottom:2,whiteSpace:'nowrap'}}, '€'+s.vals[ci]+'m'),
           h('div',{title:`${s.name} ${c}: €${s.vals[ci]}m`,style:{width:17,height:(s.vals[ci]/cfMax*100)+'%',background:`var(${s.color})`,borderRadius:'3px 3px 0 0',minHeight:2,transition:'height .5s cubic-bezier(.4,0,.2,1)'}})))),
       h('div',{style:{fontSize:9.5,color:'var(--muted)',marginTop:6}},c));
     const cfPlot=h('div',{style:{flex:1,minHeight:160,display:'flex'}},
