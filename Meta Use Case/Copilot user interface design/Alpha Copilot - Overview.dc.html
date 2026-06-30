@@ -4891,7 +4891,8 @@ class Component extends DCLogic {
   }
 
   /* ====================== FUND vs FUND WORKBENCH ====================== */
-  FVF_FUNDS(){ return [
+  FVF_FUNDS(){ if(this.DB&&Array.isArray(this.DB.offerings)&&this.DB.offerings.length) return this.DB.offerings; /* review8 — offerings/platform funds now from the DB `offerings` atom; inline kept as fallback */
+   return [
     {id:'eqtx',name:'EQT X',mgr:'EQT Partners',logo:'eqt',strat:'Buyout',sk:'buyout',region:'Europe',vintage:2025,status:'open',fit:88,size:'€22.0bn',min:'€50k',close:'Sep 2026',
       perf:{moic:2.1,tvpi:1.9,dpi:0.72,irr:17.4}, fees:{mgmt:1.5,carry:20,hurdle:8,term:10, drag:2.4},
       sector:{tech:30,health:20,finance:14,industrial:18,consumer:12,energy:6}, geo:{na:18,europe:64,asia:12,row:6},

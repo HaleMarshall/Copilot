@@ -2465,5 +2465,371 @@
       },
       "offering": null
     }
-  }
+  },
+  "offerings": [
+    {
+      "id": "eqtx",
+      "name": "EQT X",
+      "mgr": "EQT Partners",
+      "logo": "eqt",
+      "strat": "Buyout",
+      "sk": "buyout",
+      "region": "Europe",
+      "vintage": 2025,
+      "status": "open",
+      "fit": 88,
+      "size": "€22.0bn",
+      "min": "€50k",
+      "close": "Sep 2026",
+      "perf": {
+        "moic": 2.1,
+        "tvpi": 1.9,
+        "dpi": 0.72,
+        "irr": 17.4
+      },
+      "fees": {
+        "mgmt": 1.5,
+        "carry": 20,
+        "hurdle": 8,
+        "term": 10,
+        "drag": 2.4
+      },
+      "sector": {
+        "tech": 30,
+        "health": 20,
+        "finance": 14,
+        "industrial": 18,
+        "consumer": 12,
+        "energy": 6
+      },
+      "geo": {
+        "na": 18,
+        "europe": 64,
+        "asia": 12,
+        "row": 6
+      },
+      "team": {
+        "size": 42,
+        "tenure": 11,
+        "keyman": "Stable — no changes",
+        "score": 8.6
+      },
+      "life": {
+        "deploy": 18,
+        "mode": "Buying"
+      }
+    },
+    {
+      "id": "arespcs",
+      "name": "Ares Private Credit Solutions III",
+      "mgr": "Ares Management",
+      "logo": "ares",
+      "strat": "Private Credit",
+      "sk": "credit",
+      "region": "Global",
+      "vintage": 2026,
+      "status": "open",
+      "fit": 94,
+      "size": "€8.0bn",
+      "min": "€50k",
+      "close": "Aug 2026",
+      "perf": {
+        "moic": 1.5,
+        "tvpi": 1.4,
+        "dpi": 0.55,
+        "irr": 13.2
+      },
+      "fees": {
+        "mgmt": 1.25,
+        "carry": 15,
+        "hurdle": 6,
+        "term": 8,
+        "drag": 1.9
+      },
+      "sector": {
+        "tech": 10,
+        "health": 14,
+        "finance": 30,
+        "industrial": 20,
+        "consumer": 14,
+        "energy": 12
+      },
+      "geo": {
+        "na": 58,
+        "europe": 30,
+        "asia": 8,
+        "row": 4
+      },
+      "team": {
+        "size": 28,
+        "tenure": 9,
+        "keyman": "Stable — no changes",
+        "score": 8.1
+      },
+      "life": {
+        "deploy": 24,
+        "mode": "Buying"
+      }
+    },
+    {
+      "id": "ga",
+      "name": "General Atlantic Inv. Partners",
+      "mgr": "General Atlantic",
+      "logo": "general-atlantic",
+      "strat": "Growth",
+      "sk": "growth",
+      "region": "North America",
+      "vintage": 2026,
+      "status": "open",
+      "fit": 76,
+      "size": "€6.5bn",
+      "min": "€75k",
+      "close": "Nov 2026",
+      "perf": {
+        "moic": 2.4,
+        "tvpi": 2,
+        "dpi": 0.48,
+        "irr": 19.1
+      },
+      "fees": {
+        "mgmt": 1.75,
+        "carry": 20,
+        "hurdle": 8,
+        "term": 10,
+        "drag": 2.8
+      },
+      "sector": {
+        "tech": 46,
+        "health": 16,
+        "finance": 14,
+        "industrial": 6,
+        "consumer": 16,
+        "energy": 2
+      },
+      "geo": {
+        "na": 62,
+        "europe": 18,
+        "asia": 16,
+        "row": 4
+      },
+      "team": {
+        "size": 36,
+        "tenure": 8,
+        "keyman": "1 partner departure (2024)",
+        "score": 7.4
+      },
+      "life": {
+        "deploy": 12,
+        "mode": "Buying"
+      }
+    },
+    {
+      "id": "lex",
+      "name": "Lexington Capital Partners XI",
+      "mgr": "Lexington Partners",
+      "logo": "lexington-partners",
+      "strat": "Secondaries",
+      "sk": "secondaries",
+      "region": "Global",
+      "vintage": 2026,
+      "status": "open",
+      "fit": 83,
+      "size": "€22.7bn",
+      "min": "€100k",
+      "close": "Dec 2026",
+      "perf": {
+        "moic": 1.7,
+        "tvpi": 1.5,
+        "dpi": 0.84,
+        "irr": 15.6
+      },
+      "fees": {
+        "mgmt": 1,
+        "carry": 12.5,
+        "hurdle": 7,
+        "term": 7,
+        "drag": 1.6
+      },
+      "sector": {
+        "tech": 24,
+        "health": 18,
+        "finance": 18,
+        "industrial": 16,
+        "consumer": 14,
+        "energy": 10
+      },
+      "geo": {
+        "na": 48,
+        "europe": 34,
+        "asia": 12,
+        "row": 6
+      },
+      "team": {
+        "size": 31,
+        "tenure": 13,
+        "keyman": "Stable — no changes",
+        "score": 8.3
+      },
+      "life": {
+        "deploy": 40,
+        "mode": "Deploying"
+      }
+    },
+    {
+      "id": "hg",
+      "name": "Hg Saturn 4",
+      "mgr": "Hg Capital",
+      "logo": "eqt",
+      "strat": "Buyout",
+      "sk": "buyout",
+      "region": "Europe",
+      "vintage": 2025,
+      "status": "open",
+      "fit": 79,
+      "size": "€11.0bn",
+      "min": "€50k",
+      "close": "Oct 2026",
+      "perf": {
+        "moic": 2.3,
+        "tvpi": 2.1,
+        "dpi": 0.66,
+        "irr": 18.8
+      },
+      "fees": {
+        "mgmt": 1.5,
+        "carry": 20,
+        "hurdle": 8,
+        "term": 10,
+        "drag": 2.5
+      },
+      "sector": {
+        "tech": 58,
+        "health": 8,
+        "finance": 14,
+        "industrial": 10,
+        "consumer": 8,
+        "energy": 2
+      },
+      "geo": {
+        "na": 22,
+        "europe": 66,
+        "asia": 8,
+        "row": 4
+      },
+      "team": {
+        "size": 38,
+        "tenure": 12,
+        "keyman": "Stable — no changes",
+        "score": 8.5
+      },
+      "life": {
+        "deploy": 16,
+        "mode": "Buying"
+      }
+    },
+    {
+      "id": "cvc",
+      "name": "CVC Capital Partners IX",
+      "mgr": "CVC",
+      "logo": "eqt",
+      "strat": "Buyout",
+      "sk": "buyout",
+      "region": "Europe",
+      "vintage": 2024,
+      "status": "held",
+      "fit": 72,
+      "size": "€26.0bn",
+      "min": "€50k",
+      "close": "Closed",
+      "perf": {
+        "moic": 1.7,
+        "tvpi": 1.6,
+        "dpi": 0.61,
+        "irr": 13.9
+      },
+      "fees": {
+        "mgmt": 2,
+        "carry": 20,
+        "hurdle": 8,
+        "term": 10,
+        "drag": 3.1
+      },
+      "sector": {
+        "tech": 22,
+        "health": 18,
+        "finance": 18,
+        "industrial": 20,
+        "consumer": 16,
+        "energy": 6
+      },
+      "geo": {
+        "na": 20,
+        "europe": 62,
+        "asia": 12,
+        "row": 6
+      },
+      "team": {
+        "size": 45,
+        "tenure": 10,
+        "keyman": "1 key-man change (2023)",
+        "score": 7.6
+      },
+      "life": {
+        "deploy": 72,
+        "mode": "Harvesting"
+      }
+    },
+    {
+      "id": "thrive",
+      "name": "Thrive Capital VIII",
+      "mgr": "Thrive Capital",
+      "logo": "general-atlantic",
+      "strat": "Venture / AI",
+      "sk": "ai",
+      "region": "North America",
+      "vintage": 2022,
+      "status": "passed",
+      "fit": 64,
+      "size": "€4.2bn",
+      "min": "€100k",
+      "close": "Passed 2022",
+      "perf": {
+        "moic": 2.6,
+        "tvpi": 2.3,
+        "dpi": 0.31,
+        "irr": 21
+      },
+      "fees": {
+        "mgmt": 2,
+        "carry": 25,
+        "hurdle": 0,
+        "term": 10,
+        "drag": 3.6
+      },
+      "sector": {
+        "tech": 72,
+        "health": 6,
+        "finance": 8,
+        "industrial": 2,
+        "consumer": 10,
+        "energy": 0
+      },
+      "geo": {
+        "na": 82,
+        "europe": 10,
+        "asia": 6,
+        "row": 2
+      },
+      "team": {
+        "size": 22,
+        "tenure": 7,
+        "keyman": "Founder-led, concentrated",
+        "score": 7.1
+      },
+      "life": {
+        "deploy": 88,
+        "mode": "Harvesting"
+      }
+    }
+  ]
 }
