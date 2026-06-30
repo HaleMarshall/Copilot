@@ -7061,7 +7061,8 @@ class Component extends DCLogic {
       {ac:'Venture',irr:23.1,cons:80,funds:[{id:'index-xii',name:'Index Ventures XII',irr:23.1,vintage:2022}]}]}
   ]; }
   /* items 199/204/207/208/215/219 — manager-level profile metadata (domicile, listed status, firm history, since-inception KPIs, scores, top-quartile, current offering) */
-  MGR_META(){ return {
+  MGR_META(){ if(this.DB&&this.DB.managers&&Object.keys(this.DB.managers).length) return this.DB.managers; /* review8 — manager firm records now from the DB `managers` atom; inline kept as fallback */
+   return {
     eqt:        {country:'Sweden',     demonym:'Swedish',  listed:true,  est:1994, aum:'€232bn', moic:2.4, since:18.1, avgDpi:1.9, nFunds:24, topQ:18, scores:{consistency:88,delivery:85,markup:82}, offering:'EQT XI (Buyout)'},
     kkr:        {country:'USA',        demonym:'American', listed:true,  est:1976, aum:'$638bn', moic:2.3, since:16.8, avgDpi:1.85,nFunds:22, topQ:15, scores:{consistency:85,delivery:83,markup:80}, offering:'KKR North America XIV'},
     blackstone: {country:'USA',        demonym:'American', listed:true,  est:1985, aum:'$1.1tn', moic:2.5, since:17.5, avgDpi:2.0, nFunds:30, topQ:22, scores:{consistency:84,delivery:86,markup:83}, offering:'Blackstone Capital X'},

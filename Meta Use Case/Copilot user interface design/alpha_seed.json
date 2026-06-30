@@ -2193,5 +2193,277 @@
         1.2
       ]
     ]
+  },
+  "managers": {
+    "eqt": {
+      "country": "Sweden",
+      "demonym": "Swedish",
+      "listed": true,
+      "est": 1994,
+      "aum": "€232bn",
+      "moic": 2.4,
+      "since": 18.1,
+      "avgDpi": 1.9,
+      "nFunds": 24,
+      "topQ": 18,
+      "scores": {
+        "consistency": 88,
+        "delivery": 85,
+        "markup": 82
+      },
+      "offering": "EQT XI (Buyout)"
+    },
+    "kkr": {
+      "country": "USA",
+      "demonym": "American",
+      "listed": true,
+      "est": 1976,
+      "aum": "$638bn",
+      "moic": 2.3,
+      "since": 16.8,
+      "avgDpi": 1.85,
+      "nFunds": 22,
+      "topQ": 15,
+      "scores": {
+        "consistency": 85,
+        "delivery": 83,
+        "markup": 80
+      },
+      "offering": "KKR North America XIV"
+    },
+    "blackstone": {
+      "country": "USA",
+      "demonym": "American",
+      "listed": true,
+      "est": 1985,
+      "aum": "$1.1tn",
+      "moic": 2.5,
+      "since": 17.5,
+      "avgDpi": 2.0,
+      "nFunds": 30,
+      "topQ": 22,
+      "scores": {
+        "consistency": 84,
+        "delivery": 86,
+        "markup": 83
+      },
+      "offering": "Blackstone Capital X"
+    },
+    "carlyle": {
+      "country": "USA",
+      "demonym": "American",
+      "listed": true,
+      "est": 1987,
+      "aum": "$447bn",
+      "moic": 2.1,
+      "since": 14.2,
+      "avgDpi": 1.7,
+      "nFunds": 26,
+      "topQ": 14,
+      "scores": {
+        "consistency": 76,
+        "delivery": 75,
+        "markup": 72
+      },
+      "offering": null
+    },
+    "ares": {
+      "country": "USA",
+      "demonym": "American",
+      "listed": true,
+      "est": 1997,
+      "aum": "$484bn",
+      "moic": 1.9,
+      "since": 12.9,
+      "avgDpi": 1.5,
+      "nFunds": 18,
+      "topQ": 11,
+      "scores": {
+        "consistency": 87,
+        "delivery": 84,
+        "markup": 80
+      },
+      "offering": "Ares Private Credit V"
+    },
+    "cvc": {
+      "country": "Luxembourg",
+      "demonym": "European",
+      "listed": true,
+      "est": 1981,
+      "aum": "€193bn",
+      "moic": 2.6,
+      "since": 18.9,
+      "avgDpi": 2.1,
+      "nFunds": 14,
+      "topQ": 11,
+      "scores": {
+        "consistency": 83,
+        "delivery": 82,
+        "markup": 84
+      },
+      "offering": null
+    },
+    "cinven": {
+      "country": "UK",
+      "demonym": "British",
+      "listed": false,
+      "est": 1977,
+      "aum": "€40bn",
+      "moic": 2.2,
+      "since": 16.1,
+      "avgDpi": 1.8,
+      "nFunds": 12,
+      "topQ": 8,
+      "scores": {
+        "consistency": 80,
+        "delivery": 79,
+        "markup": 77
+      },
+      "offering": null
+    },
+    "genatl": {
+      "country": "USA",
+      "demonym": "American",
+      "listed": false,
+      "est": 1980,
+      "aum": "$100bn",
+      "moic": 2.7,
+      "since": 20.4,
+      "avgDpi": 2.2,
+      "nFunds": 16,
+      "topQ": 12,
+      "scores": {
+        "consistency": 82,
+        "delivery": 80,
+        "markup": 79
+      },
+      "offering": "GA Growth XIII"
+    },
+    "thomabravo": {
+      "country": "USA",
+      "demonym": "American",
+      "listed": false,
+      "est": 2008,
+      "aum": "$160bn",
+      "moic": 2.9,
+      "since": 24.1,
+      "avgDpi": 2.4,
+      "nFunds": 15,
+      "topQ": 13,
+      "scores": {
+        "consistency": 89,
+        "delivery": 88,
+        "markup": 86
+      },
+      "offering": "Thoma Bravo XVI"
+    },
+    "hg": {
+      "country": "UK",
+      "demonym": "British",
+      "listed": false,
+      "est": 2000,
+      "aum": "$75bn",
+      "moic": 2.8,
+      "since": 22.7,
+      "avgDpi": 2.3,
+      "nFunds": 18,
+      "topQ": 16,
+      "scores": {
+        "consistency": 90,
+        "delivery": 89,
+        "markup": 87
+      },
+      "offering": "Hg Saturn 4"
+    },
+    "antin": {
+      "country": "France",
+      "demonym": "French",
+      "listed": true,
+      "est": 2007,
+      "aum": "€31bn",
+      "moic": 2.0,
+      "since": 14.8,
+      "avgDpi": 1.6,
+      "nFunds": 9,
+      "topQ": 7,
+      "scores": {
+        "consistency": 85,
+        "delivery": 83,
+        "markup": 81
+      },
+      "offering": null
+    },
+    "lexington": {
+      "country": "USA",
+      "demonym": "American",
+      "listed": false,
+      "est": 1994,
+      "aum": "$70bn",
+      "moic": 2.1,
+      "since": 13.7,
+      "avgDpi": 1.7,
+      "nFunds": 22,
+      "topQ": 15,
+      "scores": {
+        "consistency": 88,
+        "delivery": 85,
+        "markup": 84
+      },
+      "offering": null
+    },
+    "insight": {
+      "country": "USA",
+      "demonym": "American",
+      "listed": false,
+      "est": 1995,
+      "aum": "$90bn",
+      "moic": 2.4,
+      "since": 18.0,
+      "avgDpi": 1.9,
+      "nFunds": 13,
+      "topQ": 9,
+      "scores": {
+        "consistency": 78,
+        "delivery": 77,
+        "markup": 75
+      },
+      "offering": "Insight Partners XIII"
+    },
+    "thrive": {
+      "country": "USA",
+      "demonym": "American",
+      "listed": false,
+      "est": 2010,
+      "aum": "$25bn",
+      "moic": 2.6,
+      "since": 26.5,
+      "avgDpi": 2.1,
+      "nFunds": 9,
+      "topQ": 7,
+      "scores": {
+        "consistency": 74,
+        "delivery": 76,
+        "markup": 73
+      },
+      "offering": "Thrive Capital IX"
+    },
+    "index": {
+      "country": "UK",
+      "demonym": "British",
+      "listed": false,
+      "est": 1996,
+      "aum": "$13bn",
+      "moic": 2.5,
+      "since": 23.1,
+      "avgDpi": 2.0,
+      "nFunds": 12,
+      "topQ": 9,
+      "scores": {
+        "consistency": 80,
+        "delivery": 81,
+        "markup": 78
+      },
+      "offering": null
+    }
   }
 }
