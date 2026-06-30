@@ -2836,15 +2836,16 @@ class Component extends DCLogic {
   pill(k,opts,def){ return this.seg(opts.map(o=>typeof o==='string'?{label:o,value:o}:o), this.dtog(k,def), v=>this.setDtog(k,v), {sm:true}); }
   twoCol(a,b,cols){ return this.h('div',{style:{display:'grid',gridTemplateColumns:cols||'1fr 1fr',gap:16,alignItems:'stretch'}},a,b); }
   stack(arr){ return this.h('div',{style:{display:'flex',flexDirection:'column',gap:14}},arr); }
-  groupedBars(cats, series){
+  groupedBars(cats, series, opts){
     const h=this.h; const max=Math.max(...series.flatMap(s=>s.vals),1)*1.22;
+    const u=opts&&opts.unit; const lbl=(v)=> u? ('€'+v+u) : v;   /* money charts: €-prefix so the global-currency wrapper converts the label */
     return h('div',null,
       h('div',{style:{display:'flex',alignItems:'flex-end',gap:16,height:300,padding:'0 6px'}},
         cats.map((c,ci)=>h('div',{key:ci,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',height:'100%'}},
           h('div',{style:{flex:1,display:'flex',alignItems:'flex-end',gap:5,width:'100%',justifyContent:'center'}},
             series.map((s,si)=>h('div',{key:si,style:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-end',height:'100%'}},
-              h('div',{style:{fontSize:12,fontFamily:this.SF,fontWeight:600,color:'var(--ink)',marginBottom:4,whiteSpace:'nowrap'}}, s.vals[ci]),
-              h('div',{title:`${s.name} ${s.vals[ci]}`,style:{width:Math.max(16,58/series.length),height:(s.vals[ci]/max*100)+'%',background:`var(${s.color})`,borderRadius:'4px 4px 0 0',minHeight:3,transition:'height .55s cubic-bezier(.4,0,.2,1), background .3s ease'}})))),
+              h('div',{style:{fontSize:12,fontFamily:this.SF,fontWeight:600,color:'var(--ink)',marginBottom:4,whiteSpace:'nowrap'}}, lbl(s.vals[ci])),
+              h('div',{title:`${s.name} ${lbl(s.vals[ci])}`,style:{width:Math.max(16,58/series.length),height:(s.vals[ci]/max*100)+'%',background:`var(${s.color})`,borderRadius:'4px 4px 0 0',minHeight:3,transition:'height .55s cubic-bezier(.4,0,.2,1), background .3s ease'}})))),
           h('div',{style:{fontSize:11.5,color:'var(--muted)',marginTop:8,fontFamily:"Inter,system-ui,sans-serif"}},c)))),
       h('div',{style:{display:'flex',gap:18,justifyContent:'center',marginTop:12,flexWrap:'wrap'}}, series.map((s,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',gap:7,fontSize:12.5}},h('span',{style:{width:10,height:10,borderRadius:2,background:`var(${s.color})`}}),s.name))));
   }
@@ -3281,7 +3282,7 @@ class Component extends DCLogic {
       't1-4:plan':()=>{ const span=this.dtog('pace','5-year'); const yrs=span==='3-year'?['2026','2027','2028']:['2026','2027','2028','2029','2030'];
         const you=[2.4,2.1,2.6,2.2,1.9].slice(0,yrs.length), peer=[1.8,1.9,2.0,1.8,1.7].slice(0,yrs.length);
         return this.twoCol(
-          this.card({title:'Commitments per year (€m)',right:this.pill('pace',['3-year','5-year'],'5-year'),children:this.groupedBars(yrs,[{name:'Your plan',color:'--data-1',vals:you},{name:'Peer pace',color:'--data-7',vals:peer}]),caption:'A steady €2m-a-year cadence spreads vintage risk and avoids bunching like your 2021–22 concentration.'}),
+          this.card({title:'Commitments per year (€m)',right:this.pill('pace',['3-year','5-year'],'5-year'),children:this.groupedBars(yrs,[{name:'Your plan',color:'--data-1',vals:you},{name:'Peer pace',color:'--data-7',vals:peer}],{unit:'m'}),caption:'A steady €2m-a-year cadence spreads vintage risk and avoids bunching like your 2021–22 concentration.'}),
           this.card({title:'Cumulative committed (€m)',children:h('div',null,this.scenarioSvg([{name:'Your plan',color:'--data-1',main:true,vals:this.vz(19,[2.4, 4.5, 7.1, 9.3, 11.2])},{name:'Peer pace',color:'--data-7',dash:true,vals:this.vz(20,[1.8, 3.7, 5.7, 7.5, 9.2])}],['2026','2027','2028','2029','2030']),this.lineLegend([{name:'Your plan',color:'--data-1'},{name:'Peer pace',color:'--data-7',dash:true}])),caption:'You deploy a little ahead of peers — front-loading while valuations are reasonable.'}));
       },
       't1-4:stress':()=>this.twoCol(
@@ -8094,7 +8095,7 @@ class Component extends DCLogic {
         const ccyDim=dimsAll.find(x=>x.key==='currency'); const th=(t)=>h('th',{style:{textAlign:'left',padding:'7px 9px',fontSize:10,textTransform:'uppercase',letterSpacing:'.04em',color:'var(--muted)',borderBottom:'2px solid var(--line)'}},t); const td=(v)=>h('td',{style:{padding:'8px 9px',borderBottom:'1px solid var(--line)',fontSize:12}},v);
         const holdingsTable=this.card({title:'Holdings — fund-level detail',badge:this.badge('L3 · Bloomberg view','synth'),children:h('div',{style:{overflowX:'auto'}}, h('table',{style:{width:'100%',borderCollapse:'collapse',minWidth:560}}, h('thead',null,h('tr',null,th('Fund'),th('Strategy'),th('Vintage'),th('NAV'),th('TVPI'),th('DPI'),th('IRR'))), h('tbody',null, held.map(f=>h('tr',{key:f.id}, td(h('b',null,f.name)), td(f.strat), td(String(f.vintage||'—')), td(f.nav||'—'), td(f.tvpi||'—'), td(f.dpi||'—'), td(f.irr||'—')))))),caption:'Every holding, with per-fund TVPI / DPI / IRR — the detail an L3 family office expects.'});
         const fxCard=this.card({title:'Currency & FX exposure',style:{flex:'1 1 300px'},children:ccyDim?this.donutNamed(Object.keys(ccyDim.actual).map((k,i)=>({name:k,p:ccyDim.actual[k],color:(ccyDim.colors&&ccyDim.colors[k])||('--data-'+((i%9)+1))})),140,fx.base||'EUR','base'):h('div',{style:{fontSize:12,color:'var(--muted)'}},'—'),caption:'Underlying currency mix · base '+(fx.base||'EUR')+' · spot 1 EUR = '+((fx.rates&&fx.rates.USD)||1.083)+' USD.'});
-        const vintCard=this.card({title:'Vintage spread (NAV by year)',style:{flex:'1 1 320px'},children:this.groupedBars(['2019','2020','2021','2022','2023','2024','2025'],[{name:'NAV €m',color:'--data-3',vals:this.vz(1,[4.6,2.4,3.8,2.1,1.9,1.2,0.6])}]),caption:'Diversification across vintage years smooths the J-curve.'});
+        const vintCard=this.card({title:'Vintage spread (NAV by year)',style:{flex:'1 1 320px'},children:this.groupedBars(['2019','2020','2021','2022','2023','2024','2025'],[{name:'NAV €m',color:'--data-3',vals:this.vz(1,[4.6,2.4,3.8,2.1,1.9,1.2,0.6])}],{unit:'m'}),caption:'Diversification across vintage years smooths the J-curve.'});
         return wrap([ head('Your portfolio — as it stands', lvl('A clean summary — no deep detail.','Strategy, sector, region & currency — the dimensions that matter.','Full detail: funds, companies, countries, GPs and FX — the Bloomberg view.')),
           this.card({title:'Headline',children:tiles}),
           dims.length?h('div',{style:{display:'flex',gap:16,flexWrap:'wrap'}}, dims):null,
@@ -8306,7 +8307,7 @@ class Component extends DCLogic {
         kpi('Avg fund fill rate','71%','+4pp QoQ',true)),
       h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}},
         this.card({title:'Platform AUM growth (€bn, last 6 quarters)',children:this.fAxisLine([{name:'AUM',color:'--data-1',main:true,vals:this.vz(55,[3.1, 3.4, 3.6, 3.9, 4.0, 4.2])}],['Q1','Q2','Q3','Q4','Q1','Q2'],{H:210,fmt:v=>'€'+v+'bn'}),caption:'Total assets on the platform — steady compounding across all investors.'}),
-        this.card({title:'Net new commitments by strategy (€m, this quarter)',children:this.groupedBars(['Buyout','Credit','Secondaries','Infra','Growth'],[{name:'€m',color:'--data-1',vals:this.vz(56,[120, 78, 52, 34, 26])}]),caption:'Where this quarter’s new capital went — private credit and secondaries gaining share.'}),
+        this.card({title:'Net new commitments by strategy (€m, this quarter)',children:this.groupedBars(['Buyout','Credit','Secondaries','Infra','Growth'],[{name:'€m',color:'--data-1',vals:this.vz(56,[120, 78, 52, 34, 26])}],{unit:'m'}),caption:'Where this quarter’s new capital went — private credit and secondaries gaining share.'}),
         this.card({title:'Cohort allocation trend (last 6 quarters)',children:this.groupedBars(['Q1','Q2','Q3','Q4','Q1','Q2'],[{name:'Private credit %',color:'--data-4',vals:this.vz(57,[8, 9, 11, 12, 13, 15])},{name:'Secondaries %',color:'--data-7',vals:this.vz(58,[5, 5, 6, 7, 8, 9])}]),caption:'Platform-wide drift toward private credit and secondaries — aggregate across all investors.'}),
         this.card({title:'Manager-pattern intelligence',children:this.groupedBars(['Software','Health','Industrials','Energy','Consumer'],[{name:'Top-manager focus',color:'--data-1',vals:this.vz(59,[9, 6, 4, 3, 2])}]),caption:'Where top-ranked managers concentrate — aggregated from the manager universe.'}),
         this.card({title:'Fund fill rate by strategy (%)',children:this.groupedBars(['Buyout','Credit','Secondaries','Infra','Growth'],[{name:'Fill %',color:'--data-5',vals:this.vz(60,[82, 74, 68, 61, 55])}]),caption:'How fast each strategy’s funds fill — a demand signal for product & sales.'}),
