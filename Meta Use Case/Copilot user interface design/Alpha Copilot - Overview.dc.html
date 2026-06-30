@@ -1773,7 +1773,7 @@ class Component extends DCLogic {
       h('div',{style:{fontFamily:SF,fontSize:15,fontWeight:700,color:'#111'}},title));
     const foot=(n)=>h('div',{style:{display:'flex',justifyContent:'space-between',marginTop:14,paddingTop:8,borderTop:'1px solid #e6e6e6',fontSize:9.5,color:'#999'}}, h('span',null,'Moonfare · Alpha — Portfolio Report · Confidential'), h('span',null,'Page '+n+' · as of '+asOf));
     const pageWrap=(title,n,body)=>h('div',{className:'sc-pdf-page',style:{padding:'10px 0 18px',marginBottom:18,borderBottom:'1px dashed #ddd'}}, brand(title), body, foot(n));
-    const kpis=[['Net asset value',P.navText||'€16.6m'],['Net IRR',P.irr||'11.0%'],['Net MOIC',P.moicTableNet||'1.80x'],['TVPI',P.tvpiTableNet||'2.10x'],['DPI',P.dpiTableNet||'0.82x'],['Committed','€20.5m']];
+    const kpis=[['Net asset value',P.navText||'€16.6m'],['Net IRR',(P.irr||'11.0')+'%'],['Net MOIC',P.moicTableNet||'1.80x'],['TVPI',P.tvpiTableNet||'2.10x'],['DPI',P.dpiTableNet||'0.82x'],['Committed',P.committed||'€20.5m']];
     const kpiGrid=h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10}}, kpis.map((t,i)=>h('div',{key:i,style:{border:'1px solid #e6e6e6',borderRadius:10,padding:'10px 12px',background:'#fafafa'}}, h('div',{style:{fontSize:10.5,color:'#777',marginBottom:2}},t[0]), h('div',{style:{fontFamily:SF,fontSize:18,fontWeight:700,color:'#111'}},t[1]))));
     const dims=[['strategy','Strategy'],['region','Region'],['currency','Currency'],['sector','Sector']];
     const cover=h('div',{className:'sc-pdf-page',style:{marginBottom:18,borderBottom:'1px dashed #ddd',borderRadius:12,overflow:'hidden'}},
@@ -4364,11 +4364,12 @@ class Component extends DCLogic {
         h('button',{onClick:()=>this.askFromPage('I’d like to add more cash to my cash account.'),style:{alignSelf:'flex-start',border:'none',background:'transparent',color:'var(--brand-ink)',fontSize:12,fontWeight:600,cursor:'pointer',padding:0,fontFamily:'Inter,system-ui,sans-serif'}},'＋ Or add more cash to your account')) : null;
       body=[
         /* item 89 — top KPI row: Committed · Called · Uncalled · Cash Position (uncrowded) */
-        this.kpiTiles([['Committed','€20.5m','total commitment'],['Called','€16.6m','drawn to date'],['Uncalled','€3.9m','committed, not drawn'],['Cash Position','€1.1m','in your cash account']]),
+        /* review8 — cash KPI tiles read from the DB (portfolio + bank atoms) */
+        (()=>{ const _P=(this.DB&&this.DB.portfolio)||{}; const _B=(this.DB&&this.DB.bank)||{}; return this.kpiTiles([['Committed',_P.committed||'€20.5m','total commitment'],['Called',_P.calledText||'€13.0m','drawn to date'],['Uncalled',_P.uncalled||'€7.5m','committed, not drawn'],['Cash Position',_B.cashPositionText||'€1.1m','in your cash account']]); })(),
         /* item 91 — Net Distributions (distributions − capital calls) below the top row, separate from Cash Position */
         h('div',{key:'nd',style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,border:'1px solid var(--line)',borderRadius:12,padding:'11px 14px',background:'var(--surface-2)'}},
-          h('div',{style:{minWidth:0}}, h('div',{style:{fontSize:12,fontWeight:700,color:'var(--ink)'}},'Net Distributions'), h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:1}},'distributions − capital calls (what you’ve gotten back)')),
-          h('div',{style:{fontFamily:SF,fontSize:20,fontWeight:700,color:'var(--over)',flex:'0 0 auto'}},'+€0.9m')),
+          h('div',{style:{minWidth:0}}, h('div',{style:{fontSize:12,fontWeight:700,color:'var(--ink)'}},'Net Distributions'), h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:1}},'distributions − capital called (cumulative)')),
+          (()=>{ const nd=((this.DB&&this.DB.portfolio&&this.DB.portfolio.netDistCumulative)!=null?this.DB.portfolio.netDistCumulative:0); const pos=nd>=0; return h('div',{style:{fontFamily:SF,fontSize:20,fontWeight:700,color:pos?'var(--over)':'var(--under)',flex:'0 0 auto'}},(pos?'+':'−')+'€'+Math.abs(nd).toFixed(1)+'m'); })()),
         investPrompt,
         /* item 92 — reassuring, non-technical Alpha cashflow summary (J-curve framing) */
         this.card({title:'Alpha’s read on your cash flow',badge:this.badge('AI','synth'),tone:'alpha',
@@ -5531,12 +5532,13 @@ class Component extends DCLogic {
         h('div',{style:{fontSize:11,color:'var(--muted)'}},lab), h('div',{style:{fontFamily:SF,fontSize:20,fontWeight:700,color:col||'var(--ink)',marginTop:3}},val), sub?h('div',{style:{fontSize:10,color:'var(--muted)',marginTop:1}},sub):null);
       const cashBoxesCard=this.card({title:'Committed · called · distributions',badge:this.badge('your portfolio','conf'),style:{height:'100%'},
         children:h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}},
+          /* review8 — every cash box now reads from the DB (portfolio totals + bank atom) */
           cashTile('Committed',P.committed||'€20.5m','total commitment'),
-          cashTile('Called',P.navText||'€16.6m','drawn to date'),
-          cashTile('Uncalled',P.uncalled||'€3.9m','committed, not drawn'),
+          cashTile('Called',P.calledText||'€13.0m','drawn to date'),
+          cashTile('Uncalled',P.uncalled||'€7.5m','committed, not drawn'),
           cashTile('Distributions',P.distributionsText||'€10.6m','returned'),
-          cashTile('Cash position',P.cashPosition||'€1.1m','in your cash account'),
-          cashTile('Net distributions','+€0.9m','distributions − calls','var(--over)'))});
+          cashTile('Cash position',((this.DB&&this.DB.bank&&this.DB.bank.cashPositionText)||'€1.1m'),'in your cash account'),
+          (()=>{ const nd=(P.netDistCumulative!=null?P.netDistCumulative:0); const pos=nd>=0; return cashTile('Net distributions',(pos?'+':'−')+'€'+Math.abs(nd).toFixed(1)+'m','distributions − called', pos?'var(--over)':'var(--under)'); })())});
       content=h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
         h('div',{style:{display:'grid',gridTemplateColumns:'minmax(0,1fr) minmax(0,1.05fr)',gap:16,alignItems:'stretch'}}, cashBoxesCard, cfChart),
         /* review7 items 18/19 — MERGED view named 'Investments, Committed, Called, and Performance': the table and the J-curve graph in one card; click a row to highlight that fund's logo on the curve (right); default shows every fund's logo */
