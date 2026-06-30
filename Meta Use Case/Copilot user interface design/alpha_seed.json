@@ -12,9 +12,9 @@
     "dpiTableNet": "0.82x",
     "dpiTableGross": "0.90x",
     "moic": "1.8",
-    "moicTableNet": "1.80x",
+    "moicTableNet": "2.09x",
     "moicTableGross": "1.95x",
-    "tvpiTableNet": "2.10x",
+    "tvpiTableNet": "2.09x",
     "tvpiTableGross": "2.30x",
     "fundsHeld": 8,
     "managers": 6,
@@ -22,7 +22,7 @@
     "largestHoldingDetail": "€4.6m · 28% NAV",
     "rank": "Top 18%",
     "cashPosition": "€1.1m",
-    "uncalled": "€3.9m",
+    "uncalled": "€7.5m",
     "committable": "€4.3m",
     "tvpi": "2.1",
     "committed": "€20.5m",
@@ -31,7 +31,15 @@
     "baseCcy": "EUR",
     "qoqAbs": "+€0.6m",
     "qoqPct": "+3.7%",
-    "reporting": "5 of 8 funds reporting Q1 2026 · 3 lagged at Q4 2025"
+    "reporting": "5 of 8 funds reporting Q1 2026 · 3 lagged at Q4 2025",
+    "committedNum": 20.5,
+    "called": 13.0,
+    "calledText": "€13.0m",
+    "uncalledNum": 7.5,
+    "rvpi": 1.28,
+    "netDistCumulative": -2.4,
+    "netDistTTM": 4.1,
+    "netGain": 3.6
   },
   "pm": {
     "you": 15.7,
@@ -234,22 +242,22 @@
       "2025"
     ],
     "calls": [
-      1.2,
-      1.6,
-      2.1,
-      1.7,
-      1.2,
-      0.9,
-      0.6
-    ],
-    "distributions": [
-      0.3,
-      0.7,
-      1.1,
       1.6,
       2.0,
-      2.3,
-      2.6
+      3.2,
+      2.4,
+      1.8,
+      1.4,
+      0.7
+    ],
+    "distributions": [
+      0.0,
+      0.0,
+      0.3,
+      0.8,
+      1.8,
+      2.9,
+      4.8
     ]
   },
   "heldFunds": [
@@ -261,15 +269,15 @@
       "strat": "Buyout",
       "vintage": 2019,
       "contrib": 1.8,
-      "moic": "2.3x",
-      "dpi": "1.1x",
-      "irr": "19.4%",
+      "moic": "2.9x",
+      "dpi": "1.4x",
+      "irr": "16.3%",
       "nav": "€4.6m",
-      "called": "92%",
+      "called": "91%",
       "stage": "Harvesting",
       "note": "Top contributor this quarter — three portfolio exits marked up.",
-      "tvpi": "2.4x",
-      "dvpi": "2.3x",
+      "tvpi": "2.9x",
+      "dvpi": "2.6x",
       "month": "Mar 2019",
       "navUncommitted": "€0.2m"
     },
@@ -281,15 +289,15 @@
       "strat": "AI / Tech",
       "vintage": 2021,
       "contrib": 1.2,
-      "moic": "1.9x",
-      "dpi": "0.3x",
-      "irr": "16.1%",
+      "moic": "1.8x",
+      "dpi": "0.4x",
+      "irr": "12.1%",
       "nav": "€3.1m",
-      "called": "74%",
+      "called": "73%",
       "stage": "Buying",
       "note": "AI holdings re-rated; still early on realisations.",
-      "tvpi": "2.0x",
-      "dvpi": "1.9x",
+      "tvpi": "1.8x",
+      "dvpi": "1.3x",
       "month": "Jul 2021",
       "navUncommitted": "€1.0m"
     },
@@ -301,15 +309,15 @@
       "strat": "Growth",
       "vintage": 2020,
       "contrib": 0.7,
-      "moic": "1.7x",
-      "dpi": "0.5x",
-      "irr": "14.2%",
+      "moic": "2.3x",
+      "dpi": "1.1x",
+      "irr": "14.8%",
       "nav": "€2.4m",
-      "called": "81%",
+      "called": "84%",
       "stage": "Deploying",
       "note": "Steady growth-equity compounding across tech & consumer.",
-      "tvpi": "1.8x",
-      "dvpi": "1.7x",
+      "tvpi": "2.3x",
+      "dvpi": "1.9x",
       "month": "Feb 2020",
       "navUncommitted": "€0.6m"
     },
@@ -321,15 +329,15 @@
       "strat": "Buyout",
       "vintage": 2022,
       "contrib": 0.4,
-      "moic": "1.4x",
-      "dpi": "0.2x",
+      "moic": "1.6x",
+      "dpi": "0.3x",
       "irr": "11.8%",
       "nav": "€2.0m",
-      "called": "58%",
+      "called": "64%",
       "stage": "Buying",
       "note": "Mid-life European buyout — tracking plan.",
-      "tvpi": "1.5x",
-      "dvpi": "1.4x",
+      "tvpi": "1.6x",
+      "dvpi": "1.0x",
       "month": "Sep 2022",
       "navUncommitted": "€1.1m"
     },
@@ -341,14 +349,14 @@
       "strat": "Private Credit",
       "vintage": 2023,
       "contrib": -0.3,
-      "moic": "1.1x",
-      "dpi": "0.1x",
-      "irr": "8.4%",
+      "moic": "2.0x",
+      "dpi": "0.6x",
+      "irr": "26.0%",
       "nav": "€1.5m",
-      "called": "46%",
+      "called": "55%",
       "stage": "Deploying",
       "note": "Income accruing; mark held flat — small drag this quarter.",
-      "tvpi": "1.2x",
+      "tvpi": "2.0x",
       "dvpi": "1.1x",
       "month": "May 2023",
       "navUncommitted": "€1.4m"
@@ -361,15 +369,15 @@
       "strat": "Buyout",
       "vintage": 2021,
       "contrib": -0.6,
-      "moic": "1.2x",
-      "dpi": "0.1x",
-      "irr": "7.1%",
+      "moic": "2.1x",
+      "dpi": "0.9x",
+      "irr": "15.6%",
       "nav": "€1.8m",
-      "called": "69%",
+      "called": "80%",
       "stage": "Buying",
       "note": "One holding written down — biggest detractor this quarter.",
-      "tvpi": "1.3x",
-      "dvpi": "1.2x",
+      "tvpi": "2.1x",
+      "dvpi": "1.6x",
       "month": "Nov 2021",
       "navUncommitted": "€0.8m"
     },
@@ -381,15 +389,15 @@
       "strat": "Infrastructure",
       "vintage": 2024,
       "contrib": -0.2,
-      "moic": "0.9x",
-      "dpi": "0.0x",
-      "irr": "−4.0%",
+      "moic": "1.1x",
+      "dpi": "0.1x",
+      "irr": "6.9%",
       "nav": "€0.7m",
-      "called": "38%",
+      "called": "28%",
       "stage": "J-curve",
       "note": "Young infra fund — J-curve trough, expected.",
-      "tvpi": "0.9x",
-      "dvpi": "0.9x",
+      "tvpi": "1.1x",
+      "dvpi": "0.3x",
       "month": "Jan 2024",
       "navUncommitted": "€1.2m"
     },
@@ -403,13 +411,13 @@
       "contrib": -0.1,
       "moic": "1.0x",
       "dpi": "0.0x",
-      "irr": "−1.2%",
+      "irr": "0.0%",
       "nav": "€0.5m",
-      "called": "22%",
+      "called": "20%",
       "stage": "J-curve",
       "note": "Recently called; too early to mark.",
       "tvpi": "1.0x",
-      "dvpi": "1.0x",
+      "dvpi": "0.2x",
       "month": "Aug 2024",
       "navUncommitted": "€1.5m"
     }
@@ -423,7 +431,55 @@
       "vintage": 2019,
       "nav": 4.6,
       "format": "Primary funds",
-      "committed": 3.5
+      "committed": 3.5,
+      "called": 3.2,
+      "distributions": 4.6,
+      "paidIn": 3.2,
+      "uncalled": 0.3,
+      "committedNative": 3.5,
+      "navNative": 4.6,
+      "cf": [
+        {
+          "y": 2019,
+          "call": 1.6,
+          "dist": 0.0
+        },
+        {
+          "y": 2020,
+          "call": 0.96,
+          "dist": 0.0
+        },
+        {
+          "y": 2021,
+          "call": 0.64,
+          "dist": 0.31
+        },
+        {
+          "y": 2022,
+          "call": 0.0,
+          "dist": 0.61
+        },
+        {
+          "y": 2023,
+          "call": 0.0,
+          "dist": 0.92
+        },
+        {
+          "y": 2024,
+          "call": 0.0,
+          "dist": 1.23
+        },
+        {
+          "y": 2025,
+          "call": 0.0,
+          "dist": 1.53
+        }
+      ],
+      "dpi": 1.44,
+      "rvpi": 1.44,
+      "tvpi": 2.87,
+      "dvpi": 1.31,
+      "irr": 16.3
     },
     "thrive8": {
       "currency": "USD",
@@ -433,7 +489,45 @@
       "vintage": 2021,
       "nav": 3.1,
       "format": "Primary funds",
-      "committed": 3.0
+      "committed": 3.0,
+      "called": 2.2,
+      "distributions": 0.8,
+      "paidIn": 2.2,
+      "uncalled": 0.8,
+      "committedNative": 3.25,
+      "navNative": 3.36,
+      "cf": [
+        {
+          "y": 2021,
+          "call": 1.1,
+          "dist": 0.0
+        },
+        {
+          "y": 2022,
+          "call": 0.66,
+          "dist": 0.0
+        },
+        {
+          "y": 2023,
+          "call": 0.44,
+          "dist": 0.13
+        },
+        {
+          "y": 2024,
+          "call": 0.0,
+          "dist": 0.27
+        },
+        {
+          "y": 2025,
+          "call": 0.0,
+          "dist": 0.4
+        }
+      ],
+      "dpi": 0.36,
+      "rvpi": 1.41,
+      "tvpi": 1.77,
+      "dvpi": 0.27,
+      "irr": 12.1
     },
     "ga": {
       "currency": "USD",
@@ -443,7 +537,50 @@
       "vintage": 2020,
       "nav": 2.4,
       "format": "Primary funds",
-      "committed": 2.5
+      "committed": 2.5,
+      "called": 2.1,
+      "distributions": 2.4,
+      "paidIn": 2.1,
+      "uncalled": 0.4,
+      "committedNative": 2.71,
+      "navNative": 2.6,
+      "cf": [
+        {
+          "y": 2020,
+          "call": 1.05,
+          "dist": 0.0
+        },
+        {
+          "y": 2021,
+          "call": 0.63,
+          "dist": 0.0
+        },
+        {
+          "y": 2022,
+          "call": 0.42,
+          "dist": 0.24
+        },
+        {
+          "y": 2023,
+          "call": 0.0,
+          "dist": 0.48
+        },
+        {
+          "y": 2024,
+          "call": 0.0,
+          "dist": 0.72
+        },
+        {
+          "y": 2025,
+          "call": 0.0,
+          "dist": 0.96
+        }
+      ],
+      "dpi": 1.14,
+      "rvpi": 1.14,
+      "tvpi": 2.29,
+      "dvpi": 0.96,
+      "irr": 14.8
     },
     "cvc9": {
       "currency": "EUR",
@@ -453,7 +590,40 @@
       "vintage": 2022,
       "nav": 2.0,
       "format": "Primary funds",
-      "committed": 2.5
+      "committed": 2.5,
+      "called": 1.6,
+      "distributions": 0.5,
+      "paidIn": 1.6,
+      "uncalled": 0.9,
+      "committedNative": 2.5,
+      "navNative": 2.0,
+      "cf": [
+        {
+          "y": 2022,
+          "call": 0.8,
+          "dist": 0.0
+        },
+        {
+          "y": 2023,
+          "call": 0.48,
+          "dist": 0.0
+        },
+        {
+          "y": 2024,
+          "call": 0.32,
+          "dist": 0.17
+        },
+        {
+          "y": 2025,
+          "call": 0.0,
+          "dist": 0.33
+        }
+      ],
+      "dpi": 0.31,
+      "rvpi": 1.25,
+      "tvpi": 1.56,
+      "dvpi": 0.2,
+      "irr": 11.8
     },
     "arespcs": {
       "currency": "USD",
@@ -463,7 +633,35 @@
       "vintage": 2023,
       "nav": 1.5,
       "format": "Primary funds",
-      "committed": 2.0
+      "committed": 2.0,
+      "called": 1.1,
+      "distributions": 0.7,
+      "paidIn": 1.1,
+      "uncalled": 0.9,
+      "committedNative": 2.17,
+      "navNative": 1.62,
+      "cf": [
+        {
+          "y": 2023,
+          "call": 0.55,
+          "dist": 0.0
+        },
+        {
+          "y": 2024,
+          "call": 0.33,
+          "dist": 0.0
+        },
+        {
+          "y": 2025,
+          "call": 0.22,
+          "dist": 0.7
+        }
+      ],
+      "dpi": 0.64,
+      "rvpi": 1.36,
+      "tvpi": 2.0,
+      "dvpi": 0.35,
+      "irr": 26.0
     },
     "cinven8": {
       "currency": "EUR",
@@ -473,7 +671,45 @@
       "vintage": 2021,
       "nav": 1.8,
       "format": "Secondaries",
-      "committed": 2.0
+      "committed": 2.0,
+      "called": 1.6,
+      "distributions": 1.5,
+      "paidIn": 1.6,
+      "uncalled": 0.4,
+      "committedNative": 2.0,
+      "navNative": 1.8,
+      "cf": [
+        {
+          "y": 2021,
+          "call": 0.8,
+          "dist": 0.0
+        },
+        {
+          "y": 2022,
+          "call": 0.48,
+          "dist": 0.0
+        },
+        {
+          "y": 2023,
+          "call": 0.32,
+          "dist": 0.25
+        },
+        {
+          "y": 2024,
+          "call": 0.0,
+          "dist": 0.5
+        },
+        {
+          "y": 2025,
+          "call": 0.0,
+          "dist": 0.75
+        }
+      ],
+      "dpi": 0.94,
+      "rvpi": 1.12,
+      "tvpi": 2.06,
+      "dvpi": 0.75,
+      "irr": 15.6
     },
     "northwind": {
       "currency": "EUR",
@@ -483,7 +719,30 @@
       "vintage": 2024,
       "nav": 0.7,
       "format": "Fund of funds",
-      "committed": 2.5
+      "committed": 2.5,
+      "called": 0.7,
+      "distributions": 0.1,
+      "paidIn": 0.7,
+      "uncalled": 1.8,
+      "committedNative": 2.5,
+      "navNative": 0.7,
+      "cf": [
+        {
+          "y": 2024,
+          "call": 0.44,
+          "dist": 0.0
+        },
+        {
+          "y": 2025,
+          "call": 0.26,
+          "dist": 0.1
+        }
+      ],
+      "dpi": 0.14,
+      "rvpi": 1.0,
+      "tvpi": 1.14,
+      "dvpi": 0.04,
+      "irr": 6.9
     },
     "meridian": {
       "currency": "GBP",
@@ -493,7 +752,30 @@
       "vintage": 2024,
       "nav": 0.5,
       "format": "Direct deals",
-      "committed": 2.5
+      "committed": 2.5,
+      "called": 0.5,
+      "distributions": 0.0,
+      "paidIn": 0.5,
+      "uncalled": 2.0,
+      "committedNative": 2.12,
+      "navNative": 0.42,
+      "cf": [
+        {
+          "y": 2024,
+          "call": 0.31,
+          "dist": 0.0
+        },
+        {
+          "y": 2025,
+          "call": 0.19,
+          "dist": 0.0
+        }
+      ],
+      "dpi": 0.0,
+      "rvpi": 1.0,
+      "tvpi": 1.0,
+      "dvpi": 0.0,
+      "irr": 0.0
     }
   },
   "modelCoarse": {
@@ -1848,6 +2130,68 @@
       "Lightspeed",
       "Founders Fund",
       "Databricks"
+    ]
+  },
+  "bank": {
+    "cashPosition": 1.1,
+    "cashPositionText": "€1.1m",
+    "committable": 8.6
+  },
+  "scenario": {
+    "navGrowth": {
+      "base": 0.15,
+      "soft": 0.162,
+      "hfl": 0.135,
+      "ai": 0.18
+    },
+    "paceMultiplier": {
+      "slow": 0.7,
+      "moderate": 1.0,
+      "aggressive": 1.3
+    },
+    "recycleDefault": 1.0,
+    "executionQuartileDelta": {
+      "top": 0.04,
+      "avg": 0.0,
+      "bottom": -0.04
+    },
+    "distCurveShape": [
+      [
+        0,
+        -0.55
+      ],
+      [
+        1,
+        -0.62
+      ],
+      [
+        2,
+        -0.5
+      ],
+      [
+        3,
+        -0.28
+      ],
+      [
+        4,
+        -0.02
+      ],
+      [
+        5,
+        0.28
+      ],
+      [
+        6,
+        0.6
+      ],
+      [
+        7,
+        0.92
+      ],
+      [
+        8,
+        1.2
+      ]
     ]
   }
 }

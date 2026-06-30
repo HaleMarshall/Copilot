@@ -22,7 +22,8 @@ PORT = int(os.environ.get("PORT", "8731"))
 # dataset keys mirrored 1:1 from alpha_seed.json
 DATASET_KEYS = ["portfolio", "pm", "strats", "mix", "dims", "cashflows",
                 "heldFunds", "heldMeta", "modelCoarse", "modelFine", "followFunds", "scorecards",
-                "peer", "platform", "endowments", "benchTable", "fx", "lifecycle", "featured"]
+                "peer", "platform", "endowments", "benchTable", "fx", "lifecycle", "featured",
+                "bank", "scenario"]
 
 
 def ensure_tables():
