@@ -33,7 +33,7 @@
     "qoqPct": "+3.7%",
     "reporting": "5 of 8 funds reporting Q1 2026 · 3 lagged at Q4 2025",
     "committedNum": 20.5,
-    "called": 13.0,
+    "called": 13,
     "calledText": "€13.0m",
     "uncalledNum": 7.5,
     "rvpi": 1.28,
@@ -243,7 +243,7 @@
     ],
     "calls": [
       1.6,
-      2.0,
+      2,
       3.2,
       2.4,
       1.8,
@@ -251,8 +251,8 @@
       0.7
     ],
     "distributions": [
-      0.0,
-      0.0,
+      0,
+      0,
       0.3,
       0.8,
       1.8,
@@ -442,12 +442,12 @@
         {
           "y": 2019,
           "call": 1.6,
-          "dist": 0.0
+          "dist": 0
         },
         {
           "y": 2020,
           "call": 0.96,
-          "dist": 0.0
+          "dist": 0
         },
         {
           "y": 2021,
@@ -456,22 +456,22 @@
         },
         {
           "y": 2022,
-          "call": 0.0,
+          "call": 0,
           "dist": 0.61
         },
         {
           "y": 2023,
-          "call": 0.0,
+          "call": 0,
           "dist": 0.92
         },
         {
           "y": 2024,
-          "call": 0.0,
+          "call": 0,
           "dist": 1.23
         },
         {
           "y": 2025,
-          "call": 0.0,
+          "call": 0,
           "dist": 1.53
         }
       ],
@@ -489,7 +489,7 @@
       "vintage": 2021,
       "nav": 3.1,
       "format": "Primary funds",
-      "committed": 3.0,
+      "committed": 3,
       "called": 2.2,
       "distributions": 0.8,
       "paidIn": 2.2,
@@ -500,12 +500,12 @@
         {
           "y": 2021,
           "call": 1.1,
-          "dist": 0.0
+          "dist": 0
         },
         {
           "y": 2022,
           "call": 0.66,
-          "dist": 0.0
+          "dist": 0
         },
         {
           "y": 2023,
@@ -514,12 +514,12 @@
         },
         {
           "y": 2024,
-          "call": 0.0,
+          "call": 0,
           "dist": 0.27
         },
         {
           "y": 2025,
-          "call": 0.0,
+          "call": 0,
           "dist": 0.4
         }
       ],
@@ -548,12 +548,12 @@
         {
           "y": 2020,
           "call": 1.05,
-          "dist": 0.0
+          "dist": 0
         },
         {
           "y": 2021,
           "call": 0.63,
-          "dist": 0.0
+          "dist": 0
         },
         {
           "y": 2022,
@@ -562,17 +562,17 @@
         },
         {
           "y": 2023,
-          "call": 0.0,
+          "call": 0,
           "dist": 0.48
         },
         {
           "y": 2024,
-          "call": 0.0,
+          "call": 0,
           "dist": 0.72
         },
         {
           "y": 2025,
-          "call": 0.0,
+          "call": 0,
           "dist": 0.96
         }
       ],
@@ -588,7 +588,7 @@
       "sector": "Industrials",
       "strat": "buyout",
       "vintage": 2022,
-      "nav": 2.0,
+      "nav": 2,
       "format": "Primary funds",
       "committed": 2.5,
       "called": 1.6,
@@ -596,17 +596,17 @@
       "paidIn": 1.6,
       "uncalled": 0.9,
       "committedNative": 2.5,
-      "navNative": 2.0,
+      "navNative": 2,
       "cf": [
         {
           "y": 2022,
           "call": 0.8,
-          "dist": 0.0
+          "dist": 0
         },
         {
           "y": 2023,
           "call": 0.48,
-          "dist": 0.0
+          "dist": 0
         },
         {
           "y": 2024,
@@ -615,7 +615,7 @@
         },
         {
           "y": 2025,
-          "call": 0.0,
+          "call": 0,
           "dist": 0.33
         }
       ],
@@ -633,7 +633,7 @@
       "vintage": 2023,
       "nav": 1.5,
       "format": "Primary funds",
-      "committed": 2.0,
+      "committed": 2,
       "called": 1.1,
       "distributions": 0.7,
       "paidIn": 1.1,
@@ -644,12 +644,12 @@
         {
           "y": 2023,
           "call": 0.55,
-          "dist": 0.0
+          "dist": 0
         },
         {
           "y": 2024,
           "call": 0.33,
-          "dist": 0.0
+          "dist": 0
         },
         {
           "y": 2025,
@@ -659,9 +659,9 @@
       ],
       "dpi": 0.64,
       "rvpi": 1.36,
-      "tvpi": 2.0,
+      "tvpi": 2,
       "dvpi": 0.35,
-      "irr": 26.0
+      "irr": 26
     },
     "cinven8": {
       "currency": "EUR",
@@ -671,23 +671,23 @@
       "vintage": 2021,
       "nav": 1.8,
       "format": "Secondaries",
-      "committed": 2.0,
+      "committed": 2,
       "called": 1.6,
       "distributions": 1.5,
       "paidIn": 1.6,
       "uncalled": 0.4,
-      "committedNative": 2.0,
+      "committedNative": 2,
       "navNative": 1.8,
       "cf": [
         {
           "y": 2021,
           "call": 0.8,
-          "dist": 0.0
+          "dist": 0
         },
         {
           "y": 2022,
           "call": 0.48,
-          "dist": 0.0
+          "dist": 0
         },
         {
           "y": 2023,
@@ -696,12 +696,12 @@
         },
         {
           "y": 2024,
-          "call": 0.0,
+          "call": 0,
           "dist": 0.5
         },
         {
           "y": 2025,
-          "call": 0.0,
+          "call": 0,
           "dist": 0.75
         }
       ],
@@ -730,7 +730,7 @@
         {
           "y": 2024,
           "call": 0.44,
-          "dist": 0.0
+          "dist": 0
         },
         {
           "y": 2025,
@@ -739,7 +739,7 @@
         }
       ],
       "dpi": 0.14,
-      "rvpi": 1.0,
+      "rvpi": 1,
       "tvpi": 1.14,
       "dvpi": 0.04,
       "irr": 6.9
@@ -754,28 +754,28 @@
       "format": "Direct deals",
       "committed": 2.5,
       "called": 0.5,
-      "distributions": 0.0,
+      "distributions": 0,
       "paidIn": 0.5,
-      "uncalled": 2.0,
+      "uncalled": 2,
       "committedNative": 2.12,
       "navNative": 0.42,
       "cf": [
         {
           "y": 2024,
           "call": 0.31,
-          "dist": 0.0
+          "dist": 0
         },
         {
           "y": 2025,
           "call": 0.19,
-          "dist": 0.0
+          "dist": 0
         }
       ],
-      "dpi": 0.0,
-      "rvpi": 1.0,
-      "tvpi": 1.0,
-      "dvpi": 0.0,
-      "irr": 0.0
+      "dpi": 0,
+      "rvpi": 1,
+      "tvpi": 1,
+      "dvpi": 0,
+      "irr": 0
     }
   },
   "modelCoarse": {
@@ -1833,7 +1833,7 @@
     "baseMedian": 8.9,
     "wealthDelta": {
       "25-100M": 3.2,
-      "100M+": 6.0,
+      "100M+": 6,
       "1-5M": -1.6
     },
     "profDelta": {
@@ -1857,7 +1857,8 @@
     "ticket": {
       "you": "€150k",
       "base": 128,
-      "wealthK": 0.9
+      "wealthK": 0.9,
+      "full": "€150,000"
     },
     "irr": {
       "you": "11.0%",
@@ -1967,26 +1968,26 @@
     "base": "EUR",
     "asOf": "27 Jun 2026",
     "rates": {
-      "EUR": 1.0,
+      "EUR": 1,
       "USD": 1.083,
       "GBP": 0.848,
       "CHF": 0.962
     },
     "recordDate": "Q1 2025",
     "ratesRecord": {
-      "EUR": 1.0,
+      "EUR": 1,
       "USD": 1.041,
       "GBP": 0.833,
       "CHF": 0.945
     },
     "ratesCall": {
-      "EUR": 1.0,
+      "EUR": 1,
       "USD": 1.012,
       "GBP": 0.861,
       "CHF": 0.93
     },
     "ratesDist": {
-      "EUR": 1.0,
+      "EUR": 1,
       "USD": 1.069,
       "GBP": 0.844,
       "CHF": 0.957
@@ -2146,13 +2147,13 @@
     },
     "paceMultiplier": {
       "slow": 0.7,
-      "moderate": 1.0,
+      "moderate": 1,
       "aggressive": 1.3
     },
-    "recycleDefault": 1.0,
+    "recycleDefault": 1,
     "executionQuartileDelta": {
       "top": 0.04,
-      "avg": 0.0,
+      "avg": 0,
       "bottom": -0.04
     },
     "distCurveShape": [
@@ -2239,7 +2240,7 @@
       "aum": "$1.1tn",
       "moic": 2.5,
       "since": 17.5,
-      "avgDpi": 2.0,
+      "avgDpi": 2,
       "nFunds": 30,
       "topQ": 22,
       "scores": {
@@ -2381,7 +2382,7 @@
       "listed": true,
       "est": 2007,
       "aum": "€31bn",
-      "moic": 2.0,
+      "moic": 2,
       "since": 14.8,
       "avgDpi": 1.6,
       "nFunds": 9,
@@ -2418,7 +2419,7 @@
       "est": 1995,
       "aum": "$90bn",
       "moic": 2.4,
-      "since": 18.0,
+      "since": 18,
       "avgDpi": 1.9,
       "nFunds": 13,
       "topQ": 9,
@@ -2455,7 +2456,7 @@
       "aum": "$13bn",
       "moic": 2.5,
       "since": 23.1,
-      "avgDpi": 2.0,
+      "avgDpi": 2,
       "nFunds": 12,
       "topQ": 9,
       "scores": {
@@ -2842,7 +2843,7 @@
     ],
     "1": [
       2.1,
-      2.0,
+      2,
       1.9,
       1.8,
       1.7
@@ -3231,7 +3232,7 @@
       3.4,
       3.6,
       3.9,
-      4.0,
+      4,
       4.2
     ],
     "56": [

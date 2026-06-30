@@ -1789,7 +1789,7 @@ class Component extends DCLogic {
       return h('div',{key:i,style:{display:'flex',alignItems:'center',gap:12}}, this.donutNamed(slices,104,l,'mix'), h('div',{style:{flex:1}}, this.pdfDimTable(k,l))); }));
     const cf=(this.DB&&this.DB.cashflows)||{cats:[],calls:[],distributions:[]}; const cmx=Math.max.apply(null,(cf.calls||[]).concat(cf.distributions||[]).concat([1]));
     const cfPage=h('div',null,
-      h('div',{style:{fontSize:12.5,color:'#222',lineHeight:1.6,marginBottom:12}},'Committed €20.5m · Called €16.6m · Uncalled €3.9m · Cash position €1.1m · Net distributions +€0.9m. You have crossed the J-curve — distributions now outpace capital calls.'),
+      (()=>{ const P=(this.DB&&this.DB.portfolio)||{}; const B=(this.DB&&this.DB.bank)||{}; const nd=(P.netDistCumulative!=null?P.netDistCumulative:-2.4); const ttm=(P.netDistTTM!=null?P.netDistTTM:2.2); const ndStr=(nd>=0?'+':'−')+'€'+Math.abs(nd).toFixed(1)+'m'; const crossed=ttm>0; return h('div',{style:{fontSize:12.5,color:'#222',lineHeight:1.6,marginBottom:12}},'Committed '+(P.committed||'€20.5m')+' · Called '+(P.calledText||'€13.0m')+' · Uncalled '+(P.uncalled||'€7.5m')+' · Cash position '+(B.cashPositionText||'€1.1m')+' · Net distributions (cumulative) '+ndStr+'.'+(crossed?' Your recent distributions now outpace capital calls (TTM +€'+Math.abs(ttm).toFixed(1)+'m).':'')); })(),
       h('div',{style:{display:'flex',alignItems:'flex-end',gap:10,height:150}}, (cf.cats||[]).map((yr,i)=>h('div',{key:yr,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-end',height:'100%'}},
         h('div',{style:{display:'flex',alignItems:'flex-end',gap:3,height:'100%',justifyContent:'center'}}, h('div',{title:'Called €'+cf.calls[i]+'m',style:{width:12,height:((cf.calls[i]||0)/cmx*100)+'%',background:'#1417C2',borderRadius:'2px 2px 0 0'}}), h('div',{title:'Distributed €'+cf.distributions[i]+'m',style:{width:12,height:((cf.distributions[i]||0)/cmx*100)+'%',background:'#2D8F6F',borderRadius:'2px 2px 0 0'}})),
         h('div',{style:{fontSize:9,color:'#777',marginTop:3}},yr)))),
@@ -2682,9 +2682,9 @@ class Component extends DCLogic {
     if(viz==='nba') return h('div',{style:{display:'flex',flexDirection:'column',gap:12}},
       h('div',{style:{background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:12,padding:'16px 18px'}},
         h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'.06em',color:'var(--brand)',textTransform:'uppercase',marginBottom:6}},'Recommended now'),
-        h('div',{style:{fontFamily:this.SF,fontSize:20,fontWeight:600,marginBottom:4}},'Commit €150k to Ares Private Credit Solutions III'),
+        h('div',{style:{fontFamily:this.SF,fontSize:20,fontWeight:600,marginBottom:4}},'Commit '+(((this.DB&&this.DB.peer&&this.DB.peer.ticket&&this.DB.peer.ticket.you))||'€150k')+' to Ares Private Credit Solutions III'),
         h('div',{style:{fontSize:13,color:'var(--ink)',lineHeight:1.5}},'Closes your single largest gap (private credit, −9.8pp vs peers / −12pp vs model) and lifts your fill rate toward your 20% target. Primary over secondary here — the current vintage is deploying.')),
-      this.reasonsList(['Closes your biggest under-weight.','Top-quartile manager, team intact.','Fits your liquidity headroom (€1.1m).','Better now than waiting — strong current vintage.']));
+      this.reasonsList(['Closes your biggest under-weight.','Top-quartile manager, team intact.','Fits your liquidity headroom ('+(((this.DB&&this.DB.bank&&this.DB.bank.cashPositionText))||'€1.1m')+').','Better now than waiting — strong current vintage.']));
     if(viz==='ai') return h('div',{style:{display:'flex',gap:18,alignItems:'center',padding:'10px 0'}},
       h('div',null,h('div',{style:{fontSize:11,color:'var(--muted)'}},'Stated AI'),h('div',{style:{fontFamily:this.SF,fontSize:30,fontWeight:600}},'15%')),
       h('div',{style:{color:'var(--muted)',fontSize:20}},'→'),
@@ -3254,8 +3254,8 @@ class Component extends DCLogic {
           this.choiceCard('Wait','for a future fund',['Possible better terms later','Gap stays open meanwhile','Allocation risk if it fills'],false)),caption:'The recommendation weighs gap-closing value now against the expected future pipeline.'}),'1.2fr 1fr'),
       't1-2:ticket':()=>this.twoCol(
         this.card({title:'Recommended ticket',children:h('div',null,
-          h('div',{style:{fontFamily:this.SF,fontSize:34,fontWeight:600,marginBottom:4}},'€150,000'),
-          h('div',{style:{fontSize:12.5,color:'var(--muted)',marginBottom:14}},'≈ 4.3pp of investable wealth · within your €1.1m liquidity headroom'),
+          h('div',{style:{fontFamily:this.SF,fontSize:34,fontWeight:600,marginBottom:4}},(((this.DB&&this.DB.peer&&this.DB.peer.ticket&&this.DB.peer.ticket.full))||'€150,000')),
+          h('div',{style:{fontSize:12.5,color:'var(--muted)',marginBottom:14}},'≈ 4.3pp of investable wealth · within your '+(((this.DB&&this.DB.bank&&this.DB.bank.cashPositionText))||'€1.1m')+' liquidity headroom'),
           this.headroomBar(150,1100)),caption:'Sized to your headroom and pacing — large enough to matter, small enough not to break the plan.'}),
         this.card({title:'How it compares',children:this.scFromDB('sc3',[{l:'Suggested ticket',you:'€150k',peer:'€128k',up:true},{l:'Commitments / yr',you:'3',peer:'2.1',up:true},{l:'Headroom to target',you:'€1.1m',peer:'—',up:true},{l:'Of PM capital',you:'3.8%',peer:'—',up:true}]),caption:'Your ticket sits a little above the peer median, consistent with your wealth band.'})),
       // ---- Commitment Pacing ----
@@ -3304,7 +3304,7 @@ class Component extends DCLogic {
             h('button',{onClick:()=>this.setState({ws:'understand',uc:'t1-10',page:'mode',navExpanded:true,deepLink:null}),
               style:{marginTop:12,border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:9,padding:'9px 13px',fontSize:12,fontWeight:600,cursor:'pointer'}},'See the full Sentiment & Intent dashboard  →')),
             caption:'Share of the selected peer group currently in each activity mode — a real-time read on sentiment, not a survey.'}),
-          this.card({title:'You vs this group',children:this.scorecard([{l:'Your mode',you:'Buying',peer:seg+' '+data.buy+'%',up:true},{l:'Net activity',you:'+risk-on',peer:'mixed',up:true},{l:'Last commitment',you:'42d ago',peer:'—',up:true},{l:'Dry powder',you:'€3.9m',peer:'—',up:true}]),caption:'You are in buying mode with capacity to act — aligned with the more active peer layers.'}));
+          this.card({title:'You vs this group',children:this.scorecard([{l:'Your mode',you:'Buying',peer:seg+' '+data.buy+'%',up:true},{l:'Net activity',you:'+risk-on',peer:'mixed',up:true},{l:'Last commitment',you:'42d ago',peer:'—',up:true},{l:'Dry powder',you:(((this.DB&&this.DB.portfolio&&this.DB.portfolio.uncalled))||'€7.5m'),peer:'—',up:true}]),caption:'You are in buying mode with capacity to act — aligned with the more active peer layers.'}));
       },
       // ---- Liquidity ----
       't1-7:calls':()=>this.twoCol(
@@ -3796,7 +3796,7 @@ class Component extends DCLogic {
     const pts=[];
     pts.push(gap>0.5? ['Closes a real gap','You sit '+gap+'pp below your target in '+label+' — this commitment moves you toward it, the highest-impact use of new capital right now.']
                     : ['On-strategy add',label+' is already near your target weight — a modest ticket keeps you balanced without over-concentrating.']);
-    pts.push(['Fits your liquidity','Sized against your €1.1m cash position and €3.9m uncalled, the suggested ticket stays inside your plan — no forced selling, no overcommitment for your risk class.']);
+    pts.push(['Fits your liquidity','Sized against your '+(((this.DB&&this.DB.bank&&this.DB.bank.cashPositionText))||'€1.1m')+' cash position and '+(((this.DB&&this.DB.portfolio&&this.DB.portfolio.uncalled))||'€7.5m')+' uncalled, the suggested ticket stays inside your plan — no forced selling, no overcommitment for your risk class.']);
     pts.push(['Diversifies your book','Adds '+region+' exposure and a '+(label.toLowerCase())+' manager that complements — rather than doubles — what you already hold.']);
     pts.push(['Quality access','Top-quartile manager with the deal team intact; the kind of capacity-constrained access that is hard to get directly.']);
     return {fit,label,gap,watch:'It extends your illiquidity — only commit capital you won’t need for 7+ years. If you’re already over-weight '+label+', size it down or pick a complementary sleeve instead.'};
@@ -3898,7 +3898,7 @@ class Component extends DCLogic {
               ['Closes a real gap',null],['Fits your liquidity',null],['Diversifies your book',null],['Quality access',null]
             ].map((_,i)=>{ const fmx=this.fundFitModel(f,m); const pt=[
                 fmx.gap>0.5? ['Closes a real gap','You sit '+fmx.gap+'pp below your target in '+fmx.label+' — this is the highest-impact use of new capital right now.'] : ['On-strategy add',fmx.label+' is already near your target weight — a modest ticket keeps you balanced.'],
-                ['Fits your liquidity','Sized against your €1.1m cash and €3.9m uncalled, the suggested ticket stays inside your plan — no overcommitment for your risk class.'],
+                ['Fits your liquidity','Sized against your '+(((this.DB&&this.DB.bank&&this.DB.bank.cashPositionText))||'€1.1m')+' cash and '+(((this.DB&&this.DB.portfolio&&this.DB.portfolio.uncalled))||'€7.5m')+' uncalled, the suggested ticket stays inside your plan — no overcommitment for your risk class.'],
                 ['Diversifies your book','Adds '+((m&&m.region)||f.region||'global')+' exposure and a '+fmx.label.toLowerCase()+' manager that complements, rather than doubles, what you hold.'],
                 ['Quality access','Top-quartile manager, deal team intact — capacity-constrained access that’s hard to get directly.']
               ][i]; return h('div',{key:i,style:{display:'flex',gap:10,alignItems:'flex-start'}}, h('span',{style:{color:'#fff',fontWeight:700,flex:'0 0 16px'}},'✓'), h('div',null, h('div',{style:{fontWeight:700,fontSize:13.5,color:'#fff'}},pt[0]), h('div',{style:{fontSize:12.5,lineHeight:1.5,color:'rgba(255,255,255,.85)',marginTop:2}},pt[1]))); })) ),
@@ -4357,7 +4357,7 @@ class Component extends DCLogic {
     } else if(key==='cashflow'){
       const ranked=roster.slice().sort((a,b)=>parseFloat(b.called)-parseFloat(a.called));
       eyebrow='Your portfolio · Cash flows'; title='Your cash-flow position';
-      const cashStr='€1.1m'; const cashNum=this.eurNum(cashStr); /* items 93/94/95 — investable-capital prompt (only when cash>0): invest first, add-cash below */
+      const cashStr=((this.DB&&this.DB.bank&&this.DB.bank.cashPositionText))||'€1.1m'; const cashNum=this.eurNum(cashStr); /* items 93/94/95 — investable-capital prompt (only when cash>0): invest first, add-cash below */
       const investPrompt = cashNum>0 ? h('div',{key:'inv',style:{display:'flex',flexDirection:'column',gap:10,border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',borderRadius:12,padding:'12px 14px'}},
         h('div',{style:{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}},
           h('span',{style:{fontSize:16,flex:'0 0 auto'}},'✦'),
@@ -4377,7 +4377,7 @@ class Component extends DCLogic {
         this.card({title:'Alpha’s read on your cash flow',badge:this.badge('AI','synth'),tone:'alpha',
           children:h('div',{style:{display:'flex',flexDirection:'column',gap:9}},
             h('div',{style:{fontSize:13.5,lineHeight:1.6,color:'#fff',fontWeight:600}},'You’ve crossed the J-curve — distributions now outpace your capital calls. Everything looks healthy.'),
-            h('div',{style:{fontSize:12.5,lineHeight:1.55,color:'rgba(255,255,255,.88)'}},'Your cash-flow profile is very typical for someone with your investment behaviour and risk profile. €3.9m remains uncalled across your younger funds — that’s normal and your liquidity buffer covers it comfortably.')),
+            h('div',{style:{fontSize:12.5,lineHeight:1.55,color:'rgba(255,255,255,.88)'}},'Your cash-flow profile is very typical for someone with your investment behaviour and risk profile. '+(((this.DB&&this.DB.portfolio&&this.DB.portfolio.uncalled))||'€7.5m')+' remains uncalled across your younger funds — that’s normal and your liquidity buffer covers it comfortably.')),
           caption:'In plain terms: are you okay, and where you are on the J-curve.'}),
         /* review3 item 6 — quick summary shows only the top 3 J-curve positions; full list moves to a dedicated cash-flows page */
         /* review7 item 17 — default overview shows every fund's logo on the actual J-curve graph */
@@ -6866,7 +6866,7 @@ class Component extends DCLogic {
       const detail = add?[
         ['Closes your largest gap', a.strat+' sits '+gapAbs+'pp below your agreed target after look-through. At the suggested ticket this closes a meaningful share of that gap in a single move and is the largest single contributor to your target-fit (+'+a.lift+').'],
         ['Manager quality', 'The GP is top-quartile across its last three vintages with steady DPI, and the named deal team is intact — no key-man departures since the prior fund. Team continuity is one of the strongest correlates of repeat performance in '+a.strat.toLowerCase()+'.'],
-        ['Liquidity fit', 'Sized against your €1.1m liquidity headroom and €3.9m uncalled, this commitment stays inside your plan — no forced selling and no breach of your overcommitment ceiling for your risk class.'],
+        ['Liquidity fit', 'Sized against your '+(((this.DB&&this.DB.bank&&this.DB.bank.cashPositionText))||'€1.1m')+' liquidity headroom and '+(((this.DB&&this.DB.portfolio&&this.DB.portfolio.uncalled))||'€7.5m')+' uncalled, this commitment stays inside your plan — no forced selling and no breach of your overcommitment ceiling for your risk class.'],
         ['Timing', 'The current vintage is actively deploying into a more favourable entry environment. Waiting risks both the gap staying open and the allocation filling before you act — the platform-demand read on comparable funds is ~6 weeks to fill.'],
         ['Versus the alternatives', 'Against the other ranked moves, this improves target-fit the most per euro committed, and beats holding cash or trimming an over-weight first on expected contribution.']
       ]:[
