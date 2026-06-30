@@ -24,7 +24,7 @@ DATASET_KEYS = ["portfolio", "pm", "strats", "mix", "dims", "cashflows",
                 "heldFunds", "heldMeta", "modelCoarse", "modelFine", "followFunds", "scorecards",
                 "peer", "platform", "endowments", "benchTable", "fx", "lifecycle", "featured",
                 "bank", "scenario", "managers", "offerings", "viz", "managerTree",
-                "advisorFlows", "advisorMeta", "advisorPages", "advisorBook", "advisorSelf"]
+                "advisorFlows", "advisorMeta", "advisorPages", "advisorBook", "advisorSelf", "peModel"]
 
 
 def ensure_tables():

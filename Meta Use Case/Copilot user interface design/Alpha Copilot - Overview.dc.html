@@ -511,6 +511,8 @@ class Component extends DCLogic {
       // Future-page filters (pacing / projection)
       fCmp:'peers', fPace:'5-year', fScenario:'base', fCommit:2.0, fNavCase:'Base', futureDetail:null, futureAct:false,
       fCommitYears:10, fRecycleYear:8, fRecycleRate:100, fExecution:'topq', /* items 106-109 — Programme Inputs (Michael Blome) */
+      /* ===== PE cash-flow model (from PE_CashFlow_Tool_v15.xlsx) ===== */
+      cfPct:'75', cfMethod:'Catch-Up', cfCommitM:10, cfPaceYears:4, cfStratFocus:null, cfShowBands:true,
       fProducts:{buyout:34,growth:14,credit:12,infra:10,secondaries:14,semiliquid:8,venture:4,directs:4},
       simMode:'adjust', simPreset:'like-you', simDetail:false, /* item 172 — pro full-allocation view collapsed by default */
       simShowDials:false, /* item 174 — target-adjustment dials hidden by default; pie is the hero, dials open via a bottom toggle */
@@ -3166,7 +3168,8 @@ class Component extends DCLogic {
     /* review4 item 11 — J-curve hero is the prominent top chart; remove the small grid J-curve */
     const pairs=[pair(c[0],'commits'),pair(c[1],'cumulative'),pair(c[2],'nav'),pair(c[4],'products')];
     const grid=h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(600px,1fr))',gap:16,alignItems:'stretch'}}, pairs);
-    const main=h('div',{style:{flex:1,minWidth:0,display:'flex',flexDirection:'column',gap:16}}, header, this.fKpiTiles(pj), this.futureJCurveHero(pj), grid);
+    const cfCard=this.card({title:'PE cash-flow model — PitchBook-calibrated',badge:this.badge('engine','synth'),children:this.cfModel({level: this.state.persona2==='pro'?'L3':'L2', mix:this.modelMix()}),caption:'Forward cash flows from PitchBook strategy curves: contributions, distributions, the J-curve with percentile bands, and expected DPI / TVPI. Catch-Up vs Scale-factor distribution method; percentile 25th–90th selectable.'});
+    const main=h('div',{style:{flex:1,minWidth:0,display:'flex',flexDirection:'column',gap:16}}, header, this.fKpiTiles(pj), this.futureJCurveHero(pj), cfCard, grid);
     const actBtn=h('button',{onClick:()=>this.setState({futureAct:true}),
       style:{width:'100%',border:'none',borderRadius:12,padding:'13px',cursor:'pointer',fontSize:13.5,fontWeight:700,color:'#fff',background:'linear-gradient(135deg,#3D6BFF,#5B5CFF)',boxShadow:'0 12px 28px -12px rgba(61,107,255,.7)'}},
       '✦ Act on your prediction →');
@@ -7751,6 +7754,77 @@ class Component extends DCLogic {
       return h('button',{key:o,onClick:()=>this.setFb(id,o),style:{fontSize:11,padding:'4px 10px',borderRadius:999,border:`1px solid ${on?'var(--brand)':'var(--line)'}`,background:on?'var(--brand)':'var(--surface)',color:on?'#fff':'var(--muted)',cursor:'pointer'}}, (o==='Helpful'&&on?'✓ ':'')+o); })); }
   churnPill(c){ const h=this.h; const map={high:['--under','High'],med:['--synthetic','Medium'],low:['--over','Low']}[c]; return h('span',{style:{display:'inline-flex',alignItems:'center',gap:5,fontSize:11,fontWeight:600,color:`var(${map[0]})`}}, h('span',{style:{width:7,height:7,borderRadius:'50%',background:`var(${map[0]})`}}), map[1]); }
   /* ============================================================
+     PE CASH-FLOW FORECAST ENGINE — ported from PE_CashFlow_Tool_v15.xlsx
+     3 layers: (1) PitchBook distribution curves + Catch-Up/Scale method,
+     (2) Expected TVPI blend, (3) terminal top-up. Percentile bands 25–90.
+     ============================================================ */
+  peM(){ return (this.DB&&this.DB.peModel)||null; }
+  peCurveFor(strat,pct){ const M=this.peM(); if(!M) return null; const sk=M.strategyMap[strat]||M.strategyMap[String(strat).toLowerCase()]||(M.curves[strat]?strat:'Buyout'); const cur=M.curves[sk]||M.curves.Buyout; return {sk,years:cur.years,cc:cur.cc[pct]||cur.cc['75'],cd:cur.cd[pct]||cur.cd['75'],term:(M.terminalTVPI[sk]||{})[pct]}; }
+  peForecast(o){ const M=this.peM(); if(!M) return null; const pct=o.pct||'75',method=o.method||'Catch-Up',commit=+o.commitment||0,age=Math.max(0,Math.round(o.ageYears||0));
+    const c=this.peCurveFor(o.strategy,pct); if(!c||!commit) return null; const N=c.years.length-1, cc=c.cc, cd=c.cd, benchT=c.term||cd[N];
+    const sfCap=M.settings.sfCap||2, sfFloor=M.settings.sfFloor||0.3;
+    const actCalledM=o.actualCalledPct!=null?o.actualCalledPct:cc[Math.min(age,N)];
+    const actDistM=o.actualDistMult!=null?o.actualDistMult:cd[Math.min(age,N)];
+    const actTVPI=o.actualTVPI!=null?o.actualTVPI:(actCalledM>0?actDistM/actCalledM:benchT);
+    const yrsRem=Math.max(0,15-age); const expTVPI=Math.max(actTVPI, actTVPI+(benchT-actTVPI)*yrsRem/15);
+    let sf=1; if(method!=='Catch-Up'&&age>0&&cd[age]>0) sf=Math.min(sfCap,Math.max(sfFloor,actDistM/cd[age]));
+    const cumDM=[]; for(let t=0;t<=N;t++){ if(t<age){cumDM.push(cd[t]);continue;} if(method==='Catch-Up') cumDM.push(Math.max(actDistM,cd[t])); else cumDM.push(actDistM+(cd[t]-cd[age])*sf); }
+    const gap=Math.max(0,expTVPI-cumDM[N]); const rem=N-age; const topup=rem>0?gap/rem:0;
+    const out={years:[],contrib:[],dist:[],cumCalled:[],cumDist:[],nav:[],netCF:[],cumNet:[]};
+    for(let t=age;t<=N;t++){ const callInc=t>age?Math.max(0,(cc[t]-cc[t-1]))*commit:commit*actCalledM;
+      let distInc=t>age?Math.max(0,(cumDM[t]-cumDM[t-1]))*commit:commit*actDistM; if(t>age) distInc+=topup*commit;
+      const cumC=commit*cc[t], cumD=commit*(cumDM[t]+(t>age?topup*(t-age):0));
+      out.years.push(t-age); out.contrib.push(+callInc.toFixed(3)); out.dist.push(+distInc.toFixed(3)); out.cumCalled.push(+cumC.toFixed(3)); out.cumDist.push(+cumD.toFixed(3));
+      const deploy=cc[N]>0?cc[t]/cc[N]:1; out.nav.push(+Math.max(0,commit*expTVPI*deploy-cumD).toFixed(3)); out.netCF.push(+(distInc-callInc).toFixed(3)); out.cumNet.push(+(cumD-cumC).toFixed(3)); }
+    out.expTVPI=+expTVPI.toFixed(3); out.benchT=+benchT.toFixed(3); out.dpi=+(out.cumDist[out.cumDist.length-1]/Math.max(0.0001,out.cumCalled[out.cumCalled.length-1])).toFixed(3); out.tvpi=out.expTVPI; return out; }
+  pePortfolio(commitments,pct,method,H){ H=H||16; const agg={contrib:Array(H).fill(0),dist:Array(H).fill(0),cumNet:Array(H).fill(0)}; let totCommit=0,totDistEnd=0,totCalledEnd=0,wTVPI=0;
+    (commitments||[]).forEach(cm=>{ const f=this.peForecast({commitment:cm.commitment,strategy:cm.strategy,pct:pct,method:method,ageYears:cm.ageYears,actualCalledPct:cm.actualCalledPct,actualDistMult:cm.actualDistMult,actualTVPI:cm.actualTVPI}); if(!f) return; totCommit+=cm.commitment; const off=Math.max(0,(cm.commitYear||1)-1);
+      for(let t=0;t<f.years.length;t++){ const i=t+off; if(i>=0&&i<H){ agg.contrib[i]+=f.contrib[t]; agg.dist[i]+=f.dist[t]; } }
+      totDistEnd+=f.cumDist[f.cumDist.length-1]; totCalledEnd+=f.cumCalled[f.cumCalled.length-1]; wTVPI+=f.expTVPI*cm.commitment; });
+    let cc=0; for(let i=0;i<H;i++){ cc+=agg.dist[i]-agg.contrib[i]; agg.cumNet[i]=+cc.toFixed(2); agg.contrib[i]=+agg.contrib[i].toFixed(2); agg.dist[i]=+agg.dist[i].toFixed(2); }
+    agg.dpi=totCalledEnd>0?+(totDistEnd/totCalledEnd).toFixed(2):0; agg.tvpi=totCommit>0?+(wTVPI/totCommit).toFixed(2):0; agg.totCommit=+totCommit.toFixed(1); agg.totDistEnd=+totDistEnd.toFixed(1); agg.totCalledEnd=+totCalledEnd.toFixed(1); return agg; }
+  cfCommitments(mix,total,pace){ const strat=this.STRATS||[]; const out=[]; const entries=strat.map(kv=>({key:kv[0],label:kv[1],w:(mix[kv[0]]||0)})).filter(e=>e.w>0); const sw=entries.reduce((a,e)=>a+e.w,0)||1;
+    entries.forEach(e=>{ const amt=total*(e.w/sw); for(let y=0;y<pace;y++) out.push({strategy:e.key,label:e.label,commitment:amt/pace,commitYear:y+1}); }); return out; }
+  /* the extensive cash-flow model — level-gated controls, same engine for all */
+  cfModel(opts){ opts=opts||{}; const h=this.h; const SF=this.SF; const L=opts.level||'L3'; const M=this.peM();
+    if(!M) return this.card({title:'Cash-flow model',children:h('div',{style:{fontSize:13,color:'var(--muted)'}},'Model data unavailable.')});
+    const pct=this.state.cfPct||'75', method=this.state.cfMethod||'Catch-Up', total=+this.state.cfCommitM||10, pace=Math.max(1,Math.min(5,this.state.cfPaceYears||4));
+    const mix=opts.mix||this.modelMix()||{}; const commitments=this.cfCommitments(mix,total,pace);
+    const base=this.pePortfolio(commitments,pct,method,16), b50=this.pePortfolio(commitments,'50',method,16), b90=this.pePortfolio(commitments,'90',method,16);
+    const years=base.contrib.map((_,i)=>'Y'+(i+1));
+    const seg=(o,v,on)=>this.seg(o,v,on,{sm:true});
+    const ctlRow=(lbl,el)=>h('div',{style:{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}}, h('span',{style:{fontSize:11,color:'var(--muted)',minWidth:120}},lbl), el);
+    const slider=(lbl,val,min,max,step,fmt,on)=>h('div',{style:{flex:'1 1 220px'}}, h('div',{style:{display:'flex',justifyContent:'space-between',fontSize:11,color:'var(--muted)'}}, h('span',null,lbl), h('span',{style:{fontFamily:SF,fontWeight:700,color:'var(--ink)'}},fmt(val))), h('input',{type:'range',min:min,max:max,step:step,value:val,onInput:e=>on(+e.target.value),style:{width:'100%'}}));
+    const ctls=[];
+    if(L==='L3') ctls.push(ctlRow('Percentile', seg([{label:'25th',value:'25'},{label:'50th',value:'50'},{label:'75th',value:'75'},{label:'90th',value:'90'}],pct,v=>this.setState({cfPct:v}))));
+    else if(L==='L2') ctls.push(ctlRow('Percentile', seg([{label:'50th',value:'50'},{label:'75th',value:'75'},{label:'90th',value:'90'}],pct,v=>this.setState({cfPct:v}))));
+    if(L!=='L1') ctls.push(ctlRow('Distribution method', seg([{label:'Catch-Up',value:'Catch-Up'},{label:'Scale factor',value:'Scale'}],method,v=>this.setState({cfMethod:v}))));
+    const commitSlider=slider('Annual commitment',total,1,50,1,v=>'€'+v+'m',v=>this.setState({cfCommitM:v}));
+    const paceSlider=slider('Deploy over (years)',pace,1,5,1,v=>v+'y',v=>this.setState({cfPaceYears:v}));
+    /* charts */
+    const cfBars=this.groupedBars(years.slice(0,12),[{name:'Contributions',color:'--data-1',vals:base.contrib.slice(0,12)},{name:'Distributions',color:'--data-6',vals:base.dist.slice(0,12)}]);
+    const jSeries=[]; if(L!=='L1'&&this.state.cfShowBands){ jSeries.push({name:'90th pct',color:'--data-3',dash:true,vals:b90.cumNet}); jSeries.push({name:'50th pct',color:'--data-7',dash:true,vals:b50.cumNet}); } jSeries.push({name:pct+'th pct (selected)',color:'--data-1',main:true,vals:base.cumNet});
+    const jcurve=this.fAxisLine(jSeries, years, {H:230, fmt:v=>'€'+v+'m'});
+    const perf=this.kpiTiles(lvl_(L,
+      [['Committed','€'+base.totCommit+'m'],['Net DPI',base.dpi+'x'],['Net TVPI',base.tvpi+'x']],
+      [['Committed','€'+base.totCommit+'m'],['Expected called','€'+base.totCalledEnd+'m'],['Net DPI',base.dpi+'x'],['Net TVPI',base.tvpi+'x']],
+      [['Committed','€'+base.totCommit+'m'],['Expected called','€'+base.totCalledEnd+'m'],['Expected distributed','€'+base.totDistEnd+'m'],['Net DPI',base.dpi+'x'],['Net TVPI',base.tvpi+'x']]));
+    function lvl_(l,a,b,c){ return l==='L1'?a:(l==='L3'?c:b); }
+    /* strategy commitment grid (L3) */
+    const grid=L==='L3'? this.card({title:'Commitment plan by strategy',children:(()=>{ const byS={}; commitments.forEach(c=>{byS[c.label]=(byS[c.label]||0)+c.commitment;}); const rows=Object.keys(byS); const th=(t,r)=>h('th',{style:{textAlign:r?'right':'left',padding:'6px 9px',fontSize:10,textTransform:'uppercase',color:'var(--muted)',borderBottom:'2px solid var(--line)'}},t); const td=(v,r)=>h('td',{style:{textAlign:r?'right':'left',padding:'7px 9px',borderBottom:'1px solid var(--line)',fontSize:12.5}},v);
+      return h('table',{style:{width:'100%',borderCollapse:'collapse'}}, h('thead',null,h('tr',null,th('Strategy'),th('Commitment €m',1),th('% of plan',1),th('Bench TVPI ('+pct+'th)',1))), h('tbody',null, rows.map(s=>{ const amt=byS[s]; const sk=(this.peCurveFor(s,pct)||{}); return h('tr',{key:s}, td(s), td('€'+amt.toFixed(1)+'m',1), td(Math.round(amt/total*100)+'%',1), td((sk.term||'—')+'x',1)); }))); })(), caption:'Each strategy projected on its own PitchBook curve, staggered across the deployment window.'}) : null;
+    const methodNote=h('div',{style:{fontSize:11,color:'var(--muted)',lineHeight:1.45}}, method==='Catch-Up'?'Catch-Up: ahead-of-curve funds hold flat until the benchmark catches up (conservative).':'Scale factor: out/under-performance scales future curve distributions (cap '+(M.settings.sfCap)+'×, floor '+(M.settings.sfFloor)+'×).',' Expected-TVPI blend over 15y, terminal top-up closes the gap. Percentile = '+pct+'th PitchBook curve.');
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:14}},
+      h('div',{style:{display:'flex',gap:18,flexWrap:'wrap'}}, commitSlider, paceSlider),
+      ctls.length?h('div',{style:{display:'flex',flexDirection:'column',gap:8}}, ctls):null,
+      perf,
+      h('div',{style:{display:'flex',gap:14,flexWrap:'wrap'}},
+        this.card({title:'Contributions vs distributions (€m / yr)',style:{flex:'1 1 360px'},children:cfBars,caption:'Capital calls (early) then distributions (later) — the engine of the J-curve.'}),
+        this.card({title:'Cumulative net cash flow — the J-curve',style:{flex:'1 1 360px'},children:jcurve,caption:L==='L1'?'Your projected net position over 15 years.':'Selected '+pct+'th percentile with 50th/90th bands. Toggle percentile above.'})),
+      grid,
+      this.card({title:'How this is modelled',tight:true,children:methodNote}));
+  }
+  /* ============================================================
      ADVISOR FLOW COCKPIT — L1/L2/L3 × lifecycle, DB-driven flows
      (entry: desk → prep → in-call cockpit; every page level-gated)
      ============================================================ */
@@ -7999,10 +8073,8 @@ class Component extends DCLogic {
         const rows=strat.map(kv=>({name:kv[1],delta:+(((mixModel[kv[0]]||0)-(mixYou[kv[0]]||0)).toFixed(1)),color:kv[2]})).filter(r=>Math.abs(r.delta)>=1).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
         return wrap([ head('Suggested vs your current portfolio','The deltas are the conversation — positive = the model wants more.'),
           this.card({title:'Gap to model (pp)',children:this.miniZ(rows),caption:'Where you’re under- or over-weight versus the recommended model.'}) ]); }
-      case 'future': return wrap([ head('Your future — commitments & J-curve','If we commit at this pace, here’s how the portfolio builds and pays out.'),
-        h('div',{style:{display:'flex',gap:16,flexWrap:'wrap'}},
-          this.card({title:'Commitment plan',style:{flex:'1 1 300px'},children:this.kpiTiles([['Per year',c.investable&&c.investable.indexOf('5m')>=0?'€0.25m':'€1.25m'],['Over','10 yrs'],['Recycle','100%']]),caption:'Plan your commitments, recycle rate and horizon.'}),
-          this.card({title:'Potential returns',style:{flex:'1 1 320px'},children:this.fAxisLine([{name:'Net cash',color:'--data-1',main:true,vals:this.vz(0,[-0.6,-1.0,-0.7,-0.1,0.6,1.4,2.4])}],['Y1','Y2','Y3','Y4','Y5','Y6','Y7'],{H:170,fmt:v=>'€'+v+'m'}),caption:'The J-curve — early calls, later distributions.'})) ]);
+      case 'future': return wrap([ head('Your future — commitments & J-curve', lvl('A simple projection — we’ve set sensible defaults.','Model the commitment pace and see the J-curve with percentile bands.','Full PitchBook engine — per-strategy curves, percentile & distribution-method toggles.')),
+        this.cfModel({level:L, mix:this.modelMix()}) ]);
       case 'nextBest': case 'nextBestHints': { const hints=key==='nextBestHints'; const items=[['1','Buy-out — the core building block','Start here: the largest, most proven block of a private-markets portfolio.'],['2','AI & Tech','A timely theme you signalled interest in — don’t miss the cycle.'],['3','Anthropic IPO access','A capacity-constrained opportunity we can offer right now.']];
         return wrap([ head(hints?'A few ideas to get started':'Next best action — recommended sequence', hints?'Once your account’s set up, this is roughly the sequence we’d walk through.':'The sequence I’d suggest — start with what matters most for you.'),
           h('div',{style:{display:'flex',flexDirection:'column',gap:12}}, items.map((it,i)=>this.card({key:i,title:it[1],children:h('div',{style:{fontSize:13,color:'var(--ink)',lineHeight:1.5}},it[2]),
