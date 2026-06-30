@@ -1795,7 +1795,7 @@ class Component extends DCLogic {
         h('div',{style:{fontSize:12,letterSpacing:'.14em',textTransform:'uppercase',color:'#8C8DFF',fontWeight:700}},'Portfolio Report'),
         h('div',{style:{fontFamily:SF,fontSize:34,fontWeight:700,margin:'8px 0 6px'}},'Your Private-Markets Portfolio'),
         h('div',{style:{fontSize:13,color:'rgba(234,235,255,.8)'}}, investor+' · prepared by Alpha · as of '+asOf),
-        h('div',{style:{display:'flex',gap:26,marginTop:30,flexWrap:'wrap'}}, [['Portfolio value',P.navText||'€16.6m'],['TVPI',(P.tvpi||'2.1')+'x'],['Net IRR',P.irr||'11.0%']].map((t,i)=>h('div',{key:i}, h('div',{style:{fontSize:10.5,color:'rgba(255,255,255,.65)'}},t[0]), h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:700}},t[1]))))));
+        h('div',{style:{display:'flex',gap:26,marginTop:30,flexWrap:'wrap'}}, [['Portfolio value',P.navText||'€16.6m'],['TVPI',(P.tvpi||'2.1')+'x'],['Net IRR',(P.irr||'14.4')+'%']].map((t,i)=>h('div',{key:i}, h('div',{style:{fontSize:10.5,color:'rgba(255,255,255,.65)'}},t[0]), h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:700}},t[1]))))));
     const allocPage=h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'18px 24px'}}, dims.map(([k,l],i)=>{ const pct=this.basisPct(k); const colorsFor=(k==='strategy')?null:((this.HOME_DIMS().find(d=>d.key===k)||{colors:{}}).colors); const slices=Object.keys(pct).filter(x=>pct[x]>0).map(x=>({n:k==='strategy'?((this.STRATS.find(s=>s[0]===x)||[0,x])[1]):x, p:pct[x], color:(k==='strategy'?((this.STRATS.find(s=>s[0]===x)||[0,0,'--data-1'])[2]):(colorsFor[x]||'--data-9'))}));
       return h('div',{key:i,style:{display:'flex',alignItems:'center',gap:12}}, this.donutNamed(slices,104,l,'mix'), h('div',{style:{flex:1}}, this.pdfDimTable(k,l))); }));
     const cf=(this.DB&&this.DB.cashflows)||{cats:[],calls:[],distributions:[]}; const cmx=Math.max.apply(null,(cf.calls||[]).concat(cf.distributions||[]).concat([1]));
@@ -1859,7 +1859,7 @@ class Component extends DCLogic {
       {icon:'⏳',logo:'ares',fund:'Ares Private Credit III',unread:true,title:'Ares Private Credit III is closing soon',body:'The fund that closes your biggest gap (private credit) is 64% filled — first close imminent.',cta:'Ensure your allocation',act:()=>this.goOppFromNotif()},
       {icon:'⏳',logo:'general-atlantic',fund:'GA AI Opportunities',unread:true,title:'GA AI Opportunities is closing soon',body:'A top-ten performing manager just invested; the first-close window is open.',cta:'Ensure your first-close discount',act:()=>this.goOppFromNotif()},
       {icon:'💶',logo:'eqt',fund:'EQT IX',unread:true,title:'Distribution received — EQT IX',body:'EQT IX returned €120k to your account; your DPI moved to 1.1×.',cta:'Put it back to work',act:()=>this.goOppFromNotif()},
-      {icon:'📈',fund:null,unread:false,title:'Quarterly NAV updated',body:'Your portfolio NAV rose to €27.6m (+€3.6m this quarter).',cta:'View your performance',act:()=>this.setState({showNotif:false,ws:'understand',uc:'t1-12',page:'review',homeLaunched:true,deepLink:null,homePop:null})},
+      {icon:'📈',fund:null,unread:false,title:'Quarterly NAV updated',body:'Your portfolio NAV is €16.6m (+€0.6m this quarter).',cta:'View your performance',act:()=>this.setState({showNotif:false,ws:'understand',uc:'t1-12',page:'review',homeLaunched:true,deepLink:null,homePop:null})},
       {icon:'📄',logo:'ares',fund:'Northwind Infra III',unread:false,title:'New capital call — Northwind Infra III',body:'A €60k call is scheduled for next quarter; your liquidity buffer covers it comfortably.',cta:'Review liquidity',act:()=>this.setState({showNotif:false,ws:'understand',uc:'t1-7',page:'calls',homeLaunched:true,deepLink:null,homePop:null})}
     ]); }
   goOppFromNotif(){ this.setState({showNotif:false, showToast:false, ws:'act', uc:'opp', page:'opp', homeLaunched:true, deepLink:null, homePop:null, homeDrill:null, ask:{...this.state.ask,state:'min'}}); }
@@ -3341,7 +3341,7 @@ class Component extends DCLogic {
         const byVint=[{name:'2019',delta:1.4,sig:true,color:'--data-1'},{name:'2020',delta:0.9,sig:true,color:'--data-2'},{name:'2021',delta:0.6,sig:true,color:'--data-9'},{name:'2022',delta:0.2,sig:false,color:'--data-5'},{name:'2023',delta:-0.2,sig:false,color:'--data-4'},{name:'2024',delta:-0.4,sig:false,color:'--data-7'}];
         const z= cmp==='Vintage'? byVint : byStrat;
         return this.stack([
-          this.card({title:'NAV walk this quarter (€m)',badge:this.badge('your portfolio','conf'),children:h('div',{style:{paddingTop:6}},this.waterfall([{label:'Open',v:24.0,total:true},{label:'Buyout',v:1.1},{label:'Growth',v:0.8},{label:'AI / Tech',v:0.6},{label:'Credit',v:-0.2},{label:'Calls',v:0.9},{label:'Dists',v:-0.6},{label:'Close',v:27.6,total:true}])),caption:'Your NAV moved from €24.0m to €27.6m this quarter. Green bars added value, indigo removed it; capital calls add NAV, distributions remove it as cash goes out.'}),
+          this.card({title:'NAV walk this quarter (€m)',badge:this.badge('your portfolio','conf'),children:h('div',{style:{paddingTop:6}},this.waterfall([{label:'Open',v:16.0,total:true},{label:'Buyout',v:0.37},{label:'Growth',v:0.25},{label:'AI / Tech',v:0.14},{label:'Credit',v:-0.06},{label:'Calls',v:0.5},{label:'Dists',v:-0.6},{label:'Close',v:16.6,total:true}])),caption:'Your NAV moved from €16.0m to €16.6m this quarter (+€0.6m). Green bars added value, indigo removed it; capital calls add NAV, distributions remove it as cash goes out.'}),
           this.card({title:'Attribution '+(cmp==='Vintage'?'by vintage':'by strategy')+' (pp of NAV)',right:this.pill('attrcmp',['Strategy','Vintage'],'Strategy'),children:h('div',{style:{padding:'8px 0'}},this.miniZ(z)),caption:'Each '+(cmp==='Vintage'?'vintage’s':'strategy’s')+' contribution to the quarter’s NAV move. Buyout and AI / Tech drove the period; private credit was a small drag.'})]);
       },
       // Contributors & J-curve combined: real funds (clickable) on top, J-curve section below
@@ -4331,7 +4331,7 @@ class Component extends DCLogic {
       const ranked=roster.slice().sort((a,b)=>b.contrib-a.contrib);
       eyebrow='Your portfolio · Net Performance'; title='How your portfolio is performing';
       body=[
-        this.kpiTiles([['Net IRR','11.0%','since inception'],['MOIC','1.80x','net of fees'],['TVPI','2.10x',''],['DPI','2.10x','realised']]), /* review7 item 7 — removed Portfolio Value (already in hero) + Distributions (lives in cash-flows) */
+        (()=>{ const Pp=(this.DB&&this.DB.portfolio)||{}; return this.kpiTiles([['Net IRR',(Pp.irr||'14.4')+'%','since inception'],['MOIC',Pp.moicTableNet||'2.09x','net of fees'],['TVPI',Pp.tvpiTableNet||'2.09x',''],['DPI',Pp.dpiTableNet||'0.82x','realised']]); })(), /* review7 item 7 — removed Portfolio Value + Distributions; DB-wired (was hardcoded; DPI mislabelled 2.10x) */
         /* review3 item 4 — ONE merged Alpha's read: peer comparison + top contributor + what to watch */
         (()=>{ const youIrr=parseFloat((this.DB&&this.DB.portfolio&&this.DB.portfolio.irr)||'11.0')||11.0; const peerIrr=9.4;
           const peerLine = youIrr>=peerIrr
@@ -5254,7 +5254,9 @@ class Component extends DCLogic {
       {name:'Capital Calls',color:'--data-2',vals:CF.calls||[]},
       {name:'Distributions',color:'--data-5',vals:CF.distributions||[]}];
     const cfMax=Math.max(...cfSeries.flatMap(s=>s.vals),0.0001)*1.30;
-    const cfCalls=cfSeries[0].vals.reduce((a,b)=>a+b,0), cfDists=cfSeries[1].vals.reduce((a,b)=>a+b,0), cfNet=+(cfDists-cfCalls).toFixed(1);
+    /* reconcile to portfolio atoms (the yearly series is rounded per-bar; totals come from the atoms so the net adds up exactly) */
+    const _Pcf=(this.DB&&this.DB.portfolio)||{}; const _n=s=>parseFloat(String(s).replace(/[^0-9.\-]/g,''))||0;
+    const cfCalls=(_Pcf.called!=null?_Pcf.called:cfSeries[0].vals.reduce((a,b)=>a+b,0)), cfDists=(_Pcf.distributions!=null?_Pcf.distributions:cfSeries[1].vals.reduce((a,b)=>a+b,0)), cfNet=(_Pcf.netDistCumulative!=null?_Pcf.netDistCumulative:+(cfDists-cfCalls).toFixed(1));
     const cfView=this.dtog('cfView','Bars');
     const cumNet=cfCats.map((c,i)=>{ let cc=0,cd=0; for(let j=0;j<=i;j++){ cc+=(cfSeries[0].vals[j]||0); cd+=(cfSeries[1].vals[j]||0); } return +(cd-cc).toFixed(1); });
     const barCol=(c,ci)=>h('div',{key:ci,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',height:'100%'}},
@@ -7005,7 +7007,7 @@ class Component extends DCLogic {
   alphaRead(){
     const h=this.h; const SF=this.SF; const u=this.curUC(); const r=(this.READ_SUMMARY()[u.id])||[u.meta,null];
     const open=this.dtog('aread:'+u.id,false);
-    const chips=[['Net IRR','11.0%'],['MOIC','1.8x'],['PM allocation','16%'],['Funds held','8'],['Percentile','Top 18%']];
+    const _pp=(this.DB&&this.DB.portfolio)||{}; const chips=[['Net IRR',(_pp.irr||'14.4')+'%'],['MOIC',(_pp.moic||'2.1')+'x'],['PM allocation',((this.PM&&this.PM.you)||15.7)+'%'],['Funds held',String(_pp.fundsHeld||8)],['Percentile',_pp.rank||'Top 18%']];
     return h('section',{style:{background:'linear-gradient(135deg,var(--brand-wash),var(--surface))',border:'1px solid var(--brand-tint-3)',borderRadius:14,padding:'15px 18px'}},
       h('div',{style:{display:'flex',alignItems:'flex-start',gap:12,flexWrap:'wrap'}},
         h('div',{style:{flex:'1 1 360px',minWidth:0}},

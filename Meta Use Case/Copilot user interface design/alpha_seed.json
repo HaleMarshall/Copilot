@@ -5,15 +5,15 @@
     "paidInText": "€13.0m",
     "distributionsText": "€10.6m",
     "distributions": 10.6,
-    "irr": "11.0",
-    "irrTable": "11%",
-    "irrGross": "13%",
+    "irr": "14.4",
+    "irrTable": "14.4%",
+    "irrGross": "16.5%",
     "dpi": "0.8",
     "dpiTableNet": "0.82x",
     "dpiTableGross": "0.90x",
-    "moic": "1.8",
+    "moic": "2.1",
     "moicTableNet": "2.09x",
-    "moicTableGross": "1.95x",
+    "moicTableGross": "2.30x",
     "tvpiTableNet": "2.09x",
     "tvpiTableGross": "2.30x",
     "fundsHeld": 8,
@@ -268,7 +268,7 @@
       "logo": "eqt",
       "strat": "Buyout",
       "vintage": 2019,
-      "contrib": 1.8,
+      "contrib": 0.37,
       "moic": "2.9x",
       "dpi": "1.4x",
       "irr": "16.3%",
@@ -288,7 +288,7 @@
       "logo": "general-atlantic",
       "strat": "AI / Tech",
       "vintage": 2021,
-      "contrib": 1.2,
+      "contrib": 0.25,
       "moic": "1.8x",
       "dpi": "0.4x",
       "irr": "12.1%",
@@ -308,7 +308,7 @@
       "logo": "general-atlantic",
       "strat": "Growth",
       "vintage": 2020,
-      "contrib": 0.7,
+      "contrib": 0.14,
       "moic": "2.3x",
       "dpi": "1.1x",
       "irr": "14.8%",
@@ -328,7 +328,7 @@
       "logo": "eqt",
       "strat": "Buyout",
       "vintage": 2022,
-      "contrib": 0.4,
+      "contrib": 0.08,
       "moic": "1.6x",
       "dpi": "0.3x",
       "irr": "11.8%",
@@ -348,7 +348,7 @@
       "logo": "ares",
       "strat": "Private Credit",
       "vintage": 2023,
-      "contrib": -0.3,
+      "contrib": -0.06,
       "moic": "2.0x",
       "dpi": "0.6x",
       "irr": "26.0%",
@@ -368,7 +368,7 @@
       "logo": "eqt",
       "strat": "Buyout",
       "vintage": 2021,
-      "contrib": -0.6,
+      "contrib": -0.12,
       "moic": "2.1x",
       "dpi": "0.9x",
       "irr": "15.6%",
@@ -388,7 +388,7 @@
       "logo": "ares",
       "strat": "Infrastructure",
       "vintage": 2024,
-      "contrib": -0.2,
+      "contrib": -0.04,
       "moic": "1.1x",
       "dpi": "0.1x",
       "irr": "6.9%",
@@ -408,7 +408,7 @@
       "logo": "general-atlantic",
       "strat": "Growth",
       "vintage": 2024,
-      "contrib": -0.1,
+      "contrib": -0.02,
       "moic": "1.0x",
       "dpi": "0.0x",
       "irr": "0.0%",
@@ -1861,7 +1861,7 @@
       "full": "€150,000"
     },
     "irr": {
-      "you": "11.0%",
+      "you": "14.4%",
       "base": 8.9
     }
   },
@@ -1929,10 +1929,10 @@
       },
       {
         "l": "Net IRR",
-        "you": "11.0%",
+        "you": "14.4%",
         "peers": "9.4%",
         "model": "10.5%",
-        "top10": "14.2%"
+        "top10": "16.5%"
       },
       {
         "l": "Funds held",
@@ -3056,44 +3056,44 @@
       1.3
     ],
     "31": [
-      24,
-      29,
-      35,
-      43,
-      52,
-      63
+      16.6,
+      20.1,
+      24.2,
+      29.7,
+      36.0,
+      43.6
     ],
     "32": [
-      24,
-      27,
-      31,
-      36,
-      42,
-      49
+      16.6,
+      18.7,
+      21.4,
+      24.9,
+      29.1,
+      33.9
     ],
     "33": [
-      24,
-      25,
-      27,
-      30,
-      33,
-      37
+      16.6,
+      17.3,
+      18.7,
+      20.8,
+      22.8,
+      25.6
     ],
     "34": [
-      24,
-      27,
-      31,
-      36,
-      42,
-      49
+      16.6,
+      18.7,
+      21.4,
+      24.9,
+      29.1,
+      33.9
     ],
     "35": [
-      24.2,
-      27.6,
-      32,
-      37.6,
-      44,
-      51.5
+      16.6,
+      18.9,
+      22.0,
+      25.8,
+      30.2,
+      35.3
     ],
     "36": [
       0.72,
@@ -3142,20 +3142,20 @@
       3.6
     ],
     "43": [
-      24,
-      26,
-      29,
-      33,
-      38,
-      44
+      16.6,
+      18.0,
+      20.1,
+      22.8,
+      26.3,
+      30.4
     ],
     "44": [
-      24,
-      27,
-      31,
-      35,
-      40,
-      46
+      16.6,
+      18.7,
+      21.4,
+      24.2,
+      27.7,
+      31.8
     ],
     "45": [
       86,
