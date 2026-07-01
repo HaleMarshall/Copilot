@@ -533,6 +533,8 @@ class Component extends DCLogic {
       simDials:{pm:20, growth:0, secondaries:6, us:38},
       simTargets:null, simFocus:null, simSuggest:null,
       shareMode:false, /* advisor 'Share screen' present-mode: strips all advisor-only chrome, shows only the client-safe page */
+      presenting:false, /* advisor window has opened a separate client-view window and is syncing to it */
+      isPresentWindow:false, /* THIS window is the standalone client-view (opened with ?present=1) — a pure mirror */
       savedSims:[], simCompare:false, watchlist:[], portfolioAdds:[],
       oppSource:'baseline', oppMode:'weighted', oppWeights:{strategy:40, region:20, currency:20, sector:20}, /* item 140 Baseline first; items 122/123 — no Performance; Currency added */
       oppDetail:null, oppDetailTab:'why',
@@ -550,9 +552,28 @@ class Component extends DCLogic {
 
   /* ---------- DB backend: every number is pulled from /api/state (SQLite) ---------- */
   componentDidMount(){
-    fetch('/api/state',{cache:'no-store'}).then(r=>r.json()).then(d=>{ this.applyDB(d); const u={dbLoaded:true}; const profs=((d&&d.profiles)||[]); const p=profs[0]; if(p&&p.theme) u.theme=p.theme; if(d && !d.empty && profs.length===0 && !this.state.seenOnboard) u.showThemePicker=true; this.setState(u); })
+    /* Cross-window screen-share: the advisor keeps the full cockpit in THIS window and opens a separate
+       'client view' window (?present=1) that renders ONLY the investor rectangle. The advisor shares that
+       single window in their video call, so their rail/notes/script are never captured. The two windows
+       stay in sync over a BroadcastChannel — the advisor drives from the cockpit, the client window mirrors. */
+    let isPresent=false; try{ isPresent=new URLSearchParams(location.search).get('present')==='1'; }catch(e){}
+    try{ if('BroadcastChannel' in window){ this.pchan=new BroadcastChannel('moonfare_present');
+      this.pchan.onmessage=(e)=>{ const m=e.data||{};
+        if(this.state.isPresentWindow){ if(m.type==='state') this.setState({advClientId:m.clientId, advStage:m.stage, advLevel:m.level, advStep:m.step, advFocus:m.focus||null, displayCcy:m.ccy||this.state.displayCcy}); }
+        else if(m.type==='hello' && this.state.presenting){ this.broadcastPresent(); } }; } }catch(e){}
+    if(isPresent){ try{document.title='Moonfare — Client review';}catch(e){} this.setState({isPresentWindow:true, welcome:false, mode:'Advisor', advView:'cockpit', shareMode:true}); try{ if(this.pchan) this.pchan.postMessage({type:'hello'}); }catch(e){} }
+    fetch('/api/state',{cache:'no-store'}).then(r=>r.json()).then(d=>{ this.applyDB(d); const u={dbLoaded:true}; const profs=((d&&d.profiles)||[]); const p=profs[0]; if(p&&p.theme) u.theme=p.theme; if(d && !d.empty && profs.length===0 && !this.state.seenOnboard && !isPresent) u.showThemePicker=true; this.setState(u); })
       .catch(()=>{ this.applyDB({empty:true}); this.setState({dbLoaded:true, dbError:true}); });
   }
+  componentWillUnmount(){ try{ if(this.pchan) this.pchan.close(); }catch(e){} }
+  componentDidUpdate(pp, ps){
+    if(ps && this.state.presenting && !this.state.isPresentWindow){
+      if(ps.advStep!==this.state.advStep||ps.advStage!==this.state.advStage||ps.advLevel!==this.state.advLevel||ps.advClientId!==this.state.advClientId||ps.advFocus!==this.state.advFocus||ps.displayCcy!==this.state.displayCcy) this.broadcastPresent();
+    }
+  }
+  broadcastPresent(){ try{ if(this.pchan) this.pchan.postMessage({type:'state', clientId:this.state.advClientId, stage:this.state.advStage, level:this.state.advLevel, step:this.state.advStep, focus:this.state.advFocus, ccy:this.state.displayCcy}); }catch(e){} }
+  openPresentWindow(){ try{ this.presentWin=window.open(location.pathname+'?present=1','moonfare_present','width=1320,height=860'); }catch(e){} this.setState({presenting:true}); [400,1100,2200].forEach(t=>setTimeout(()=>this.broadcastPresent(),t)); }
+  stopPresenting(){ try{ if(this.presentWin&&!this.presentWin.closed) this.presentWin.close(); }catch(e){} this.presentWin=null; this.setState({presenting:false}); }
   applyDB(d){
     if(!d || d.empty){
       this.DB={empty:true};
@@ -8266,8 +8287,13 @@ class Component extends DCLogic {
         labelled('Currency', h('select',{value:this.state.displayCcy,onChange:e=>this.setState({displayCcy:e.target.value}),style:{background:'rgba(255,255,255,.1)',color:'#fff',border:'1px solid rgba(255,255,255,.22)',borderRadius:7,padding:'5px 8px',fontSize:11.5,fontWeight:700,cursor:'pointer'}}, this.ccyList().map(c=>h('option',{key:c,value:c,style:{color:'#111'}},c)))),
         h('div',{style:{width:1,height:30,background:'rgba(255,255,255,.14)'}}),
         h('div',{style:{textAlign:'right'}}, h('div',{style:{fontSize:12.5,fontWeight:600}},self.name), h('div',{style:{fontSize:10,color:'rgba(255,255,255,.55)'}},self.role)),
-        /* Share screen — flip to a client-safe present view that hides ALL advisor-only chrome (rail, call plan, script, notes, level/journey toggles) so the advisor can screen-share only what the investor should see */
-        h('button',{'data-testid':'share-screen',title:'Present a client-safe view — hides your call plan, script and notes',onClick:()=>this.setState({shareMode:true, advActionOpen:null, advFocus:null}),style:{display:'inline-flex',alignItems:'center',gap:6,border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'7px 13px',fontSize:11.5,fontWeight:700,cursor:'pointer',boxShadow:'0 6px 16px -8px rgba(44,45,254,.8)'}}, h('span',{style:{fontSize:13,lineHeight:1}},'⤢'), 'Share screen'),
+        /* Share to client — opens a SEPARATE window that shows only the investor rectangle; the advisor keeps
+           this full cockpit (rail/notes/script) private and shares just that window in their video call */
+        this.state.presenting
+          ? h('div',{style:{display:'flex',alignItems:'center',gap:8}},
+              h('button',{'data-testid':'share-active',title:'Bring the client-view window to the front',onClick:()=>{ try{ this.presentWin && !this.presentWin.closed ? this.presentWin.focus() : this.openPresentWindow(); }catch(e){} },style:{display:'inline-flex',alignItems:'center',gap:7,border:'1px solid rgba(255,255,255,.25)',background:'var(--over)',color:'#fff',borderRadius:8,padding:'7px 12px',fontSize:11.5,fontWeight:700,cursor:'pointer'}}, h('span',{style:{width:8,height:8,borderRadius:'50%',background:'#fff'}}), 'Sharing to client'),
+              h('button',{'data-testid':'share-stop',onClick:()=>this.stopPresenting(),style:{border:'1px solid rgba(255,255,255,.3)',background:'rgba(255,255,255,.1)',color:'#fff',borderRadius:8,padding:'7px 11px',fontSize:11.5,fontWeight:600,cursor:'pointer'}},'Stop'))
+          : h('button',{'data-testid':'share-screen',title:'Open a client-safe window that shows only the investor content — share THAT window in your video call',onClick:()=>this.openPresentWindow(),style:{display:'inline-flex',alignItems:'center',gap:6,border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'7px 13px',fontSize:11.5,fontWeight:700,cursor:'pointer',boxShadow:'0 6px 16px -8px rgba(44,45,254,.8)'}}, h('span',{style:{fontSize:13,lineHeight:1}},'⤢'), 'Share to client'),
         h('button',{onClick:()=>this.advToPrep(),style:{border:'1px solid rgba(255,255,255,.3)',background:'rgba(255,255,255,.1)',color:'#fff',borderRadius:8,padding:'6px 11px',fontSize:11.5,cursor:'pointer'}},'Exit')));
     const plan=this.advCallPlan(); const openA=this.state.advActionOpen;
     /* item 1/2 — OBJECTIVE first, always commercial */
@@ -8355,13 +8381,16 @@ class Component extends DCLogic {
     const preparedFor=h('div',{style:{minWidth:0}},
       h('div',{style:{fontSize:9.5,letterSpacing:'.1em',textTransform:'uppercase',color:'var(--muted)'}},'Prepared for'),
       h('div',{style:{fontFamily:SF,fontSize:15,fontWeight:700,color:'var(--ink)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},c.name||'Investor'));
-    const presenting=h('span',{style:{display:'inline-flex',alignItems:'center',gap:7,fontSize:11.5,fontWeight:700,color:'var(--over)',background:'rgba(45,143,111,.10)',border:'1px solid rgba(45,143,111,.28)',borderRadius:999,padding:'5px 11px'}},
-      h('span',{style:{width:8,height:8,borderRadius:'50%',background:'var(--over)'}}), 'Presenting');
+    /* isWin = this is the standalone client-view window (a pure mirror the advisor shares). It shows a subtle
+       'Live' marker and NO controls — the advisor drives from their cockpit. The in-window fallback keeps Exit + nav. */
+    const isWin=this.state.isPresentWindow;
+    const liveTag=h('span',{style:{display:'inline-flex',alignItems:'center',gap:7,fontSize:11.5,fontWeight:700,color:'var(--over)',background:'rgba(45,143,111,.10)',border:'1px solid rgba(45,143,111,.28)',borderRadius:999,padding:'5px 11px'}},
+      h('span',{style:{width:8,height:8,borderRadius:'50%',background:'var(--over)'}}), isWin?'Live':'Presenting');
     const exitBtn=h('button',{'data-testid':'exit-share',onClick:()=>this.setState({shareMode:false}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--ink)',borderRadius:9,padding:'8px 14px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},'Exit presentation');
     const header=h('div',{style:{height:64,flex:'0 0 64px',display:'flex',alignItems:'center',gap:18,padding:'0 26px',background:'var(--surface)',borderBottom:'1px solid var(--line)'}},
       brand, h('div',{style:{width:1,height:26,background:'var(--line)'}}), preparedFor,
       h('div',{style:{marginLeft:20,fontFamily:SF,fontSize:14,fontWeight:600,color:'var(--ink)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},title),
-      h('div',{style:{marginLeft:'auto',display:'flex',alignItems:'center',gap:12,flex:'0 0 auto'}}, presenting, exitBtn));
+      h('div',{style:{marginLeft:'auto',display:'flex',alignItems:'center',gap:12,flex:'0 0 auto'}}, liveTag, isWin?null:exitBtn));
     const navBtn=(label,dir,disabled,primary)=>h('button',{onClick:()=>disabled?null:(dir<0?this.advPrev():this.advNext()),disabled:disabled,
       style:{display:'inline-flex',alignItems:'center',gap:8,border:primary?'none':'1px solid var(--line)',background:primary?'var(--brand)':'var(--surface)',color:primary?'#fff':(disabled?'var(--line)':'var(--ink)'),borderRadius:10,padding:primary?'11px 22px':'11px 18px',fontSize:13,fontWeight:primary?700:600,cursor:disabled?'default':'pointer',opacity:disabled?.55:1,boxShadow:primary&&!disabled?'0 8px 20px -12px rgba(44,45,254,.6)':'none'}}, label);
     const nav=h('div',{style:{flexShrink:0,marginTop:22,paddingTop:16,borderTop:'1px solid var(--line)',display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap'}},
@@ -8372,11 +8401,11 @@ class Component extends DCLogic {
       h('div',{style:{fontSize:11,letterSpacing:'.14em',textTransform:'uppercase',color:'var(--muted)',marginBottom:10}},'Private-markets review'),
       h('div',{style:{fontFamily:SF,fontSize:30,fontWeight:600,marginBottom:12}},'Prepared for '+(c.name||'you')),
       h('div',{style:{fontSize:14,color:'var(--muted)',lineHeight:1.6,marginBottom:24}},'A tailored walk-through of your portfolio, targets and opportunities — your advisor will take you through it step by step.'),
-      h('button',{onClick:()=>this.advNext(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:11,padding:'13px 26px',fontSize:14,fontWeight:700,cursor:'pointer',boxShadow:'0 8px 20px -12px rgba(44,45,254,.6)'}},'Begin the review  →'));
+      isWin? null : h('button',{onClick:()=>this.advNext(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:11,padding:'13px 26px',fontSize:14,fontWeight:700,cursor:'pointer',boxShadow:'0 8px 20px -12px rgba(44,45,254,.6)'}},'Begin the review  →'));
     const content=safe? this.advPageRender(key) : cover;
     const body=h('div',{'data-testid':'share-canvas',style:{flex:1,minWidth:0,overflow:'auto',background:'var(--bg)',padding:'26px 32px 30px',display:'flex',flexDirection:'column'}},
       h('div',{style:{width:'100%',maxWidth:1120,margin:'0 auto',flex:1,display:'flex',flexDirection:'column'}},
-        h('div',{style:{margin:'auto 0',width:'100%'}}, content), nav));
+        h('div',{style:{margin:'auto 0',width:'100%'}}, content), isWin?null:nav));
     return h('div',{'data-testid':'share-view',style:{position:'fixed',inset:0,zIndex:70,display:'flex',flexDirection:'column',background:'var(--bg)'}}, header, body);
   }
   /* Follower opt-in — render a single notification exactly as the investor would receive it on their
@@ -9139,6 +9168,9 @@ class Component extends DCLogic {
   /* ---------- captions / badges ---------- */
   renderVals(){
     const h=this.h; const s=this.state; const co=this.cohort(); const pd=this.peerData();
+    /* keep the client-view window in sync — broadcast on every render whose nav signature changed (the DC
+       framework re-renders via renderVals; it does not call componentDidUpdate, so we sync from here). */
+    if(s.presenting && !s.isPresentWindow){ const sig=[s.advClientId,s.advStage,s.advLevel,s.advStep,s.advFocus,s.displayCcy].join('|'); if(sig!==this._presentSig){ this._presentSig=sig; this.broadcastPresent(); } }
     const cmpName=c=>c==='platform'?'Platform':c==='model'?'the Model':c==='you'?'You':c==='family'?'Family offices':c==='top10'?'the Top 10%':'Peers';
     // BL caption
     const blCap = {
