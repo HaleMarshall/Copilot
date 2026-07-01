@@ -35,8 +35,11 @@ Legend: [x] verified working & data-real · [!] bug found (with fix) · [ ] not 
 - [x] ccyConv converts every €-figure: €16.6m → $18.0m (×1.083) / £14.1m (×0.848) / Fr 16.0m, correct symbols.
 - [x] advHomeCcy derives home ccy from client region (real book encodes it as "US / USD","CH / CHF","DE / EUR"): Reuter→USD, Meier→CHF, German→EUR. Advisor header shows the client's home currency on impersonate. (First test used wrong region format {region:'US/CA'}→EUR — harness artifact, not a bug.)
 
+## advClientCohort + level differentiation — VERIFIED 2026-07-01
+- [!] FIXED: prof classifier mapped "PE executive" → Exec/Owner (generic 'exec' checked before 'pe'); also bare 'pe'/'invest' substrings matched "develoPEr"→Investor/PE. Reordered most-specific-first with word-boundaries (\bpe\b, private equity, \binvestor\b before founder|\bexec). Now Lindqvist→Investor/PE (peer median 18.4, matches L3); "Software developer"→Eng/Tech; Reuter(Founder)→Exec/Owner, Coburger→Legal, Meier→Family Office, Weber→Medical all correct.
+- [x] Level differentiation via advSeq step counts escalates L1<L2≤L3: new 8/10/11, existing 11/13/13, inactive 14/16/16; pregate 7/7/7 (intentionally lean pre-accreditation). Stage journeys differ: new builds (setTarget→modelPortfolio), existing reviews (confirmTarget→overview→changesSince→3 comparison steps→follower).
+
 ## STILL TO WALK
-- [ ] advClientCohort maps client→cohort (fc) correctly for each book client (5 clients).
 - [ ] Model-portfolio page strategy mix reflects target/inputs (L1/L2 real strategies; L3 redundant page removed).
 - [ ] Manager research (L3) filters/toggles change firm/fund tables from DB managerTree.
 - [ ] Lifecycle / what's-changed / follower iPhone previews: no emojis, logos+graph, real.
