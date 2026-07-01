@@ -672,10 +672,10 @@ class Component extends DCLogic {
     const active = dims.filter(d=>(fc[d]||[]).length && !(d==='region'&&fc[d].includes('All')));
     let strictN = Math.round(T*frac);
     let n=strictN, relaxed=false, relaxedDims=[], belowFloor=false;
-    const FLOOR=25;
-    if(this.state.demoState==='gated'){ belowFloor=true; }
+    const FLOOR=25; const paid=!!this.state.paid; /* item 22 — paid clients bypass the too-small-cohort paywall; non-paid hit it */
+    if(this.state.demoState==='gated'){ belowFloor=!paid; }
     else if(this.state.demoState==='thin'){ relaxed=true; n=Math.max(strictN, FLOOR+9); relaxedDims=active.slice(-1); }
-    else if(strictN < 8){ belowFloor=true; }                       // k-anonymity floor → gated
+    else if(strictN < 8){ belowFloor=!paid; }                      // k-anonymity floor → paywall (unless paid)
     else if(strictN < FLOOR){ relaxed=true; n=Math.max(strictN*3, 26); relaxedDims=active.slice(-1); }
     return { n: belowFloor? strictN : n, strictN, total:T, frac, relaxed, relaxedDims, belowFloor, gated:belowFloor, active, p:{n:strictN} };
   }
@@ -1199,9 +1199,11 @@ class Component extends DCLogic {
       co.relaxed? h('div',{key:'relax',style:{display:'flex',gap:8,alignItems:'center',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:8,padding:'8px 10px',marginTop:10}},
         h('span',{style:{color:'var(--brand)'}},'ⓘ'), h('span',{style:{fontSize:11,color:'var(--brand-ink)',fontWeight:600}},'Broadened to keep the group statistically meaningful'+(co.relaxedDims.length?' — relaxed: '+co.relaxedDims.join(', '):'')+'.')):null,
       co.belowFloor? h('div',{key:'gate',style:{background:'var(--gated-wash)',border:'1px solid var(--line)',borderRadius:8,padding:'11px',marginTop:10}},
-        h('div',{style:{fontSize:11.5,fontWeight:700}},'Only for paid viewers'),
-        h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:2,marginBottom:8}},'Contact your sales associate · '+co.total.toLocaleString()+' total investors'),
-        h('button',{onClick:()=>this.loosen(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:999,padding:'6px 13px',fontSize:11.5,fontWeight:600,cursor:'pointer'}},'Loosen filters')):null
+        h('div',{style:{fontSize:11.5,fontWeight:700}},'This cohort is too specific — paid clients only'),
+        h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:2,marginBottom:8}},'Narrowing to this few peers is a paid feature. Contact your sales associate · '+co.total.toLocaleString()+' total investors'),
+        h('div',{style:{display:'flex',gap:8,flexWrap:'wrap'}},
+          h('button',{onClick:()=>this.loosen(),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--ink)',borderRadius:999,padding:'6px 13px',fontSize:11.5,fontWeight:600,cursor:'pointer'}},'Loosen filters'),
+          h('button',{'data-testid':'unlock-paid',onClick:()=>this.setState({paid:true}),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:999,padding:'6px 13px',fontSize:11.5,fontWeight:700,cursor:'pointer'}},'Unlock — paid client'))):null
     ];
 
     const readonlyNote=h('div',{key:'ro',style:{fontSize:11.5,color:'var(--muted)',lineHeight:1.5,background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:10,padding:'12px 13px'}},
@@ -1250,9 +1252,11 @@ class Component extends DCLogic {
       co.relaxed? h('div',{key:'relax',style:{display:'flex',gap:8,alignItems:'center',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:8,padding:'8px 10px',marginTop:2}},
         h('span',{style:{color:'var(--brand)'}},'ⓘ'), h('span',{style:{fontSize:11,color:'var(--brand-ink)',fontWeight:600}},'Broadened to keep the group statistically meaningful'+(co.relaxedDims.length?' — relaxed: '+co.relaxedDims.join(', '):'')+'.')):null,
       co.belowFloor? h('div',{key:'gate',style:{background:'var(--gated-wash)',border:'1px solid var(--line)',borderRadius:8,padding:'11px',marginTop:2}},
-        h('div',{style:{fontSize:11.5,fontWeight:700}},'Only for paid viewers'),
-        h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:2,marginBottom:8}},'Contact your sales associate · '+co.total.toLocaleString()+' total investors'),
-        h('button',{onClick:()=>this.loosen(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:999,padding:'6px 13px',fontSize:11.5,fontWeight:600,cursor:'pointer'}},'Loosen filters')):null,
+        h('div',{style:{fontSize:11.5,fontWeight:700}},'This cohort is too specific — paid clients only'),
+        h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:2,marginBottom:8}},'Narrowing to this few peers is a paid feature. Contact your sales associate · '+co.total.toLocaleString()+' total investors'),
+        h('div',{style:{display:'flex',gap:8,flexWrap:'wrap'}},
+          h('button',{onClick:()=>this.loosen(),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--ink)',borderRadius:999,padding:'6px 13px',fontSize:11.5,fontWeight:600,cursor:'pointer'}},'Loosen filters'),
+          h('button',{'data-testid':'unlock-paid',onClick:()=>this.setState({paid:true}),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:999,padding:'6px 13px',fontSize:11.5,fontWeight:700,cursor:'pointer'}},'Unlock — paid client'))):null,
       /* item 58 — investment horizon + target so the user can fully define their own peers */
       section('Investment horizon','one', chips('horizon',['<5y','5-10y','10-15y','15y+'])),
       section('Target PM allocation','one', chips('target',['10%','15%','20%','25%','30%'])),
