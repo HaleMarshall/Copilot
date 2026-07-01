@@ -6140,14 +6140,16 @@ class Component extends DCLogic {
       /* item 70 — Z-chart instead of the table */
       const zRows=cats.map(k=>{ const yv=Math.round((+tObj[k]||0)/tot*100); const cv=Math.round((+compMix[k]||0)/compTot*100); const dd=+(yv-cv).toFixed(1); return {name:nm(d.key,k),delta:dd,color:d.colors[k]||'--data-9',sig:Math.abs(dd)>=2}; }).filter(r=>r.delta!==0).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
       /* item 68 — left: my target · middle: the comparator · right: the Z-chart */
-      const cols=h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:18,alignItems:'start'}},
-        h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutLabel('Your target'), this.donutNamed(tgtSlices,170,'Target',d.label.toLowerCase()),
-          h('div',{style:{fontSize:10,color:'var(--muted)'}},'your '+d.label.toLowerCase()+' target')),
-        hideCompare? null : h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutLabel(compShort+' · target'), this.donutNamed(compSlices,170,compShort,d.label.toLowerCase()),
-          h('div',{style:{fontSize:10,color:'var(--muted)'}},compLabel)),
-        h('div',null, h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}}, hideCompare? 'Your change vs the original proposal (pp)' : ('Your target vs '+compShort+'’s target (pp)')),
+      /* item 27 — three EQUAL columns: fixed minmax(0,1fr) tracks (not auto-fit, which collapses/unequalizes at narrow widths), one identical gap, and every cell shares simCell so the two donuts and the Z-chart sit in identically-sized, identically-inset boxes → same space, same distance from each other and from the card walls */
+      const simCell={display:'flex',flexDirection:'column',alignItems:'center',gap:6,padding:'6px 8px',minWidth:0};
+      const cols=h('div',{style:{display:'grid',gridTemplateColumns:hideCompare?'repeat(2,minmax(0,1fr))':'repeat(3,minmax(0,1fr))',gap:18,alignItems:'stretch',justifyItems:'stretch'}},
+        h('div',{style:simCell}, this.donutLabel('Your target'), this.donutNamed(tgtSlices,170,'Target',d.label.toLowerCase()),
+          h('div',{style:{fontSize:10,color:'var(--muted)',textAlign:'center'}},'your '+d.label.toLowerCase()+' target')),
+        hideCompare? null : h('div',{style:simCell}, this.donutLabel(compShort+' · target'), this.donutNamed(compSlices,170,compShort,d.label.toLowerCase()),
+          h('div',{style:{fontSize:10,color:'var(--muted)',textAlign:'center'}},compLabel)),
+        h('div',{style:Object.assign({},simCell,{alignItems:'stretch'})}, h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:8,textAlign:'center'}}, hideCompare? 'Your change vs the original proposal (pp)' : ('Your target vs '+compShort+'’s target (pp)')),
           /* item 20 — always show the Z-chart; when your target is in line with the comparator, draw the ZEROED bars (every category at 0pp on the axis), never a text fallback or fictional gray bars */
-          this.miniZ(zRows.length? zRows : cats.map(k=>({name:nm(d.key,k),delta:0,color:d.colors[k]||'--data-9'})))));
+          h('div',{style:{width:'100%'}}, this.miniZ(zRows.length? zRows : cats.map(k=>({name:nm(d.key,k),delta:0,color:d.colors[k]||'--data-9'}))))));
       /* item 67/69 — comparator selector; Peers & Custom open the group editor (same one as the comparison page) */
       const selector=hideCompare? null : h('div',null,
         h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:7}},'Compare your target against'),
