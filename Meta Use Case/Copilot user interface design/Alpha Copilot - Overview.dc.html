@@ -6108,7 +6108,7 @@ class Component extends DCLogic {
           h('div',{style:{flex:'1 1 260px',minWidth:240}},
             h('div',{style:{fontSize:10.5,fontWeight:700,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:4}},'Target vs current (pp) · updates live'), /* item 158 */
             h('div',{style:{fontSize:10.5,color:'var(--muted)',marginBottom:8,textTransform:'none',letterSpacing:0}},'Recomputes as you move the sliders.'),
-            z.some(x=>Math.abs(x.delta)>=0.5)? this.miniZ(z) : h('div',{style:{fontSize:12,color:'var(--muted)',padding:'20px 0',textAlign:'center'}},'Move a slider to open a gap vs your current mix.')))});
+            this.miniZ(z)))}); /* item 20 — always show the chart (zeroed bars when no gap), not a text fallback */
     };
     // ---- one card PER dimension (strategy, region, currency, sector): your target pie + side legend, with a 'compare against' selector under it; Custom opens sliders + numeric % inputs + risk strategies ----
     /* item 67 — only Model / Peers / Platform / Top 10% / Custom (no 'current' here) */
@@ -6133,7 +6133,8 @@ class Component extends DCLogic {
         hideCompare? null : h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutLabel(compShort+' · target'), this.donutNamed(compSlices,170,compShort,d.label.toLowerCase()),
           h('div',{style:{fontSize:10,color:'var(--muted)'}},compLabel)),
         h('div',null, h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}}, hideCompare? 'Your change vs the original proposal (pp)' : ('Your target vs '+compShort+'’s target (pp)')),
-          zRows.length? this.miniZ(zRows): h('div',{style:{fontSize:12,color:'var(--muted)',padding:'18px 0',textAlign:'center'}}, hideCompare? 'Move a slider to shape your target.' : ('In line with '+compShort+'.'))));
+          /* item 20 — always show the Z-chart; when your target is in line with the comparator, draw the ZEROED bars (every category at 0pp on the axis), never a text fallback or fictional gray bars */
+          this.miniZ(zRows.length? zRows : cats.map(k=>({name:nm(d.key,k),delta:0,color:d.colors[k]||'--data-9'})))));
       /* item 67/69 — comparator selector; Peers & Custom open the group editor (same one as the comparison page) */
       const selector=hideCompare? null : h('div',null,
         h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:7}},'Compare your target against'),

@@ -20,7 +20,7 @@ Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.
 - [x] 17. On Tailored Target adjust/compare, Calls-for-Action must match THIS page (not previous page).
 - [x] 18. Remove Vintage target (wasn't in investor view).
 - [x] 19. On all tailored-target graphs, break small numbers out with an arrow showing the %.
-- [ ] 20. 'in line with model' → show the chart with zeros, not fictional gray bars (investor view too).
+- [x] 20. 'in line with model' → show the chart with zeros, not fictional gray bars (investor view too).
 - [ ] 21. 'model target' → 'Moonfare model portfolio' EVERYWHERE (all investor + advisor pages).
 - [ ] 22. Too-small peer selection → paywall (paid clients only).
 - [ ] 23. Advisor flow: too many filters yielding too few results → take next-closest-largest before the gap-closing filter.
