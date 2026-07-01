@@ -995,7 +995,7 @@ class Component extends DCLogic {
       {label:'You',sub:'of '+this.myPmTarget()+'% target',ref:this.myPmTarget(),color:'--brand'},
       {label:opts.peerLabel||'Peers',sub:'of peer target',ref:pd.target,color:'--data-4'},
       {label:'Platform',sub:'average',ref:this.PM.platform,color:'--data-9'},
-      {label:'Model target',sub:null,ref:18,color:'--data-6',full:true},
+      {label:'Moonfare model portfolio',sub:null,ref:18,color:'--data-6',full:true},
       /* item 65 — add the endowments to fill-rate: how filled you are against an endowment-style target */
       {label:'Endowments',sub:'of '+(this.PM.endowTarget||36)+'% target',ref:this.PM.endowTarget||36,color:'--data-2'}
     ];
@@ -1016,7 +1016,7 @@ class Component extends DCLogic {
         const filled=r.full?100:(cold?0:Math.min(Math.round(yourPm/r.ref*100),100));
         const rem=100-filled;
         return h('div',{key:i,style:{height:barH,display:'flex',borderRadius:5,overflow:'hidden',cursor:'pointer'},
-          onClick:e=>this.openPop(e,{title:`Fill rate · ${r.label}`,value:`${filled}% filled of ${r.label==='Model target'?'model':r.label.toLowerCase()} ${r.ref}% target`,method:'fill = your PM% ÷ reference target',cohort:'Peers',n:pd.c.n})},
+          onClick:e=>this.openPop(e,{title:`Fill rate · ${r.label}`,value:`${filled}% filled of ${r.label==='Moonfare model portfolio'?'model':r.label.toLowerCase()} ${r.ref}% target`,method:'fill = your PM% ÷ reference target',cohort:'Peers',n:pd.c.n})},
           h('div',{style:{width:filled+'%',background:`var(${r.color})`,display:'flex',alignItems:'center',justifyContent:filled>14?'center':'flex-start',paddingLeft:filled>14?0:6,boxSizing:'border-box'}},
             filled>=8? h('span',{style:{fontSize:12,fontWeight:700,color:'#fff',fontFamily:"Inter,system-ui,sans-serif",textShadow:'0 1px 2px rgba(0,0,0,.25)'}}, filled+'%'):null),
           rem>0? h('div',{style:{width:rem+'%',background:'var(--surface-2)',display:'flex',alignItems:'center',justifyContent:'center'}},
@@ -1421,7 +1421,7 @@ class Component extends DCLogic {
       ask:{...this.state.ask, state:'open', typing:false, input:'', msgs: this.state.ask.msgs.concat([{who:'alpha', segs, agentic:'Navigated to Simulator · target set'}]) } });
   }
   chatFundCandidates(){ return [
-    {name:'Ares Private Credit Solutions III', strat:'Private Credit', fit:96, tag:'Closes your #1 gap', why:['Private credit is your single largest under-weight — roughly 12pp below your model target.','Senior direct lending pays contractual yield, which shortens your J-curve and steadies cash flow.','Ares is a top-quartile manager with a multi-cycle track record in the asset class.','The current vintage is actively deploying, so capital is put to work quickly rather than sitting idle.','A €150k ticket fits inside your €4.3m investable headroom without breaking your pacing plan.']},
+    {name:'Ares Private Credit Solutions III', strat:'Private Credit', fit:96, tag:'Closes your #1 gap', why:['Private credit is your single largest under-weight — roughly 12pp below your Moonfare model portfolio.','Senior direct lending pays contractual yield, which shortens your J-curve and steadies cash flow.','Ares is a top-quartile manager with a multi-cycle track record in the asset class.','The current vintage is actively deploying, so capital is put to work quickly rather than sitting idle.','A €150k ticket fits inside your €4.3m investable headroom without breaking your pacing plan.']},
     {name:'KKR North America XIII', strat:'Buyout', fit:91, tag:'Geographic balance', why:['Your book is Europe-heavy, and this adds large-cap North American exposure for balance.','KKR is a top-quartile, multi-cycle buyout manager with deep operating resources.','A 2026 vintage deploys into reset entry valuations after the repricing.','It mirrors funds your followed peer group has historically done well in.','The minimum and ticket sit comfortably within your liquidity headroom.']},
     {name:'Lexington Capital Partners XII', strat:'Secondaries', fit:88, tag:'Shorter J-curve', why:['Secondaries buy already-funded NAV, so distributions arrive sooner.','That directly smooths the 2021–22 vintage bunching in your current book.','It eases near-term capital-call pressure while you add primaries elsewhere.','Lexington is a scale leader with consistent secondaries performance.','It diversifies your vintage exposure in a single, efficient commitment.']}
   ]; }
@@ -1435,7 +1435,7 @@ class Component extends DCLogic {
     if(/cash|call|distribut|j.?curve/.test(t)){chart='cashflow';title='your cash-flow profile';}
     else if(/region|geograph/.test(t)){chart='region';title='your regional mix';}
     else if(/sector/.test(t)){chart='sector';title='your sector exposure';}
-    else if(/gap|target|model|over|under|vs/.test(t)){chart='gap';title='your gaps versus the model target';}
+    else if(/gap|target|model|over|under|vs/.test(t)){chart='gap';title='your gaps versus the Moonfare model portfolio';}
     const segs=[{t:'Here’s '+title+', pulled live from your portfolio:'}];
     this.setAsk(null,{ typing:false, msgs:this.state.ask.msgs.concat([{who:'alpha', segs, kind:'chart', chart, chartTitle:title}]) });
   }
@@ -2082,7 +2082,7 @@ class Component extends DCLogic {
       h('tbody',null,rows.map((r,ri)=>h('tr',{key:ri},r.map((c,ci)=>h('td',{key:ci,style:{textAlign:ci?'right':'left',padding:'8px 6px',borderBottom:'1px solid var(--line)',fontFamily:ci?"Inter,system-ui,sans-serif":'inherit',fontWeight:ci?600:400}},c))))));
     const pd=this.peerData();
     if(which==='tl') return tbl(['Actor','% of wealth'],[['You',this.PM.you+'%'],['Peers (median)',pd.median+'%'],['Platform (avg)',this.PM.platform+'%'],['Model',this.PM.model+'%'],['Your target',this.myPmTarget()+'%']]);
-    if(which==='tr') return tbl(['Reference','Target %','Fill %'],[['Your target','20%',Math.round(this.PM.you/20*100)+'%'],['Peer target',pd.target+'%',Math.round(this.PM.you/pd.target*100)+'%'],['Platform (actual)','10.5%',Math.round(this.PM.you/10.5*100)+'%'],['Model target','18%',Math.round(this.PM.you/18*100)+'%']]);
+    if(which==='tr') return tbl(['Reference','Target %','Fill %'],[['Your target','20%',Math.round(this.PM.you/20*100)+'%'],['Peer target',pd.target+'%',Math.round(this.PM.you/pd.target*100)+'%'],['Platform (actual)','10.5%',Math.round(this.PM.you/10.5*100)+'%'],['Moonfare model portfolio','18%',Math.round(this.PM.you/18*100)+'%']]);
     if(which==='br'){ const rows=this.zDeltas(this.state.cmp).map(r=>[r.name,(r.delta>0?'+':'')+r.delta+'pp', r.sig?'significant':'n.s.']); return tbl(['Strategy','Δ vs '+this.state.cmp,'Significance'],rows); }
     return null;
   }
@@ -6122,7 +6122,7 @@ class Component extends DCLogic {
       const compMix = mode==='custom'? tObj : (mode==='model'? d.target : this.dimBench(d,mode));
       const compTot=cats.reduce((a,k)=>a+(+compMix[k]||0),0)||1;
       const compSlices=cats.map(k=>({color:d.colors[k]||'--data-9',p:+(((+compMix[k]||0)/compTot*100)).toFixed(1),n:nm(d.key,k)})).filter(x=>x.p>0);
-      const compLabel=hideCompare? 'the original proposal' : {model:'the Model target',peers:'the Peers’ target',platform:'the Platform target',top10:'the Top 10% target',family:'the Family-office mix',hyp:'the H+Y+P endowments',harvard:'the Harvard endowment',yale:'the Yale endowment',princeton:'the Princeton endowment',custom:'your custom group'}[mode]||'the comparison group';
+      const compLabel=hideCompare? 'the original proposal' : {model:'the Moonfare model portfolio',peers:'the Peers’ target',platform:'the Platform target',top10:'the Top 10% target',family:'the Family-office mix',hyp:'the H+Y+P endowments',harvard:'the Harvard endowment',yale:'the Yale endowment',princeton:'the Princeton endowment',custom:'your custom group'}[mode]||'the comparison group';
       const compShort=hideCompare? 'Original' : {model:'Model',peers:'Peers',platform:'Platform',top10:'Top 10%',family:'Family offices',hyp:'H+Y+P',harvard:'Harvard',yale:'Yale',princeton:'Princeton',custom:'Custom'}[mode]||'Group';
       /* item 70 — Z-chart instead of the table */
       const zRows=cats.map(k=>{ const yv=Math.round((+tObj[k]||0)/tot*100); const cv=Math.round((+compMix[k]||0)/compTot*100); const dd=+(yv-cv).toFixed(1); return {name:nm(d.key,k),delta:dd,color:d.colors[k]||'--data-9',sig:Math.abs(dd)>=2}; }).filter(r=>r.delta!==0).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));

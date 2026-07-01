@@ -21,7 +21,7 @@ Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.
 - [x] 18. Remove Vintage target (wasn't in investor view).
 - [x] 19. On all tailored-target graphs, break small numbers out with an arrow showing the %.
 - [x] 20. 'in line with model' → show the chart with zeros, not fictional gray bars (investor view too).
-- [ ] 21. 'model target' → 'Moonfare model portfolio' EVERYWHERE (all investor + advisor pages).
+- [x] 21. 'model target' → 'Moonfare model portfolio' EVERYWHERE (all investor + advisor pages).
 - [ ] 22. Too-small peer selection → paywall (paid clients only).
 - [ ] 23. Advisor flow: too many filters yielding too few results → take next-closest-largest before the gap-closing filter.
 - [ ] 24. Direct/co-investments and secondaries are FORMATS not strategies — remove from strategy section.
