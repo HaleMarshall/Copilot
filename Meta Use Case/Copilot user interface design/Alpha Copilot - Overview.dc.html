@@ -5967,7 +5967,16 @@ class Component extends DCLogic {
     opts=opts||{}; const adv=!!opts.adv; const advL=opts.level||this.state.advLevel||'L3';
     const noCompare=adv && advL==='L1';                 /* Basic: adjust only */
     const stratOnly=adv && (advL==='L1'||advL==='L2');  /* Basic & Advanced: strategy dimension only */
-    const dims=this.HOME_DIMS();
+    const proAdv=adv && advL==='L3';                    /* Pro: every dimension, € and % */
+    /* D2 — L3 expands every dimension incl. Vintage ('freedom mix'); each shown in € and %. */
+    const vintageDim={key:'vintage',label:'Vintage',
+      actual:{'2021':10,'2022':14,'2023':18,'2024':22,'2025':20,'2026':16},
+      target:{'2021':8,'2022':12,'2023':16,'2024':22,'2025':22,'2026':20},
+      colors:{'2021':'--data-1','2022':'--data-2','2023':'--data-3','2024':'--data-5','2025':'--data-6','2026':'--data-7'}};
+    let dims=this.HOME_DIMS(); if(proAdv) dims=dims.concat([vintageDim]);
+    /* D3 — € pool for the totals row: investable wealth × PM target */
+    const _c=(this.advClient&&this.advClient())||{}; const _invM=parseFloat(String(_c.investable||this.state.investWealthM||'0').replace(/[^0-9.]/g,''))||0;
+    const poolEur=+((_invM*((this.myPmTarget()||20)/100))||0).toFixed(1); const eurStr=(pct)=>poolEur? ('€'+(+(poolEur*pct/100).toFixed(1))+'m') : '—';
     const targets=s.simTargets||this.defaultTargets();
     const focus=s.simFocus;
     let ordered=focus? dims.slice().sort((a,b)=>(a.key===focus?-1:b.key===focus?1:0)) : dims;
@@ -6101,6 +6110,18 @@ class Component extends DCLogic {
           h('button',{onClick:()=>this.setDtog('simAdjust_'+d.key,!adjOpen),style:{border:'1px solid var(--brand)',background:adjOpen?'var(--brand-wash)':'var(--surface)',color:'var(--brand-ink)',borderRadius:9,padding:'8px 14px',fontSize:12,fontWeight:700,cursor:'pointer'}}, (adjOpen?'▾ ':'✎ ')+'Adjust my target'),
           adjOpen? h('button',{onClick:()=>this.setState({simTargets:null}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:9,padding:'8px 13px',fontSize:12,fontWeight:600,cursor:'pointer'}},'Reset to model') : null),
         adjOpen? h('div',{style:{display:'flex',flexDirection:'column',gap:10,marginTop:2}}, riskToggle, h('div',{style:{display:'flex',flexDirection:'column',gap:9}}, sliders)) : null);
+      /* D2/D3 — % and € breakdown with a totals row (% sums to 100, € sums to the pool). Shown for L2/L3; L1 stays summary-only. */
+      const bdRows=cats.map(k=>{ const pct=Math.round((+tObj[k]||0)/tot*100); return {n:nm(d.key,k), color:d.colors[k]||'--data-9', pct}; }).filter(r=>r.pct>0);
+      const bdSumPct=bdRows.reduce((a,r)=>a+r.pct,0);
+      const _th=(t,r)=>h('th',{style:{textAlign:r?'right':'left',padding:'6px 9px',fontSize:9.5,textTransform:'uppercase',letterSpacing:'.04em',color:'var(--muted)',borderBottom:'2px solid var(--line)'}},t);
+      const _td=(v,r,bold)=>h('td',{style:{textAlign:r?'right':'left',padding:'6px 9px',borderBottom:'1px solid var(--line)',fontSize:12.5,fontFamily:r?SF:'inherit',fontWeight:bold?700:400}},v);
+      const bdTable=(adv && !hideCompare)? h('div',{style:{borderTop:'1px solid var(--line)',marginTop:14,paddingTop:14}},
+        h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:6}}, d.label+' target — % and €'),
+        h('table',{style:{width:'100%',borderCollapse:'collapse'}},
+          h('thead',null,h('tr',null,_th(d.label),_th('%',1),_th('€',1))),
+          h('tbody',null,
+            bdRows.map(r=>h('tr',{key:r.n}, _td(h('span',{style:{display:'inline-flex',alignItems:'center',gap:7}}, h('span',{style:{width:9,height:9,borderRadius:2,background:'var('+r.color+')',display:'inline-block'}}), r.n)), _td(r.pct+'%',1,true), _td(eurStr(r.pct),1))),
+            h('tr',{style:{background:'var(--surface-2)'}}, _td('Total',false,true), _td(bdSumPct+'%',1,true), _td(poolEur?('€'+poolEur+'m'):'—',1,true))))) : null;
       const savedThis=(s.savedDimMsg===d.key);
       return this.card({title:'Your '+d.label.toLowerCase()+' target',info:true,
         right:h('div',{style:{display:'flex',gap:8,alignItems:'center'}},
@@ -6112,8 +6133,8 @@ class Component extends DCLogic {
           /* review4 item 3 — make it absolutely clear: simulating YOUR target against the comparator GROUP'S target */
           hideCompare? null : h('div',{style:{display:'flex',gap:8,alignItems:'center',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:10,padding:'9px 12px',marginBottom:12,fontSize:12,color:'var(--brand-ink)',lineHeight:1.45}},
             h('span',{style:{flex:'0 0 auto'}},'◧'), h('span',null,'Simulating ',h('b',null,'your '+d.label.toLowerCase()+' target'),' against ',h('b',null,compLabel),' — target vs target, so you can shape toward where '+compShort+' aim to be.')),
-          cols, h('div',{style:{borderTop:'1px solid var(--line)',marginTop:14,paddingTop:14,display:'flex',flexDirection:'column',gap:12}}, selector, adjustBlock)),
-        caption:'Your '+d.label.toLowerCase()+' target vs '+compLabel+' — target against target. The Z-chart shows your target minus theirs. Press “Adjust my target” to reshape it; Peers/Custom open the group editor.'});
+          cols, bdTable, h('div',{style:{borderTop:'1px solid var(--line)',marginTop:14,paddingTop:14,display:'flex',flexDirection:'column',gap:12}}, selector, adjustBlock)),
+        caption:'Your '+d.label.toLowerCase()+' target vs '+compLabel+' — target against target, in € and %. The Z-chart shows your target minus theirs. Press “Adjust my target” to reshape it; Peers/Custom open the group editor.'});
     };
     const grid=h('div',{style:{display:'flex',flexDirection:'column',gap:18}},
       ordered.map(d=>h('div',{key:d.key}, dimTargetCard(d, noCompare))));
@@ -6164,8 +6185,12 @@ class Component extends DCLogic {
       h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:9,lineHeight:1.5}},'Comparisons vs peers, the model or best performers are on the levers (right). Ask Alpha for anything else.'));
 
     const anyCustom=Object.values(s.simCmp||{}).includes('custom');
+    /* D5 — flag a manually-adjusted target so peer comparison reads right (external holdings aren't in the model) */
+    const extCaveat=(adv && dirty)? h('div',{style:{display:'flex',gap:9,alignItems:'flex-start',background:'rgba(232,115,44,.10)',border:'1px solid rgba(232,115,44,.35)',borderRadius:10,padding:'10px 13px'}},
+      h('span',{style:{fontSize:9,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--data-2)',background:'#fff',border:'1px solid rgba(232,115,44,.4)',borderRadius:5,padding:'2px 6px',flex:'0 0 auto'}},'Adjusted'),
+      h('span',{style:{fontSize:12,color:'var(--ink)',lineHeight:1.45}},'Target manually adjusted. If this reflects holdings kept elsewhere, peer comparison will read low — peers hold everything at Moonfare and the external portion isn’t modelled. Flag it when you show the client.')) : null;
     /* 'Take your target further' + saved-target compare are dropped in the advisor cockpit — the cockpit has its own next steps */
-    return h('div',{style:{display:'flex',flexDirection:'column',gap:18}}, header, grid, ((dirty||anyCustom||Object.keys(s.savedDimTargets||{}).length)?actions:null), adv?null:deeper, adv?null:compareCard);
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:18}}, header, extCaveat, grid, ((dirty||anyCustom||Object.keys(s.savedDimTargets||{}).length)?actions:null), adv?null:deeper, adv?null:compareCard);
   }
 
   /* ====================== OPPORTUNITIES (Act) ====================== */
@@ -8031,7 +8056,16 @@ class Component extends DCLogic {
   advLvl(a,b,c){ const l=this.state.advLevel; return l==='L1'?a:(l==='L3'?c:b); }
   /* ---- controls ---- */
   advClientCommit(c){ const w=parseFloat(String((c&&c.investable)||'').replace(/[^0-9.]/g,''))||10; const tgt=this.myPmTarget()||35; const pace=this.state.cfPaceYears||4; return Math.max(0.5, Math.round(w*tgt/100/pace*2)/2); }
-  advOpenClient(id){ const c=this.advBook().find(x=>x.id===id); const lv=(this.state.advLevelOverride&&this.state.advLevelOverride[id])||(c&&c.level)||'L2'; this.setState({advClientId:id, advStage:(c&&c.stage)||'new', advLevel:lv, advView:'prep', advPrepGoals:null, advStep:0, advReact:{}, advCFAextra:0, advPrepPrompt:'', advPrepMode:'preset', persona2:(lv==='L3'?'pro':'guided'), advActionOpen:null, advEdits:{}, cfCommitM:this.advClientCommit(c)}); }
+  /* D1 — map a client's risk label to a model risk-class id so the target prefills from what was agreed on intake */
+  advRiskId(label){ label=String(label||'').toLowerCase(); const R=this.RISKS||[];
+    const hit=R.find(r=>(r.short||'').toLowerCase()===label); if(hit) return hit.id;
+    if(/conserv|caut|income/.test(label)) return 'income_resilience';
+    if(/balanc/.test(label)) return 'balanced_compounding';
+    if(/growth|equity/.test(label)) return 'equity_growth';
+    if(/innov|\bai\b/.test(label)) return 'innovation_ai_alpha';
+    if(/aggress|opportun|advanced/.test(label)) return 'opportunistic_advanced';
+    return this.state.riskId||'balanced_compounding'; }
+  advOpenClient(id){ const c=this.advBook().find(x=>x.id===id); const lv=(this.state.advLevelOverride&&this.state.advLevelOverride[id])||(c&&c.level)||'L2'; this.setState({advClientId:id, advStage:(c&&c.stage)||'new', advLevel:lv, advView:'prep', advPrepGoals:null, advStep:0, advReact:{}, advCFAextra:0, advPrepPrompt:'', advPrepMode:'preset', persona2:(lv==='L3'?'pro':'guided'), advActionOpen:null, advEdits:{}, riskId:this.advRiskId(c&&c.risk), simTargets:null, cfCommitM:this.advClientCommit(c)}); }
   advEnterCockpit(){ this.setState({advView:'cockpit', advStep:0, advReact:{}, advCFAextra:0, persona2:(this.state.advLevel==='L3'?'pro':'guided'), cfCommitM:this.advClientCommit(this.advClient())}); }
   advExit(){ this.setState({advView:'desk', advClientId:null}); }
   advToPrep(){ this.setState({advView:'prep'}); }
@@ -8234,7 +8268,12 @@ class Component extends DCLogic {
     const cFooter=h('div',{style:{flexShrink:0,marginTop:28,paddingTop:13,borderTop:'1px solid var(--line)',display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap'}},
       h('span',{style:{fontFamily:SF,fontSize:12,fontWeight:600,color:'var(--muted)'}},'Moonfare', h('span',{style:{fontWeight:400,color:'var(--line)'}},'  ·  '), h('span',{style:{fontWeight:400,fontFamily:'Inter,system-ui,sans-serif'}},'AskAlpha advisor cockpit')),
       h('span',{style:{fontSize:11,color:'var(--muted)',letterSpacing:'.02em'}},'Step '+(step+1)+' of '+seq.length+'  ·  '+stageLbl+'  ·  '+this.state.advLevel+'  ·  snapshot snap_8f3c'));
-    const canvas=h('div',{style:{flex:1,minWidth:0,height:'100%',overflow:'auto',background:'var(--bg)',padding:'18px 26px 22px',display:'flex',flexDirection:'column'}}, crumb, focusBanner, contentWrap, cFooter);
+    /* D6 — prominent, discoverable Back / Next in the canvas itself (not only the rail) */
+    const canvasNav=h('div',{style:{flexShrink:0,marginTop:20,paddingTop:14,borderTop:'1px solid var(--line)',display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap'}},
+      h('button',{onClick:()=>this.advPrev(),disabled:step===0,style:{display:'inline-flex',alignItems:'center',gap:8,border:'1px solid var(--line)',background:'var(--surface)',color:step===0?'var(--line)':'var(--ink)',borderRadius:10,padding:'11px 18px',fontSize:13,fontWeight:600,cursor:step===0?'default':'pointer'}},'←  Back'),
+      h('span',{style:{fontSize:11.5,color:'var(--muted)'}},'Step '+(step+1)+' of '+seq.length+' · '+(pm.title||'')),
+      h('button',{onClick:()=>this.advNext(),disabled:step===seq.length-1,style:{display:'inline-flex',alignItems:'center',gap:8,border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'11px 22px',fontSize:13,fontWeight:700,cursor:step===seq.length-1?'default':'pointer',opacity:step===seq.length-1?.5:1,boxShadow:'0 8px 20px -12px rgba(44,45,254,.6)'}}, (step===seq.length-1?'Finish':'Next step')+'  →'));
+    const canvas=h('div',{style:{flex:1,minWidth:0,height:'100%',overflow:'auto',background:'var(--bg)',padding:'18px 26px 22px',display:'flex',flexDirection:'column'}}, crumb, focusBanner, contentWrap, canvasNav, cFooter);
     return h('div',{style:{position:'fixed',inset:0,zIndex:60,display:'flex',flexDirection:'column',background:'var(--bg)'}}, topbar, h('div',{style:{flex:1,display:'flex',minHeight:0}}, rail, canvas));
   }
   /* Follower opt-in — render a single notification exactly as the investor would receive it on their
@@ -8386,7 +8425,7 @@ class Component extends DCLogic {
             h('div',{style:{fontSize:10.5,color:hot?'var(--brand-ink)':'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em',marginBottom:2}},label), inner);
           if(!editing) return box(h('div',{style:{fontFamily:SF,fontSize:16,fontWeight:600,color:'var(--ink)',minHeight:22}}, (val===''||val==null)?'—':val));
           const st={width:'100%',boxSizing:'border-box',border:'1px solid var(--line)',borderRadius:7,background:'var(--surface)',outline:'none',fontFamily:SF,fontSize:16,fontWeight:600,color:'var(--ink)',padding:'6px 8px'};
-          if(opts.type==='select') return box(h('select',{value:val,onChange:e=>set(kk,e.target.value),style:Object.assign({cursor:'pointer'},st)}, (opts.options||[]).map(o=>h('option',{key:o,value:o},o))));
+          if(opts.type==='select') return box(h('select',{value:val,onChange:e=>{ set(kk,e.target.value); if(opts.onPick) opts.onPick(e.target.value); },style:Object.assign({cursor:'pointer'},st)}, (opts.options||[]).map(o=>h('option',{key:o,value:o},o))));
           return box(h('input',{type:opts.type==='num'?'number':'text',value:val,placeholder:'—',onChange:e=>set(kk,e.target.value),style:st})); };
         const already=get('pmInvested', c.pmInvested||'No');
         const yes = /^y/i.test(String(already));
@@ -8406,7 +8445,8 @@ class Component extends DCLogic {
         ].concat(minimal?[]:[
           efield('Liquidity buffer','liquidity','12-month buffer',{type:'select',options:liqOpts}),
           efield('Age','age',c.age||'',{type:'num'}),
-          efield('Risk class','risk',c.risk||'',{type:'select',options:riskOpts}),
+          /* D1 — risk class bound to the model: prefilled from the agreed risk, editing it re-derives the target */
+          efield('Risk class','risk',(this.RISKS.find(r=>r.id===this.state.riskId)||{}).short||c.risk||'',{type:'select',options:riskOpts,onPick:(v)=>this.setState({riskId:this.advRiskId(v),simTargets:null})}),
           efield('Currency','currency',homeCcy,{type:'select',options:ccyList}),
           efield('Region','region',curRegion,{type:'select',options:regionOpts}),
           efield('Profession','profession',c.occupation||''),
