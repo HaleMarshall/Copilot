@@ -53,7 +53,7 @@ Source: ~/Downloads/Advisor View 2 review.zip (click-comments.md). Status: [ ] t
 ## Levels & lifecycle
 - [ ] 34. L2 visibly differs: simple/fewer toggles; only strategy adjustable (OK).
 - [ ] 35. Pre-gate: no peer benchmarking (esp L2); simple future toggles; show opportunities to L2 (funds like EQT); selectable ideas → Moonfare accreditation.
-- [ ] 36. L1 existing: "Model vs your portfolio today" shows the actual invested strategies; headline = 4 metrics (DPI etc.) + a performance graph.
-- [ ] 37. "What's changed": no emojis; use logos + a graph; make it look real.
-- [ ] 38. "Suggested vs current portfolio": add suggest-opportunities beneath.
+- [x] 36. L1 existing: "Model vs your portfolio today" shows the actual invested strategies; headline = 4 metrics (DPI etc.) + a performance graph.
+- [x] 37. "What's changed": no emojis; use logos + a graph; make it look real.
+- [x] 38. "Suggested vs current portfolio": add suggest-opportunities beneath.
 - [ ] 39. Existing flow: remove the duplicate "your tailored target"; make opportunities selectable so reserve-interest/new-portfolio has something.

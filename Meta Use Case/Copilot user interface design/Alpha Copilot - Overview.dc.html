@@ -8395,13 +8395,29 @@ class Component extends DCLogic {
         }
         return wrap([ head('Your tailored model portfolio', _adjusted?'Updated to reflect the strategy mix you adjusted on the target step.':'Diversified across the strategies that fit your profile.'),
           h('div',{style:{display:'flex',gap:16,flexWrap:'wrap',alignItems:'stretch'}}, stratCard, table) ]); }
-      case 'modelExisting': return wrap([ head('Model vs your portfolio today','The gaps between the two are exactly what we can act on.'),
-        h('div',{style:{display:'flex',gap:16,flexWrap:'wrap'}}, this.card({title:'You today',style:{flex:'1 1 300px'},children:this.donutNamed(toSlices(mixYou),150,'You','mix')}), this.card({title:'Recommended model',style:{flex:'1 1 300px'},children:this.donutNamed(toSlices(mixModel),150,'Model','mix')})) ]);
+      case 'modelExisting': {
+        /* item 36 — show the ACTUAL strategies they're invested in (a real breakdown from their holdings), not just two donuts */
+        const held=(this.DB&&this.DB.heldFunds)||this.HELD_FUNDS()||[];
+        const byStrat={}; held.forEach(f=>{ const s=f.strat||'Other'; const nav=parseFloat(String(f.nav||'').replace(/[^0-9.]/g,''))||0; (byStrat[s]=byStrat[s]||{n:0,nav:0}); byStrat[s].n++; byStrat[s].nav+=nav; });
+        const totNav=Object.keys(byStrat).reduce((a,k)=>a+byStrat[k].nav,0)||1;
+        const rows=Object.keys(byStrat).sort((a,b)=>byStrat[b].nav-byStrat[a].nav);
+        const th=(t,r)=>h('th',{style:{textAlign:r?'right':'left',padding:'7px 9px',fontSize:10,textTransform:'uppercase',letterSpacing:'.04em',color:'var(--muted)',borderBottom:'2px solid var(--line)'}},t);
+        const td=(v,r)=>h('td',{style:{textAlign:r?'right':'left',padding:'8px 9px',borderBottom:'1px solid var(--line)',fontSize:12.5}},v);
+        const breakdown=this.card({title:'What you’re actually invested in — by strategy', badge:this.badge('your holdings','conf'),
+          children:h('table',{style:{width:'100%',borderCollapse:'collapse'}}, h('thead',null,h('tr',null,th('Strategy'),th('Funds',1),th('NAV',1),th('% of book',1))),
+            h('tbody',null, rows.map(s=>h('tr',{key:s}, td(s), td(String(byStrat[s].n),1), td('€'+byStrat[s].nav.toFixed(1)+'m',1), td(Math.round(byStrat[s].nav/totNav*100)+'%',1))))),
+          caption:'Your real strategy exposure today, straight from your holdings — this is what we compare against the recommended model.'});
+        return wrap([ head('Model vs your portfolio today','The gaps between the two are exactly what we can act on.'),
+          h('div',{style:{display:'flex',gap:16,flexWrap:'wrap'}}, this.card({title:'You today',style:{flex:'1 1 300px'},children:this.donutNamed(toSlices(mixYou),150,'You','mix')}), this.card({title:'Recommended model',style:{flex:'1 1 300px'},children:this.donutNamed(toSlices(mixModel),150,'Model','mix')})),
+          breakdown ]);
+      }
       case 'overview': {
+        /* item 36 — headline is FOUR metrics (incl. DPI) even at L1, plus a performance graph below */
         const tiles=this.kpiTiles(lvl(
-          [['Portfolio value',P.navText||'€16.6m'],['TVPI',(P.tvpi||'2.1')+'x'],['Funds',String(P.fundsHeld||8)]],
-          [['Portfolio value',P.navText||'€16.6m'],['TVPI',(P.tvpi||'2.1')+'x'],['Committed',P.committed||'€20.5m'],['Funds',String(P.fundsHeld||8)]],
+          [['Portfolio value',P.navText||'€16.6m'],['TVPI',(P.tvpi||'2.1')+'x'],['DPI',(P.dpiTableNet||'0.82x')],['Funds',String(P.fundsHeld||8)]],
+          [['Portfolio value',P.navText||'€16.6m'],['TVPI',(P.tvpi||'2.1')+'x'],['DPI',(P.dpiTableNet||'0.82x')],['Committed',P.committed||'€20.5m'],['Funds',String(P.fundsHeld||8)]],
           [['Portfolio value',P.navText||'€16.6m'],['TVPI',(P.tvpi||'2.1')+'x'],['Net IRR',(P.irr||'11.0')+'%'],['DPI',(P.dpiTableNet||'0.82x')],['Companies',String(P.companies||187)],['Countries',String(P.countries||19)]]));
+        const perfGraph=this.card({title:'Performance — NAV trend (€m)', children:this.fAxisLine([{name:'NAV',color:'--data-1',main:true,vals:this.vz(2,[9.8,11.2,12.6,13.9,14.8,15.7,16.6])}],['Q1','Q2','Q3','Q4','Q1','Q2','Q3'],{H:180,fmt:v=>'€'+v+'m'}),caption:'Portfolio value over the last seven quarters — steady compounding.'});
         const dims=lvl(
           [],
           [['Strategy',mixYou],['Platform',mixPlat]].map(([t,m],i)=>this.card({key:i,title:t+' mix',style:{flex:'1 1 240px'},children:this.donutNamed(toSlices(m),130,t,'mix')})),
@@ -8414,12 +8430,21 @@ class Component extends DCLogic {
         const vintCard=this.card({title:'Vintage spread (NAV by year)',style:{flex:'1 1 320px'},children:this.groupedBars(['2019','2020','2021','2022','2023','2024','2025'],[{name:'NAV €m',color:'--data-3',vals:this.vz(1,[4.6,2.4,3.8,2.1,1.9,1.2,0.6])}],{unit:'m'}),caption:'Diversification across vintage years smooths the J-curve.'});
         return wrap([ head('Your portfolio — as it stands', lvl('A clean summary — no deep detail.','Strategy, sector, region & currency — the dimensions that matter.','Full detail: funds, companies, countries, GPs and FX — the Bloomberg view.')),
           this.card({title:'Headline',children:tiles}),
+          perfGraph,
           dims.length?h('div',{style:{display:'flex',gap:16,flexWrap:'wrap'}}, dims):null,
           L==='L3'?holdingsTable:null,
           L==='L3'?h('div',{style:{display:'flex',gap:16,flexWrap:'wrap'}}, fxCard, vintCard):null ]);
       }
-      case 'changesSince': return wrap([ head('Since our last conversation','The highlights worth walking through.'),
-        this.card({title:'What’s changed',badge:this.badge('talking points','synth'),children:h('div',{style:{display:'flex',flexDirection:'column',gap:10}}, [['📈','Databricks marked up','An outperformer in your book drove a quarter-on-quarter gain.'],['🤖','Heavy activity in AI & Tech','Several peers and top performers added exposure this quarter.'],['💶','Distribution received','Capital returned that we can put back to work.']].map((x,i)=>h('div',{key:i,style:{display:'flex',gap:11,alignItems:'flex-start'}}, h('span',{style:{fontSize:18}},x[0]), h('div',null, h('div',{style:{fontSize:13.5,fontWeight:600}},x[1]), h('div',{style:{fontSize:12,color:'var(--muted)',marginTop:2,lineHeight:1.45}},x[2])))))}) ]);
+      case 'changesSince': {
+        /* item 37 — no emojis: use manager/fund logos, and add a performance graph so it looks like a real update */
+        const rowsC=[['general-atlantic','Databricks marked up','An outperformer in your book drove a quarter-on-quarter gain.'],['kkr','Heavy activity in AI & Tech','Several peers and top performers added exposure this quarter.'],['eqt','Distribution received','EQT IX returned capital that we can put back to work.']];
+        const logoTile=(logo)=>h('div',{style:{width:34,height:34,flex:'0 0 34px',borderRadius:8,background:'#fff',border:'1px solid var(--line)',padding:4,display:'flex',alignItems:'center',justifyContent:'center'}},
+          h('img',{src:'assets/logos/'+logo+'.png',alt:'',onError:e=>{e.target.style.display='none';e.target.parentNode.style.background='var(--brand-wash)';},style:{maxWidth:'100%',maxHeight:'100%',objectFit:'contain'}}));
+        const perfG=this.card({title:'Your NAV since we last spoke (€m)', children:this.fAxisLine([{name:'NAV',color:'--data-1',main:true,vals:this.vz(3,[14.8,15.2,15.7,16.1,16.6])}],['−4q','−3q','−2q','−1q','Now'],{H:170,fmt:v=>'€'+v+'m'}),caption:'Portfolio value across the quarters since our last conversation.'});
+        return wrap([ head('Since our last conversation','The highlights worth walking through.'),
+          perfG,
+          this.card({title:'What’s changed',badge:this.badge('talking points','synth'),children:h('div',{style:{display:'flex',flexDirection:'column',gap:10}}, rowsC.map((x,i)=>h('div',{key:i,style:{display:'flex',gap:11,alignItems:'center'}}, logoTile(x[0]), h('div',null, h('div',{style:{fontSize:13.5,fontWeight:600}},x[1]), h('div',{style:{fontSize:12,color:'var(--muted)',marginTop:2,lineHeight:1.45}},x[2])))))}) ]);
+      }
       case 'peerComparison': { const pmYou=(this.PM&&this.PM.you)||15.7; const pmPeer=(this.DB&&this.DB.peer&&this.DB.peer.baseMedian)||8.9; const pmEnd=(this.PM&&this.PM.endow)||34; const pmFO=((this.PRESETS['family-offices']||{}).median)||18.6;
         /* item 15 — select individual endowments (Harvard / Yale / Princeton), not only the combined H+Y+P */
         const endPM={hyp:pmEnd, harvard:40, yale:45, princeton:38}; const endName={hyp:'H+Y+P',harvard:'Harvard',yale:'Yale',princeton:'Princeton'};
@@ -8458,8 +8483,18 @@ class Component extends DCLogic {
         if(fd){ const cats=Object.keys(fd.actual||{}); const rows=cats.map(k=>({name:k,delta:+(((fd.target||{})[k]||0)-(fd.actual[k]||0)).toFixed(1)})).filter(r=>Math.abs(r.delta)>=1).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
           return wrap([ head('Suggested vs current — '+fd.label,'Where your '+fd.label.toLowerCase()+' sits versus target — jumped here from the script.'), this.card({title:fd.label+' gap to target (pp)',children:this.miniZ(rows),caption:'Positive = target wants more of that '+fd.label.toLowerCase()+'.'}) ]); }
         const rows=strat.map(kv=>({name:kv[1],delta:+(((mixModel[kv[0]]||0)-(mixYou[kv[0]]||0)).toFixed(1)),color:kv[2]})).filter(r=>Math.abs(r.delta)>=1).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
+        /* item 38 — suggest opportunities beneath the gap chart: curated funds for the top under-weight strategies */
+        const under=strat.map(kv=>({k:kv[0],name:kv[1],gap:+(((mixModel[kv[0]]||0)-(mixYou[kv[0]]||0))).toFixed(1)})).filter(g=>g.gap>1).sort((a,b)=>b.gap-a.gap).slice(0,2);
+        const oppRows=under.flatMap(g=>((this.oppFundsForStrat?this.oppFundsForStrat(g.name):[])||[]).slice(0,2).map(f=>({f,g})));
+        const oppCard=oppRows.length? this.card({title:'Opportunities to close these gaps', badge:this.badge('curated','synth'),
+          children:h('div',{style:{display:'flex',flexDirection:'column',gap:8}}, oppRows.map(({f,g})=>h('div',{key:f.id,style:{display:'flex',alignItems:'center',gap:10,padding:'9px 11px',border:'1px solid var(--line)',borderRadius:10,background:'var(--surface)'}},
+            (f.logo? h('img',{src:'assets/logos/'+f.logo+'.png',alt:'',onError:e=>{e.target.style.display='none';},style:{width:26,height:26,flex:'0 0 26px',borderRadius:6,background:'#fff',border:'1px solid var(--line)',padding:3,objectFit:'contain'}}):null),
+            h('div',{style:{flex:1,minWidth:0}}, h('div',{style:{fontSize:13,fontWeight:600}},f.name), h('div',{style:{fontSize:10.5,color:'var(--muted)'}}, g.name+' · +'+g.gap+'pp to target'+(f.mgr?' · '+f.mgr:''))),
+            h('button',{onClick:()=>this.askFromPage('Assess '+f.name+' to close my '+g.name+' gap.'),style:{flex:'0 0 auto',border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:8,padding:'7px 12px',fontSize:11.5,fontWeight:700,cursor:'pointer'}},'Assess →')))),
+          caption:'Concrete funds that would close your largest gaps to the model — the natural next step off this comparison.'}) : null;
         return wrap([ head('Suggested vs your current portfolio','The deltas are the conversation — positive = the model wants more.'),
-          this.card({title:'Gap to model (pp)',children:this.miniZ(rows),caption:'Where you’re under- or over-weight versus the recommended model.'}) ]); }
+          this.card({title:'Gap to model (pp)',children:this.miniZ(rows),caption:'Where you’re under- or over-weight versus the recommended model.'}),
+          oppCard ]); }
       case 'future': { const stg=this.state.advStage; const fScope=(stg==='existing'||stg==='inactive')?'combined':'new';
         return wrap([ head('Your future — commitments & J-curve', lvl('A simple projection — we’ve set sensible defaults.','Model the commitment pace and see the J-curve with percentile bands.','Full PitchBook engine — per-strategy curves, percentile & distribution-method toggles.')),
         this.cfModel({level:L, mix:this.modelMix(), forceScope:fScope}) ]); }
