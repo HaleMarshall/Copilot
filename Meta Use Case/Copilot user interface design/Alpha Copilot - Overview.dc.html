@@ -6181,10 +6181,14 @@ class Component extends DCLogic {
             h('span',{style:{fontSize:11,color:'var(--muted)'}},'%')),
           h('div',{style:{textAlign:'right',fontSize:11,fontFamily:SF,fontWeight:600,color:'var(--muted)'}}, cur+'→'+tgt));
       }) : null;
-      /* item 29 — the Adjust button now lives in the comparator row; this block only reveals (when open) Reset + risk toggle + sliders */
+      /* item 30 — 'Reset to model' only appears when the current target actually DIFFERS from the saved (or, before any save, the model) baseline; comparing per-category rounded % */
+      const baseTgt=(s.savedDimTargets&&s.savedDimTargets[d.key])||d.target||{};
+      const baseTot=cats.reduce((a,k)=>a+(+baseTgt[k]||0),0)||1;
+      const dimChanged=cats.some(k=>Math.round((+tObj[k]||0)/tot*100)!==Math.round((+baseTgt[k]||0)/baseTot*100));
+      /* item 29 — the Adjust button now lives in the comparator row; this block only reveals (when open) Reset (item 30 — only if changed) + risk toggle + sliders */
       const adjustBlock=adjOpen? h('div',{style:{display:'flex',flexDirection:'column',gap:10,marginTop:2}},
-        h('div',{style:{display:'flex',gap:9,flexWrap:'wrap',alignItems:'center'}},
-          h('button',{onClick:()=>this.setState({simTargets:null}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:9,padding:'8px 13px',fontSize:12,fontWeight:600,cursor:'pointer'}},'Reset to model')),
+        dimChanged? h('div',{style:{display:'flex',gap:9,flexWrap:'wrap',alignItems:'center'}},
+          h('button',{'data-testid':'reset-target-'+d.key,onClick:()=>this.setState({simTargets:null}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:9,padding:'8px 13px',fontSize:12,fontWeight:600,cursor:'pointer'}},'Reset to model')) : null,
         h('div',{style:{display:'flex',flexDirection:'column',gap:10,marginTop:2}}, riskToggle, h('div',{style:{display:'flex',flexDirection:'column',gap:9}}, sliders))) : null;
       /* item 28 — the per-dimension %/€/Total line-item table was removed from the tailored-target cards; the donuts + Z-chart + comparator selector carry the story, no redundant table */
       const savedThis=(s.savedDimMsg===d.key);

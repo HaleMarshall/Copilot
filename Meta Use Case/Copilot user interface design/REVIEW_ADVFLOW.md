@@ -30,7 +30,7 @@ Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.
 - [x] 27. All three charts: equal space + equal distance from each other and the card walls.
 - [x] 28. Remove the entire strategy/region table (%, totals, base ccy) from tailored-target — keep only compare-against (model/peers/platform/top).
 - [x] 29. 'Adjust my target' in a distinct color, next to Model.
-- [ ] 30. 'Reset to model' only appears if sliders changed from saved target.
+- [x] 30. 'Reset to model' only appears if sliders changed from saved target.
 - [ ] 31. 'Saved' button disappears once something is changed.
 - [ ] 32. Sliders look like bar charts (not weird sliders); % more centered; sliders smaller.
 - [ ] 33. Right-hand side shows allocated in millions (% AND €m).
