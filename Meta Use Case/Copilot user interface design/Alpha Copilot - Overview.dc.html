@@ -532,6 +532,7 @@ class Component extends DCLogic {
       mgrProfile:null, cmpList:[], cmpCrit:'since', cmpMetricDetail:null, mgrListed:'all', mgrHasOffering:false, /* items 199-219 — manager profile, comparison-list builder (GPs/funds/strategies), priority criterion, drill-in detail, list filters */
       simDials:{pm:20, growth:0, secondaries:6, us:38},
       simTargets:null, simFocus:null, simSuggest:null,
+      shareMode:false, /* advisor 'Share screen' present-mode: strips all advisor-only chrome, shows only the client-safe page */
       savedSims:[], simCompare:false, watchlist:[], portfolioAdds:[],
       oppSource:'baseline', oppMode:'weighted', oppWeights:{strategy:40, region:20, currency:20, sector:20}, /* item 140 Baseline first; items 122/123 — no Performance; Currency added */
       oppDetail:null, oppDetailTab:'why',
@@ -8108,7 +8109,7 @@ class Component extends DCLogic {
   advSaveProfile(){ const id=this.state.advClientId; if(!id) return; setTimeout(()=>{ try{ localStorage.setItem('advProfile:'+id, JSON.stringify({edits:this.state.advEdits||{}, riskId:this.state.riskId, simTargets:this.state.simTargets||null, ts:1})); }catch(e){} },0); }
   advEnterCockpit(){ this.setState({advView:'cockpit', advStep:0, advReact:{}, advCFAextra:0, persona2:(this.state.advLevel==='L3'?'pro':'guided'), cfCommitM:this.advClientCommit(this.advClient())}); }
   advExit(){ this.setState({advView:'desk', advClientId:null}); }
-  advToPrep(){ this.setState({advView:'prep'}); }
+  advToPrep(){ this.setState({advView:'prep', shareMode:false}); }
   advStepTo(i){ const s=this.advSeq(); this.setState({advStep:Math.max(0,Math.min(i,s.length-1)), advFocus:null, advSeized:false}); this.advSaveProfile(); }
   advNext(){ this.advStepTo(this.state.advStep+1); }
   /* E1/E2 — map each cockpit step to a workspace (Understand / Shape / Act / Research) so the advisor can jump non-linearly mid-call */
@@ -8243,6 +8244,7 @@ class Component extends DCLogic {
   advCockpit(){
     const h=this.h; const SF=this.SF; const c=this.advClient()||{name:'Investor',init:'IN'}; const self=this.advSelf();
     const seq=this.advSeq(); const step=Math.max(0,Math.min(this.state.advStep,seq.length-1)); const key=seq[step]; const pm=this.advPageMeta(key); const meta=this.advStageMeta(); const goals=this.advGoals();
+    if(this.state.shareMode) return this.advPresentView(c, seq, step, key, pm);
     const topChip=(t)=>h('span',{style:{fontSize:11,color:'rgba(255,255,255,.82)',background:'rgba(255,255,255,.1)',border:'1px solid rgba(255,255,255,.16)',borderRadius:6,padding:'2px 8px'}},t);
     const dseg=(opts,val,on)=>h('div',{style:{display:'inline-flex',background:'rgba(255,255,255,.08)',border:'1px solid rgba(255,255,255,.16)',borderRadius:9,padding:2}}, opts.map(o=>h('button',{key:o.value,onClick:()=>on(o.value),style:{border:'none',background:val===o.value?'var(--brand)':'transparent',color:val===o.value?'#fff':'rgba(255,255,255,.7)',borderRadius:7,padding:'5px 11px',fontSize:11.5,fontWeight:700,cursor:'pointer'}},o.label)));
     const labelled=(l,el)=>h('div',{style:{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:3}}, h('span',{style:{fontSize:9,letterSpacing:'.1em',textTransform:'uppercase',color:'rgba(255,255,255,.5)'}},l), el);
@@ -8264,6 +8266,8 @@ class Component extends DCLogic {
         labelled('Currency', h('select',{value:this.state.displayCcy,onChange:e=>this.setState({displayCcy:e.target.value}),style:{background:'rgba(255,255,255,.1)',color:'#fff',border:'1px solid rgba(255,255,255,.22)',borderRadius:7,padding:'5px 8px',fontSize:11.5,fontWeight:700,cursor:'pointer'}}, this.ccyList().map(c=>h('option',{key:c,value:c,style:{color:'#111'}},c)))),
         h('div',{style:{width:1,height:30,background:'rgba(255,255,255,.14)'}}),
         h('div',{style:{textAlign:'right'}}, h('div',{style:{fontSize:12.5,fontWeight:600}},self.name), h('div',{style:{fontSize:10,color:'rgba(255,255,255,.55)'}},self.role)),
+        /* Share screen — flip to a client-safe present view that hides ALL advisor-only chrome (rail, call plan, script, notes, level/journey toggles) so the advisor can screen-share only what the investor should see */
+        h('button',{'data-testid':'share-screen',title:'Present a client-safe view — hides your call plan, script and notes',onClick:()=>this.setState({shareMode:true, advActionOpen:null, advFocus:null}),style:{display:'inline-flex',alignItems:'center',gap:6,border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'7px 13px',fontSize:11.5,fontWeight:700,cursor:'pointer',boxShadow:'0 6px 16px -8px rgba(44,45,254,.8)'}}, h('span',{style:{fontSize:13,lineHeight:1}},'⤢'), 'Share screen'),
         h('button',{onClick:()=>this.advToPrep(),style:{border:'1px solid rgba(255,255,255,.3)',background:'rgba(255,255,255,.1)',color:'#fff',borderRadius:8,padding:'6px 11px',fontSize:11.5,cursor:'pointer'}},'Exit')));
     const plan=this.advCallPlan(); const openA=this.state.advActionOpen;
     /* item 1/2 — OBJECTIVE first, always commercial */
@@ -8331,6 +8335,49 @@ class Component extends DCLogic {
       h('button',{onClick:()=>this.advNext(),disabled:step===seq.length-1,style:{display:'inline-flex',alignItems:'center',gap:8,border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'11px 22px',fontSize:13,fontWeight:700,cursor:step===seq.length-1?'default':'pointer',opacity:step===seq.length-1?.5:1,boxShadow:'0 8px 20px -12px rgba(44,45,254,.6)'}}, (step===seq.length-1?'Finish':'Next step')+'  →'));
     const canvas=h('div',{style:{flex:1,minWidth:0,height:'100%',overflow:'auto',background:'var(--bg)',padding:'18px 26px 22px',display:'flex',flexDirection:'column'}}, wsNav, crumb, focusBanner, contentWrap, canvasNav, cFooter);
     return h('div',{style:{position:'fixed',inset:0,zIndex:60,display:'flex',flexDirection:'column',background:'var(--bg)'}}, topbar, h('div',{style:{flex:1,display:'flex',minHeight:0}}, rail, canvas));
+  }
+  /* Share-screen present mode — a clean, client-safe render of the CURRENT page only.
+     Everything advisor-internal (the left rail with the call objective, 'Targets for this call',
+     Calls-for-action, the compliance-neutralised advisor script and private notes, plus the
+     Journey/Advice-level toggles and internal snapshot badge) is removed. The advisor keeps a
+     minimal top strip (brand + 'Prepared for <client>' + Back/Next + Exit) so they can walk the
+     investor through the same charts they'd see, and screen-share only this. */
+  advPresentView(c, seq, step, key, pm){
+    const h=this.h; const SF=this.SF;
+    /* some steps are advisor-only (the 'case for this call' briefing is explicitly not for the client) —
+       in share mode these are replaced by a neutral, client-safe cover so nothing internal ever leaks. */
+    const ADV_ONLY={execSummary:1, prepBrief:1};
+    const safe=!ADV_ONLY[key];
+    const title=safe?(pm.title||''):'Private-markets review';
+    /* logo image is the Moonfare wordmark; show a text wordmark only if the asset fails to load (no redundant double-brand) */
+    const brand=h('div',{style:{display:'flex',alignItems:'center',gap:9}},
+      h('img',{src:'assets/moonfare_logo.png',alt:'Moonfare',onError:e=>{e.target.style.display='none';e.target.insertAdjacentHTML('afterend','<span style="font-family:'+SF+';font-size:16px;font-weight:700;color:var(--ink)">Moonfare</span>');},style:{height:24}}));
+    const preparedFor=h('div',{style:{minWidth:0}},
+      h('div',{style:{fontSize:9.5,letterSpacing:'.1em',textTransform:'uppercase',color:'var(--muted)'}},'Prepared for'),
+      h('div',{style:{fontFamily:SF,fontSize:15,fontWeight:700,color:'var(--ink)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},c.name||'Investor'));
+    const presenting=h('span',{style:{display:'inline-flex',alignItems:'center',gap:7,fontSize:11.5,fontWeight:700,color:'var(--over)',background:'rgba(45,143,111,.10)',border:'1px solid rgba(45,143,111,.28)',borderRadius:999,padding:'5px 11px'}},
+      h('span',{style:{width:8,height:8,borderRadius:'50%',background:'var(--over)'}}), 'Presenting');
+    const exitBtn=h('button',{'data-testid':'exit-share',onClick:()=>this.setState({shareMode:false}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--ink)',borderRadius:9,padding:'8px 14px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},'Exit presentation');
+    const header=h('div',{style:{height:64,flex:'0 0 64px',display:'flex',alignItems:'center',gap:18,padding:'0 26px',background:'var(--surface)',borderBottom:'1px solid var(--line)'}},
+      brand, h('div',{style:{width:1,height:26,background:'var(--line)'}}), preparedFor,
+      h('div',{style:{marginLeft:20,fontFamily:SF,fontSize:14,fontWeight:600,color:'var(--ink)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},title),
+      h('div',{style:{marginLeft:'auto',display:'flex',alignItems:'center',gap:12,flex:'0 0 auto'}}, presenting, exitBtn));
+    const navBtn=(label,dir,disabled,primary)=>h('button',{onClick:()=>disabled?null:(dir<0?this.advPrev():this.advNext()),disabled:disabled,
+      style:{display:'inline-flex',alignItems:'center',gap:8,border:primary?'none':'1px solid var(--line)',background:primary?'var(--brand)':'var(--surface)',color:primary?'#fff':(disabled?'var(--line)':'var(--ink)'),borderRadius:10,padding:primary?'11px 22px':'11px 18px',fontSize:13,fontWeight:primary?700:600,cursor:disabled?'default':'pointer',opacity:disabled?.55:1,boxShadow:primary&&!disabled?'0 8px 20px -12px rgba(44,45,254,.6)':'none'}}, label);
+    const nav=h('div',{style:{flexShrink:0,marginTop:22,paddingTop:16,borderTop:'1px solid var(--line)',display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap'}},
+      navBtn('←  Back',-1,step===0,false),
+      h('span',{style:{fontSize:11.5,color:'var(--muted)'}},'Step '+(step+1)+' of '+seq.length+' · '+title),
+      navBtn((step===seq.length-1?'Finish':'Next step')+'  →',1,step===seq.length-1,true));
+    const cover=h('div',{'data-testid':'share-cover',style:{textAlign:'center',maxWidth:640,margin:'0 auto',padding:'40px 0'}},
+      h('div',{style:{fontSize:11,letterSpacing:'.14em',textTransform:'uppercase',color:'var(--muted)',marginBottom:10}},'Private-markets review'),
+      h('div',{style:{fontFamily:SF,fontSize:30,fontWeight:600,marginBottom:12}},'Prepared for '+(c.name||'you')),
+      h('div',{style:{fontSize:14,color:'var(--muted)',lineHeight:1.6,marginBottom:24}},'A tailored walk-through of your portfolio, targets and opportunities — your advisor will take you through it step by step.'),
+      h('button',{onClick:()=>this.advNext(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:11,padding:'13px 26px',fontSize:14,fontWeight:700,cursor:'pointer',boxShadow:'0 8px 20px -12px rgba(44,45,254,.6)'}},'Begin the review  →'));
+    const content=safe? this.advPageRender(key) : cover;
+    const body=h('div',{'data-testid':'share-canvas',style:{flex:1,minWidth:0,overflow:'auto',background:'var(--bg)',padding:'26px 32px 30px',display:'flex',flexDirection:'column'}},
+      h('div',{style:{width:'100%',maxWidth:1120,margin:'0 auto',flex:1,display:'flex',flexDirection:'column'}},
+        h('div',{style:{margin:'auto 0',width:'100%'}}, content), nav));
+    return h('div',{'data-testid':'share-view',style:{position:'fixed',inset:0,zIndex:70,display:'flex',flexDirection:'column',background:'var(--bg)'}}, header, body);
   }
   /* Follower opt-in — render a single notification exactly as the investor would receive it on their
      preferred channel (WhatsApp business message / in-app push / on-website toast). Skeuomorphic device
