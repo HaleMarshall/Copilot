@@ -8240,38 +8240,64 @@ class Component extends DCLogic {
     const fieldHL={Wealth:['Investable wealth'],Risk:['Risk class'],Cohort:['Region','Profession']};
     switch(key){
       case 'execSummary': {
-        const args=[{t:'Investable wealth likely understated',d:'A profile like '+(c.name||'this client')+'’s typically treats more as investable — worth confirming.'},
-          {t:'Behind on private-markets allocation',d:'Filled '+(this.PM&&this.PM.you||15.7)+'% vs a '+(this.myPmTarget())+'% target — clear room to deploy.'},
-          {t:'Lagging the peer group',d:'Comparable investors allocate more to private markets — a concrete, motivating gap.'},
-          {t:'No / low AI & Tech exposure',d:'A timely theme the client has signalled interest in.'},
-          {t:'Strong on currency/region — lead with a win',d:'Well-positioned here; open on strength before the gaps.'}];
+        const args=[{t:'Investable wealth likely understated',d:'A profile like '+(c.name||'this client')+'’s typically treats more as investable — worth confirming.',why:'Onboarding captured a conservative figure; peers at this profile report 20–40% more investable wealth once illiquid assets are excluded correctly.',how:'Open on: “Before we model — does the wealth figure on file still reflect what you’d put to work?” Update it live on the intake page.'},
+          {t:'Behind on private-markets allocation',d:'Filled '+(this.PM&&this.PM.you||15.7)+'% vs a '+(this.myPmTarget())+'% target — clear room to deploy.',why:'At '+(this.PM&&this.PM.you||15.7)+'% of '+(this.myPmTarget())+'% target, there is material headroom; every point closer compounds over the horizon.',how:'Frame the gap as opportunity, not shortfall: “You’re '+Math.max(0,Math.round((this.myPmTarget()-(this.PM&&this.PM.you||15.7))))+'pp from your own target — here’s the pacing to close it.”'},
+          {t:'Lagging the peer group',d:'Comparable investors allocate more to private markets — a concrete, motivating gap.',why:'Peers matched on wealth, age and profession sit meaningfully higher — a credible, non-pushy motivator.',how:'Show the peer bar on the comparison step; let the number do the persuading.'},
+          {t:'No / low AI & Tech exposure',d:'A timely theme the client has signalled interest in.',why:'The client raised AI in prior conversation; the sector sleeve is under-represented in their current mix.',how:'Tie it to a concrete vehicle on the opportunities step rather than a generic pitch.'},
+          {t:'Strong on currency/region — lead with a win',d:'Well-positioned here; open on strength before the gaps.',why:'Their region/currency mix is already close to model — a genuine strength to acknowledge first.',how:'Open the call on this so the gaps land as fine-tuning, not criticism.'}];
         const show=Math.min(3+this.state.advCFAextra, args.length);
-        return wrap([ head('Executive summary — what to achieve','For you, not the client. Lead with the strongest case the data makes. Objective: '+this.advStageMeta().objective+'.'),
-          this.card({title:'The case, in three moves',badge:this.badge('AI · advisor-only','synth'),children:h('div',{style:{display:'flex',flexDirection:'column',gap:9}}, args.slice(0,show).map((a,i)=>h('div',{key:i,style:{display:'flex',gap:11,alignItems:'flex-start',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:10,padding:'11px 13px'}}, h('span',{style:{width:22,height:22,flex:'0 0 22px',borderRadius:'50%',background:'var(--brand)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:700}},String(i+1)), h('div',null, h('div',{style:{fontSize:13.5,fontWeight:600}},a.t), h('div',{style:{fontSize:12,color:'var(--muted)',marginTop:2,lineHeight:1.45}},a.d))))),
-            caption:'Compliance-neutralised — these are check-list prompts, not advice. Use “I need more” in the rail to reveal additional arguments.'}) ]);
+        const open=this.state.advCaseOpen;
+        const caseCard=(a,i)=>{ const isOpen=open===i;
+          return h('div',{key:i,onClick:()=>this.setState({advCaseOpen:isOpen?null:i}),style:{cursor:'pointer',background:isOpen?'var(--brand-wash)':'var(--surface-2)',border:'1px solid '+(isOpen?'var(--brand-tint-3)':'var(--line)'),borderRadius:10,padding:'11px 13px',transition:'all .12s'}},
+            h('div',{style:{display:'flex',gap:11,alignItems:'flex-start'}},
+              h('span',{style:{width:22,height:22,flex:'0 0 22px',borderRadius:'50%',background:'var(--brand)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:700}},String(i+1)),
+              h('div',{style:{flex:1}}, h('div',{style:{display:'flex',alignItems:'center',gap:8}}, h('div',{style:{fontSize:13.5,fontWeight:600,flex:1}},a.t), h('span',{style:{fontSize:11,color:'var(--brand-ink)',fontWeight:700}}, isOpen?'▾':'▸')),
+                h('div',{style:{fontSize:12,color:'var(--muted)',marginTop:2,lineHeight:1.45}},a.d))),
+            isOpen? h('div',{style:{marginTop:10,paddingTop:10,borderTop:'1px solid var(--brand-tint-3)',display:'flex',flexDirection:'column',gap:8}},
+              h('div',null, h('div',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--brand-ink)',marginBottom:2}},'Why it matters'), h('div',{style:{fontSize:12.5,color:'var(--ink)',lineHeight:1.5}},a.why)),
+              h('div',null, h('div',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--brand-ink)',marginBottom:2}},'How to open it'), h('div',{style:{fontSize:12.5,color:'var(--ink)',lineHeight:1.5}},a.how))) : null); };
+        return wrap([ head('Prepare-for-call summary','For you, not the client. Lead with the strongest case the data makes — click any move to see why it matters and how to open it. Objective: '+this.advStageMeta().objective+'.'),
+          this.card({title:'The case, in three moves',badge:this.badge('AI · advisor-only','synth'),
+            right:h('button',{onClick:()=>this.setState({advCFAextra:(this.state.advCFAextra||0)+1}),disabled:show>=args.length,style:{border:'1px solid var(--brand-tint-3)',background:show>=args.length?'var(--surface-2)':'var(--brand-wash)',color:show>=args.length?'var(--muted)':'var(--brand-ink)',borderRadius:8,padding:'6px 12px',fontSize:11.5,fontWeight:700,cursor:show>=args.length?'default':'pointer'}}, show>=args.length?'All shown':'✦ Suggest another'),
+            children:h('div',{style:{display:'flex',flexDirection:'column',gap:9}}, args.slice(0,show).map(caseCard)),
+            caption:'Compliance-neutralised — check-list prompts, not advice. “✦ Suggest another” adds the next-strongest argument to this summary; click a move to expand it.'}),
+          h('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}},
+            h('button',{onClick:()=>this.advNext(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'11px 18px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'✦ Suggest calling '+(c.name?c.name.split(' ')[0]:'the investor')+' →'),
+            h('button',{onClick:()=>this.askFromPage('Draft talking points to open the call with '+(c.name||'this client')+' based on this prepare-for-call summary.'),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:10,padding:'11px 16px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},'Ask Alpha for talking points')) ]);
       }
       case 'intake': case 'intakeMin': {
         const minimal=key==='intakeMin'; const ed=this.state.advEdits||{};
-        /* editable during the call — each field is a live, controlled input (onChange, not onInput) feeding the model.
-           Transcript: wealth is prefilled from onboarding; Region & Profession are the net-new fields; everything editable. */
-        const efield=(label,kk,dv,pre)=>{ const hot=focus&&(fieldHL[focus]||[]).indexOf(label)>=0; const val=(ed[kk]!=null?ed[kk]:dv);
-          return h('div',{key:kk,style:{borderRadius:9,padding:'8px 11px',background:hot?'var(--brand-wash)':'var(--surface-2)',border:'1px solid '+(hot?'var(--brand-tint-3)':'var(--line)'),boxShadow:hot?'0 0 0 2px var(--brand-tint-3)':'none'}},
-            h('div',{style:{display:'flex',alignItems:'center',gap:6,marginBottom:2}},
-              h('span',{style:{fontSize:10.5,color:hot?'var(--brand-ink)':'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em'}},label),
-              pre? h('span',{style:{fontSize:8.5,fontWeight:700,color:'var(--muted)',background:'var(--surface)',border:'1px solid var(--line)',borderRadius:4,padding:'0 4px'}},'prefilled') : h('span',{style:{fontSize:8.5,fontWeight:700,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:4,padding:'0 4px'}},'add')),
-            h('input',{value:val, placeholder:'—', onChange:e=>{ const n=Object.assign({},this.state.advEdits); n[kk]=e.target.value; this.setState({advEdits:n}); },style:{width:'100%',boxSizing:'border-box',border:'none',background:'transparent',outline:'none',fontFamily:SF,fontSize:16,fontWeight:600,color:'var(--ink)'}})); };
-        /* wealth/age/risk/target prefilled from onboarding; region + profession are the fields to add on this page; PM-history captures whether & how much they already hold */
-        const efields=[efield('Investable wealth','wealth',c.investable||'',true), efield('Age band','age',c.age||'',true), efield('Risk class','risk',c.risk||'',true)]
+        const editing=!!this.state.advEditMode;                 /* item 7 — explicit Edit toggle so it's obvious the fields are editable */
+        const get=(kk,dv)=>(ed[kk]!=null?ed[kk]:dv);
+        const set=(kk,v)=>{ const n=Object.assign({},this.state.advEdits); n[kk]=v; this.setState({advEdits:n}); };
+        const riskOpts=(this.RISKS||[]).map(r=>r.label||r.short||r.id);
+        /* one field — read-only chip when not editing, the right control (text/number/select) when editing */
+        const efield=(label,kk,dv,opts)=>{ opts=opts||{}; const hot=focus&&(fieldHL[focus]||[]).indexOf(label)>=0; const val=get(kk,dv);
+          const box=(inner)=>h('div',{key:kk,style:{borderRadius:9,padding:'8px 11px',background:hot?'var(--brand-wash)':'var(--surface-2)',border:'1px solid '+(hot?'var(--brand-tint-3)':(editing?'var(--brand-tint-3)':'var(--line)')),boxShadow:hot?'0 0 0 2px var(--brand-tint-3)':'none'}},
+            h('div',{style:{fontSize:10.5,color:hot?'var(--brand-ink)':'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em',marginBottom:2}},label), inner);
+          if(!editing) return box(h('div',{style:{fontFamily:SF,fontSize:16,fontWeight:600,color:'var(--ink)',minHeight:22}}, (val===''||val==null)?'—':val));
+          const st={width:'100%',boxSizing:'border-box',border:'1px solid var(--line)',borderRadius:7,background:'var(--surface)',outline:'none',fontFamily:SF,fontSize:16,fontWeight:600,color:'var(--ink)',padding:'6px 8px'};
+          if(opts.type==='select') return box(h('select',{value:val,onChange:e=>set(kk,e.target.value),style:Object.assign({cursor:'pointer'},st)}, (opts.options||[]).map(o=>h('option',{key:o,value:o},o))));
+          return box(h('input',{type:opts.type==='num'?'number':'text',value:val,placeholder:'—',onChange:e=>set(kk,e.target.value),style:st})); };
+        const already=get('pmInvested', c.pmInvested||'No');
+        const yes = /^y/i.test(String(already));
+        const fields=[efield('Investable wealth','wealth',c.investable||''), efield('Age','age',c.age||'',{type:'num'}), efield('Risk class','risk',c.risk||'',{type:'select',options:riskOpts})]
           .concat(minimal?[]:[
             efield('Region','region',c.region||''),
             efield('Profession','profession',c.occupation||''),
-            efield('Already in private markets?','pmInvested',c.pmInvested||'No — first-time'),
-            efield('Amount invested so far (PM)','pmInvestedAmt',c.pmInvestedAmt||'€0'),
-            efield('Private-markets target','target',this.myPmTarget()+'%',true),
-            efield('Liquidity needs','liquidity','Moderate · keep a 12-month buffer')]);
-        return wrap([ head('Client profile', minimal?'Just enough to show a tailored model — the rest comes after accreditation.':'Prefilled from onboarding — everything is editable. Add Region & Profession, and capture whether they’ve already invested in private markets and how much. Changes flow straight into the model.'),
-          this.card({title:'Profile',badge:this.badge('editable · live','conf'),children:h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:10}}, efields),caption:'Edit any field live in the call — wealth, age & risk come from onboarding; Region, Profession and existing private-markets holdings are captured here.'}),
-          (c.notes&&c.notes.length)?this.card({title:'Notes from our conversation',badge:this.badge('AI','synth'),children:h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, c.notes.map((n,i)=>h('div',{key:i,style:{display:'flex',gap:8,fontSize:13,lineHeight:1.45}},h('span',{style:{color:'var(--brand)'}},'•'),n))),caption:'Captured by Ask Alpha — the client sees these too, so they know they were heard.'}):null ]);
+            efield('Company','company',(c.company&&c.company!=='—')?c.company:''),   /* item 8 — Founder of <company> */
+            efield('Already in private markets?','pmInvested',already,{type:'select',options:['No','Yes']}), /* item 9 — Yes/No dropdown */
+            yes? efield('Amount invested so far (PM)','pmInvestedAmt',c.pmInvestedAmt||'€0') : null,        /* item 9 — only when Yes */
+            efield('Private-markets target','target',this.myPmTarget()+'%'),                                /* item 10 — editable */
+            efield('Liquidity needs','liquidity','Moderate · keep a 12-month buffer')]).filter(Boolean);
+        const editBtn=h('button',{onClick:()=>this.setState({advEditMode:!editing}),style:{border:'1px solid '+(editing?'var(--brand)':'var(--line)'),background:editing?'var(--brand)':'var(--surface)',color:editing?'#fff':'var(--brand-ink)',borderRadius:8,padding:'6px 14px',fontSize:12,fontWeight:700,cursor:'pointer'}}, editing?'✓ Done':'✎ Edit');
+        const notesOpen=this.dtog('advConvNotes',false);
+        return wrap([ head('Client profile', minimal?'Just enough to show a tailored model — the rest comes after accreditation.':'Prefilled from onboarding. Press ✎ Edit to change anything — wealth, age (exact), risk, region, profession & company, and whether they already hold private markets. Changes flow into the model.'),
+          this.card({title:'Profile', right:editBtn, badge:this.badge(editing?'editing':'tap ✎ Edit','conf'),children:h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:10}}, fields),caption: editing?'Editing — type into any field or pick from the dropdowns; press ✓ Done when finished.':'Read-only. Press ✎ Edit to change any field, including exact age, risk class and private-markets target.'}),
+          /* item 11 — 'Notes from our conversation' de-emphasised: collapsed by default */
+          (c.notes&&c.notes.length)? h('div',{style:{border:'1px solid var(--line)',borderRadius:12,background:'var(--surface)',overflow:'hidden'}},
+            h('button',{onClick:()=>this.setDtog('advConvNotes',!notesOpen),style:{width:'100%',display:'flex',alignItems:'center',justifyContent:'space-between',border:'none',background:'transparent',cursor:'pointer',padding:'11px 14px',fontSize:12.5,fontWeight:600,color:'var(--muted)'}}, h('span',null,'Notes from our conversation ('+c.notes.length+') · AI-captured'), h('span',null,notesOpen?'▾':'▸')),
+            notesOpen? h('div',{style:{padding:'0 14px 12px',display:'flex',flexDirection:'column',gap:7}}, c.notes.map((n,i)=>h('div',{key:i,style:{display:'flex',gap:8,fontSize:13,lineHeight:1.45}},h('span',{style:{color:'var(--brand)'}},'•'),n))) : null) : null ]);
       }
       case 'setTarget': case 'confirmTarget': {
         const confirm=key==='confirmTarget';

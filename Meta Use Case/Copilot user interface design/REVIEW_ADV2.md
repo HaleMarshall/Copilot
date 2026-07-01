@@ -6,17 +6,17 @@ Source: ~/Downloads/Advisor View 2 review.zip (click-comments.md). Status: [ ] t
 - [x] 2. Advisor desk: change the suggested level (L1/L2/L3) per client right on the desk, without opening the client.
 
 ## Executive summary / prepare-for-call
-- [ ] 3. Exec-summary "the case in three moves": click a case to see a fuller detail of what to achieve; top-3 actions clickable.
-- [ ] 4. Rename exec summary → "Prepare-for-call summary"; the Suggest button updates the exec summary content.
-- [ ] 5. Add a "Suggest calling the investor" button.
+- [x] 3. Exec-summary "the case in three moves": click a case to see a fuller detail of what to achieve; top-3 actions clickable.
+- [x] 4. Rename exec summary → "Prepare-for-call summary"; the Suggest button updates the exec summary content.
+- [x] 5. Add a "Suggest calling the investor" button.
 
 ## Intake / profile
-- [ ] 6. Age = exact number, not a range (advisor + investor view).
-- [ ] 7. Fields genuinely editable + a visible Edit affordance/button (user still can't edit; add explicit edit toggle).
-- [ ] 8. Profession = "Founder of <company>" (add company field); drop "recent exit" wording.
-- [ ] 9. "Already in private markets?" = Yes/No dropdown; "Amount invested so far" appears only when Yes; the Add must work.
-- [ ] 10. PM target allocation editable; risk class editable; everything editable.
-- [ ] 11. "Notes from our conversation" — de-emphasize / make optional (called unnecessary).
+- [x] 6. Age = exact number, not a range (advisor + investor view).
+- [x] 7. Fields genuinely editable + a visible Edit affordance/button (user still can't edit; add explicit edit toggle).
+- [x] 8. Profession = "Founder of <company>" (add company field); drop "recent exit" wording.
+- [x] 9. "Already in private markets?" = Yes/No dropdown; "Amount invested so far" appears only when Yes; the Add must work.
+- [x] 10. PM target allocation editable; risk class editable; everything editable.
+- [x] 11. "Notes from our conversation" — de-emphasize / make optional (called unnecessary).
 
 ## Tailored model portfolio
 - [ ] 12. Taxonomy: AI/Tech is a SECTOR (not strategy); Direct & Co-investments is a FORMAT; Secondaries is a FORMAT. Fix STRATS to real strategies; move AI→sector, directs/secondaries→format.
