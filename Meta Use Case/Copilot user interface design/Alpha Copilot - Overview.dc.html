@@ -8193,7 +8193,7 @@ class Component extends DCLogic {
   advStepWS(key){ return {
       /* item 13 — Understand is only the investor profile overview; the tailored TARGET (adjust & compare) lives in Shape.
          setTarget + confirmTarget are both the tailored-target simulator (simulatorBody), so both map to 'shape'. */
-      execSummary:'understand', intake:'understand', intakeMin:'understand', overview:'understand', modelExisting:'understand', changesSince:'understand', aiThinking:'understand', modelPortfolio:'understand',
+      execSummary:'understand', intake:'understand', intakeMin:'understand', overview:'understand', modelExisting:'understand', changesSince:'understand', aiThinking:'understand', modelPortfolio:'shape',
       setTarget:'shape', confirmTarget:'shape', simTarget:'shape', simExisting:'shape', simFull:'shape', targetSimulator:'shape', multiComparison:'shape', compareToCurrent:'shape', peerComparison:'shape', future:'shape',
       nextBest:'act', nextBestHints:'act', opportunities:'act', missedOut:'act', seize:'act', follower:'act', backToKyc:'act',
       managerComparison:'research', fundComparison:'research'
@@ -8752,12 +8752,12 @@ class Component extends DCLogic {
         const secCard=this.card({title:'Sector mix', badge:this.badge('AI / Tech lives here','synth'), style:{flex:'1 1 240px'},children:this.donutNamed(dimSlices(secD),150,'Sector','mix'),caption:'Sector exposure — AI & Tech is a sector, not a strategy.'});
         const fmtCard=this.card({title:'Format mix', badge:this.badge('Secondaries · Co-invest','synth'), style:{flex:'1 1 240px'},children:this.donutNamed(dimSlices(fmtD),150,'Format','mix'),caption:'Access format — Secondaries and Direct / Co-investment are formats, not strategies.'});
         if(L==='L3'){
-          /* L3 — FULL institutional breakdown: every dimension (strategy, sector, format, region, currency, vintage)
+          /* L3 — FULL institutional breakdown: every dimension (strategy, sector, format, region, currency)
              gets both a donut AND a line-item table with % and € of plan, each with a TOTAL row. This is the
              Bloomberg-for-private-markets density an LP allocating hundreds of millions expects. */
-          const vintageDim={key:'vintage',label:'Vintage',target:{'2021':8,'2022':12,'2023':16,'2024':22,'2025':22,'2026':20},colors:{'2021':'--data-1','2022':'--data-2','2023':'--data-3','2024':'--data-5','2025':'--data-6','2026':'--data-7'}};
+          /* item 38 — Vintage is NOT a target dimension (same reasoning as item 18); removed from the L3 full-view breakdown */
           const regionD=DIMS2.find(d=>d.key==='region')||{}; const curD=DIMS2.find(d=>d.key==='currency')||{};
-          const secSl=dimSlices(secD), fmtSl=dimSlices(fmtD), regSl=dimSlices(regionD), curSl=dimSlices(curD), vintSl=dimSlices(vintageDim);
+          const secSl=dimSlices(secD), fmtSl=dimSlices(fmtD), regSl=dimSlices(regionD), curSl=dimSlices(curD);
           const bh=(t,r)=>h('th',{style:{textAlign:r?'right':'left',padding:'7px 9px',fontSize:10,textTransform:'uppercase',letterSpacing:'.04em',color:'var(--muted)',borderBottom:'2px solid var(--line)'}},t);
           const bd=(v,r,bold,topline)=>h('td',{style:{textAlign:r?'right':'left',padding:'8px 9px',borderBottom:'1px solid var(--line)',borderTop:topline?'2px solid var(--ink)':'none',fontSize:12.5,fontWeight:bold?700:400}},v);
           const bTable=(label,entries)=>{ const sum=entries.reduce((a,e)=>a+(e.p||0),0)||1; const norm=entries.map(e=>({name:e.name,color:e.color,pn:+((e.p||0)/sum*100).toFixed(1)}));
@@ -8777,8 +8777,7 @@ class Component extends DCLogic {
             dimBlock('Sector', secSl, 'Sector', this.badge('AI / Tech','synth')),
             dimBlock('Format', fmtSl, 'Format', this.badge('Secondaries · Co-invest','synth')),
             dimBlock('Region', regSl, 'Region'),
-            dimBlock('Currency', curSl, 'Currency'),
-            dimBlock('Vintage', vintSl, 'Vintage') ]);
+            dimBlock('Currency', curSl, 'Currency') ]);
         }
         return wrap([ head('Your tailored model portfolio', _adjusted?'Updated to reflect the strategy mix you adjusted on the target step.':'Diversified across the strategies that fit your profile.'),
           h('div',{style:{display:'flex',gap:16,flexWrap:'wrap',alignItems:'stretch'}}, stratCard, table) ]); }

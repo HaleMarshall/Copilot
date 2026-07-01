@@ -38,7 +38,7 @@ Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.
 - [x] 35. Going-from/going-to arrows only when changed from model/old target (no static numbers).
 - [x] 36. Total row: edit €m to raise PM allocation; shows new % of investable wealth next to total; distinct total row.
 - [x] 37. Same (36-style table) for region, currency, sector, format. No vintage.
-- [ ] 38. Tailored model portfolio (view 3 of L3) → Shape not Understand; no vintage mix.
+- [x] 38. Tailored model portfolio (view 3 of L3) → Shape not Understand; no vintage mix.
 - [ ] 39. Rename 'your tailored model portfolio full view' → 'Your tailored asset allocation for you'.
 - [ ] 40. Tailored model portfolio strategy mix must match the earlier decided mix (secondaries/infra/AI&tech) — connect them.
 - [ ] 41. Orient all charts in tailored model portfolio per the previous view.
