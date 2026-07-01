@@ -15,7 +15,7 @@ Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.
 - [x] 12. Client profile: include investment targets (capital growth, diversification, access to institutional managers, income distributions, thematic exposure, long-term family wealth planning).
 - [x] 13. Tailored target + adjust/compare → Shape view, not Understand (Understand = profile overview; Shape = simulator+compare for L3).
 - [x] 14. Risk class wrong: classed Opportunistic/Advanced but headline says Aggressive; changing doesn't work.
-- [ ] 15. Region change doesn't apply (still same).
+- [x] 15. Region change doesn't apply (still same).
 - [ ] 16. Move the new Profile section up under investor name / investable wealth (top part).
 - [ ] 17. On Tailored Target adjust/compare, Calls-for-Action must match THIS page (not previous page).
 - [ ] 18. Remove Vintage target (wasn't in investor view).

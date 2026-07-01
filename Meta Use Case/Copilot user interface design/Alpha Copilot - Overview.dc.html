@@ -8116,6 +8116,8 @@ class Component extends DCLogic {
   /* item 14 — the LIVE risk classification (derived from riskId, the single source of truth) so every headline
      matches the intake field and updates the moment the advisor changes it — no stale/mismatched book label. */
   advRiskLabel(){ const r=(this.RISKS||[]).find(x=>x.id===this.state.riskId); if(r&&r.short) return r.short; const c=this.advClient&&this.advClient(); const cr=c&&c.risk; const r2=cr?(this.RISKS||[]).find(x=>x.id===this.advRiskId(cr)):null; return (r2&&r2.short)||cr||'—'; }
+  /* item 15 — the LIVE region (advisor's edit wins over the static book value) so the headline chip + peer cohort follow the intake */
+  advRegionLabel(){ const ed=this.state.advEdits||{}; if(ed.region) return ed.region; const c=this.advClient&&this.advClient(); return (c&&c.region)||'—'; }
   /* the client's home currency (from region 'US / USD' → USD, or an explicit currency) — drives the display currency so figures show in their money */
   advHomeCcy(c){ c=c||{}; const fromCur=(c.currency||'').toUpperCase(); if(/^[A-Z]{3}$/.test(fromCur)) return fromCur; const r=String(c.region||''); const seg=r.split('/').pop().trim().toUpperCase(); if(/^[A-Z]{3}$/.test(seg)) return seg; /* item 8 — region labels → home ccy */ const byLabel={'AMERICA':'USD','MIDDLE EAST':'USD','ASIA':'USD','EUROPE':'EUR','REST OF WORLD':'USD'}[r.split('/')[0].trim().toUpperCase()]; return byLabel||'EUR'; }
   /* map a client's profile to the peer-cohort filters so the peer comparison is matched to THIS client
@@ -8296,7 +8298,7 @@ class Component extends DCLogic {
           narrow? null : (()=>{ const isNew=this.state.advStage==='new'||this.state.advStage==='pregate'; const homeCcy=((c.region||'').split('/').pop()||'EUR').trim(); const firm=(c.company&&c.company!=='—')?c.company:null;
             const chips = isNew
               ? [topChip('Age '+(c.age||'—')), topChip(c.occupation||'Founder'), firm?topChip(firm):null, topChip('Home '+homeCcy)]
-              : [topChip('Target '+(this.myPmTarget()||20)+'%'), topChip('Risk: '+this.advRiskLabel()), c.region?topChip(c.region):null, firm?topChip(firm):null];
+              : [topChip('Target '+(this.myPmTarget()||20)+'%'), topChip('Risk: '+this.advRiskLabel()), topChip(this.advRegionLabel()), firm?topChip(firm):null];
             return h('div',{style:{display:'flex',gap:6,marginTop:3,flexWrap:'wrap'}}, chips.filter(Boolean)); })())),
       h('div',{style:{marginLeft:'auto',display:'flex',alignItems:'center',gap:narrow?10:16,flexWrap:'wrap',rowGap:8,justifyContent:'flex-end'}},
         narrow? null : h('div',{style:{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:2,background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.14)',borderRadius:8,padding:'5px 10px'}}, h('span',{style:{fontSize:8.5,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(255,255,255,.45)'}},'Grounded'), h('span',{style:{fontSize:11,fontWeight:600,color:'rgba(255,255,255,.85)'}},'snap_8f3c · live data')),
@@ -8633,7 +8635,8 @@ class Component extends DCLogic {
           /* D1 — risk class bound to the model: prefilled from the agreed risk, editing it re-derives the target */
           efield('Risk class','risk',(this.RISKS.find(r=>r.id===this.state.riskId)||{}).short||c.risk||'',{type:'select',options:riskOpts,onPick:(v)=>this.setState({riskId:this.advRiskId(v),simTargets:null})}),
           efield('Currency','currency',homeCcy,{type:'select',options:ccyList,onPick:(v)=>this.setState({displayCcy:/^[A-Z]{3}$/.test(v)?v:this.state.displayCcy})}),
-          efield('Region','region',curRegion,{type:'select',options:regionOpts}),
+          /* item 15 — changing region re-derives the peer cohort so the comparison actually follows the region */
+          efield('Region','region',curRegion,{type:'select',options:regionOpts,onPick:(v)=>this.setState({fc:this.advClientCohort(Object.assign({},this.advClient()||{},{region:v}))})}),
           efield('Profession','profession',c.occupation||''),
           efield('Company','company',(c.company&&c.company!=='—')?c.company:'')
         ]).filter(Boolean);
