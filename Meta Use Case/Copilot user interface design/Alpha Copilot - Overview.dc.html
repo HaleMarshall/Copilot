@@ -128,7 +128,7 @@
           <div style="margin-left:auto;display:flex;align-items:center;gap:10px;flex:0 0 auto">
             <button onClick="{{ exportPdf }}" style="display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);height:30px;padding:0 12px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600">⤓ PDF</button>
             <sc-if value="{{ controlClosed }}" hint-placeholder-val="{{ false }}">
-              <button onClick="{{ openControl }}" style="display:inline-flex;align-items:center;gap:6px;border:1px solid var(--brand);background:var(--brand-wash);color:var(--brand-ink);height:30px;padding:0 12px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700">⚙ Levers</button>
+              <button onClick="{{ openControl }}" style="display:inline-flex;align-items:center;gap:6px;border:1px solid var(--brand);background:var(--brand-wash);color:var(--brand-ink);height:30px;padding:0 12px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700">Levers</button>
             </sc-if>
           </div>
         </div>
@@ -1048,7 +1048,7 @@ class Component extends DCLogic {
   gatedBox(size){
     const h=this.h;
     return h('div',{style:{width:size,height:size,borderRadius:14,background:'var(--gated-wash)',border:'1px solid var(--line)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',padding:12,gap:6}},
-      h('div',{style:{fontSize:18}},'🔒'),
+      h('div',{style:{fontSize:18}},''),
       h('div',{style:{fontSize:10.5,color:'var(--ink)',fontWeight:600,lineHeight:1.35}},'Only for paid viewers — contact your sales associate'),
       h('div',{style:{fontSize:9.5,color:'var(--muted)',fontFamily:"Inter,system-ui,sans-serif"}},'5,500 total investors'));
   }
@@ -1075,7 +1075,7 @@ class Component extends DCLogic {
     const h=this.h; const cur=this.state.surface;
     const groups=[
       ['Overview',[['Overview','◫','overview']]],
-      ['Compare',[['Allocation','▦','s2'],['Region','◴','s3'],['Format','▤','s4'],['Vintage','▥','s5'],['Look-through','⬡','s6'],['Performance','▲','s7'],['KPIs','◇','soon']]],
+      ['Compare',[['Allocation','▦','s2'],['Region','◴','s3'],['Format','▤','s4'],['Vintage','▥','s5'],['Look-through','','s6'],['Performance','▲','s7'],['KPIs','◇','soon']]],
       ['Plan',[['Architect','✦','soon'],['Pacing','◷','soon'],['Liquidity','≈','soon'],['Projection','⋰','soon']]],
       ['Act',[['Funds','▣','s13'],['Next','→','soon'],['Explain','?','soon']]],
       ['Learn',[['Why-not','⊘','soon'],['Managers','◉','soon'],['Macro','◔','soon']]]
@@ -1169,7 +1169,7 @@ class Component extends DCLogic {
       co.relaxed? h('div',{key:'relax',style:{display:'flex',gap:8,alignItems:'center',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:8,padding:'8px 10px',marginTop:10}},
         h('span',{style:{color:'var(--brand)'}},'ⓘ'), h('span',{style:{fontSize:11,color:'var(--brand-ink)',fontWeight:600}},'Broadened to keep the group statistically meaningful'+(co.relaxedDims.length?' — relaxed: '+co.relaxedDims.join(', '):'')+'.')):null,
       co.belowFloor? h('div',{key:'gate',style:{background:'var(--gated-wash)',border:'1px solid var(--line)',borderRadius:8,padding:'11px',marginTop:10}},
-        h('div',{style:{fontSize:11.5,fontWeight:700}},'🔒 Only for paid viewers'),
+        h('div',{style:{fontSize:11.5,fontWeight:700}},'Only for paid viewers'),
         h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:2,marginBottom:8}},'Contact your sales associate · '+co.total.toLocaleString()+' total investors'),
         h('button',{onClick:()=>this.loosen(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:999,padding:'6px 13px',fontSize:11.5,fontWeight:600,cursor:'pointer'}},'Loosen filters')):null
     ];
@@ -1220,7 +1220,7 @@ class Component extends DCLogic {
       co.relaxed? h('div',{key:'relax',style:{display:'flex',gap:8,alignItems:'center',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:8,padding:'8px 10px',marginTop:2}},
         h('span',{style:{color:'var(--brand)'}},'ⓘ'), h('span',{style:{fontSize:11,color:'var(--brand-ink)',fontWeight:600}},'Broadened to keep the group statistically meaningful'+(co.relaxedDims.length?' — relaxed: '+co.relaxedDims.join(', '):'')+'.')):null,
       co.belowFloor? h('div',{key:'gate',style:{background:'var(--gated-wash)',border:'1px solid var(--line)',borderRadius:8,padding:'11px',marginTop:2}},
-        h('div',{style:{fontSize:11.5,fontWeight:700}},'🔒 Only for paid viewers'),
+        h('div',{style:{fontSize:11.5,fontWeight:700}},'Only for paid viewers'),
         h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:2,marginBottom:8}},'Contact your sales associate · '+co.total.toLocaleString()+' total investors'),
         h('button',{onClick:()=>this.loosen(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:999,padding:'6px 13px',fontSize:11.5,fontWeight:600,cursor:'pointer'}},'Loosen filters')):null,
       /* item 58 — investment horizon + target so the user can fully define their own peers */
@@ -1228,7 +1228,7 @@ class Component extends DCLogic {
       section('Target PM allocation','one', chips('target',['10%','15%','20%','25%','30%'])),
       /* item 58 — save the defined group as a named custom peer set (default = your actual peers) */
       (()=>{ const saved=this.state.savedPeers||[];
-        const sChip=(p,i)=>h('button',{key:i,onClick:()=>this.applyPeers(p),style:{border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',color:'var(--brand-ink)',fontSize:11.5,fontWeight:600,padding:'5px 10px',borderRadius:999,cursor:'pointer'}},'★ '+p.name);
+        const sChip=(p,i)=>h('button',{key:i,onClick:()=>this.applyPeers(p),style:{border:'1px solid var(--brand-tint-3)',background:'var(--brand-wash)',color:'var(--brand-ink)',fontSize:11.5,fontWeight:600,padding:'5px 10px',borderRadius:999,cursor:'pointer'}},''+p.name);
         return h('div',{key:'savepeers',style:{marginTop:6}},
           h('div',{style:{fontSize:11,fontWeight:700,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.06em',marginBottom:8}},'Saved peer groups'),
           saved.length? h('div',{style:{display:'flex',flexWrap:'wrap',gap:6,marginBottom:9}}, saved.map(sChip)) : h('div',{style:{fontSize:11,color:'var(--muted)',marginBottom:9,lineHeight:1.45}},'None yet — by default you’re compared against your actual peers. Define a group above and save it.'),
@@ -1311,7 +1311,7 @@ class Component extends DCLogic {
     if(m.who==='user') return h('div',{key:i,style:{alignSelf:'flex-end',maxWidth:'82%',background:'var(--brand)',color:'#fff',padding:'9px 13px',borderRadius:'14px 14px 4px 14px',fontSize:13,lineHeight:1.45}}, m.text);
     const wide = m.kind==='funds'||m.kind==='chart';
     return h('div',{key:i,style:{alignSelf:'flex-start',maxWidth:wide?'97%':'88%',width:wide?'97%':'auto'}},
-      m.agentic? h('div',{style:{display:'inline-flex',alignItems:'center',gap:6,marginBottom:7,background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',color:'var(--brand-ink)',borderRadius:999,padding:'3px 10px',fontSize:10.5,fontWeight:700,letterSpacing:'.03em'}}, h('span',null,'⚡'), m.agentic):null,
+      m.agentic? h('div',{style:{display:'inline-flex',alignItems:'center',gap:6,marginBottom:7,background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',color:'var(--brand-ink)',borderRadius:999,padding:'3px 10px',fontSize:10.5,fontWeight:700,letterSpacing:'.03em'}}, h('span',null,''), m.agentic):null,
       h('div',{style:{background:'var(--surface-2)',border:'1px solid var(--line)',padding:'11px 14px',borderRadius:'14px 14px 14px 4px',fontSize:13,lineHeight:1.55,color:'var(--ink)'}},
         m.segs.map((s,j)=> s.chip
           ? h('button',{key:j,onClick:e=>this.openPop(e,{title:s.chip,value:s.prov||s.chip,method:s.method||'computed from your portfolio vs cohort',cohort:'Peers',n:this.peerData().c.n}),
@@ -1397,7 +1397,7 @@ class Component extends DCLogic {
   ]; }
   agentSuggestFunds(q){
     const funds=this.chatFundCandidates();
-    const segs=[{t:'Here are the funds that best close your gap to target, ranked by fit. Each carries a five-point rationale and is sized to your headroom — tap '},{chip:'💼 Add'},{t:' to add one to your commitments.'}];
+    const segs=[{t:'Here are the funds that best close your gap to target, ranked by fit. Each carries a five-point rationale and is sized to your headroom — tap '},{chip:'Add'},{t:' to add one to your commitments.'}];
     this.setAsk(null,{ typing:false, msgs:this.state.ask.msgs.concat([{who:'alpha', segs, kind:'funds', funds}]) });
   }
   agentChart(q){ const t=(q||'').toLowerCase();
@@ -1521,7 +1521,7 @@ class Component extends DCLogic {
       a.msgs.slice(1).map((m,i)=> m.who==='user'
         ? h('div',{key:i,style:{alignSelf:'flex-end',maxWidth:'85%',background:'linear-gradient(135deg,#3D6BFF,#5B5CFF)',color:'#fff',padding:'10px 14px',borderRadius:'15px 15px 5px 15px',fontSize:13.5,lineHeight:1.45}}, m.text)
         : h('div',{key:i,style:{alignSelf:'flex-start',maxWidth:'92%',width:(m.kind?'92%':'auto')}},
-            m.agentic? h('div',{style:{display:'inline-flex',alignItems:'center',gap:6,marginBottom:7,background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',color:'var(--brand-ink)',borderRadius:999,padding:'3px 10px',fontSize:10.5,fontWeight:700}}, h('span',null,'⚡'), m.agentic):null,
+            m.agentic? h('div',{style:{display:'inline-flex',alignItems:'center',gap:6,marginBottom:7,background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',color:'var(--brand-ink)',borderRadius:999,padding:'3px 10px',fontSize:10.5,fontWeight:700}}, h('span',null,''), m.agentic):null,
             h('div',{style:{background:'var(--surface)',border:'1px solid var(--hero-line)',color:'var(--hero-ink)',padding:'11px 15px',borderRadius:'15px 15px 15px 5px',fontSize:13.5,lineHeight:1.55}},
               m.segs.map((s,j)=> s.chip? h('span',{key:j,style:{background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:6,padding:'0 6px',margin:'0 1px',fontWeight:700,color:'var(--brand-ink)'}},s.chip) : h('span',{key:j},s.t))),
             m.kind==='funds'? h('div',{style:{display:'flex',flexDirection:'column',gap:10,marginTop:10}}, m.funds.map((f,k)=>this.chatFundCard(f,k))):null,
@@ -1583,12 +1583,12 @@ class Component extends DCLogic {
 
   /* ---------- top-bar controls ---------- */
   themeToggle(){
-    return this.seg([{label:'☀',value:'light'},{label:'☾',value:'dark'},{label:'◐',value:'hybrid'}], this.state.theme, v=>this.setState({theme:v}), {sm:true});
+    return this.seg([{label:'',value:'light'},{label:'',value:'dark'},{label:'◐',value:'hybrid'}], this.state.theme, v=>this.setState({theme:v}), {sm:true});
   }
   /* ---------- theme chooser with live previews (onboarding + settings) ---------- */
   themeMeta(){ return [
-    {id:'light', name:'Light', icon:'☀', desc:'Clean & bright', bg:'#FAFAF8', panel:'#FFFFFF', bar:'#2C2DFE', sub:'#C9C6BD', line:'#E5E2DC', top:'#20243A'},
-    {id:'dark',  name:'Dark',  icon:'☾', desc:'Low-light, easy on the eyes', bg:'#12131A', panel:'#1C1F2B', bar:'#5B5CFF', sub:'#363B4E', line:'#2A2E3D', top:'#0C0D14'},
+    {id:'light', name:'Light', icon:'', desc:'Clean & bright', bg:'#FAFAF8', panel:'#FFFFFF', bar:'#2C2DFE', sub:'#C9C6BD', line:'#E5E2DC', top:'#20243A'},
+    {id:'dark',  name:'Dark',  icon:'', desc:'Low-light, easy on the eyes', bg:'#12131A', panel:'#1C1F2B', bar:'#5B5CFF', sub:'#363B4E', line:'#2A2E3D', top:'#0C0D14'},
     {id:'hybrid',name:'Hybrid',icon:'◐', desc:'Warm cream canvas', bg:'#F4EFE2', panel:'#FFFFFF', bar:'#2C2DFE', sub:'#D8D0BE', line:'#E5E2DC', top:'#20243A'}
   ]; }
   themeCard(t, selected, onClick, big){
@@ -1640,9 +1640,9 @@ class Component extends DCLogic {
     this.setState(base); }
   welcomeRoles(){ const h=this.h; const SF=this.SF;
     const ROLES=[
-      ['Investor','👤','Your own tailored portfolio — build, simulate and compare against peers, the model and endowments.'],
-      ['Advisor','🎧','The advisor cockpit — prepare for a call, walk a client through their tailored plan across L1–L3.'],
-      ['Internal','🏢','Aggregate platform consoles for sales, product and IC — never per-identifiable client.']];
+      ['Investor','','Your own tailored portfolio — build, simulate and compare against peers, the model and endowments.'],
+      ['Advisor','','The advisor cockpit — prepare for a call, walk a client through their tailored plan across L1–L3.'],
+      ['Internal','','Aggregate platform consoles for sales, product and IC — never per-identifiable client.']];
     return h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:12}},
       ROLES.map(r=>h('button',{key:r[0],onClick:()=>this.enterAs(r[0]),
         style:{textAlign:'left',border:'1px solid var(--line)',background:'var(--surface)',borderRadius:14,padding:'16px 16px',cursor:'pointer',display:'flex',flexDirection:'column',gap:7,transition:'all .12s'},
@@ -1863,7 +1863,7 @@ class Component extends DCLogic {
     if(sel.holdings) pages.push(pageWrap('Holdings',++n, holdPage));
     if(sel.legend) pages.push(pageWrap('Legend & definitions',++n, legendPage));
     const PAGEDEF=[['cover','Cover'],['performance','Performance'],['cashflow','Cash flow'],['allocation','Allocation'],['vintage','Vintage'],['holdings','Holdings'],['legend','Legend']];
-    const chk=(k,l)=>h('button',{key:k,onClick:()=>togglePage(k),style:{display:'inline-flex',alignItems:'center',gap:6,border:'1px solid '+(sel[k]?'var(--brand)':'#ccc'),background:sel[k]?'var(--brand-wash)':'#fff',color:sel[k]?'var(--brand-ink)':'#666',borderRadius:8,padding:'5px 10px',fontSize:11.5,fontWeight:600,cursor:'pointer'}}, h('span',null, sel[k]?'☑':'☐'), l);
+    const chk=(k,l)=>h('button',{key:k,onClick:()=>togglePage(k),style:{display:'inline-flex',alignItems:'center',gap:6,border:'1px solid '+(sel[k]?'var(--brand)':'#ccc'),background:sel[k]?'var(--brand-wash)':'#fff',color:sel[k]?'var(--brand-ink)':'#666',borderRadius:8,padding:'5px 10px',fontSize:11.5,fontWeight:600,cursor:'pointer'}}, h('span',null, sel[k]?'':''), l);
     const header=h('div',{className:'sc-pdf-noprint',style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,padding:'12px 18px',borderBottom:'1px solid #e6e6e6',position:'sticky',top:0,background:'#fff',borderRadius:'12px 12px 0 0',flexWrap:'wrap'}},
       h('div',{style:{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}}, h('span',{style:{fontWeight:700,fontSize:13,color:'#111'}},'PDF export — choose pages:'), h('div',{style:{display:'flex',gap:6,flexWrap:'wrap'}}, PAGEDEF.map(([k,l])=>chk(k,l)))),
       h('div',{style:{display:'flex',gap:8}}, h('button',{onClick:()=>window.print(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'8px 14px',fontSize:12.5,fontWeight:700,cursor:'pointer'}},'⤓ Save as PDF'), h('button',{onClick:()=>this.setState({showPdf:false}),style:{border:'1px solid #ccc',background:'#fff',color:'#444',borderRadius:8,padding:'8px 12px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},'Close')));
@@ -1878,7 +1878,7 @@ class Component extends DCLogic {
   notifBell(){
     const h=this.h; const n=this.state.notifsSeen?0:this.NOTIFS().filter(x=>x.unread).length;
     return h('button',{onClick:()=>this.toggleNotif(),title:'Notifications',
-      style:{position:'relative',border:'1px solid var(--topbar-line)',background:'var(--topbar-chip)',color:'var(--topbar-ink)',width:30,height:30,borderRadius:8,cursor:'pointer',fontSize:14,flex:'0 0 auto'}},'🔔',
+      style:{position:'relative',border:'1px solid var(--topbar-line)',background:'var(--topbar-chip)',color:'var(--topbar-ink)',width:30,height:30,borderRadius:8,cursor:'pointer',fontSize:14,flex:'0 0 auto'}},'',
       n?h('span',{style:{position:'absolute',top:-5,right:-5,minWidth:16,height:16,padding:'0 3px',borderRadius:999,background:'#C8392F',color:'#fff',fontSize:9.5,fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',boxSizing:'border-box'}},String(n)):null);
   }
   profileBtn(){
@@ -1890,18 +1890,18 @@ class Component extends DCLogic {
   }
   NOTIFS(){ const g=this.state.following; const gl=g==='top10'?'Top performers':(g==='peers'?'Your peer group':null);
     const follow = g? [
-      {icon:'⭐',logo:'kkr',fund:'KKR North America XIII',unread:true,title:gl+' just invested in KKR North America XIII',body:(g==='top10'?'7 of the platform’s top-10% performers':'5 investors in your peer group')+' committed in the last 30 days. Tap to view the fund.',cta:'See opportunity',act:()=>this.openFollowFund('kkr13')},
-      {icon:'⭐',logo:'lexington-partners',fund:'Lexington Capital Partners XII',unread:true,title:gl+' added Lexington Capital Partners XII',body:(g==='top10'?'4 top performers':'3 peers in your group')+' added secondaries this month.',cta:'See opportunity',act:()=>this.openFollowFund('lex12')}
+      {icon:'',logo:'kkr',fund:'KKR North America XIII',unread:true,title:gl+' just invested in KKR North America XIII',body:(g==='top10'?'7 of the platform’s top-10% performers':'5 investors in your peer group')+' committed in the last 30 days. Tap to view the fund.',cta:'See opportunity',act:()=>this.openFollowFund('kkr13')},
+      {icon:'',logo:'lexington-partners',fund:'Lexington Capital Partners XII',unread:true,title:gl+' added Lexington Capital Partners XII',body:(g==='top10'?'4 top performers':'3 peers in your group')+' added secondaries this month.',cta:'See opportunity',act:()=>this.openFollowFund('lex12')}
     ] : [];
     // Every notification follows headline + factual body + a call-to-action (items 33-35). Tone stays factual — no hype.
     return follow.concat([
-      {icon:'⏳',logo:'ares',fund:'Ares Private Credit III',unread:true,title:'Ares Private Credit III is closing soon',body:'The fund that closes your biggest gap (private credit) is 64% filled — first close imminent.',cta:'Ensure your allocation',act:()=>this.goOppFromNotif()},
-      {icon:'⏳',logo:'general-atlantic',fund:'GA AI Opportunities',unread:true,title:'GA AI Opportunities is closing soon',body:'A top-ten performing manager just invested; the first-close window is open.',cta:'Ensure your first-close discount',act:()=>this.goOppFromNotif()},
-      {icon:'📤',logo:'kkr',fund:'KKR North America XIII',unread:true,title:'KKR just exited Axel Springer',body:'A position in KKR North America XIII — a fund you hold — was realised at ~2.4×. A distribution to LPs is expected to follow.',cta:'See the news',act:()=>this.goOppFromNotif()},
-      {icon:'🚀',logo:'general-atlantic',fund:'GA AI Opportunities',unread:true,title:'Anthropic has filed to IPO',body:'A company held in your AI sleeve (via GA AI Opportunities) is going public — secondary access may open for followers.',cta:'See the news',act:()=>this.goOppFromNotif()},
-      {icon:'💶',logo:'eqt',fund:'EQT IX',unread:true,title:'Distribution received — EQT IX',body:'EQT IX returned €120k to your account; your DPI moved to 1.1×.',cta:'Put it back to work',act:()=>this.goOppFromNotif()},
-      {icon:'📈',fund:null,unread:false,title:'Quarterly NAV updated',body:'Your portfolio NAV is €16.6m (+€0.6m this quarter).',cta:'View your performance',act:()=>this.setState({showNotif:false,ws:'understand',uc:'t1-12',page:'review',homeLaunched:true,deepLink:null,homePop:null})},
-      {icon:'📄',logo:'ares',fund:'Northwind Infra III',unread:false,title:'New capital call — Northwind Infra III',body:'A €60k call is scheduled for next quarter; your liquidity buffer covers it comfortably.',cta:'Review liquidity',act:()=>this.setState({showNotif:false,ws:'understand',uc:'t1-7',page:'calls',homeLaunched:true,deepLink:null,homePop:null})}
+      {icon:'',logo:'ares',fund:'Ares Private Credit III',unread:true,title:'Ares Private Credit III is closing soon',body:'The fund that closes your biggest gap (private credit) is 64% filled — first close imminent.',cta:'Ensure your allocation',act:()=>this.goOppFromNotif()},
+      {icon:'',logo:'general-atlantic',fund:'GA AI Opportunities',unread:true,title:'GA AI Opportunities is closing soon',body:'A top-ten performing manager just invested; the first-close window is open.',cta:'Ensure your first-close discount',act:()=>this.goOppFromNotif()},
+      {icon:'',logo:'kkr',fund:'KKR North America XIII',unread:true,title:'KKR just exited Axel Springer',body:'A position in KKR North America XIII — a fund you hold — was realised at ~2.4×. A distribution to LPs is expected to follow.',cta:'See the news',act:()=>this.goOppFromNotif()},
+      {icon:'',logo:'general-atlantic',fund:'GA AI Opportunities',unread:true,title:'Anthropic has filed to IPO',body:'A company held in your AI sleeve (via GA AI Opportunities) is going public — secondary access may open for followers.',cta:'See the news',act:()=>this.goOppFromNotif()},
+      {icon:'',logo:'eqt',fund:'EQT IX',unread:true,title:'Distribution received — EQT IX',body:'EQT IX returned €120k to your account; your DPI moved to 1.1×.',cta:'Put it back to work',act:()=>this.goOppFromNotif()},
+      {icon:'',fund:null,unread:false,title:'Quarterly NAV updated',body:'Your portfolio NAV is €16.6m (+€0.6m this quarter).',cta:'View your performance',act:()=>this.setState({showNotif:false,ws:'understand',uc:'t1-12',page:'review',homeLaunched:true,deepLink:null,homePop:null})},
+      {icon:'',logo:'ares',fund:'Northwind Infra III',unread:false,title:'New capital call — Northwind Infra III',body:'A €60k call is scheduled for next quarter; your liquidity buffer covers it comfortably.',cta:'Review liquidity',act:()=>this.setState({showNotif:false,ws:'understand',uc:'t1-7',page:'calls',homeLaunched:true,deepLink:null,homePop:null})}
     ]); }
   goOppFromNotif(){ this.setState({showNotif:false, showToast:false, ws:'act', uc:'opp', page:'opp', homeLaunched:true, deepLink:null, homePop:null, homeDrill:null, ask:{...this.state.ask,state:'min'}}); }
   notifPanelBody(){
@@ -2647,7 +2647,7 @@ class Component extends DCLogic {
     return h('div',{style:{padding:'4px 0'}},
       h('div',{style:{maxWidth:1080,width:'100%',margin:'0 auto',border:'2px dashed var(--line)',borderRadius:16,background:'var(--surface)',padding:'26px 30px'}},
         h('div',{style:{display:'flex',alignItems:'flex-start',gap:14,marginBottom:20}},
-          h('div',{style:{flex:'0 0 44px',width:44,height:44,borderRadius:12,border:'2px dashed var(--muted)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--muted)',fontSize:19}},'⛌'),
+          h('div',{style:{flex:'0 0 44px',width:44,height:44,borderRadius:12,border:'2px dashed var(--muted)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--muted)',fontSize:19}},''),
           h('div',{style:{minWidth:0,flex:1}},
             h('div',{style:{fontSize:10,letterSpacing:'.1em',textTransform:'uppercase',color:'var(--muted)'}}, page&&page.title? page.title : u.title),
             h('div',{style:{fontFamily:SF,fontSize:22,fontWeight:600,marginTop:2}},`Lights up when the ${feed} feed connects`),
@@ -3899,7 +3899,7 @@ class Component extends DCLogic {
       h('div',null, railFacts.map(railRow)),
       h('button',{onClick:()=>this.toggleCmp&&this.toggleCmp({kind:'fund',id:f.id,label:f.name}),style:{width:'100%',marginTop:14,border:'1px solid var(--brand)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:11,padding:'11px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'⇄ Compare Fund'),
       f.closed
-        ? h('button',{onClick:()=>this.toggleWatch(f.name),style:{width:'100%',marginTop:9,border:'1px solid var(--line)',background:'var(--surface-2)',color:'var(--muted)',opacity:.8,borderRadius:11,padding:'12px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}}, (this.state.watchlist||[]).includes(f.name)?'🔔 On the waitlist':'🔒 Closed · Join the waitlist')
+        ? h('button',{onClick:()=>this.toggleWatch(f.name),style:{width:'100%',marginTop:9,border:'1px solid var(--line)',background:'var(--surface-2)',color:'var(--muted)',opacity:.8,borderRadius:11,padding:'12px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}}, (this.state.watchlist||[]).includes(f.name)?'On the waitlist':'Closed · Join the waitlist')
         : h('button',{onClick:()=>this.addToCart(f.name,f.strat),style:{width:'100%',marginTop:9,border:'none',background:'var(--brand)',color:'#fff',borderRadius:11,padding:'12px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}}, (featured||prospect)?'Request Allocation':'Invest more'));
     // ---------- hero + KPIs ----------
     const heroImg=h('div',{style:{position:'relative',flex:'1 1 300px',minWidth:240,minHeight:200,borderRadius:14,overflow:'hidden',background:'radial-gradient(circle at 40% 36%, #34343a 0%, #1a1a1c 40%, #0a0a0b 72%)',display:'flex',alignItems:'flex-start',padding:18}},
@@ -3987,7 +3987,7 @@ class Component extends DCLogic {
               h('div',{style:{fontFamily:SF,fontSize:40,fontWeight:700,color:'var(--brand)',lineHeight:1.1,marginTop:4}}, this.fundFitModel(f,m).fit),
               h('div',{style:{fontSize:11,color:'var(--muted)'}},'out of 100')),
             h('div',{style:{border:'1px solid var(--synthetic)',background:'var(--synthetic-wash)',borderRadius:14,padding:'13px 14px'}},
-              h('div',{style:{fontSize:11,fontWeight:700,color:'var(--synthetic)',marginBottom:5}},'⚑ What to watch'),
+              h('div',{style:{fontSize:11,fontWeight:700,color:'var(--synthetic)',marginBottom:5}},'What to watch'),
               h('div',{style:{fontSize:12,color:'var(--ink)',lineHeight:1.5}}, this.fundFitModel(f,m).watch)))),
         h('div',{style:{marginTop:16}}, this.fundActions(f.name,false,f.strat,f.closed)));
     } else if(tabValid==='seed' && C){
@@ -4015,7 +4015,7 @@ class Component extends DCLogic {
           h('div',{style:{border:'1px solid var(--line)',borderRadius:12,overflow:'hidden'}}, C.terms.map((r,i)=>h('div',{key:i,style:{display:'grid',gridTemplateColumns:'1fr 1.3fr',gap:12,padding:'10px 14px',borderBottom:i<C.terms.length-1?'1px solid var(--line)':'none',background:i%2?'var(--surface-2)':'transparent',fontSize:12.5}}, h('span',{style:{color:'var(--muted)'}},r[0]), h('span',{style:{fontWeight:600}},r[1]))))) : null,
         sub('Documents'),
         h('div',null, this.FUND_DOCS().map((d,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,border:'1px solid var(--line)',borderRadius:10,padding:'11px 13px',marginBottom:8}},
-          h('div',{style:{display:'flex',alignItems:'center',gap:11,minWidth:0}}, h('span',{style:{fontSize:18}},'📄'), h('div',{style:{minWidth:0}}, h('div',{style:{fontSize:13,fontWeight:600}},d.n), h('div',{style:{fontSize:11,color:'var(--muted)'}},d.meta))),
+          h('div',{style:{display:'flex',alignItems:'center',gap:11,minWidth:0}}, h('span',{style:{fontSize:18}},''), h('div',{style:{minWidth:0}}, h('div',{style:{fontSize:13,fontWeight:600}},d.n), h('div',{style:{fontSize:11,color:'var(--muted)'}},d.meta))),
           h('span',{style:{fontSize:11.5,color:'var(--brand-ink)',fontWeight:700,border:'1px solid var(--brand-tint-3)',borderRadius:8,padding:'5px 10px'}},'Request')))),
         h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:6}},'Demo — document access is illustrative.'));
     }
@@ -4072,10 +4072,10 @@ class Component extends DCLogic {
   shopBtn(name,strat,sm){ const h=this.h; const inC=this.inCart(name);
     if(this.isHeld(name)){ /* item 62 — held funds show a static cart marker, not a buy action */
       return h('span',{title:'Already in your portfolio',
-        style:{flex:'0 0 auto',display:'inline-flex',alignItems:'center',justifyContent:'center',gap:4,border:'1px solid var(--over)',background:'var(--over-wash)',color:'var(--over)',borderRadius:8,padding:sm?'4px 7px':'6px 10px',fontSize:sm?11:12,fontWeight:700,whiteSpace:'nowrap'}}, sm?'💼':'💼 Held');
+        style:{flex:'0 0 auto',display:'inline-flex',alignItems:'center',justifyContent:'center',gap:4,border:'1px solid var(--over)',background:'var(--over-wash)',color:'var(--over)',borderRadius:8,padding:sm?'4px 7px':'6px 10px',fontSize:sm?11:12,fontWeight:700,whiteSpace:'nowrap'}}, sm?'':'Held');
     }
     return h('button',{onClick:e=>{e.stopPropagation();this.addToCart(name,strat);},title:inC?'In your commitments':'Add to commitments',
-      style:{flex:'0 0 auto',display:'inline-flex',alignItems:'center',justifyContent:'center',gap:4,border:'1px solid '+(inC?'var(--over)':'var(--brand-tint-3)'),background:inC?'var(--over-wash)':'var(--surface)',color:inC?'var(--over)':'var(--brand-ink)',borderRadius:8,padding:sm?'4px 7px':'6px 10px',fontSize:sm?11:12,fontWeight:700,cursor:'pointer',whiteSpace:'nowrap'}}, inC?'💼✓':('💼'+(sm?'':' Seize'))); /* review7 item 20 — 'Buy' → opportunity language */
+      style:{flex:'0 0 auto',display:'inline-flex',alignItems:'center',justifyContent:'center',gap:4,border:'1px solid '+(inC?'var(--over)':'var(--brand-tint-3)'),background:inC?'var(--over-wash)':'var(--surface)',color:inC?'var(--over)':'var(--brand-ink)',borderRadius:8,padding:sm?'4px 7px':'6px 10px',fontSize:sm?11:12,fontWeight:700,cursor:'pointer',whiteSpace:'nowrap'}}, inC?'✓':(''+(sm?'':' Seize'))); /* review7 item 20 — 'Buy' → opportunity language */
   }
   addToCart(name,strat){ const c=this.state.cart||[]; if(c.some(x=>x.name===name)){ this.setState({showCart:true,cartCommitted:false}); return; }
     const f=this.HELD_FUNDS().find(x=>x.name===name); this.setState({cart:c.concat([{name, ticket:150, strat:strat||(f&&f.strat)||''}]), showCart:true, cartCommitted:false, showNotif:false, showProfile:false}); }
@@ -4087,21 +4087,21 @@ class Component extends DCLogic {
     return h('div',{style:{display:'flex',gap:8,flexWrap:'wrap'}},
       held
         ? h('button',{onClick:e=>{e.stopPropagation();this.suggestSimilar(name,strat);},title:'You already hold this fund — see comparable funds on the platform',
-            style:{border:'none',borderRadius:9,padding:pad,fontSize:fs,fontWeight:700,cursor:'pointer',background:'var(--brand)',color:'#fff',fontFamily:'Inter,system-ui,sans-serif'}}, '✨ Suggest similar funds')
+            style:{border:'none',borderRadius:9,padding:pad,fontSize:fs,fontWeight:700,cursor:'pointer',background:'var(--brand)',color:'#fff',fontFamily:'Inter,system-ui,sans-serif'}}, 'Suggest similar funds')
         : closed
         /* closed funds: the action is greyed out where the CTA would be, with a waitlist instead */
         ? h('button',{onClick:e=>{e.stopPropagation();this.toggleWatch(name);},title:'This fund is closed — join the waitlist to be notified when it reopens',
-            style:{border:'1px solid var(--line)',borderRadius:9,padding:pad,fontSize:fs,fontWeight:700,cursor:'pointer',background:'var(--surface-2)',color:'var(--muted)',opacity:.75,fontFamily:'Inter,system-ui,sans-serif'}}, inW?'🔔 On the waitlist':'🔒 Closed · Join the waitlist')
+            style:{border:'1px solid var(--line)',borderRadius:9,padding:pad,fontSize:fs,fontWeight:700,cursor:'pointer',background:'var(--surface-2)',color:'var(--muted)',opacity:.75,fontFamily:'Inter,system-ui,sans-serif'}}, inW?'On the waitlist':'Closed · Join the waitlist')
         : h('button',{onClick:e=>{e.stopPropagation();this.addToCart(name,strat);},
             style:{border:'none',borderRadius:9,padding:pad,fontSize:fs,fontWeight:700,cursor:'pointer',background:inC?'var(--over)':'var(--brand)',color:'#fff',fontFamily:'Inter,system-ui,sans-serif'}}, inC?'✓ Added':'✦ Seize the opportunity'),
       held?null:h('button',{onClick:e=>{e.stopPropagation();this.addToPortfolio(name);},
         style:{border:'1px solid '+(inP?'var(--over)':'var(--brand-tint-3)'),borderRadius:9,padding:pad,fontSize:fs,fontWeight:600,cursor:'pointer',background:inP?'var(--over-wash)':'var(--surface)',color:inP?'var(--over)':'var(--brand-ink)',fontFamily:'Inter,system-ui,sans-serif'}}, inP?'✓ In portfolio plan':'＋ Portfolio plan'),
       held?null:h('button',{onClick:e=>{e.stopPropagation();this.toggleWatch(name);},
-        style:{border:'1px solid '+(inW?'var(--brand)':'var(--line)'),background:inW?'var(--brand-wash)':'var(--surface)',color:inW?'var(--brand-ink)':'var(--muted)',borderRadius:9,padding:pad,fontSize:fs,fontWeight:600,cursor:'pointer'}}, inW?'♥ Watchlisted':'♡ Watchlist'));
+        style:{border:'1px solid '+(inW?'var(--brand)':'var(--line)'),background:inW?'var(--brand-wash)':'var(--surface)',color:inW?'var(--brand-ink)':'var(--muted)',borderRadius:9,padding:pad,fontSize:fs,fontWeight:600,cursor:'pointer'}}, inW?'✓ Watchlisted':'Watchlist'));
   }
   cartBtn(){ const h=this.h; const n=(this.state.cart||[]).length;
     return h('button',{onClick:()=>this.setState({showCart:!this.state.showCart,showNotif:false,showProfile:false,cartCommitted:false}),title:'Your commitments',
-      style:{position:'relative',border:'1px solid var(--topbar-line)',background:n?'var(--brand-wash)':'var(--topbar-chip)',color:'var(--topbar-ink)',width:30,height:30,borderRadius:8,cursor:'pointer',fontSize:14,flex:'0 0 auto'}},'💼',
+      style:{position:'relative',border:'1px solid var(--topbar-line)',background:n?'var(--brand-wash)':'var(--topbar-chip)',color:'var(--topbar-ink)',width:30,height:30,borderRadius:8,cursor:'pointer',fontSize:14,flex:'0 0 auto'}},'',
       n?h('span',{style:{position:'absolute',top:-5,right:-5,minWidth:16,height:16,padding:'0 3px',borderRadius:999,background:'var(--brand)',color:'#fff',fontSize:9.5,fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',boxSizing:'border-box',border:'1px solid var(--navy)'}},String(n)):null);
   }
   cartPanelBody(){
@@ -4124,7 +4124,7 @@ class Component extends DCLogic {
             h('button',{onClick:()=>step(x,25),style:cartStep},'＋'))))))
       : h('div',{style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',padding:'30px',color:'var(--muted)',gap:10}},
           this.state.cartCommitted? h('div',{style:{display:'contents'}}, h('div',{style:{fontSize:34}},'✓'), h('div',{style:{fontFamily:SF,fontSize:16,fontWeight:700,color:'var(--over)'}},'Commitment submitted'), h('div',{style:{fontSize:12.5,lineHeight:1.5,maxWidth:260}},'Moonfare will send your subscription documents to review and sign. You can track status under Notifications.'))
-            : h('div',{style:{display:'contents'}}, h('div',{style:{fontSize:30}},'💼'), h('div',{style:{fontSize:13,lineHeight:1.5,maxWidth:250}},'Your commitments list is empty. Add a fund from any opportunity, fund card or your portfolio to start a commitment.'))),
+            : h('div',{style:{display:'contents'}}, h('div',{style:{fontSize:30}},''), h('div',{style:{fontSize:13,lineHeight:1.5,maxWidth:250}},'Your commitments list is empty. Add a fund from any opportunity, fund card or your portfolio to start a commitment.'))),
       items.length? h('div',{style:{flex:'0 0 auto',padding:'16px 18px',borderTop:'1px solid var(--line)',background:'var(--surface-2)'}},
         h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:6}}, h('span',{style:{fontSize:12.5,color:'var(--muted)'}},'Total commitment'), h('span',{style:{fontFamily:SF,fontSize:20,fontWeight:700}},'€'+total+'k')),
         h('div',{style:{fontSize:11,color:'var(--muted)',lineHeight:1.5,marginBottom:12}},'Against your €4.3m investable headroom · calls are drawn over time, not upfront.'),
@@ -4388,7 +4388,7 @@ class Component extends DCLogic {
         h('div',{key:'cbv'}, this.panelSection('Commitments by vintage','% of committed capital'),
           this.fAxisBars(vYears,[{name:'% committed',color:'--data-1',vals:vPct}],{fmt:v=>v+'%',H:210}),
           h('div',{style:{display:'flex',alignItems:'center',gap:8,margin:'8px 0 4px'}},
-            h('span',{style:{fontSize:10.5,fontWeight:700,color:'var(--synthetic)',background:'var(--synthetic-wash)',border:'1px solid var(--synthetic)',borderRadius:999,padding:'2px 9px'}},'⚑ Bunched 2021–22 · '+bunch+'%')),
+            h('span',{style:{fontSize:10.5,fontWeight:700,color:'var(--synthetic)',background:'var(--synthetic-wash)',border:'1px solid var(--synthetic)',borderRadius:999,padding:'2px 9px'}},'Bunched 2021–22 · '+bunch+'%')),
           h('div',{style:{fontSize:12,color:'var(--muted)',lineHeight:1.5}},'Shown as % of committed capital (not € total). Two adjacent vintages hold '+bunch+'% of your commitments — a bunching flag you may want to smooth.')),
         h('div',{key:'hm'}, this.panelSection('Vintage × strategy heat-map','look-through · 88% of NAV'),
           this.vintageHeatmap(vYears),
@@ -4520,7 +4520,7 @@ class Component extends DCLogic {
           h('div',{style:{fontFamily:SF,fontSize:21,fontWeight:700,lineHeight:1.15}}, f.name),
           h('div',{style:{fontSize:12,color:'var(--muted)'}}, f.mgr))),
       h('div',{style:{display:'flex',gap:10,alignItems:'flex-start',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:12,padding:'12px 14px',marginBottom:14}},
-        h('span',{style:{fontSize:17,flex:'0 0 auto'}},'⭐'),
+        h('span',{style:{fontSize:17,flex:'0 0 auto'}},''),
         h('div',{style:{fontSize:12.5,lineHeight:1.5,color:'var(--brand-ink)'}}, h('b',null,gl+' just invested. '), (f.by&&f.by[g])||'')),
       h('div',{style:{display:'flex',gap:8,flexWrap:'wrap',marginBottom:14}}, chip('Fund size',f.size), chip('Target net',f.tgt), chip('Minimum',f.min), chip('Closes',f.close)),
       h('div',{style:{fontFamily:SF,fontSize:13.5,fontWeight:700,margin:'2px 0 9px'}},'Why '+gl.toLowerCase()+' like this fund'),
@@ -4776,7 +4776,7 @@ class Component extends DCLogic {
         return h('div',{key:y+k,style:{height:22,borderRadius:4,background:`color-mix(in srgb, var(--brand) ${Math.round(intensity*100)}%, var(--surface-2))`}});
       })]));
     return h('div',{style:{display:'flex',flexDirection:'column',gap:14}},
-      this.card({title:'Commitments by vintage',badge:this.badge('9 vintages'),right:h('span',{style:{display:'inline-flex',alignItems:'center',gap:6,fontSize:11.5,fontWeight:700,color:'var(--under)',background:'var(--under-wash)',border:'1px solid var(--under)',padding:'4px 10px',borderRadius:999}},'⚠ Bunched: 2021–22 = 40%'),
+      this.card({title:'Commitments by vintage',badge:this.badge('9 vintages'),right:h('span',{style:{display:'inline-flex',alignItems:'center',gap:6,fontSize:11.5,fontWeight:700,color:'var(--under)',background:'var(--under-wash)',border:'1px solid var(--under)',padding:'4px 10px',borderRadius:999}},'Bunched: 2021–22 = 40%'),
         children:bars,caption:'Shown as % of committed capital (not € totals). Two adjacent vintages hold 40% of your commitments — a bunching flag you may want to smooth.'}),
       this.card({title:'Vintage × strategy heat-map',badge:this.coverageBadge(88),children:grid,caption:'Darker = more capital committed to that strategy in that vintage. Based on 88% of committed capital that resolves to a strategy.'}));
   }
@@ -4851,7 +4851,7 @@ class Component extends DCLogic {
       const ratio=Math.round((m.you/(base==='plat'?m.plat:m.peer))*100);
       const badge = m.early
         ? h('div',{style:{display:'flex',gap:8,alignItems:'flex-start',background:'#FCEFE6',border:'1px solid #F3D2BC',borderRadius:8,padding:'7px 11px',marginTop:10}},
-            h('span',{style:{fontSize:12}},'⚠'),
+            h('span',{style:{fontSize:12}},''),
             h('span',{style:{fontSize:11.5,color:'#9A4B16',lineHeight:1.4}},'Too early to rank — most funds are <4yr vintage; IRR is J-curve-distorted and GP-marked. Use DPI (realised) for comparison.'))
         : h('span',{style:{display:'inline-block',background:'#FCEFE6',color:'#C8631F',fontWeight:700,fontSize:12,padding:'4px 10px',borderRadius:999,marginLeft:12,verticalAlign:'middle'}}, ratio+'% of '+cmp);
       return h('div',{key:m.k,style:{flex:'1 1 340px',minWidth:300,background:'var(--surface)',border:'1px solid var(--line)',borderRadius:16,padding:'20px 22px',display:'flex',flexDirection:'column'}},
@@ -5205,7 +5205,7 @@ class Component extends DCLogic {
   dbEmptyView(){ const h=this.h; const SF=this.SF;
     return h('div',{style:{minHeight:'60vh',display:'flex',alignItems:'center',justifyContent:'center'}},
       h('div',{style:{maxWidth:520,textAlign:'center',border:'2px dashed var(--line)',borderRadius:16,padding:'32px 30px',background:'var(--surface)'}},
-        h('div',{style:{fontSize:30,marginBottom:8}},'🗄️'),
+        h('div',{style:{fontSize:30,marginBottom:8}},''),
         h('div',{style:{fontFamily:SF,fontSize:20,fontWeight:700,marginBottom:8}},'No data — the database is empty'),
         h('div',{style:{fontSize:13,color:'var(--muted)',lineHeight:1.6}},'Every figure on this dashboard is read live from the backend database (',h('code',{style:{fontSize:12}},'alpha.db'),'). It is currently missing or empty, so there is nothing to show. Restore it with ',h('code',{style:{fontSize:12}},'python3 server.py --seed'),' (or restart the server) and refresh.'))); }
   homeOverviewBody(){
@@ -6737,7 +6737,7 @@ class Component extends DCLogic {
     const endowRow = (pieMode==='others' && dimKey==='strategy') ? h('div',{style:{display:'flex',gap:6,flexWrap:'wrap',alignItems:'center'}},
       h('span',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)'}},'Endowments'),
       endowOpts.map(([v,l])=>{ const on=cmp===v; return h('button',{key:v,onClick:()=>this.setState({cmp:v}),
-        style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 12px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}}, '🎓 '+l); })) : null;
+        style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 12px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}}, ''+l); })) : null;
     /* review4 items 9-10 — the page 'Benchmark against' section is gone; give this card its own comparator selector in 'others' mode */
     const dimCmpSel = pieMode==='others'? this.seg([{label:'Peers',value:'peers'},{label:'Model',value:'model'},{label:'Platform',value:'platform'},{label:'Top 10%',value:'top10'},{label:'Family offices',value:'family'},{label:'Custom',value:'custom'}], cmp, v=>this.setComparator(v,false),{sm:true}) : null;
     const dimControls=h('div',{style:{display:'flex',gap:10,flexWrap:'wrap',marginBottom:12,alignItems:'center'}}, modeSel, pieMode==='others'? selfSel : null, dimCmpSel, endowRow);
@@ -6857,7 +6857,7 @@ class Component extends DCLogic {
     const sel=h('div',{style:{display:'flex',gap:6,flexWrap:'wrap'}},
       [['peers','Peers'],['platform','Platform'],['top10','Top 10%'],['family','Family offices'],['custom','Custom']].map(([v,l])=>cyBtn(v,l,v==='custom'?'✎':'')),
       h('span',{style:{width:1,alignSelf:'stretch',background:'var(--line)',margin:'0 2px'}}),
-      [['hyp','H+Y+P'],['harvard','Harvard'],['yale','Yale'],['princeton','Princeton']].map(([v,l])=>cyBtn(v,l,'🎓')));
+      [['hyp','H+Y+P'],['harvard','Harvard'],['yale','Yale'],['princeton','Princeton']].map(([v,l])=>cyBtn(v,l,'')));
     /* two pies — actual vs actual */
     const dsize='min(190px,22vh)';
     const pies=h('div',{style:{display:'flex',gap:'clamp(24px,5vw,70px)',justifyContent:'center',alignItems:'flex-start',flexWrap:'wrap'}},
@@ -6877,9 +6877,9 @@ class Component extends DCLogic {
           h('div',{style:{fontFamily:SF,fontSize:12,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},name),
           h('div',{style:{fontSize:10,color:'var(--muted)'}}, f.mgr||'')),
         h('div',{style:{display:'flex',gap:6,flexWrap:'wrap',flex:'0 0 auto'}},
-          h('button',{onClick:e=>{e.stopPropagation();this.toggleWatch(name);},style:{border:'1px solid '+(inW?'var(--brand)':'var(--line)'),background:inW?'var(--brand-wash)':'var(--surface)',color:inW?'var(--brand-ink)':'var(--muted)',borderRadius:7,padding:'4px 8px',fontSize:10.5,fontWeight:600,cursor:'pointer'}}, inW?'♥':'♡'),
+          h('button',{onClick:e=>{e.stopPropagation();this.toggleWatch(name);},style:{border:'1px solid '+(inW?'var(--brand)':'var(--line)'),background:inW?'var(--brand-wash)':'var(--surface)',color:inW?'var(--brand-ink)':'var(--muted)',borderRadius:7,padding:'4px 8px',fontSize:10.5,fontWeight:600,cursor:'pointer'}}, inW?'✓':'＋'),
           live? h('button',{onClick:e=>{e.stopPropagation();this.addToCart(name,label);},style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:7,padding:'4px 8px',fontSize:10.5,fontWeight:700,cursor:'pointer'}},'✦ Seize') : null,
-          h('button',{onClick:e=>{e.stopPropagation();this.suggestSimilar(name,label);},style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:7,padding:'4px 8px',fontSize:10.5,fontWeight:600,cursor:'pointer'}},'✨ Similar'))); };
+          h('button',{onClick:e=>{e.stopPropagation();this.suggestSimilar(name,label);},style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:7,padding:'4px 8px',fontSize:10.5,fontWeight:600,cursor:'pointer'}},'Similar'))); };
     /* comparator representative funds for a category (we don't hold peer-specific data; show platform funds in that bucket) */
     const compFundsFor=(n)=>{ const key=String(n).split(' ')[0].toLowerCase();
       return (this.OPP_FUNDS_LIST?this.OPP_FUNDS_LIST():[]).filter(o=>((o.strat||o.ac||'')+'').toLowerCase().includes(key)).slice(0,3); };
@@ -6921,7 +6921,7 @@ class Component extends DCLogic {
     const chip=(val,label)=>{ const on=g===val; return h('button',{key:val,onClick:()=>this.setState(Object.assign({following:on?null:val}, val==='custom'?{cmp:'custom',controlOpen:true}:{})),
       style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand)':'var(--surface)',color:on?'#fff':'var(--muted)',borderRadius:999,padding:'4px 10px',fontSize:11,fontWeight:on?700:500,cursor:'pointer'}}, label); };
     return h('div',{style:{flex:'0 0 auto',width:'min(280px,90vw)',border:'1px solid var(--line)',borderRadius:12,background:'var(--surface)',padding:'12px 14px'}},
-      h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:6}}, h('span',{style:{fontSize:14}},'🔔'), h('div',{style:{fontFamily:SF,fontSize:13.5,fontWeight:700}},'Follow a group')),
+      h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:6}}, h('span',{style:{fontSize:14}},''), h('div',{style:{fontFamily:SF,fontSize:13.5,fontWeight:700}},'Follow a group')),
       h('div',{style:{fontSize:11,color:'var(--muted)',lineHeight:1.4,marginBottom:8}}, g? ('Following '+(g==='top10'?'the top 10%':g==='custom'?('a custom group'+(this.state.followCustomName?(' · '+this.state.followCustomName):'')):'your peers')+' — alerts in the bell.') : 'Get alerts when a group commits to a fund.'),
       h('div',{style:{display:'flex',gap:6,flexWrap:'wrap'}}, chip('peers','Peers'), chip('top10','Top 10%'), chip('custom','✎ Custom')));
   }
@@ -6940,7 +6940,7 @@ class Component extends DCLogic {
       h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:7}},'Your saved groups'),
       h('div',{style:{display:'flex',gap:6,flexWrap:'wrap'}}, saved.map((p,i)=>{ const on=g==='custom'&&this.state.followCustomName===p.name;
         return h('button',{key:i,onClick:()=>this.setState({following:'custom',followCustomName:p.name,fc:{...(p.fc||{})}}),
-          style:{border:'1px solid '+(on?'var(--brand)':'var(--brand-tint-3)'),background:on?'var(--brand)':'var(--brand-wash)',color:on?'#fff':'var(--brand-ink)',fontSize:11.5,fontWeight:600,padding:'5px 11px',borderRadius:999,cursor:'pointer'}}, (on?'✓ ':'★ ')+p.name); }))) : null;
+          style:{border:'1px solid '+(on?'var(--brand)':'var(--brand-tint-3)'),background:on?'var(--brand)':'var(--brand-wash)',color:on?'#fff':'var(--brand-ink)',fontSize:11.5,fontWeight:600,padding:'5px 11px',borderRadius:999,cursor:'pointer'}}, (on?'✓ ':'')+p.name); }))) : null;
     return this.card({title:'Follow a group', info:true,
       children:h('div',null,
         h('div',{style:{fontSize:12.5,color:'var(--muted)',lineHeight:1.55,marginBottom:12}},'Get notified the moment the investors you follow commit to a fund — then view and act on it in one tap. Notifications appear in the bell, top-right.'),
@@ -7271,7 +7271,7 @@ class Component extends DCLogic {
   newsTagColor(tag){ return {Exit:'--over', IPO:'--data-2', Fundraise:'--data-1', Deal:'--data-6', Distribution:'--over', Performance:'--data-5', Strategy:'--data-3', 'New fund':'--brand', Portfolio:'--brand'}[tag]||'--brand'; }
   newsRow(n){ const h=this.h; const col='var('+(this.newsTagColor(n.tag))+')';
     return h('div',{key:n.title,style:{display:'flex',gap:12,padding:'12px 0',borderBottom:'1px solid var(--line)'}},
-      (n.logo? h('img',{src:'assets/logos/'+n.logo+'.png',alt:'',onError:e=>{e.target.style.display='none';},style:{width:34,height:34,flex:'0 0 34px',borderRadius:8,background:'#fff',border:'1px solid var(--line)',padding:4,objectFit:'contain'}}) : h('div',{style:{width:34,height:34,flex:'0 0 34px',borderRadius:8,background:'var(--surface-2)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:15}},'📰')),
+      (n.logo? h('img',{src:'assets/logos/'+n.logo+'.png',alt:'',onError:e=>{e.target.style.display='none';},style:{width:34,height:34,flex:'0 0 34px',borderRadius:8,background:'#fff',border:'1px solid var(--line)',padding:4,objectFit:'contain'}}) : h('div',{style:{width:34,height:34,flex:'0 0 34px',borderRadius:8,background:'var(--surface-2)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:15}},'')),
       h('div',{style:{flex:1,minWidth:0}},
         h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:2,flexWrap:'wrap'}},
           h('span',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'#fff',background:col,borderRadius:5,padding:'1px 7px'}},n.tag),
@@ -7348,7 +7348,7 @@ class Component extends DCLogic {
     const actions=h('div',{style:{display:'flex',gap:10,flexWrap:'wrap',alignItems:'center'}},
       h('button',{onClick:()=>this.setDtog('mgrFollow_'+m.id,!following),
         style:{display:'inline-flex',alignItems:'center',gap:8,border:'1px solid '+(following?'var(--over)':'var(--line)'),background:following?'rgba(45,143,111,.1)':'var(--surface)',color:following?'var(--over)':'var(--ink)',borderRadius:10,padding:'11px 16px',fontSize:12.5,fontWeight:700,cursor:'pointer'}},
-        following?'🔔 You’ll be notified of the next offering':'🔔 Notify me on next platform offering'),
+        following?'You’ll be notified of the next offering':'Notify me on next platform offering'),
       md.offering? h('button',{onClick:()=>this.askFromPage('I want to commit to '+md.offering+' from '+m.name+'. Walk me through it.'),
         style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'11px 18px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'✦ Seize the opportunity — '+md.offering)
         : h('span',{style:{fontSize:11.5,color:'var(--muted)'}},'No current offering on the platform — follow to be alerted.'));
@@ -7399,7 +7399,7 @@ class Component extends DCLogic {
       caption:'A fund manager is an aggregate of its funds — open any fund (e.g. '+(allFundsM[0]?allFundsM[0].name:'a fund')+') for its own calls, distributions and returns.'});
     // ---- fund documents (kept from the Copilot document set) ----
     const docRow=(d)=>h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,border:'1px solid var(--line)',borderRadius:10,padding:'11px 13px',marginBottom:8}},
-      h('div',{style:{display:'flex',alignItems:'center',gap:10,minWidth:0}}, h('span',{style:{fontSize:16}},'📄'), h('div',{style:{minWidth:0}}, h('div',{style:{fontSize:13,fontWeight:600}},d.name), h('div',{style:{fontSize:11,color:'var(--muted)'}},d.meta))),
+      h('div',{style:{display:'flex',alignItems:'center',gap:10,minWidth:0}}, h('span',{style:{fontSize:16}},''), h('div',{style:{minWidth:0}}, h('div',{style:{fontSize:13,fontWeight:600}},d.name), h('div',{style:{fontSize:11,color:'var(--muted)'}},d.meta))),
       h('span',{style:{fontSize:11.5,color:'var(--brand-ink)',fontWeight:600,flex:'0 0 auto'}},'Download'));
     const docsCard=this.card({title:'Documents',info:true,children:h('div',null, this.mgrDocs(m).map((d,i)=>h('div',{key:i},docRow(d)))),
       caption:'Fund documents associated with '+m.name+'.'});
@@ -7412,7 +7412,7 @@ class Component extends DCLogic {
           bestFund? ['Their strongest fund is ',h('strong',{key:'b',style:{color:'#fff'}},bestFund.name),' ('+bestFund.irr+'% net IRR).'] : null,
           md.offering? [' Their ',h('strong',{key:'o',style:{color:'#fff'}},md.offering),' is open on the platform now.'] : ' Nothing is open from them right now — follow to be alerted.'),
         h('div',{style:{display:'flex',gap:9,flexWrap:'wrap'}},
-          md.offering? h('button',{onClick:()=>this.askFromPage('Is '+md.offering+' from '+m.name+' a good fit for my portfolio?'),style:{border:'none',background:'#fff',color:'var(--brand-ink)',borderRadius:9,padding:'9px 14px',fontSize:12,fontWeight:700,cursor:'pointer'}},'💼 Assess '+md.offering):null,
+          md.offering? h('button',{onClick:()=>this.askFromPage('Is '+md.offering+' from '+m.name+' a good fit for my portfolio?'),style:{border:'none',background:'#fff',color:'var(--brand-ink)',borderRadius:9,padding:'9px 14px',fontSize:12,fontWeight:700,cursor:'pointer'}},'Assess '+md.offering):null,
           h('button',{onClick:()=>this.askFromPage('How does '+m.name+' fit my goals and where are the risks for me?'),style:{border:'1px solid rgba(255,255,255,.55)',background:'transparent',color:'#fff',borderRadius:9,padding:'9px 14px',fontSize:12,fontWeight:600,cursor:'pointer'}},'Ask Alpha a follow-up →'))),
       caption:'Tailored to your profile — not a generic fund pitch.'});
 
@@ -7493,11 +7493,11 @@ class Component extends DCLogic {
       h('div',{style:{fontSize:12,color:'var(--muted)'}}, f.eyebrow||(f.name+' investing in')),
       h('div',{style:{fontFamily:SF,fontSize:23,fontWeight:700,color:'var(--ink)',lineHeight:1.1}}, f.name),
       h('div',{style:{fontSize:13.5,color:'var(--ink)',lineHeight:1.5,maxWidth:560}}, f.desc),
-      h('div',{style:{display:'flex',gap:22,flexWrap:'wrap',marginTop:2}}, chip('🌐',f.region), chip('💼',f.ac)),
+      h('div',{style:{display:'flex',gap:22,flexWrap:'wrap',marginTop:2}}, chip('',f.region), chip('',f.ac)),
       h('div',{style:{display:'flex',gap:8,flexWrap:'wrap'}}, (f.tags||[]).map(t=>h('span',{key:t,style:{fontSize:11.5,color:'var(--muted)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:7,padding:'4px 11px'}},t))),
       kpiRow);
     const right=h('div',{style:{flex:'0 0 220px',minWidth:170,display:'flex',alignItems:'center',justifyContent:'center',padding:'18px 20px'}},
-      h('button',{onClick:()=>this.toggleWatch(f.name),style:{border:'none',background:onW?'var(--over)':'var(--brand)',color:'#fff',borderRadius:11,padding:'12px 18px',fontSize:13.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif',display:'inline-flex',alignItems:'center',gap:8}}, h('span',null,'🔔'), onW?'On the waitlist':'Join the Waitlist'));
+      h('button',{onClick:()=>this.toggleWatch(f.name),style:{border:'none',background:onW?'var(--over)':'var(--brand)',color:'#fff',borderRadius:11,padding:'12px 18px',fontSize:13.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif',display:'inline-flex',alignItems:'center',gap:8}}, h('span',null,''), onW?'On the waitlist':'Join the Waitlist'));
     return h('div',{key:f.id,style:{display:'flex',flexWrap:'wrap',border:'1px solid var(--line)',borderRadius:16,overflow:'hidden',background:'var(--surface)',opacity:.92,boxShadow:'0 10px 30px -22px rgba(0,0,0,.3)'}}, left, mid, right);
   }
   featuredFundCard(){
@@ -7506,7 +7506,7 @@ class Component extends DCLogic {
     const tag=(t)=>h('span',{key:t,style:{fontSize:11.5,color:'var(--muted)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:7,padding:'3px 10px'}},t);
     /* left — vinyl-style dark panel with the New badge + Moonfare wordmark */
     const left=h('div',{style:{position:'relative',flex:'0 0 150px',minWidth:120,minHeight:160,background:'radial-gradient(circle at 40% 36%, #34343a 0%, #1a1a1c 40%, #0a0a0b 72%)',display:'flex',alignItems:'flex-end',padding:14}},
-      h('span',{style:{position:'absolute',top:12,left:12,display:'inline-flex',alignItems:'center',gap:5,background:'#fff',color:'var(--ink)',borderRadius:8,padding:'4px 10px',fontSize:11.5,fontWeight:700,boxShadow:'0 2px 8px rgba(0,0,0,.3)'}},'🔔 New'),
+      h('span',{style:{position:'absolute',top:12,left:12,display:'inline-flex',alignItems:'center',gap:5,background:'#fff',color:'var(--ink)',borderRadius:8,padding:'4px 10px',fontSize:11.5,fontWeight:700,boxShadow:'0 2px 8px rgba(0,0,0,.3)'}},'New'),
       h('img',{src:'assets/moonfare_logo_white.png',alt:'Moonfare',onError:e=>{e.target.style.display='none';},style:{height:20,opacity:.95}}));
     /* middle — eyebrow / title / desc / region+ac / tags / KPI row */
     const kpiRow=h('div',{style:{display:'flex',flexWrap:'wrap',marginTop:6,borderTop:'1px solid var(--line)',paddingTop:12}}, (f.kpis||[]).map((k,i)=>
@@ -7517,7 +7517,7 @@ class Component extends DCLogic {
       h('div',{style:{fontSize:12,color:'var(--muted)'}}, f.name+' SCSp investing in'),
       h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:700,color:'var(--ink)',lineHeight:1.1}}, f.name),
       h('div',{style:{fontSize:13.5,color:'var(--ink)',lineHeight:1.5,maxWidth:520}}, f.desc),
-      h('div',{style:{display:'flex',gap:22,flexWrap:'wrap',marginTop:4}}, chip('🌐',f.region), chip('💼',f.ac)),
+      h('div',{style:{display:'flex',gap:22,flexWrap:'wrap',marginTop:4}}, chip('',f.region), chip('',f.ac)),
       h('div',{style:{display:'flex',gap:8,flexWrap:'wrap'}}, (f.tags||[]).map(tag)),
       kpiRow);
     /* right — SEED PORTFOLIO panel with elite-manager wordmarks */
@@ -7529,7 +7529,7 @@ class Component extends DCLogic {
       left, mid, right,
       h('div',{style:{flex:'1 1 100%',display:'flex',gap:10,padding:'0 22px 16px',flexWrap:'wrap'}},
         h('button',{onClick:()=>this.openFundPage(f.id),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'10px 18px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'View this fund →'),
-        h('button',{onClick:()=>this.toggleWatch(f.name),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:10,padding:'10px 16px',fontSize:12.5,fontWeight:600,cursor:'pointer'}}, (this.state.watchlist||[]).includes(f.name)?'♥ Watchlisted':'♡ Watchlist')));
+        h('button',{onClick:()=>this.toggleWatch(f.name),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:10,padding:'10px 16px',fontSize:12.5,fontWeight:600,cursor:'pointer'}}, (this.state.watchlist||[]).includes(f.name)?'✓ Watchlisted':'Watchlist')));
   }
   /* nature / city landscape backdrops for manager logos on the Funds & Managers list (deterministic per key) */
   /* review7 item 31 — locally-downloaded city-skyline / landscape backgrounds (assets/bg), consistent ~640px format, no remote dependency */
@@ -7569,7 +7569,7 @@ class Component extends DCLogic {
     // ---- search + controls ----
     const searchBar=h('div',{style:{display:'flex',gap:10,flexWrap:'wrap',alignItems:'center'}},
       h('div',{style:{flex:'1 1 320px',minWidth:260,display:'flex',alignItems:'center',gap:8,border:'1px solid var(--line)',borderRadius:11,padding:'10px 13px',background:'var(--surface)'}},
-        h('span',{style:{color:'var(--muted)',fontSize:14}},'🔍'),
+        h('span',{style:{color:'var(--muted)',fontSize:14}},''),
         h('input',{type:'text',value:s.mgrQuery,placeholder:'Search managers — e.g. “all Buyout managers on the platform”',
           onChange:e=>this.setState({mgrQuery:e.target.value}),
           style:{flex:1,border:'none',outline:'none',background:'transparent',fontSize:13,color:'var(--ink)',fontFamily:'Inter,system-ui,sans-serif'}}),
@@ -7658,7 +7658,7 @@ class Component extends DCLogic {
         right:h('button',{onClick:()=>this.setState({mgrSel:[]}),style:{border:'1px solid var(--line)',background:'var(--surface)',borderRadius:8,padding:'6px 12px',fontSize:12,fontWeight:600,color:'var(--brand)',cursor:'pointer'}},'Clear'),
         children:h('div',{style:{display:'flex',flexDirection:'column',gap:10}},
           ranked.map((r,i)=>h('div',{key:r.m.id,style:{display:'grid',gridTemplateColumns:'150px 1fr 64px',gap:12,alignItems:'center'}},
-            h('div',{style:{minWidth:0}}, h('div',{style:{fontWeight:600,fontSize:13}}, (i===0?'🏆 ':'')+r.m.name), h('div',{style:{fontSize:10,color:'var(--muted)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}, r.fund?r.fund.name:'')),
+            h('div',{style:{minWidth:0}}, h('div',{style:{fontWeight:600,fontSize:13}}, (i===0?'':'')+r.m.name), h('div',{style:{fontSize:10,color:'var(--muted)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}, r.fund?r.fund.name:'')),
             h('div',{style:{background:'var(--surface-2)',borderRadius:6,height:18,position:'relative',overflow:'hidden'}},
               h('div',{style:{position:'absolute',left:0,top:0,bottom:0,width:(r.irr/max*100)+'%',background:i===0?'var(--over)':'var(--brand)',borderRadius:6}})),
             h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:15,fontWeight:700}}, r.irr+'%'))) ),
@@ -7712,7 +7712,7 @@ class Component extends DCLogic {
 
     /* highlighted product at the very top of the Funds & Managers list */
     const featuredHead=h('div',{style:{display:'flex',alignItems:'baseline',gap:10}},
-      h('span',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--brand)'}},'★ Highlighted fund'),
+      h('span',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--brand)'}},'Highlighted fund'),
       h('span',{style:{fontSize:11.5,color:'var(--muted)'}},'Featured on the platform right now'));
     /* waitlist (closed) funds — bottom of the page */
     const wl=this.WAITLIST_FUNDS()||[];
@@ -7809,7 +7809,7 @@ class Component extends DCLogic {
     const headerRow=h('div',{style:{display:'grid',gridTemplateColumns:grid,gap:10,alignItems:'end',paddingBottom:10,borderBottom:'2px solid var(--line)'}},
       h('div',null,''),
       cols.map(c=>h('div',{key:c.key,style:{textAlign:'center',padding:'0 4px'}},
-        c.key===leaderKey? h('div',{style:{fontSize:9.5,fontWeight:700,color:'var(--over)',marginBottom:3}},'🏆 BEST ON '+critLabel.toUpperCase()):h('div',{style:{height:14}}),
+        c.key===leaderKey? h('div',{style:{fontSize:9.5,fontWeight:700,color:'var(--over)',marginBottom:3}},'BEST ON '+critLabel.toUpperCase()):h('div',{style:{height:14}}),
         h('div',{style:{fontSize:8.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)'}},c.kindLabel),
         h('div',{style:{fontFamily:SF,fontSize:15,fontWeight:600,color:'var(--ink)',lineHeight:1.2}},c.name),
         h('div',{style:{fontSize:9.5,color:'var(--muted)',marginTop:1}},c.sub),
@@ -7836,7 +7836,7 @@ class Component extends DCLogic {
         children:h('div',{style:{display:'flex',flexDirection:'column',gap:11}},
           h('div',{style:{fontSize:12.5,color:'var(--muted)',lineHeight:1.5}}, this.MGR_METRIC_EXPL()[label]||''),
           cells.map(({c,m})=>h('div',{key:c.key,style:{display:'grid',gridTemplateColumns:'160px 1fr 70px',gap:12,alignItems:'center'}},
-            h('div',{style:{fontSize:12.5,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}, (m.n!=null&&m.n===best&&ns.length>1?'🏆 ':'')+c.name),
+            h('div',{style:{fontSize:12.5,fontWeight:600,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}, (m.n!=null&&m.n===best&&ns.length>1?'':'')+c.name),
             h('div',{style:{background:'var(--surface-2)',borderRadius:6,height:18,position:'relative',overflow:'hidden'}}, m.n!=null? h('div',{style:{position:'absolute',left:0,top:0,bottom:0,width:Math.max(3,(m.n/max*100))+'%',background:(m.n===best?'var(--over)':'var(--brand)'),borderRadius:6}}):null),
             h('div',{style:{textAlign:'right',fontFamily:SF,fontSize:14,fontWeight:700}}, m.value)))),
         caption:'Same drill-in pattern as the Home overview side pages.'});
@@ -8068,7 +8068,7 @@ class Component extends DCLogic {
           return h('button',{key:l,onClick:(e)=>{ e.stopPropagation(); this.setState({advLevelOverride:Object.assign({},this.state.advLevelOverride,{[x.id]:l})}); },
             style:{border:'none',background:on?'var(--brand)':'var(--brand-wash)',color:on?'#fff':'var(--brand-ink)',padding:'2px 8px',fontSize:10.5,fontWeight:700,cursor:'pointer'}}, l); })); };
     const stageChip=(s)=>h('span',{style:{fontSize:10.5,fontWeight:600,color:'var(--muted)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:6,padding:'1px 7px',textTransform:'capitalize'}},s);
-    const kindIcon=(k)=>k==='fund'?'⭐':(k==='news'?'📰':'📊');
+    const kindIcon=(k)=>k==='fund'?'':(k==='news'?'':'');
     const av=(x)=>h('div',{style:{width:40,height:40,flex:'0 0 40px',borderRadius:'50%',background:'var(--brand)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:700}},x.init);
     const row=(x)=>h('div',{key:x.id,style:{display:'flex',gap:14,alignItems:'flex-start',background:'var(--surface)',border:'1px solid var(--line)',borderRadius:13,padding:'15px 16px'}},
       av(x),
@@ -8225,7 +8225,7 @@ class Component extends DCLogic {
         h('div',{style:{padding:'16px 12px 22px',minHeight:320,background:'#ECE5DD',backgroundImage:'radial-gradient(rgba(0,0,0,.04) 1px, transparent 1px)',backgroundSize:'16px 16px'}},
           h('div',{style:{textAlign:'center',margin:'0 auto 14px',width:'fit-content',background:'#FCF4CB',color:'#5b5638',fontSize:10.5,borderRadius:7,padding:'3px 10px'}},'Today'),
           h('div',{style:{maxWidth:'88%',background:'#fff',borderRadius:'3px 14px 14px 14px',padding:'10px 12px',boxShadow:'0 1px 1px rgba(0,0,0,.1)'}},
-            h('div',{style:{fontSize:13,fontWeight:700,color:'#111',marginBottom:3}}, (n.emoji||'🔔')+' '+n.title),
+            h('div',{style:{fontSize:13,fontWeight:700,color:'#111',marginBottom:3}}, (n.emoji||'')+' '+n.title),
             h('div',{style:{fontSize:12.5,color:'#222',lineHeight:1.5}}, n.body),
             h('div',{style:{marginTop:9,paddingTop:8,borderTop:'1px solid #eee',display:'flex',alignItems:'center',gap:6}}, appIcon(16,4), h('span',{style:{color:'#075E54',fontSize:12.5,fontWeight:600}},'Open in Moonfare')),
             h('div',{style:{textAlign:'right',fontSize:9.5,color:'#8a8a8a',marginTop:5}}, n.time+' ✓✓'))));
@@ -8248,7 +8248,7 @@ class Component extends DCLogic {
         h('div',{style:{display:'flex',alignItems:'center',gap:7,background:'var(--surface)',borderRadius:'9px 9px 0 0',padding:'7px 12px',fontSize:11,color:'var(--ink)',maxWidth:210}}, favicon, h('span',{style:{whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',fontWeight:600}},'Moonfare — Private Markets'), h('span',{style:{color:'var(--muted)'}},'✕'))),
       h('div',{style:{display:'flex',alignItems:'center',gap:6,padding:'8px 12px',borderBottom:'1px solid var(--line)',background:'var(--surface)'}},
         h('span',{style:{color:'var(--muted)',fontSize:13}},'‹ ›'),
-        h('div',{style:{marginLeft:6,flex:1,display:'flex',alignItems:'center',gap:7,background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:999,padding:'5px 12px',fontSize:11.5,color:'var(--ink)'}}, h('span',{style:{color:'var(--over)'}},'🔒'), h('span',null,'app.moonfare.com/portfolio'))),
+        h('div',{style:{marginLeft:6,flex:1,display:'flex',alignItems:'center',gap:7,background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:999,padding:'5px 12px',fontSize:11.5,color:'var(--ink)'}}, h('span',{style:{color:'var(--over)'}},''), h('span',null,'app.moonfare.com/portfolio'))),
       h('div',{style:{position:'relative',minHeight:180,padding:14,background:'linear-gradient(180deg,var(--surface),var(--surface-2))'}},
         /* faux page header with the Moonfare wordmark */
         h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:14,opacity:.9}}, appIcon(22,6), h('span',{style:{fontFamily:SF,fontWeight:700,fontSize:15,color:'var(--ink)'}},'Moonfare')),
@@ -8471,7 +8471,7 @@ class Component extends DCLogic {
         const endowToggle = L==='L3'? h('div',{style:{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap',marginBottom:10}},
           h('span',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)'}},'Endowments'),
           [['combined','Combined (H+Y+P)',false],['individual','Individual',true]].map(o=>{ const on=endInd===o[2];
-            return h('button',{key:o[0],onClick:()=>this.setDtog('advEndowInd',o[2]),style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'4px 12px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}}, '🎓 '+o[1]); })) : null;
+            return h('button',{key:o[0],onClick:()=>this.setDtog('advEndowInd',o[2]),style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'4px 12px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}}, ''+o[1]); })) : null;
         /* suggest a fund for the private-credit gap — the cleanest diversifier from an equity/AI-heavy book */
         const pc=(this.OPP_FUNDS&&this.OPP_FUNDS().credit)||{};
         const creditCard=pc.fund? this.card({title:'Suggest a fund — private credit', badge:this.badge('Alpha pick','synth'),
@@ -8584,7 +8584,7 @@ class Component extends DCLogic {
           missed?lvlNote('Inactive flow · catch with the deal first — then converge into the structured Existing review (next steps).'):null ]); }
       case 'seize': { if(this.state.advSeized){ return wrap([ head('Interest reserved','You’re first in line — we’ll handle the rest.'),
           this.card({title:'Reserved ✓',tone:'alpha',children:h('div',{style:{display:'flex',flexDirection:'column',gap:12}}, h('div',{style:{fontSize:14,lineHeight:1.55,color:'rgba(255,255,255,.92)'}},'Your interest is logged. The moment the allocation opens you’ll get a push notification and an email — “Invest in Lexington now” — and it routes straight back to your reserved-interest queue.'),
-            h('div',{style:{background:'rgba(255,255,255,.12)',borderRadius:10,padding:'11px 13px',fontSize:12.5,color:'#fff'}}, h('b',null,'🔔 Push · '), 'Your Lexington Secondary just opened — reserve converted to allocation request.'),
+            h('div',{style:{background:'rgba(255,255,255,.12)',borderRadius:10,padding:'11px 13px',fontSize:12.5,color:'#fff'}}, h('b',null,'Push · '), 'Your Lexington Secondary just opened — reserve converted to allocation request.'),
             h('button',{onClick:()=>this.advNext(),style:{alignSelf:'flex-start',border:'none',background:'#fff',color:'var(--brand-ink)',borderRadius:9,padding:'11px 18px',fontSize:13.5,fontWeight:700,cursor:'pointer'}},'Continue  →'))})]); }
         {/* item 31 — an accredited/existing investor can invest now; only pre-gate prospects reserve interest until KYC */
         const canInvest=this.state.advStage!=='pregate';
@@ -8603,17 +8603,17 @@ class Component extends DCLogic {
           return h('label',{key:x[0],onClick:()=>setTopic(x[0]),style:{display:'flex',gap:11,alignItems:'flex-start',background:on?'var(--brand-wash)':'var(--surface-2)',border:'1px solid '+(on?'var(--brand-tint-3)':'var(--line)'),borderRadius:10,padding:'11px 13px',cursor:'pointer'}},
             h('span',{style:{marginTop:2,width:17,height:17,flex:'0 0 17px',borderRadius:5,border:'1px solid '+(on?'var(--brand)':'var(--muted)'),background:on?'var(--brand)':'transparent',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:800}},on?'✓':''),
             h('div',null,h('div',{style:{fontSize:13.5,fontWeight:600}},x[1]),h('div',{style:{fontSize:12,color:'var(--muted)',marginTop:2,lineHeight:1.4}},x[2]))); })),caption:'Subscription to the follower feed — our most reliable way to keep nudging between calls.'});
-        const CH=[['whatsapp','WhatsApp','🟢'],['inapp','In-app','📱'],['website','On website','🖥️']];
+        const CH=[['whatsapp','WhatsApp',''],['inapp','In-app',''],['website','On website','']];
         const chanCard=this.card({title:'Preferred notification method',children:h('div',null,
           h('div',{style:{display:'flex',gap:8,flexWrap:'wrap'}}, CH.map(x=>{ const on=chan===x[0];
             return h('button',{key:x[0],onClick:()=>this.setState({folChannel:x[0]}),style:{display:'flex',alignItems:'center',gap:7,border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--ink)',borderRadius:999,padding:'8px 15px',fontSize:12.5,fontWeight:on?700:500,cursor:'pointer'}}, h('span',null,x[2]), x[1]); })),
           h('div',{style:{fontSize:12,color:'var(--muted)',marginTop:9,lineHeight:1.45}}, {whatsapp:'Delivered as a WhatsApp message from Moonfare’s verified business account.',inapp:'A push notification on the Moonfare mobile app — lands on the lock screen.',website:'An in-product toast the next time they’re signed in to moonfare.com.'}[chan])),caption:'Choose how ' + (c.name||'this investor') + ' hears from us — the preview updates live.'});
         /* a real, relevant event drawn from the follow topics they’ve turned on */
         const sample = topics.news
-          ? {emoji:'📈',title:'KKR just exited Axel Springer',body:'A holding inside KKR North America XIII — a fund you follow — was realised at ~2.4×. A distribution to LPs may follow in the coming weeks.',time:'2m ago'}
+          ? {emoji:'',title:'KKR just exited Axel Springer',body:'A holding inside KKR North America XIII — a fund you follow — was realised at ~2.4×. A distribution to LPs may follow in the coming weeks.',time:'2m ago'}
           : topics.top10
-          ? {emoji:'🏆',title:'Top-10% allocators moved into Secondaries',body:'The platform’s strongest performers added Ardian Secondaries IX this quarter. It fits your under-weight in secondaries.',time:'1h ago'}
-          : {emoji:'👥',title:'3 investors like you committed to Buyout',body:'Peers and family offices in your band are deploying into large-cap buyout — see how you compare.',time:'Today'};
+          ? {emoji:'',title:'Top-10% allocators moved into Secondaries',body:'The platform’s strongest performers added Ardian Secondaries IX this quarter. It fits your under-weight in secondaries.',time:'1h ago'}
+          : {emoji:'',title:'3 investors like you committed to Buyout',body:'Peers and family offices in your band are deploying into large-cap buyout — see how you compare.',time:'Today'};
         const preview=this.followerChannelPreview(chan, sample);
         const right=h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:10}},
           h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)',alignSelf:'flex-start'}},'Live preview — '+({whatsapp:'WhatsApp',inapp:'In-app push',website:'On website'}[chan])),
@@ -8699,7 +8699,7 @@ class Component extends DCLogic {
           h('div',{style:{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap',marginBottom:4}},
             h('span',{style:{fontFamily:SF,fontSize:15,fontWeight:600}},c.name),
             h('span',{style:{fontSize:11,color:'var(--muted)'}},c.code),
-            h('span',{style:{fontSize:11,fontWeight:700,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:999,padding:'2px 9px'}},'📅 '+c.meeting)),
+            h('span',{style:{fontSize:11,fontWeight:700,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:999,padding:'2px 9px'}},''+c.meeting)),
           h('div',{style:{fontSize:12.5,color:'var(--ink)',lineHeight:1.5,marginBottom:8}}, h('b',{style:{color:'var(--brand)'}},'Their goal: '),c.goal,' · ',h('b',null,'target '),c.target),
           h('div',{style:{fontSize:12.5,color:'var(--ink)',lineHeight:1.5}}, h('b',{style:{color:'var(--brand)'}},'Talking points: '),'Close the '+c.gap+'pp gap to model; deploy '+c.liq+' of headroom; '+c.trigger.toLowerCase())),
         h('button',{onClick:()=>this.impersonate(c),style:{flex:'0 0 auto',alignSelf:'center',background:'var(--brand)',color:'#fff',border:'none',borderRadius:9,padding:'9px 15px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},'Open copilot →'));
@@ -8713,7 +8713,7 @@ class Component extends DCLogic {
           h('div',{style:{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap',marginBottom:4}},
             h('span',{style:{fontFamily:SF,fontSize:15,fontWeight:600}},c.name),
             h('span',{style:{fontSize:11,color:'var(--muted)'}},c.code+' · '+c.prof)),
-          h('div',{style:{fontSize:13,color:'var(--ink)',lineHeight:1.5}}, h('b',{style:{color:'var(--brand)'}},'⚡ Signal: '),c.signal,'.'),
+          h('div',{style:{fontSize:13,color:'var(--ink)',lineHeight:1.5}}, h('b',{style:{color:'var(--brand)'}},'Signal: '),c.signal,'.'),
           this.fbBtns(c.id)),
         h('button',{onClick:()=>this.impersonate(c),style:{flex:'0 0 auto',alignSelf:'center',background:'var(--brand)',color:'#fff',border:'none',borderRadius:9,padding:'9px 15px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},'Open copilot →'));
       flowContent= signals.length? h('div',{style:{display:'flex',flexDirection:'column',gap:12}}, signals.map(inCard)) : h('div',{style:{fontSize:13,color:'var(--muted)',padding:'20px'}},'No inbound signals right now.');
@@ -8739,7 +8739,7 @@ class Component extends DCLogic {
           flowContent)));
   }
   ncPanel(title,sub){ const h=this.h; return h('div',{style:{border:'2px dashed var(--line)',borderRadius:14,background:'var(--surface)',padding:'26px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',minHeight:200}},
-    h('div',{style:{width:42,height:42,borderRadius:11,border:'2px dashed var(--muted)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--muted)',fontSize:18,marginBottom:12}},'⛌'),
+    h('div',{style:{width:42,height:42,borderRadius:11,border:'2px dashed var(--muted)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--muted)',fontSize:18,marginBottom:12}},''),
     h('div',{style:{fontFamily:this.SF,fontSize:15,fontWeight:600,marginBottom:6}},title),
     h('div',{style:{fontSize:12,color:'var(--muted)',lineHeight:1.5,maxWidth:320}},sub)); }
   internalBody(){
