@@ -8613,7 +8613,32 @@ class Component extends DCLogic {
             nSel? h('div',{style:{marginTop:10,fontSize:12,color:'var(--ink)',lineHeight:1.5}}, nSel+' fund'+(nSel>1?'s':'')+' across '+(new Set(selArr.map(f=>f.stratKey)).size)+' '+(new Set(selArr.map(f=>f.stratKey)).size>1?'strategies':'strategy')+' — this is the portfolio you’d take into commitment.') : null,
             nSel? h('button',{onClick:()=>this.advNext(),style:{marginTop:12,border:'none',background:'var(--brand)',color:'#fff',borderRadius:9,padding:'10px 16px',fontSize:12.5,fontWeight:700,cursor:'pointer'}},'Take these to commitment  →') : null),
           caption:'Live impact of the funds you select — compared against your current mix. No need to re-simulate or re-benchmark; you’ve already done that.'});
-        return wrap([ head(hints?'A few ideas to get started':'Next best action — curated portfolios', hints?'Once the account’s set up, these are the sleeves we’d build — each as a small portfolio of funds.':'Filled from your actual gaps — each strategy is a curated portfolio of funds. Tick the ones to take forward and watch the portfolio update.'),
+        /* G1 — current allocation vs target as the FIRST element (for a new client it's zero across the board — that frames what to build) */
+        const allocVsTarget=this.card({title:'Current allocation vs target (%)', badge:this.badge(isNew?'new — building from zero':'gap to target','conf'),
+          children:this.groupedBars(strat.map(kv=>kv[1]),[{name:'Current',color:'--data-9',vals:strat.map(kv=>isNew?0:Math.round(mixYou[kv[0]]||0))},{name:'Target',color:'--data-1',vals:strat.map(kv=>Math.round(mixModel[kv[0]]||0))}]),
+          caption: isNew?'A new client is at zero across the board — this frames exactly what to build toward the target.':'Where you sit today vs the target — the gaps below are what next-best closes.'});
+        /* G3 — close the gap fastest: 'optimize all' auto-picks a fund per gap, and target-fill progress climbs as funds are added */
+        const totalGap=gaps.reduce((a,g)=>a+Math.max(0,g.gap),0)||1;
+        const closed=selArr.reduce((a,f)=>{ const g=gaps.find(x=>x.k===f.stratKey); return a+(g?Math.min(g.gap,perFund):0); },0);
+        const fillPct=Math.min(100,Math.round(closed/totalGap*100));
+        const optimizeAll=()=>{ const n={}; gaps.forEach(g=>{ const f=((this.oppFundsForStrat?this.oppFundsForStrat(g.name):[])||[])[0]; if(f) n[f.id]={id:f.id,name:f.name,logo:f.logo,mgr:f.mgr,stratKey:g.k}; }); this.setState({advSelFunds:n}); };
+        const DIMS2=(typeof this.HOME_DIMS==='function')?this.HOME_DIMS():[];
+        const dimGap=(d)=>{ const a=d.actual||{}, t=d.target||{}; let best=null; Object.keys(t).forEach(k=>{ const g=+(((t[k]||0)-(isNew?0:(a[k]||0)))).toFixed(1); if(!best||g>best.g) best={k,g}; }); return best; };
+        const perDim = (L==='L3')? h('div',{style:{display:'flex',gap:7,flexWrap:'wrap',marginTop:10}}, ['strategy','region','currency','sector','format'].map(dk=>{ const d=DIMS2.find(x=>x.key===dk); if(!d) return null; const b=dimGap(d); const on=(this.state.advFocus||'').toLowerCase()===d.label.toLowerCase();
+          return h('button',{key:dk,onClick:()=>this.setState({advFocus:on?null:d.label}),title:'Biggest '+d.label.toLowerCase()+' gap',style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--ink)',borderRadius:999,padding:'5px 11px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}}, d.label+(b&&b.g>0?' +'+b.g+'pp '+b.k:'')); }).filter(Boolean)) : null;
+        const optimizeCard=this.card({title:'Close the gap fastest', badge:this.badge('optimizer','synth'),
+          children:h('div',null,
+            h('div',{style:{display:'flex',gap:10,alignItems:'center',flexWrap:'wrap',marginBottom:10}},
+              h('button',{onClick:optimizeAll,style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:9,padding:'9px 15px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'✦ Optimize all — recommended portfolio'),
+              h('button',{onClick:()=>this.setState({advSelFunds:{}}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:9,padding:'9px 13px',fontSize:12,fontWeight:600,cursor:'pointer'}},'Clear')),
+            h('div',{style:{display:'flex',justifyContent:'space-between',fontSize:11.5,marginBottom:4}}, h('span',{style:{color:'var(--muted)'}},'Target fill — gap closed by your picks'), h('span',{style:{fontFamily:SF,fontWeight:700,color:fillPct>=100?'var(--over)':'var(--ink)'}},fillPct+'%')),
+            h('div',{style:{background:'var(--surface-2)',borderRadius:6,height:10,overflow:'hidden'}}, h('div',{style:{width:fillPct+'%',height:'100%',background: fillPct>=100?'var(--over)':'var(--brand)',borderRadius:6,transition:'width .2s'}})),
+            perDim,
+            (L==='L3'&&perDim)? h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:8,lineHeight:1.45}},'Per-dimension gaps (strategy · region · currency · sector · format). “Optimize all” builds the recommended portfolio that closes the largest gaps first.') : h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:8}},'“Optimize all” builds the recommended portfolio that closes your largest gaps first.')),
+          caption:'The fastest path to target — add the recommended funds and watch target-fill climb.'});
+        return wrap([ head(hints?'A few ideas to get started':'Next best action — curated portfolios', hints?'Once the account’s set up, these are the sleeves we’d build — each as a small portfolio of funds.':'Current vs target first, then a curated portfolio of funds per gap. Tick the ones to take forward — or “Optimize all” — and watch the portfolio update.'),
+          allocVsTarget,
+          optimizeCard,
           h('div',{style:{display:'grid',gridTemplateColumns:'minmax(0,1.3fr) minmax(280px,1fr)',gap:16,alignItems:'start'}},
             h('div',{style:{display:'flex',flexDirection:'column',gap:14}}, stratCards.length?stratCards:h('div',{style:{fontSize:13,color:'var(--muted)'}},'Your mix is close to target — no material gaps to fill.')),
             impactCard) ]);
