@@ -23,8 +23,8 @@ Source: ~/Downloads/Advisor View 2 review.zip (click-comments.md). Status: [ ] t
 - [x] 13. L3 tailored-model page: strategy mix already shown prior page — remove the redundant page for L3, show more/other; L1/L2 strategy mix must show real strategies.
 
 ## Comparison
-- [ ] 14. Target adjusts based on the actual input target.
-- [ ] 15. Endowments selectable individually (not only combined) — a button to open individual endowments, in PM allocation + comparison.
+- [x] 14. Target adjusts based on the actual input target.
+- [x] 15. Endowments selectable individually (not only combined) — a button to open individual endowments, in PM allocation + comparison.
 - [ ] 16. De-duplicate "Compare Yourself / Strategy / Funds" (they're the same comparison).
 - [ ] 17. Strategy drill-in: new investor → suggest a fund; existing investor → different (already invested).
 - [ ] 18. Fill-rate "at your stage": for a new investor show only the current year, not years 1–7 range (also investor view).
