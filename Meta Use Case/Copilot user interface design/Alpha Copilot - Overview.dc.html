@@ -8127,6 +8127,31 @@ class Component extends DCLogic {
       h('button',{onClick:()=>this.advEnterCockpit(),style:{width:'100%',border:'none',background:'var(--brand)',color:'#fff',borderRadius:12,padding:'15px',fontSize:15,fontWeight:700,cursor:'pointer',boxShadow:'0 12px 30px -16px rgba(44,45,254,.7)'}},'Enter investor view →'));
   }
   advCFAextraItems(){ return [{t:'Surface a timely opportunity',tag:'→ Opportunities · Deal'},{t:'Position the follower feed',tag:'→ Follower · Opt-in'},{t:'Check liquidity headroom',tag:'→ Profile · Liquidity'}]; }
+  /* Step-1 single source of truth: the commercial OBJECTIVE + the ordered MOVES (Observation → Why → Action).
+     The left-rail plan and the centre observations both read this, so the action wording & order line up 1↔1.
+     Journey-driven: new/pre-gate clients get onboarding observations; existing/inactive get allocation ones.
+     Peer-lag is folded into the allocation move (an argument to increase now); the follower feed is its own move. */
+  advCallPlan(){
+    const c=this.advClient()||{}; const stg=this.state.advStage;
+    const you=(this.PM&&this.PM.you)||15.7; const tgt=this.myPmTarget()||20; const gap=Math.max(0,Math.round(tgt-you));
+    const firm=(c.company&&c.company!=='—')?c.company:null; const who=(c.name?c.name.split(' ').slice(-1)[0]:'the client');
+    if(stg==='new'||stg==='pregate'){
+      return { objective: stg==='pregate'?'Show the tailored plan and move to accreditation':'Onboard and place the first commitment',
+        moves:[
+          {obs:'Investable wealth likely understated', why:'A profile like '+who+'’s'+(firm?' ('+firm+')':'')+' typically treats more as investable than onboarding captured — confirm it before we size anything.', action:'Confirm investable wealth'},
+          {obs:'Strong buyout affinity in prior sales notes', why:'Earlier conversations leaned to large-cap buyout — the natural core to anchor a first portfolio on.', action:'Anchor on a buyout core'},
+          {obs:'New to private markets — zero allocation today', why:'All whitespace: every point of allocation agreed now compounds over the horizon from a standing start.', action:'Agree a starting allocation & first fund'},
+          {obs:'Keep them warm through to accreditation', why:'Secondary and forward-looking — set the follow feed after the advice so they stay engaged before KYC.', action:'Set up the follower feed'}
+        ]};
+    }
+    return { objective: stg==='inactive'?'Re-engage and place the next commitment':'Raise the private-markets allocation toward target',
+      moves:[
+        {obs:'Behind on the private-markets allocation', why:'Filled '+you+'% of a '+tgt+'% target'+(gap?(' — '+gap+'pp of headroom'):'')+'; comparable investors allocate more, which is the argument to move now.', action:'Agree a higher allocation'},
+        {obs:'Under-weight private credit vs the model', why:'The cleanest diversifier from an equity- and AI-heavy book — floating-rate income that pays through the J-curve.', action:'Add a private-credit sleeve'},
+        {obs:'Interested in AI & tech, little exposure', why:'A timely theme the client has signalled — tie it to a concrete vehicle rather than a generic pitch.', action:'Introduce the AI opportunity'},
+        {obs:'Stay close between commitments', why:'Secondary and forward-looking — after the advice, set the follow feed so they hear the right signals.', action:'Set up the follower feed'}
+      ]};
+  }
   advCockpit(){
     const h=this.h; const SF=this.SF; const c=this.advClient()||{name:'Investor',init:'IN'}; const self=this.advSelf();
     const seq=this.advSeq(); const step=Math.max(0,Math.min(this.state.advStep,seq.length-1)); const key=seq[step]; const pm=this.advPageMeta(key); const meta=this.advStageMeta(); const goals=this.advGoals();
@@ -8138,7 +8163,12 @@ class Component extends DCLogic {
       h('div',{style:{width:1,height:30,background:'rgba(255,255,255,.14)'}}),
       h('div',{style:{display:'flex',alignItems:'center',gap:10,minWidth:0}}, h('div',{style:{width:34,height:34,borderRadius:'50%',background:'var(--brand)',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:700,fontSize:13}},c.init),
         h('div',{style:{minWidth:0}}, h('div',{style:{display:'flex',alignItems:'center',gap:7,flexWrap:'wrap'}}, h('span',{style:{fontFamily:SF,fontSize:14,fontWeight:700}},c.name), c.badge?h('span',{style:{fontSize:9,fontWeight:700,color:'#fff',background:'var(--over)',borderRadius:4,padding:'1px 6px'}},c.badge):null, h('span',{style:{fontSize:11,color:'rgba(255,255,255,.7)'}},'Investable '+(c.investable||'—'))),
-          h('div',{style:{display:'flex',gap:6,marginTop:3,flexWrap:'wrap'}}, topChip('Age '+(c.age||'—')), topChip('Risk: '+(c.risk||'—')), c.occupation?topChip(c.occupation):null, c.region?topChip(c.region):null))),
+          /* item 7 — top bar adapts to the journey: a NEW client has no profile data yet (Age · Founder · Company · Home currency, no Risk); an EXISTING client carries the essential profile (Target · Risk · Region). Firm shown either way. */
+          (()=>{ const isNew=this.state.advStage==='new'||this.state.advStage==='pregate'; const homeCcy=((c.region||'').split('/').pop()||'EUR').trim(); const firm=(c.company&&c.company!=='—')?c.company:null;
+            const chips = isNew
+              ? [topChip('Age '+(c.age||'—')), topChip(c.occupation||'Founder'), firm?topChip(firm):null, topChip('Home '+homeCcy)]
+              : [topChip('Target '+(this.myPmTarget()||20)+'%'), topChip('Risk: '+(c.risk||'—')), c.region?topChip(c.region):null, firm?topChip(firm):null];
+            return h('div',{style:{display:'flex',gap:6,marginTop:3,flexWrap:'wrap'}}, chips.filter(Boolean)); })())),
       h('div',{style:{marginLeft:'auto',display:'flex',alignItems:'center',gap:16}},
         h('div',{style:{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:2,background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.14)',borderRadius:8,padding:'5px 10px'}}, h('span',{style:{fontSize:8.5,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(255,255,255,.45)'}},'Grounded'), h('span',{style:{fontSize:11,fontWeight:600,color:'rgba(255,255,255,.85)'}},'snap_8f3c · live data')),
         labelled('Journey', dseg([{label:'Pre Gate',value:'pregate'},{label:'New',value:'new'},{label:'Existing',value:'existing'},{label:'Inactive',value:'inactive'}], this.state.advStage, v=>this.advSetStage(v))),
@@ -8147,21 +8177,23 @@ class Component extends DCLogic {
         h('div',{style:{width:1,height:30,background:'rgba(255,255,255,.14)'}}),
         h('div',{style:{textAlign:'right'}}, h('div',{style:{fontSize:12.5,fontWeight:600}},self.name), h('div',{style:{fontSize:10,color:'rgba(255,255,255,.55)'}},self.role)),
         h('button',{onClick:()=>this.advToPrep(),style:{border:'1px solid rgba(255,255,255,.3)',background:'rgba(255,255,255,.1)',color:'#fff',borderRadius:8,padding:'6px 11px',fontSize:11.5,cursor:'pointer'}},'Exit')));
-    const actDetail=(meta.actionsDetail)||[]; const openA=this.state.advActionOpen;
+    const plan=this.advCallPlan(); const openA=this.state.advActionOpen;
+    /* item 1/2 — OBJECTIVE first, always commercial */
+    const objChip=h('div',{style:{display:'flex',alignItems:'flex-start',gap:7,marginBottom:12,flexWrap:'wrap',background:'var(--brand)',borderRadius:10,padding:'10px 12px'}},
+      h('span',{style:{fontSize:9,fontWeight:700,letterSpacing:'.06em',color:'var(--brand)',background:'#fff',borderRadius:5,padding:'2px 7px',flex:'0 0 auto'}},'OBJECTIVE'),
+      h('span',{style:{fontSize:12.5,color:'#fff',lineHeight:1.4,fontWeight:600}},plan.objective));
+    /* item 4/5/6 — targets/results for this call: the ordered moves, action wording identical to the centre observations, count-agnostic, expandable to the observation & why */
     const goalsBox=h('div',{style:{background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:12,padding:'13px 14px',marginBottom:12}},
-      h('div',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--brand-ink)',marginBottom:8}},'Top 3 actions for this call'),
-      h('div',{style:{display:'flex',flexDirection:'column',gap:6}}, goals.slice(0,3).map((g,i)=>{ const d=actDetail[i]; const on=openA===i;
+      h('div',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--brand-ink)',marginBottom:8}},'Targets for this call'),
+      h('div',{style:{display:'flex',flexDirection:'column',gap:6}}, plan.moves.map((m,i)=>{ const on=openA===i;
         return h('div',{key:i},
-          h('div',{onClick:d?()=>this.setState({advActionOpen:on?null:i}):null,style:{display:'flex',gap:8,alignItems:'flex-start',fontSize:12,color:'var(--ink)',lineHeight:1.35,cursor:d?'pointer':'default'}},
+          h('div',{onClick:()=>this.setState({advActionOpen:on?null:i}),style:{display:'flex',gap:8,alignItems:'flex-start',fontSize:12,color:'var(--ink)',lineHeight:1.35,cursor:'pointer'}},
             h('span',{style:{width:17,height:17,flex:'0 0 17px',borderRadius:'50%',background:'var(--brand)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700}},String(i+1)),
-            h('span',{style:{flex:1}},g),
-            d?h('span',{style:{fontSize:11,color:'var(--brand-ink)'}}, on?'▾':'›'):null),
-          (on&&d)? h('div',{style:{margin:'6px 0 2px 25px',padding:'8px 10px',background:'var(--surface)',border:'1px solid var(--brand-tint-3)',borderRadius:8,fontSize:11,lineHeight:1.5,color:'var(--ink)'}},
-            h('div',null, h('b',{style:{color:'var(--brand-ink)'}},'Signal: '), d.signal),
-            h('div',{style:{marginTop:3}}, h('b',{style:{color:'var(--brand-ink)'}},'Observation: '), d.observation),
-            h('div',{style:{marginTop:3}}, h('b',{style:{color:'var(--brand-ink)'}},'Why: '), d.why),
-            h('div',{style:{marginTop:4,fontSize:9.5,color:'var(--muted)',fontStyle:'italic'}},'AI-generated from call signals & platform data')):null); })));
-    const objChip=h('div',{style:{display:'flex',alignItems:'center',gap:7,marginBottom:12,flexWrap:'wrap'}}, h('span',{style:{fontSize:9,fontWeight:700,letterSpacing:'.06em',color:'#fff',background:'var(--brand)',borderRadius:5,padding:'2px 7px'}},'OBJECTIVE'), h('span',{style:{fontSize:12,color:'var(--ink)',lineHeight:1.35}},meta.objective));
+            h('span',{style:{flex:1,fontWeight:600}},m.action),
+            h('span',{style:{fontSize:11,color:'var(--brand-ink)'}}, on?'▾':'›')),
+          on? h('div',{style:{margin:'6px 0 2px 25px',padding:'8px 10px',background:'var(--surface)',border:'1px solid var(--brand-tint-3)',borderRadius:8,fontSize:11,lineHeight:1.5,color:'var(--ink)'}},
+            h('div',null, h('b',{style:{color:'var(--brand-ink)'}},'Observation: '), m.obs),
+            h('div',{style:{marginTop:3}}, h('b',{style:{color:'var(--brand-ink)'}},'Why: '), m.why)):null); })));
     const prog=(step+1)/seq.length;
     const stepBox=h('div',{style:{marginBottom:12}},
       h('div',{style:{fontSize:10,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)'}},'Step '+(step+1)+' of '+seq.length+' · '+this.state.advStage.toUpperCase()),
@@ -8187,7 +8219,7 @@ class Component extends DCLogic {
       h('div',{style:{fontSize:12.5,color:'var(--ink)',lineHeight:1.55,fontStyle:'italic'}},pm.script));
     const rail=h('div',{style:{flex:'0 0 320px',width:320,background:'var(--surface)',borderRight:'1px solid var(--line)',height:'100%',overflow:'auto',padding:'16px 16px 28px'}},
       h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14}}, h('span',{style:{fontFamily:SF,fontSize:15,fontWeight:700}},'Moonfare'), h('span',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.06em',color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:5,padding:'2px 7px'}},'ADVISOR')),
-      goalsBox, objChip, stepBox, navBtns, h('div',{style:{height:1,background:'var(--line)',margin:'2px 0 14px'}}), cfaSection, h('div',{style:{height:1,background:'var(--line)',margin:'2px 0 14px'}}), scriptBox, h('div',{style:{height:1,background:'var(--line)',margin:'14px 0'}}), this.advNoteCard());
+      objChip, goalsBox, stepBox, navBtns, h('div',{style:{height:1,background:'var(--line)',margin:'2px 0 14px'}}), cfaSection, h('div',{style:{height:1,background:'var(--line)',margin:'2px 0 14px'}}), scriptBox, h('div',{style:{height:1,background:'var(--line)',margin:'14px 0'}}), this.advNoteCard());
     const crumb=h('div',{style:{display:'flex',alignItems:'center',gap:8,fontSize:11.5,color:'var(--muted)',marginBottom:16,flexWrap:'wrap'}}, h('span',{style:{fontFamily:SF,fontWeight:600,color:'var(--ink)'}},'Moonfare'), h('span',{style:{color:'var(--over)'}},'●'), h('span',null,'Canvas · '+this.state.advLevel+'  ·  '+pm.crumb));
     const focusBanner=this.state.advFocus? h('div',{style:{display:'flex',alignItems:'center',gap:10,background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:10,padding:'9px 13px',marginBottom:14}}, h('span',{style:{fontSize:11,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--brand-ink)'}},'Focused'), h('span',{style:{fontSize:12.5,color:'var(--ink)'}},'Jumped from the script to '+this.state.advFocus+'.'), h('button',{onClick:()=>this.advClearFocus(),style:{marginLeft:'auto',border:'1px solid var(--brand-tint-3)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:7,padding:'3px 9px',fontSize:11,cursor:'pointer'}},'Clear ✕')) : null;
     /* short steps float centred (margin:auto safely centres when there's room, collapses to top-aligned + scrollable when content is tall); a faint footer anchors the bottom */
@@ -8306,29 +8338,32 @@ class Component extends DCLogic {
     const fieldHL={Wealth:['Investable wealth'],Risk:['Risk class'],Cohort:['Region','Profession']};
     switch(key){
       case 'execSummary': {
-        const args=[{t:'Investable wealth likely understated',d:'A profile like '+(c.name||'this client')+'’s typically treats more as investable — worth confirming.',why:'Onboarding captured a conservative figure; peers at this profile report 20–40% more investable wealth once illiquid assets are excluded correctly.',how:'Open on: “Before we model — does the wealth figure on file still reflect what you’d put to work?” Update it live on the intake page.'},
-          {t:'Behind on private-markets allocation',d:'Filled '+(this.PM&&this.PM.you||15.7)+'% vs a '+(this.myPmTarget())+'% target — clear room to deploy.',why:'At '+(this.PM&&this.PM.you||15.7)+'% of '+(this.myPmTarget())+'% target, there is material headroom; every point closer compounds over the horizon.',how:'Frame the gap as opportunity, not shortfall: “You’re '+Math.max(0,Math.round((this.myPmTarget()-(this.PM&&this.PM.you||15.7))))+'pp from your own target — here’s the pacing to close it.”'},
-          {t:'Lagging the peer group',d:'Comparable investors allocate more to private markets — a concrete, motivating gap.',why:'Peers matched on wealth, age and profession sit meaningfully higher — a credible, non-pushy motivator.',how:'Show the peer bar on the comparison step; let the number do the persuading.'},
-          {t:'No / low AI & Tech exposure',d:'A timely theme the client has signalled interest in.',why:'The client raised AI in prior conversation; the sector sleeve is under-represented in their current mix.',how:'Tie it to a concrete vehicle on the opportunities step rather than a generic pitch.'},
-          {t:'Strong on currency/region — lead with a win',d:'Well-positioned here; open on strength before the gaps.',why:'Their region/currency mix is already close to model — a genuine strength to acknowledge first.',how:'Open the call on this so the gaps land as fine-tuning, not criticism.'}];
-        const show=Math.min(3+this.state.advCFAextra, args.length);
-        const open=this.state.advCaseOpen;
-        const caseCard=(a,i)=>{ const isOpen=open===i;
-          return h('div',{key:i,onClick:()=>this.setState({advCaseOpen:isOpen?null:i}),style:{cursor:'pointer',background:isOpen?'var(--brand-wash)':'var(--surface-2)',border:'1px solid '+(isOpen?'var(--brand-tint-3)':'var(--line)'),borderRadius:10,padding:'11px 13px',transition:'all .12s'}},
-            h('div',{style:{display:'flex',gap:11,alignItems:'flex-start'}},
+        /* Step-1: Observation → Why it matters → How to open it (the ACTION). The action wording & order match the
+           left rail's 'Targets for this call' 1↔1 (both read advCallPlan). Count-agnostic; journey drives the observations. */
+        const plan=this.advCallPlan(); const open=this.state.advCaseOpen;
+        const moveCard=(m,i)=>{ const isOpen=open===i;
+          return h('div',{key:i,style:{background:'var(--surface)',border:'1px solid '+(isOpen?'var(--brand-tint-3)':'var(--line)'),borderRadius:11,padding:'13px 15px'}},
+            h('div',{onClick:()=>this.setState({advCaseOpen:isOpen?null:i}),style:{display:'flex',gap:11,alignItems:'flex-start',cursor:'pointer'}},
               h('span',{style:{width:22,height:22,flex:'0 0 22px',borderRadius:'50%',background:'var(--brand)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:700}},String(i+1)),
-              h('div',{style:{flex:1}}, h('div',{style:{display:'flex',alignItems:'center',gap:8}}, h('div',{style:{fontSize:13.5,fontWeight:600,flex:1}},a.t), h('span',{style:{fontSize:11,color:'var(--brand-ink)',fontWeight:700}}, isOpen?'▾':'▸')),
-                h('div',{style:{fontSize:12,color:'var(--muted)',marginTop:2,lineHeight:1.45}},a.d))),
-            isOpen? h('div',{style:{marginTop:10,paddingTop:10,borderTop:'1px solid var(--brand-tint-3)',display:'flex',flexDirection:'column',gap:8}},
-              h('div',null, h('div',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--brand-ink)',marginBottom:2}},'Why it matters'), h('div',{style:{fontSize:12.5,color:'var(--ink)',lineHeight:1.5}},a.why)),
-              h('div',null, h('div',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--brand-ink)',marginBottom:2}},'How to open it'), h('div',{style:{fontSize:12.5,color:'var(--ink)',lineHeight:1.5}},a.how))) : null); };
-        return wrap([ head('Prepare-for-call summary','For you, not the client. Lead with the strongest case the data makes — click any move to see why it matters and how to open it. Objective: '+this.advStageMeta().objective+'.'),
-          this.card({title:'The case, in three moves',badge:this.badge('AI · advisor-only','synth'),
-            right:h('button',{onClick:()=>this.setState({advCFAextra:(this.state.advCFAextra||0)+1}),disabled:show>=args.length,style:{border:'1px solid var(--brand-tint-3)',background:show>=args.length?'var(--surface-2)':'var(--brand-wash)',color:show>=args.length?'var(--muted)':'var(--brand-ink)',borderRadius:8,padding:'6px 12px',fontSize:11.5,fontWeight:700,cursor:show>=args.length?'default':'pointer'}}, show>=args.length?'All shown':'✦ Suggest another'),
-            children:h('div',{style:{display:'flex',flexDirection:'column',gap:9}}, args.slice(0,show).map(caseCard)),
-            caption:'Compliance-neutralised — check-list prompts, not advice. “✦ Suggest another” adds the next-strongest argument to this summary; click a move to expand it.'}),
+              h('div',{style:{flex:1,minWidth:0}},
+                h('div',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)'}},'Observation'),
+                h('div',{style:{fontSize:14,fontWeight:600,lineHeight:1.3}},m.obs)),
+              h('span',{style:{fontSize:11,color:'var(--brand-ink)',fontWeight:700}}, isOpen?'▾':'▸')),
+            h('div',{style:{marginTop:9,paddingLeft:33}},
+              h('div',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:2}},'Why it matters'),
+              h('div',{style:{fontSize:12.5,color:'var(--ink)',lineHeight:1.5}},m.why),
+              /* the action, resolved on the page — identical wording to the left 'Targets for this call' item #(i+1) */
+              h('div',{style:{marginTop:10,paddingTop:10,borderTop:'1px solid var(--line)',display:'flex',alignItems:'center',gap:9,flexWrap:'wrap'}},
+                h('span',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--brand-ink)'}},'How to open it'),
+                h('button',{onClick:()=>this.advNext(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:9,padding:'7px 14px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}}, m.action+'  →'),
+                h('span',{style:{fontSize:10.5,color:'var(--muted)'}},'target #'+(i+1)+' on the left'))),
+            isOpen? h('div',{style:{marginTop:9,paddingLeft:33,fontSize:11.5,color:'var(--muted)',lineHeight:1.5}}, 'Compliance-neutralised — a check-list prompt, not advice. Signal content is from the platform data & sales notes.') : null); };
+        return wrap([ head('Prepare-for-call summary','Objective → observations → actions. Each observation resolves into its action below, matching the numbered targets pinned on the left. Objective: '+plan.objective+'.'),
+          this.card({title:'The case for this call — '+plan.moves.length+' moves',badge:this.badge('AI · advisor-only','synth'),
+            children:h('div',{style:{display:'flex',flexDirection:'column',gap:10}}, plan.moves.map(moveCard)),
+            caption:'Observation → why it matters → how to open it. The action on each block is word-for-word the matching left-rail target.'}),
           h('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}},
-            h('button',{onClick:()=>this.advNext(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'11px 18px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'✦ Suggest calling '+(c.name?c.name.split(' ')[0]:'the investor')+' →'),
+            h('button',{onClick:()=>this.advNext(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'11px 18px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'Start the call — '+(plan.moves[0]?plan.moves[0].action:'begin')+'  →'),
             h('button',{onClick:()=>this.askFromPage('Draft talking points to open the call with '+(c.name||'this client')+' based on this prepare-for-call summary.'),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:10,padding:'11px 16px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},'Ask Alpha for talking points')) ]);
       }
       case 'intake': case 'intakeMin': {

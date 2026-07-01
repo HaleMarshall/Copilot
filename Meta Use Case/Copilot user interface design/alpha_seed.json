@@ -3869,7 +3869,7 @@
   },
   "advisorMeta": {
     "new": {
-      "objective": "Onboard & place the first portfolio product",
+      "objective": "Onboard and place the first commitment",
       "goals": [
         "Confirm the profile & investable wealth",
         "Agree the target allocation & first commitment",
@@ -3894,7 +3894,7 @@
       ]
     },
     "existing": {
-      "objective": "Deepen the relationship & secure the next commitment",
+      "objective": "Raise the private-markets allocation toward target",
       "goals": [
         "Review since last talk & confirm the profile",
         "Close the gap to target with the next commitment",
@@ -3919,7 +3919,7 @@
       ]
     },
     "inactive": {
-      "objective": "Reactivate with a timely, concrete opportunity",
+      "objective": "Re-engage and place the next commitment",
       "goals": [
         "Re-engage on a missed / live deal",
         "Reserve interest on the open opportunity",
@@ -3944,7 +3944,7 @@
       ]
     },
     "pregate": {
-      "objective": "Tease the tailored model & route to accreditation",
+      "objective": "Show the tailored plan and move to accreditation",
       "goals": [
         "Capture the minimum intake",
         "Show the tailored model & peer position",
@@ -3971,10 +3971,10 @@
   },
   "advisorPages": {
     "execSummary": {
-      "title": "Executive summary — what to achieve",
+      "title": "Prepare-for-call summary",
       "crumb": "Pre-flow › Advisor briefing",
       "cfa": [],
-      "script": "This briefing is for you, not the client. Lead with the strongest case the data makes — keep it to three moves."
+      "script": "This briefing is for you, not the client. Lead with the strongest case the data makes — objective first, then observations, each resolving into its action."
     },
     "intake": {
       "title": "Client profile — prefilled & editable",
