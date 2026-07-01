@@ -8114,13 +8114,15 @@ class Component extends DCLogic {
     if(/aggress|opportun|advanced/.test(label)) return 'opportunistic_advanced';
     return this.state.riskId||'balanced_compounding'; }
   /* the client's home currency (from region 'US / USD' → USD, or an explicit currency) — drives the display currency so figures show in their money */
-  advHomeCcy(c){ c=c||{}; const fromCur=(c.currency||'').toUpperCase(); if(/^[A-Z]{3}$/.test(fromCur)) return fromCur; const seg=String(c.region||'').split('/').pop().trim().toUpperCase(); if(/^[A-Z]{3}$/.test(seg)) return seg; return 'EUR'; }
+  advHomeCcy(c){ c=c||{}; const fromCur=(c.currency||'').toUpperCase(); if(/^[A-Z]{3}$/.test(fromCur)) return fromCur; const r=String(c.region||''); const seg=r.split('/').pop().trim().toUpperCase(); if(/^[A-Z]{3}$/.test(seg)) return seg; /* item 8 — region labels → home ccy */ const byLabel={'AMERICA':'USD','MIDDLE EAST':'USD','ASIA':'USD','EUROPE':'EUR','REST OF WORLD':'USD'}[r.split('/')[0].trim().toUpperCase()]; return byLabel||'EUR'; }
   /* map a client's profile to the peer-cohort filters so the peer comparison is matched to THIS client
      (the parametric peer DB then yields a statistically coherent segment — a 56yo US founder ≠ a 30yo engineer) */
   advClientCohort(c){ c=c||{};
     const age=parseInt(String(c.age).replace(/[^0-9]/g,''),10); const ageB= isNaN(age)?'35-50':(age<35?'20-35':age<50?'35-50':age<65?'50-65':'65+');
     const cc=String(c.region||'').split('/')[0].trim().toUpperCase();
-    const region={US:'US/CA',CA:'US/CA',DE:'DACH',AT:'DACH',CH:'DACH',SE:'N-Europe',NO:'N-Europe',DK:'N-Europe',FI:'N-Europe',UK:'UK',GB:'UK',AE:'Middle East',SA:'Middle East',SG:'Asia',HK:'Asia',JP:'Asia'}[cc]||'DACH';
+    /* accepts both country codes (book clients: "US / USD") and the new intake region labels (item 8: Europe/Middle East/Asia/America/Rest of World) */
+    const region={US:'US/CA',CA:'US/CA',DE:'DACH',AT:'DACH',CH:'DACH',SE:'N-Europe',NO:'N-Europe',DK:'N-Europe',FI:'N-Europe',UK:'UK',GB:'UK',AE:'Middle East',SA:'Middle East',SG:'Asia',HK:'Asia',JP:'Asia',
+      'EUROPE':'DACH','MIDDLE EAST':'Middle East','ASIA':'Asia','AMERICA':'US/CA','REST OF WORLD':'RoW'}[cc]||'DACH';
     const occ=String(c.occupation||'').toLowerCase();
     /* order matters: most-specific first, and PE/investing is checked before the generic 'exec' so a "PE executive" maps to the sophisticated Investor/PE cohort — not Exec/Owner. Word-boundaries avoid loose substring hits (bare 'pe' was matching "develoPEr"). */
     const prof=/family office/.test(occ)?'Family Office':/\bpe\b|private equity|venture capital|\bvc\b|hedge fund|asset manage|portfolio manager|\binvestor\b|investment (manage|profess|analyst|associate|director|banker)/.test(occ)?'Investor/PE':/founder|owner|\bexec|ceo|cfo|coo|managing director|\bmd\b|\bpartner\b/.test(occ)?'Exec/Owner':/law|legal|attorney|solicitor/.test(occ)?'Legal':/physician|medic|doctor|surgeon|dentist/.test(occ)?'Medical':/eng|tech|software|developer|scientist|architect/.test(occ)?'Eng/Tech':/consult/.test(occ)?'Consulting':/financ|bank/.test(occ)?'Financial Services':'Other';
@@ -8606,7 +8608,7 @@ class Component extends DCLogic {
         /* C6 — preset dropdowns for constrained fields (currency, region, liquidity) instead of free text */
         const ccyOpts=['EUR','USD','GBP','CHF','SGD','JPY','Other'];
         const homeCcy=((c.region||'').split('/').pop()||'EUR').trim(); const ccyList=ccyOpts.indexOf(homeCcy)>=0?ccyOpts:[homeCcy].concat(ccyOpts);
-        const regionPreset=['DACH','UK & Ireland','Nordics','Rest of EU','US / USD','APAC','Rest of World'];
+        const regionPreset=['Europe','Middle East','Asia','America','Rest of World']; /* item 8 */
         const curRegion=get('region',c.region||''); const regionOpts=(curRegion&&regionPreset.indexOf(curRegion)<0)?[curRegion].concat(regionPreset):regionPreset;
         const liqOpts=['6-month buffer','12-month buffer','24-month buffer','No specific buffer'];
         /* C1/C2/C3 — investable wealth first, then the private-markets allocation (current + target) right beside it;

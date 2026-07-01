@@ -8,7 +8,7 @@ Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.
 - [x] 5. When compressing the screen it looks weird (responsive).
 - [x] 6. Move private-markets target next to investable wealth.
 - [x] 7. 'already in private markets' → 'already invested in private markets'.
-- [ ] 8. Regions → Europe, Middle East, Asia, America, Rest of World.
+- [x] 8. Regions → Europe, Middle East, Asia, America, Rest of World.
 - [ ] 9. Field header (label) larger than the input field.
 - [ ] 10. Align all input fields (already-in-PM not aligned with PM-target).
 - [ ] 11. Use the investor set-target profile as a design example.
