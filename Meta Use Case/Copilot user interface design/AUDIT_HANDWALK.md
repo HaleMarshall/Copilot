@@ -39,12 +39,18 @@ Legend: [x] verified working & data-real · [!] bug found (with fix) · [ ] not 
 - [!] FIXED: prof classifier mapped "PE executive" → Exec/Owner (generic 'exec' checked before 'pe'); also bare 'pe'/'invest' substrings matched "develoPEr"→Investor/PE. Reordered most-specific-first with word-boundaries (\bpe\b, private equity, \binvestor\b before founder|\bexec). Now Lindqvist→Investor/PE (peer median 18.4, matches L3); "Software developer"→Eng/Tech; Reuter(Founder)→Exec/Owner, Coburger→Legal, Meier→Family Office, Weber→Medical all correct.
 - [x] Level differentiation via advSeq step counts escalates L1<L2≤L3: new 8/10/11, existing 11/13/13, inactive 14/16/16; pregate 7/7/7 (intentionally lean pre-accreditation). Stage journeys differ: new builds (setTarget→modelPortfolio), existing reviews (confirmTarget→overview→changesSince→3 comparison steps→follower).
 
+## Model-portfolio + manager research + emoji + hardcoded sweep — VERIFIED 2026-07-01
+- [x] modelMix() yields 5 DISTINCT coherent portfolios by riskId: income_resilience(credit40/infra22), balanced(buyout40), equity_growth(buyout55), innovation_ai_alpha(ai15), opportunistic(spread). Page reflects the risk input. (Note: venture=0 across all models — intentional, Moonfare model folds early-stage into growth.)
+- [x] Manager research L3 reads DB `managerTree` (not fallback), 15 mgrs/7 ACs; asset-class filter reduces list (All 15→Buyout 8→Growth 2); per-class IRR real (EQT all-time 17.1 vs Buyout 19.2 vs Infra 15.1); sort desc works (Thrive 26.5>Thoma Bravo 24.1>Index 23.1).
+- [x] Emoji sweep (Python Unicode): ZERO pictographic emoji (no 📊/🎯/💰 etc). Only 4 monochrome typographic UI glyphs remain — ✦(AI accent) ✓(confirm) ✎(edit) ✕(close) — plus ▲/▼ over/under (MANDATED by palette rules). "Remove emojis" satisfied; functional icons kept.
+- [x] hist=[numbers] hardcoded = 0 (item-1 fix holds). Investor/advisor financial charts DB-driven/derived (portfolioMetrics, futureProj, peerData, vz DB-first at 35 call sites).
+
+## KNOWN GAP (low priority, honest)
+- [~] 19 numeric `vals:[...]` inline arrays remain, ALL in the internal ops console (lines 9000-9089: platform AUM, net flows, channel conversion, fill-rate, waitlist, capital calls, liquidity buffer). These are synthetic internal business KPIs (Moonfare staff view), NOT investor financial figures — they'd be synthetic in the DB too, so wiring only relocates mock numbers. Candidate for a future `internalOps` DB atom if the internal console needs to be DB-backed; not a financial-correctness issue for the investor/advisor audit.
+
 ## STILL TO WALK
-- [ ] Model-portfolio page strategy mix reflects target/inputs (L1/L2 real strategies; L3 redundant page removed).
-- [ ] Manager research (L3) filters/toggles change firm/fund tables from DB managerTree.
-- [ ] Lifecycle / what's-changed / follower iPhone previews: no emojis, logos+graph, real.
-- [ ] Level differentiation across pregate/new/existing/inactive (advSeq step counts + body density per level).
-- [ ] Fund pages consume filled CSV (pending user's data).
+- [ ] Lifecycle / what's-changed / follower iPhone previews render (logos+graph, look real) — spot-render check.
+- [ ] Fund pages consume filled CSV (pending user's data at ~/Downloads/moonfare_funds/).
 - [ ] Model-portfolio page: strategy mix reflects target/inputs (L1/L2 real strategies; L3 redundant page removed).
 - [ ] Manager research (L3): filters/toggles change firm/fund tables from DB managerTree.
 - [ ] Currency: displayCcy change converts every €-figure incl. advisor header; home-ccy derives from region.
