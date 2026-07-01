@@ -8152,6 +8152,12 @@ class Component extends DCLogic {
         {obs:'Stay close between commitments', why:'Secondary and forward-looking — after the advice, set the follow feed so they hear the right signals.', action:'Set up the follower feed'}
       ]};
   }
+  /* F1 — new/pre-gate client has no current holdings; a raw peer comparison makes them look like they're "lagging".
+     Surface the caveat and frame the comparison around the proposed TARGET instead of a zero current position. */
+  advCompareCaveat(){ const h=this.h; if(!(this.state.advStage==='new'||this.state.advStage==='pregate')) return null;
+    return h('div',{style:{display:'flex',gap:9,alignItems:'flex-start',background:'var(--data-2-wash, rgba(232,115,44,.10))',border:'1px solid rgba(232,115,44,.35)',borderRadius:10,padding:'10px 13px',marginBottom:12}},
+      h('span',{style:{fontSize:9,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--data-2)',background:'#fff',border:'1px solid rgba(232,115,44,.4)',borderRadius:5,padding:'2px 6px',flex:'0 0 auto'}},'New client'),
+      h('span',{style:{fontSize:12,color:'var(--ink)',lineHeight:1.45}},'No current holdings yet — this compares the ',h('b',null,'proposed target'),', not a current position. A new client isn’t “lagging”; peer comparison of what they hold only becomes meaningful once they’re invested.')); }
   advCockpit(){
     const h=this.h; const SF=this.SF; const c=this.advClient()||{name:'Investor',init:'IN'}; const self=this.advSelf();
     const seq=this.advSeq(); const step=Math.max(0,Math.min(this.state.advStep,seq.length-1)); const key=seq[step]; const pm=this.advPageMeta(key); const meta=this.advStageMeta(); const goals=this.advGoals();
@@ -8325,7 +8331,9 @@ class Component extends DCLogic {
         managerComparison:'managerOverviewBody', fundComparison:'managerOverviewBody'};
       const fn=DELEG[key];
       if(fn && typeof this[fn]==='function'){ try{ const body=this[fn]();
-        return delegWrap(L+' · full toolbox', 'The complete Investor-View '+(pm.title||key)+' — every adjustor & drill-in, live for '+(c.name||'this client')+'.', body);
+        /* F1 — prepend the new-client caveat on comparison steps */
+        const cmpKeys={multiComparison:1,peerComparison:1,compareToCurrent:1}; const cav=cmpKeys[key]?this.advCompareCaveat():null;
+        return delegWrap(L+' · full toolbox', 'The complete Investor-View '+(pm.title||key)+' — every adjustor & drill-in, live for '+(c.name||'this client')+'.', cav? h('div',null,cav,body):body);
         }catch(e){ /* fall through to the light advisor composition below */ } } }
     const wrap=(kids)=>h('div',{style:{maxWidth:1000,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}, kids);
     const head=(t,s)=>h('div',null, h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:600,letterSpacing:'-.01em'}},t), s?h('div',{style:{fontSize:13,color:'var(--muted)',marginTop:3,lineHeight:1.5,maxWidth:680}},s):null);
@@ -8520,7 +8528,10 @@ class Component extends DCLogic {
         /* item 15 — select individual endowments (Harvard / Yale / Princeton), not only the combined H+Y+P */
         const endPM={hyp:pmEnd, harvard:40, yale:45, princeton:38}; const endName={hyp:'H+Y+P',harvard:'Harvard',yale:'Yale',princeton:'Princeton'};
         const endInd=this.dtog('advEndowInd',false); /* false = combined H+Y+P; true = the three individually */
-        const baseCats=['You','Peers','Family offices','Your target']; const baseVals=[pmYou,pmPeer,pmFO,this.myPmTarget()];
+        /* F1 — new client holds nothing: drop the misleading current 'You' bar, lead with 'Your target' */
+        const newClient=this.state.advStage==='new'||this.state.advStage==='pregate';
+        const baseCats= newClient? ['Your target','Peers','Family offices'] : ['You','Peers','Family offices','Your target'];
+        const baseVals= newClient? [this.myPmTarget(),pmPeer,pmFO] : [pmYou,pmPeer,pmFO,this.myPmTarget()];
         const endCats = endInd? ['Harvard','Yale','Princeton'] : ['Endowments (H+Y+P)'];
         const endVals = endInd? [endPM.harvard,endPM.yale,endPM.princeton] : [pmEnd];
         const cats=lvl(baseCats, baseCats, baseCats.concat(endCats));
@@ -8540,14 +8551,16 @@ class Component extends DCLogic {
               h('div',{style:{fontSize:11.5,color:'var(--brand-ink)',marginTop:4}},'Closes your largest under-weight — private credit adds floating-rate, contractual income that barely correlates with your buyout & AI exposure.')),
             h('button',{onClick:()=>this.askFromPage('Assess '+pc.fund+' ('+pc.strat+') for my private-credit gap — is it a fit and how much should I commit?'),style:{flex:'0 0 auto',border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'10px 16px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'✦ Assess this fund')),
           caption:'A concrete next step off the peer comparison — the fund that best fills the private-credit gap for this profile.'}) : null;
-        return wrap([ head('You vs your peers & family offices'+(L==='L3'?' & endowments':''),'People with a profile like yours — and single/multi-family offices — typically allocate quite differently.'),
+        return wrap([ this.advCompareCaveat(),
+          head(newClient?'Your target vs peers & family offices':('You vs your peers & family offices'+(L==='L3'?' & endowments':'')), newClient?'A new client holds nothing yet — this frames the proposed target against comparable investors.':'People with a profile like yours — and single/multi-family offices — typically allocate quite differently.'),
           this.card({title:'Private-markets allocation (%)',children:h('div',null, endowToggle, this.groupedBars(cats,[{name:'PM %',color:'--data-1',vals:vals}])),caption: L==='L1'?'Where you sit against comparable investors, family offices — and your own target.':'Against peers, family offices, your target'+(L==='L3'?' and the endowments — pick Combined or the individual schools above.':'.')}),
           creditCard ]); }
       case 'multiComparison': { const fd=dimByName(focus); const dimSel=(d)=>h('div',{style:{display:'flex',gap:7,flexWrap:'wrap',marginBottom:12}}, [['strategy','Strategy']].concat((L!=='L1'?DIMS.filter(x=>x.key!=='strategy').map(x=>[x.key,x.label]):[])).map(o=>{ const on=(focus?String(focus).toLowerCase():'strategy')===o[1].toLowerCase()||(o[0]==='strategy'&&!fd); return h('button',{key:o[0],onClick:()=>this.setState({advFocus:o[0]==='strategy'?null:o[1]}),style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--ink)',borderRadius:999,padding:'5px 12px',fontSize:11.5,fontWeight:600,cursor:'pointer'}},o[1]); }));
         let chart, title;
         if(fd){ const cats=Object.keys(fd.actual||{}); title=fd.label+' allocation (%)'; chart=this.groupedBars(cats,[{name:'You',color:'--data-1',vals:cats.map(k=>fd.actual[k]||0)},{name:'Your target',color:'--data-5',vals:cats.map(k=>(fd.target||{})[k]||0)}]); }
         else { const foMix=(this.PRESETS['family-offices']||{}).mix||{}; const series=[{name:'You',color:'--data-1',vals:catVals(mixYou)},{name:'Platform',color:'--data-7',vals:catVals(mixPlat)},{name:'Model',color:'--data-5',vals:catVals(mixModel)},{name:'Family offices',color:'--data-10',vals:strat.map(kv=>foMix[kv[0]]||0)}]; if(L==='L3'){ const endow=(this.DB&&this.DB.endowments&&this.DB.endowments.harvard)||{}; series.push({name:'Endowments',color:'--data-8',vals:strat.map(kv=>endow[kv[0]]||0)}); } title='Strategy allocation (%)'; chart=this.groupedBars(catLabels,series); }
-        return wrap([ head('Compare — peers, platform, model, family offices'+(L==='L3'?', endowments':''), lvl('You against the platform, our model and family offices.','You against the platform, our model and family offices.','The full lens: platform, model, family offices, endowments and top-10% — the institutional view.')),
+        return wrap([ this.advCompareCaveat(),
+          head('Compare — peers, platform, model, family offices'+(L==='L3'?', endowments':''), lvl('You against the platform, our model and family offices.','You against the platform, our model and family offices.','The full lens: platform, model, family offices, endowments and top-10% — the institutional view.')),
           dimSel(),
           this.card({title:title,children:chart,caption:fd?('Your '+fd.label.toLowerCase()+' mix vs your target — jumped here from the advisor script.'):'Higher bars = more weight to that strategy.'}) ]); }
       case 'compareToCurrent': { const fd=dimByName(focus);
