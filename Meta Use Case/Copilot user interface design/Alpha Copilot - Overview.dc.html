@@ -6171,7 +6171,9 @@ class Component extends DCLogic {
           return h('button',{key:r.id,onClick:()=>this.setState({riskId:r.id,simTargets:null}),title:'PM target '+r.pmTarget+'%',
             style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 11px',fontSize:11,fontWeight:on?700:500,cursor:'pointer',whiteSpace:'nowrap'}}, r.short); }))) : null;
       /* item 32 — the target 'sliders' are now horizontal BAR CHARTS: a compact track filled to the target % in the category colour, the % centred ON the bar, dragged via an invisible range overlay (smaller/tighter than the old native range). Precise numeric entry returns as a table-like cell in item 34. */
-      const sliders = adjOpen? cats.map(k=>{ const raw=(tObj[k]!=null?tObj[k]:d.actual[k]); const cur=Math.round(d.actual[k]||0); const tgt=Math.round((+tObj[k]||0)/tot*100); const fill=Math.max(0,Math.min(100,tgt));
+      /* item 35 — the from→to arrow's 'from' is the MODEL target (or the saved 'old' target if one exists), not the static current holding; it renders ONLY when the new target actually differs from that baseline */
+      const baseObj=(s.savedDimTargets&&s.savedDimTargets[d.key])||d.target||{}; const baseTotV=cats.reduce((a,x)=>a+(+baseObj[x]||0),0)||1;
+      const sliders = adjOpen? cats.map(k=>{ const raw=(tObj[k]!=null?tObj[k]:d.actual[k]); const cur=Math.round(d.actual[k]||0); const tgt=Math.round((+tObj[k]||0)/tot*100); const fill=Math.max(0,Math.min(100,tgt)); const basePct=Math.round((+baseObj[k]||0)/baseTotV*100);
         return h('div',{key:k,style:{display:'grid',gridTemplateColumns:'104px 1fr 66px',alignItems:'center',gap:9}},
           h('div',{style:{display:'flex',alignItems:'center',gap:7,minWidth:0}},
             h('span',{style:{width:9,height:9,borderRadius:2,background:`var(${d.colors[k]})`,flex:'0 0 9px'}}),
@@ -6188,7 +6190,7 @@ class Component extends DCLogic {
           /* item 33 — right cell shows the ALLOCATED-IN-MILLIONS amount (pool €m × target %) so the reader sees % (on the bar) AND €m; the pp change sits beneath it */
           h('div',{style:{textAlign:'right',lineHeight:1.15}},
             h('div',{'data-testid':'eurm-'+d.key+'-'+k,style:{fontSize:11.5,fontFamily:SF,fontWeight:700,color:'var(--ink)'}}, eurStr(tgt)),
-            h('div',{style:{fontSize:9.5,fontFamily:SF,fontWeight:600,color:'var(--muted)',marginTop:1}}, cur+'→'+tgt)));
+            (basePct!==tgt)? h('div',{'data-testid':'fromto-'+d.key+'-'+k,style:{fontSize:9.5,fontFamily:SF,fontWeight:600,color:'var(--muted)',marginTop:1}}, basePct+'→'+tgt) : null));
       }) : null;
       /* item 30 — 'Reset to model' only appears when the current target actually DIFFERS from the saved (or, before any save, the model) baseline; comparing per-category rounded % */
       const baseTgt=(s.savedDimTargets&&s.savedDimTargets[d.key])||d.target||{};
