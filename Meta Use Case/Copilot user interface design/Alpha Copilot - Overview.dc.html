@@ -5347,7 +5347,7 @@ class Component extends DCLogic {
       h('div',{style:{fontSize:11.5,lineHeight:1.45,color:'rgba(255,255,255,.9)'}},
         'Your book is worth ',h('strong',{key:'v',style:{color:'#fff'}},_navTxt),' at ',h('strong',{key:'t',style:{color:'#fff'}},_tvpi+'x TVPI'),' ('+_qoq+' this quarter), and you’ve filled ',h('strong',{key:'p',style:{color:'#fff'}},_pmYou+'%'),' of your '+_pmTgt+'% private-markets target. Across the book your largest gap is ',h('strong',{key:'u',style:{color:'#fff'}},_under.n+' ('+Math.abs(_under.d)+'pp under)'),' and '+_topHold.n+' is your biggest concentration at '+_topHold.p+'%.'));
     const suggestBtn=h('button',{onClick:()=>this.setState({homeDrill:null,homeFocusCat:null,simSuggest:'strategy'}),
-      style:{flex:'1 1 220px',minWidth:200,border:'none',background:'var(--brand)',color:'#fff',borderRadius:14,padding:'12px 20px',fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif',boxShadow:'0 10px 26px -16px rgba(44,45,254,.65)',display:'flex',alignItems:'center',justifyContent:'center',gap:6,textAlign:'center'}},
+      style:{flex:'0 0 auto',alignSelf:'center',border:'1px solid var(--brand)',background:'var(--brand-wash)',color:'var(--brand-ink)',borderRadius:9,padding:'8px 14px',fontSize:12.5,fontWeight:600,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif',display:'inline-flex',alignItems:'center',justifyContent:'center',gap:6,whiteSpace:'nowrap'}},
       '✦ Suggest opportunities to fill the gaps  →');
     // item 71 — 'Where you're concentrated' box + allocated-vs-committed Z-chart (real deviation data), moved down the page
     const concRows=this.basisPct('strategy'); // for the concentration ranking (current basis)
@@ -5373,7 +5373,12 @@ class Component extends DCLogic {
     const _paidIn=parseFloat(String(_P.paidInText||'13').replace(/[^0-9.]/g,''))||13;
     const _totalVal=(_ccy===_baseCcy)?(_P.navText||'€16.6m'):(_ccySym(_ccy)+(_navN*_rate).toFixed(1)+'m');
     const _aboveCalled=(_ccySym(_ccy))+( (_navN-_paidIn)*_rate ).toFixed(1)+'m';
-    const _ccyToggle=h('div',{onClick:e=>e.stopPropagation()}, this.seg(Object.keys(_fx.rates||{EUR:1}).map(c=>({label:c,value:c})), _ccy, v=>this.setDtog('hdrCcy',v), {sm:true}));
+    /* currency as a dropdown — EUR · USD · GBP · CHF surfaced first, every other currency selectable below (item: was oversized segmented buttons) */
+    const _ccyAll=Object.keys(_fx.rates||{EUR:1}); const _ccyPref=['EUR','USD','GBP','CHF'];
+    const _ccyOrder=_ccyPref.filter(c=>_ccyAll.includes(c)).concat(_ccyAll.filter(c=>_ccyPref.indexOf(c)<0));
+    const _ccyToggle=h('select',{value:_ccy,onClick:e=>e.stopPropagation(),onChange:e=>this.setDtog('hdrCcy',e.target.value),
+      style:{background:'rgba(255,255,255,.16)',color:'#fff',border:'1px solid rgba(255,255,255,.4)',borderRadius:8,padding:'5px 10px',fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},
+      _ccyOrder.map(c=>h('option',{key:c,value:c,style:{color:'#111'}}, c+' '+_ccySym(c).trim())));
     /* PDF#2 (review3) — prominent TOTAL PORTFOLIO VALUE hero + clear base currency, with Funds/GPs/Companies/Countries cards */
     const heroLeft=h('div',{style:{flex:'1 1 360px',minWidth:280,background:'linear-gradient(135deg,var(--brand),var(--brand-ink))',borderRadius:16,padding:'20px 22px',color:'#fff',display:'flex',flexDirection:'column',gap:10}},
       h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,flexWrap:'wrap'}},
