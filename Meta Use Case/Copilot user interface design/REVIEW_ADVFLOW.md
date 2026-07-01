@@ -1,0 +1,62 @@
+# Moonfare Alpha Advisor-Flow Design Review — 59 items, built ONE AT A TIME, Playwright-verified each.
+Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.md). [x]=done+verified, [ ]=todo.
+
+- [x] 1. Remove the top view (investor workspace-nav strip) in advisor view. (a88f7f4 — verified last turn)
+- [ ] 2. Skip the dashboard section for the advisor view (advisor IS the advisor).
+- [ ] 3. When clicking Share to client, it should hide the client view.
+- [ ] 4. Understand/Shape/Act/Research should be the same design as the normal investor view.
+- [ ] 5. When compressing the screen it looks weird (responsive).
+- [ ] 6. Move private-markets target next to investable wealth.
+- [ ] 7. 'already in private markets' → 'already invested in private markets'.
+- [ ] 8. Regions → Europe, Middle East, Asia, America, Rest of World.
+- [ ] 9. Field header (label) larger than the input field.
+- [ ] 10. Align all input fields (already-in-PM not aligned with PM-target).
+- [ ] 11. Use the investor set-target profile as a design example.
+- [ ] 12. Client profile: include investment targets (capital growth, diversification, access to institutional managers, income distributions, thematic exposure, long-term family wealth planning).
+- [ ] 13. Tailored target + adjust/compare → Shape view, not Understand (Understand = profile overview; Shape = simulator+compare for L3).
+- [ ] 14. Risk class wrong: classed Opportunistic/Advanced but headline says Aggressive; changing doesn't work.
+- [ ] 15. Region change doesn't apply (still same).
+- [ ] 16. Move the new Profile section up under investor name / investable wealth (top part).
+- [ ] 17. On Tailored Target adjust/compare, Calls-for-Action must match THIS page (not previous page).
+- [ ] 18. Remove Vintage target (wasn't in investor view).
+- [ ] 19. On all tailored-target graphs, break small numbers out with an arrow showing the %.
+- [ ] 20. 'in line with model' → show the chart with zeros, not fictional gray bars (investor view too).
+- [ ] 21. 'model target' → 'Moonfare model portfolio' EVERYWHERE (all investor + advisor pages).
+- [ ] 22. Too-small peer selection → paywall (paid clients only).
+- [ ] 23. Advisor flow: too many filters yielding too few results → take next-closest-largest before the gap-closing filter.
+- [ ] 24. Direct/co-investments and secondaries are FORMATS not strategies — remove from strategy section.
+- [ ] 25. Keep strategies in strategy target; remove direct & co-investments entirely.
+- [ ] 26. Remove Direct & Co-Investments from the investor view too.
+- [ ] 27. All three charts: equal space + equal distance from each other and the card walls.
+- [ ] 28. Remove the entire strategy/region table (%, totals, base ccy) from tailored-target — keep only compare-against (model/peers/platform/top).
+- [ ] 29. 'Adjust my target' in a distinct color, next to Model.
+- [ ] 30. 'Reset to model' only appears if sliders changed from saved target.
+- [ ] 31. 'Saved' button disappears once something is changed.
+- [ ] 32. Sliders look like bar charts (not weird sliders); % more centered; sliders smaller.
+- [ ] 33. Right-hand side shows allocated in millions (% AND €m).
+- [ ] 34. Slider input boxes shouldn't look like input boxes — like a normal table.
+- [ ] 35. Going-from/going-to arrows only when changed from model/old target (no static numbers).
+- [ ] 36. Total row: edit €m to raise PM allocation; shows new % of investable wealth next to total; distinct total row.
+- [ ] 37. Same (36-style table) for region, currency, sector, format. No vintage.
+- [ ] 38. Tailored model portfolio (view 3 of L3) → Shape not Understand; no vintage mix.
+- [ ] 39. Rename 'your tailored model portfolio full view' → 'Your tailored asset allocation for you'.
+- [ ] 40. Tailored model portfolio strategy mix must match the earlier decided mix (secondaries/infra/AI&tech) — connect them.
+- [ ] 41. Orient all charts in tailored model portfolio per the previous view.
+- [ ] 42. Remove the useless yellow badge next to Sector mix / Format mix.
+- [ ] 43. Format mix: remove co-investments; AI/tech isn't a format.
+- [ ] 44. Sector ordering: AI at 8% shouldn't sit above Healthcare at 18% — order by value.
+- [ ] 45. Currency says Euro but investor is USD — make consistent.
+- [ ] 46. Advisor can select done/future pages to download as PDF (plan ahead / send proposal).
+- [ ] 47. New investor: change 'existing' → 'new' next to investor.
+- [ ] 48. Remove 'L3 full toolbox, the complete investor view...' noise text.
+- [ ] 49. Remove comparison/peer-benchmark/portfolio-comparison for NEW investor entirely (nothing to compare).
+- [ ] 50. After Shape, next is ACT not Research (understand→shape→act→research order).
+- [ ] 51. Next-best-actions must be the SAME page as investor view (import it, don't invent).
+- [ ] 52. Show target portfolio (what needs filling) + click individual funds to add to portfolio.
+- [ ] 53. Delete current-allocation-vs-target (useless, it's zero).
+- [ ] 54. Direct/co-investment shouldn't jump up in the chart.
+- [ ] 55. Click individual funds → open fund page (view before invest).
+- [ ] 56. Take investor next-best-action page + your-target section + opportunities + preview-before-buy.
+- [ ] 57. Let me change strategy/region/currency/sector mix (what matters most) or one goal to optimize all fast.
+- [ ] 58. Add whom to follow + platform.
+- [ ] 59. Add a Call Summary + Next Actions page (reminders + notes).
