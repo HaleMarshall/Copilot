@@ -8345,14 +8345,17 @@ class Component extends DCLogic {
     const rail=h('div',{style:{flex:'0 0 320px',width:320,background:'var(--surface)',borderRight:'1px solid var(--line)',height:'100%',overflow:'auto',padding:'16px 16px 28px'}},
       h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14}}, h('span',{style:{fontFamily:SF,fontSize:15,fontWeight:700}},'Moonfare'), h('span',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.06em',color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:5,padding:'2px 7px'}},'ADVISOR')),
       objChip, goalsBox, stepBox, navBtns, h('div',{style:{height:1,background:'var(--line)',margin:'2px 0 14px'}}), cfaSection, h('div',{style:{height:1,background:'var(--line)',margin:'2px 0 14px'}}), scriptBox, h('div',{style:{height:1,background:'var(--line)',margin:'14px 0'}}), this.advNoteCard());
-    /* E1/E2 — Understand → Shape → Act → Research nav in the advisor flow; free jumping for mid-call pivots */
-    const WS=[['understand','Understand','Overview & targets'],['shape','Shape','Simulator & compare'],['act','Act','Opportunities & next best'],['research','Research','Managers & funds']];
+    /* E1/E2 — Understand → Shape → Act → Research nav, SAME design as the investor view's wsNav() (compact
+       verb-over-label pill row, chip when active). Reuses this.WS() so labels match the investor view exactly;
+       free jumping for mid-call pivots, greyed when a workspace isn't part of this journey. */
     const curWs=this.advStepWS(key);
-    const wsNav=h('div',{style:{display:'flex',gap:8,flexWrap:'wrap',marginBottom:14}}, WS.map(([w,l,sub])=>{ const on=curWs===w; const avail=this.advSeq().some(k=>this.advStepWS(k)===w);
-      return h('button',{key:w,onClick:()=>{ if(avail) this.advJumpWS(w); },disabled:!avail,title:avail?('Jump to '+l):(l+' — not in this journey'),
-        style:{flex:'1 1 150px',textAlign:'left',border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand)':(avail?'var(--surface)':'var(--surface-2)'),color:on?'#fff':(avail?'var(--ink)':'var(--muted)'),borderRadius:11,padding:'9px 13px',cursor:avail?'pointer':'default',opacity:avail?1:.55}},
-        h('div',{style:{fontSize:12.5,fontWeight:700,fontFamily:SF}},l),
-        h('div',{style:{fontSize:10,color:on?'rgba(255,255,255,.8)':'var(--muted)',marginTop:1}},sub)); }));
+    const wsNav=h('div',{style:{display:'inline-flex',gap:3,background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:12,padding:4,marginBottom:14,alignSelf:'flex-start',maxWidth:'100%',flexWrap:'wrap'}}, this.WS().map(w=>{ const on=curWs===w.id; const avail=this.advSeq().some(k=>this.advStepWS(k)===w.id);
+      return h('button',{key:w.id,onClick:()=>{ if(avail) this.advJumpWS(w.id); },disabled:!avail,title:avail?('Jump to '+w.verb):(w.verb+' — not in this journey'),
+        style:{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:0,padding:'6px 16px',borderRadius:9,cursor:avail?'pointer':'default',border:'none',background:on?'var(--surface)':'transparent',boxShadow:on?'0 1px 3px rgba(0,0,0,.12)':'none',opacity:avail?1:.4},
+        onMouseEnter:e=>{if(!on&&avail)e.currentTarget.style.background='var(--surface)';},
+        onMouseLeave:e=>{if(!on)e.currentTarget.style.background='transparent';}},
+        h('span',{style:{fontSize:8.5,letterSpacing:'.1em',textTransform:'uppercase',color:'var(--muted)'}}, w.verb),
+        h('span',{style:{fontSize:13.5,fontWeight:on?700:500,whiteSpace:'nowrap',color:'var(--ink)'}}, w.label)); }));
     const crumb=h('div',{style:{display:'flex',alignItems:'center',gap:8,fontSize:11.5,color:'var(--muted)',marginBottom:16,flexWrap:'wrap'}}, h('span',{style:{fontFamily:SF,fontWeight:600,color:'var(--ink)'}},'Moonfare'), h('span',{style:{color:'var(--over)'}},'●'), h('span',null,'Canvas · '+this.state.advLevel+'  ·  '+pm.crumb));
     const focusBanner=this.state.advFocus? h('div',{style:{display:'flex',alignItems:'center',gap:10,background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:10,padding:'9px 13px',marginBottom:14}}, h('span',{style:{fontSize:11,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--brand-ink)'}},'Focused'), h('span',{style:{fontSize:12.5,color:'var(--ink)'}},'Jumped from the script to '+this.state.advFocus+'.'), h('button',{onClick:()=>this.advClearFocus(),style:{marginLeft:'auto',border:'1px solid var(--brand-tint-3)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:7,padding:'3px 9px',fontSize:11,cursor:'pointer'}},'Clear ✕')) : null;
     /* short steps float centred (margin:auto safely centres when there's room, collapses to top-aligned + scrollable when content is tall); a faint footer anchors the bottom */
