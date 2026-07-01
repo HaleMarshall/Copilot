@@ -3202,18 +3202,15 @@ class Component extends DCLogic {
     const grid=h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(600px,1fr))',gap:16,alignItems:'stretch'}}, pairs);
     const cfCard=this.card({title:'PE cash-flow model — PitchBook-calibrated',badge:this.badge('engine','synth'),children:this.cfModel({level: this.state.persona2==='pro'?'L3':'L2', mix:this.modelMix()}),caption:'Forward cash flows from PitchBook strategy curves: contributions, distributions, the J-curve with percentile bands, and expected DPI / TVPI. Catch-Up vs Scale-factor distribution method; percentile 25th–90th selectable.'});
     const main=h('div',{style:{flex:1,minWidth:0,display:'flex',flexDirection:'column',gap:16}}, header, this.fKpiTiles(pj), this.futureJCurveHero(pj), cfCard, grid);
-    const actBtn=h('button',{onClick:()=>this.setState({futureAct:true}),
-      style:{width:'100%',border:'none',borderRadius:12,padding:'13px',cursor:'pointer',fontSize:13.5,fontWeight:700,color:'#fff',background:'linear-gradient(135deg,#3D6BFF,#5B5CFF)',boxShadow:'0 12px 28px -12px rgba(61,107,255,.7)'}},
-      '✦ Act on your prediction →');
+    /* item 28 — 'Act on your prediction' CTA removed per review (next-best action is a dedicated later step) */
     const filters=h('div',{style:{background:'var(--surface)',border:'1px solid var(--line)',borderRadius:14,padding:'16px 16px 18px'}},
       h('div',{style:{fontSize:14,fontWeight:700,fontFamily:SF,marginBottom:3}},'Future filters'),
       h('div',{style:{fontSize:11,color:'var(--muted)',marginBottom:14}},'Tune the forward view — every chart recomputes live.'),
       this.futureFilters(pj));
-    const right=h('aside',{style:{flex:'0 0 300px',width:300,alignSelf:'flex-start',position:'sticky',top:0,display:'flex',flexDirection:'column',gap:14}}, actBtn, filters);
+    const right=h('aside',{style:{flex:'0 0 300px',width:300,alignSelf:'flex-start',position:'sticky',top:0,display:'flex',flexDirection:'column',gap:14}}, filters);
     return h('div',null,
       h('div',{style:{display:'flex',gap:18,alignItems:'flex-start'}}, main, right),
-      s.futureDetail? this.futureDetailBody(pj):null,
-      s.futureAct? this.futureActBody():null);
+      s.futureDetail? this.futureDetailBody(pj):null);
   }
   futureDetailBody(pj){
     const h=this.h; const SF=this.SF; const k=this.state.futureDetail;
@@ -8448,9 +8445,13 @@ class Component extends DCLogic {
           this.card({title:'Reserved ✓',tone:'alpha',children:h('div',{style:{display:'flex',flexDirection:'column',gap:12}}, h('div',{style:{fontSize:14,lineHeight:1.55,color:'rgba(255,255,255,.92)'}},'Your interest is logged. The moment the allocation opens you’ll get a push notification and an email — “Invest in Lexington now” — and it routes straight back to your reserved-interest queue.'),
             h('div',{style:{background:'rgba(255,255,255,.12)',borderRadius:10,padding:'11px 13px',fontSize:12.5,color:'#fff'}}, h('b',null,'🔔 Push · '), 'Your Lexington Secondary just opened — reserve converted to allocation request.'),
             h('button',{onClick:()=>this.advNext(),style:{alignSelf:'flex-start',border:'none',background:'#fff',color:'var(--brand-ink)',borderRadius:9,padding:'11px 18px',fontSize:13.5,fontWeight:700,cursor:'pointer'}},'Continue  →'))})]); }
-        return wrap([ head('Seize this opportunity','Reserve interest now — you’ll be first in line when it opens. No commitment yet.'),
-        this.card({title:'Reserve of interest',tone:'alpha',children:h('div',{style:{display:'flex',flexDirection:'column',gap:12}}, h('div',{style:{fontSize:14,lineHeight:1.55,color:'rgba(255,255,255,.92)'}},'Shall I reserve your interest? You’ll get a note the moment the allocation opens — and we’ll line up the paperwork so you don’t miss the window.'),
-          h('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}}, h('button',{onClick:()=>this.setState({advSeized:true}),style:{border:'none',background:'#fff',color:'var(--brand-ink)',borderRadius:9,padding:'11px 18px',fontSize:13.5,fontWeight:700,cursor:'pointer'}},'Reserve interest →'), h('button',{onClick:()=>this.setState({advSeized:true}),style:{border:'1px solid rgba(255,255,255,.5)',background:'transparent',color:'#fff',borderRadius:9,padding:'11px 18px',fontSize:13.5,fontWeight:600,cursor:'pointer'}},'Request allocation')))}) ]); }
+        {/* item 31 — an accredited/existing investor can invest now; only pre-gate prospects reserve interest until KYC */
+        const canInvest=this.state.advStage!=='pregate';
+        return wrap([ head(canInvest?'Seize this opportunity':'Seize this opportunity','Ready to act — commit now, or reserve your place if the allocation isn’t open yet.'),
+        this.card({title:canInvest?'Invest now':'Reserve of interest',tone:'alpha',children:h('div',{style:{display:'flex',flexDirection:'column',gap:12}}, h('div',{style:{fontSize:14,lineHeight:1.55,color:'rgba(255,255,255,.92)'}}, canInvest?'You’re accredited and ready — place the commitment now, and we’ll line up the paperwork straight away.':'Shall I reserve your interest? You’ll get a note the moment the allocation opens — and we’ll line up the paperwork so you don’t miss the window.'),
+          h('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}},
+            canInvest? h('button',{onClick:()=>this.setState({advSeized:true}),style:{border:'none',background:'#fff',color:'var(--brand-ink)',borderRadius:9,padding:'11px 18px',fontSize:13.5,fontWeight:700,cursor:'pointer'}},'✦ Invest now →') : null,
+            h('button',{onClick:()=>this.setState({advSeized:true}),style:{border: canInvest?'1px solid rgba(255,255,255,.5)':'none',background: canInvest?'transparent':'#fff',color: canInvest?'#fff':'var(--brand-ink)',borderRadius:9,padding:'11px 18px',fontSize:13.5,fontWeight:canInvest?600:700,cursor:'pointer'}},'Reserve interest →')))}) ]); }}
       case 'follower': {
         const chan=this.state.folChannel||'whatsapp';
         const defTopics={peers:true,top10:true,news:false};

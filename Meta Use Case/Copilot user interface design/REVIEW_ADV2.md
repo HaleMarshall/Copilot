@@ -39,12 +39,12 @@ Source: ~/Downloads/Advisor View 2 review.zip (click-comments.md). Status: [ ] t
 - [ ] 25. Macro toggle Slow Growth / Moderate / Aggressive must move the J-curve.
 - [ ] 26. Execution Quality (Top Quartile / Average) must do something.
 - [ ] 27. Product-mix sliders (Buyout/Growth/…/Direct) must affect the projection.
-- [ ] 28. Remove the "act on your prediction" part.
+- [x] 28. Remove the "act on your prediction" part.
 
 ## Next best / opportunities
 - [ ] 29. Next-best based on prior steps (not hard-coded); curated multi-fund PORTFOLIOS per strategy (buyout, AI&tech, etc.), not a single fund or the whole fund page.
 - [ ] 30. After selecting funds: show right-side pie of portfolio impact + comparison; drop the redundant re-simulate-target / re-peer-benchmark / re-manager-comparison steps.
-- [ ] 31. Prefer an "Invest Now" button (over reserve-interest).
+- [x] 31. Prefer an "Invest Now" button (over reserve-interest).
 
 ## Follower / notifications
 - [ ] 32. "Follow what matters": realistic iPhone frame; fix in-app + website; correct favicon; real Moonfare site + logo in the note.
