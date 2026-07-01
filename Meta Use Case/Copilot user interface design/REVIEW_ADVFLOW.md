@@ -36,7 +36,7 @@ Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.
 - [x] 33. Right-hand side shows allocated in millions (% AND €m).
 - [x] 34. Slider input boxes shouldn't look like input boxes — like a normal table.
 - [x] 35. Going-from/going-to arrows only when changed from model/old target (no static numbers).
-- [ ] 36. Total row: edit €m to raise PM allocation; shows new % of investable wealth next to total; distinct total row.
+- [x] 36. Total row: edit €m to raise PM allocation; shows new % of investable wealth next to total; distinct total row.
 - [ ] 37. Same (36-style table) for region, currency, sector, format. No vintage.
 - [ ] 38. Tailored model portfolio (view 3 of L3) → Shape not Understand; no vintage mix.
 - [ ] 39. Rename 'your tailored model portfolio full view' → 'Your tailored asset allocation for you'.

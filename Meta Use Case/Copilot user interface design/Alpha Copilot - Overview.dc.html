@@ -6196,11 +6196,21 @@ class Component extends DCLogic {
       const baseTgt=(s.savedDimTargets&&s.savedDimTargets[d.key])||d.target||{};
       const baseTot=cats.reduce((a,k)=>a+(+baseTgt[k]||0),0)||1;
       const dimChanged=cats.some(k=>Math.round((+tObj[k]||0)/tot*100)!==Math.round((+baseTgt[k]||0)/baseTot*100));
+      /* item 36 — a DISTINCT, editable TOTAL row: shows the total private-markets €m (poolEur) with the % of investable wealth on the LEFT; editing the €m raises the PM allocation by setting targetPct = €m / investable × 100, which recomputes poolEur + every category's €m. Subtle by default (surface-2 + top rule); when the % is raised above the model PM target it turns mint with a ▲. */
+      const pmPctWealth=_invM? +(poolEur/_invM*100).toFixed(1) : (this.myPmTarget()||20);
+      const pmBase=(this.PM&&this.PM.target)||20; const pmRaised=pmPctWealth>pmBase+0.05;
+      const totalRow=h('div',{'data-testid':'total-pm-'+d.key,style:{display:'grid',gridTemplateColumns:'104px 1fr 66px',alignItems:'center',gap:9,marginTop:8,paddingTop:9,borderTop:'2px solid var(--line)',background:'var(--surface-2)',borderRadius:'0 0 8px 8px',padding:'9px 8px 8px'}},
+        h('div',{style:{display:'flex',flexDirection:'column',gap:1,minWidth:0}},
+          h('span',{style:{fontSize:11.5,fontFamily:SF,fontWeight:700,color:'var(--ink)'}},'Total private markets'),
+          h('span',{'data-testid':'pm-pct-wealth-'+d.key,style:{fontSize:10,fontWeight:700,color:pmRaised?'var(--over)':'var(--muted)'}}, (pmRaised?'\u25b2 ':'')+pmPctWealth+'% of investable wealth')),
+        h('div',{style:{fontSize:9.5,color:'var(--muted)',textAlign:'center',fontStyle:'italic'}},'edit \u20acm to raise your private-markets allocation'),
+        h('div',{style:{textAlign:'right',fontSize:11.5,fontFamily:SF,fontWeight:700,color:'var(--ink)'}}, '\u20ac',
+          h('input',{'data-testid':'total-eurm-'+d.key,type:'text',inputMode:'decimal',value:String(poolEur),onChange:e=>{ const X=Math.max(0,+String(e.target.value).replace(/[^0-9.]/g,'')||0); this.setState({targetPct:_invM? +Math.max(0,Math.min(100,X/_invM*100)).toFixed(2) : X}); },'aria-label':'total private-markets euro millions',style:{width:38,textAlign:'right',border:'none',outline:'none',background:'transparent',fontSize:11.5,fontFamily:SF,fontWeight:700,color:'var(--ink)',padding:0}}), 'm'));
       /* item 29 — the Adjust button now lives in the comparator row; this block only reveals (when open) Reset (item 30 — only if changed) + risk toggle + sliders */
       const adjustBlock=adjOpen? h('div',{style:{display:'flex',flexDirection:'column',gap:10,marginTop:2}},
         dimChanged? h('div',{style:{display:'flex',gap:9,flexWrap:'wrap',alignItems:'center'}},
           h('button',{'data-testid':'reset-target-'+d.key,onClick:()=>this.setState({simTargets:null}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:9,padding:'8px 13px',fontSize:12,fontWeight:600,cursor:'pointer'}},'Reset to model')) : null,
-        h('div',{style:{display:'flex',flexDirection:'column',gap:10,marginTop:2}}, riskToggle, h('div',{style:{display:'flex',flexDirection:'column',gap:9}}, sliders))) : null;
+        h('div',{style:{display:'flex',flexDirection:'column',gap:10,marginTop:2}}, riskToggle, h('div',{style:{display:'flex',flexDirection:'column',gap:9}}, sliders, totalRow))) : null;
       /* item 28 — the per-dimension %/€/Total line-item table was removed from the tailored-target cards; the donuts + Z-chart + comparator selector carry the story, no redundant table */
       /* item 31 — the '✓ Saved' pill goes away the moment the target changes from the saved baseline (reuses item 30's dimChanged) */
       const savedThis=(s.savedDimMsg===d.key) && !dimChanged;
