@@ -5903,25 +5903,37 @@ class Component extends DCLogic {
         style:{width:'100%',accentColor:'var(--brand)',cursor:'pointer'}}),
       help?h('div',{style:{fontSize:10.5,color:'var(--muted)',marginTop:4,lineHeight:1.4}},help):null);
   }
-  simulatorBody(){
+  simulatorBody(opts){
     const h=this.h; const SF=this.SF; const s=this.state;
+    /* advisor context (transcript): Basic (L1) = model + strategy-level adjust only, no comparison world;
+       Advanced (L2) = strategy adjust + strategy-level comparison; Pro (L3) = full simulator (all dims + compare).
+       Follow-a-group + 'take your target further' are dropped in the advisor cockpit (Follower is its own step). */
+    opts=opts||{}; const adv=!!opts.adv; const advL=opts.level||this.state.advLevel||'L3';
+    const noCompare=adv && advL==='L1';                 /* Basic: adjust only */
+    const stratOnly=adv && (advL==='L1'||advL==='L2');  /* Basic & Advanced: strategy dimension only */
     const dims=this.HOME_DIMS();
     const targets=s.simTargets||this.defaultTargets();
     const focus=s.simFocus;
-    const ordered=focus? dims.slice().sort((a,b)=>(a.key===focus?-1:b.key===focus?1:0)) : dims;
+    let ordered=focus? dims.slice().sort((a,b)=>(a.key===focus?-1:b.key===focus?1:0)) : dims;
+    if(stratOnly) ordered=dims.filter(d=>d.key==='strategy');
     const nm=(dimKey,k)=> dimKey==='strategy' ? (this.STRATS.find(x=>x[0]===k)||[null,k])[1] : k;
     const dirty=this.targetsDirty();
 
     // ---- header + AI build-target action ----
+    const _title = noCompare ? 'Your tailored target' : (adv ? 'Your tailored target — adjust & compare' : 'Simulate and compare your targets');
+    const _sub = noCompare
+      ? 'This is the model we’d suggest — adjust the strategy mix with the sliders and it updates live, with the delta versus the original proposal.'
+      : (adv
+        ? 'Adjust the strategy mix, then compare your target against peers, the model, family offices or the endowments — target vs target.'
+        : 'Set a target per dimension, then simulate it against the group you’re comparing — Custom lets you shape it with the sliders. Save each target individually.');
     const header=h('div',{style:{display:'flex',gap:16,alignItems:'flex-start',justifyContent:'space-between',flexWrap:'wrap'}},
       h('div',{style:{minWidth:0}},
         h('div',{style:{fontSize:10.5,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Shape · Target simulator'), /* item 63 */
         /* review6 — chrome pagehead is suppressed on this view, so the body owns the single title (no more duplicate intro) */
-        h('div',{style:{fontFamily:SF,fontSize:26,fontWeight:600,margin:'3px 0 2px'}},'Simulate and compare your targets'),
-        h('div',{style:{fontSize:13,color:'var(--muted)',lineHeight:1.5,maxWidth:620}},
-          'Set a target per dimension, then simulate it against the group you’re comparing — Custom lets you shape it with the sliders. Save each target individually.')),
+        h('div',{style:{fontFamily:SF,fontSize:26,fontWeight:600,margin:'3px 0 2px'}}, _title),
+        h('div',{style:{fontSize:13,color:'var(--muted)',lineHeight:1.5,maxWidth:620}}, _sub)),
       h('div',{style:{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:10,flex:'0 0 auto'}},
-        this.followCardCompact(), /* review4 item 7 — Follow-a-group next to the simulator title, right side */
+        adv? null : this.followCardCompact(), /* review4 item 7 — Follow-a-group by the title (investor view only; advisor has the Follower step) */
         h('button',{onClick:()=>this.aiBuildTarget(),style:{display:'inline-flex',alignItems:'center',gap:8,background:'linear-gradient(135deg,#2C2DFE,#5B5CFF)',color:'#fff',border:'none',borderRadius:11,padding:'12px 18px',fontSize:13,fontWeight:700,cursor:'pointer',boxShadow:'0 8px 22px -10px rgba(44,45,254,.6)',fontFamily:'Inter,system-ui,sans-serif'}},'✦ Build my target with Alpha'),
         h('div',{style:{fontSize:10.5,color:'var(--muted)'}},'New here? Let Alpha propose a starting target.')));
 
@@ -5982,32 +5994,33 @@ class Component extends DCLogic {
     // ---- one card PER dimension (strategy, region, currency, sector): your target pie + side legend, with a 'compare against' selector under it; Custom opens sliders + numeric % inputs + risk strategies ----
     /* item 67 — only Model / Peers / Platform / Top 10% / Custom (no 'current' here) */
     const CMP=[['model','Model'],['peers','Peers'],['platform','Platform'],['top10','Top 10%'],['family','Family offices'],['custom','Custom']];
-    const dimTargetCard=(d)=>{
+    const dimTargetCard=(d, hideCompare)=>{
       const cats=Object.keys(d.actual);
       const tObj=targets[d.key]||d.target||d.actual;
       const tot=cats.reduce((a,k)=>a+(+tObj[k]||0),0)||1;
       const tgtSlices=cats.map(k=>({color:d.colors[k]||'--data-9',p:+(((+tObj[k]||0)/tot*100)).toFixed(1),n:nm(d.key,k)}));
-      const mode=(s.simCmp&&s.simCmp[d.key])||'model'; /* item 67 — default Model, not current */
+      const mode=hideCompare? 'model' : ((s.simCmp&&s.simCmp[d.key])||'model'); /* item 67 — default Model, not current; Basic compares only vs the original proposal */
       const compMix = mode==='custom'? tObj : (mode==='model'? d.target : this.dimBench(d,mode));
       const compTot=cats.reduce((a,k)=>a+(+compMix[k]||0),0)||1;
       const compSlices=cats.map(k=>({color:d.colors[k]||'--data-9',p:+(((+compMix[k]||0)/compTot*100)).toFixed(1),n:nm(d.key,k)})).filter(x=>x.p>0);
-      const compLabel={model:'the Model target',peers:'the Peers’ target',platform:'the Platform target',top10:'the Top 10% target',family:'the Family-office mix',custom:'your custom group'}[mode];
-      const compShort={model:'Model',peers:'Peers',platform:'Platform',top10:'Top 10%',family:'Family offices',custom:'Custom'}[mode];
+      const compLabel=hideCompare? 'the original proposal' : {model:'the Model target',peers:'the Peers’ target',platform:'the Platform target',top10:'the Top 10% target',family:'the Family-office mix',custom:'your custom group'}[mode];
+      const compShort=hideCompare? 'Original' : {model:'Model',peers:'Peers',platform:'Platform',top10:'Top 10%',family:'Family offices',custom:'Custom'}[mode];
       /* item 70 — Z-chart instead of the table */
       const zRows=cats.map(k=>{ const yv=Math.round((+tObj[k]||0)/tot*100); const cv=Math.round((+compMix[k]||0)/compTot*100); const dd=+(yv-cv).toFixed(1); return {name:nm(d.key,k),delta:dd,color:d.colors[k]||'--data-9',sig:Math.abs(dd)>=2}; }).filter(r=>r.delta!==0).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
       /* item 68 — left: my target · middle: the comparator · right: the Z-chart */
       const cols=h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:18,alignItems:'start'}},
         h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutLabel('Your target'), this.donutNamed(tgtSlices,170,'Target',d.label.toLowerCase()),
           h('div',{style:{fontSize:10,color:'var(--muted)'}},'your '+d.label.toLowerCase()+' target')),
-        h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutLabel(compShort+' · target'), this.donutNamed(compSlices,170,compShort,d.label.toLowerCase()),
+        hideCompare? null : h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutLabel(compShort+' · target'), this.donutNamed(compSlices,170,compShort,d.label.toLowerCase()),
           h('div',{style:{fontSize:10,color:'var(--muted)'}},compLabel)),
-        h('div',null, h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}},'Your target vs '+compShort+'’s target (pp)'),
-          zRows.length? this.miniZ(zRows): h('div',{style:{fontSize:12,color:'var(--muted)',padding:'18px 0',textAlign:'center'}},'In line with '+compShort+'.')));
+        h('div',null, h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}}, hideCompare? 'Your change vs the original proposal (pp)' : ('Your target vs '+compShort+'’s target (pp)')),
+          zRows.length? this.miniZ(zRows): h('div',{style:{fontSize:12,color:'var(--muted)',padding:'18px 0',textAlign:'center'}}, hideCompare? 'Move a slider to shape your target.' : ('In line with '+compShort+'.'))));
       /* item 67/69 — comparator selector; Peers & Custom open the group editor (same one as the comparison page) */
-      const selector=h('div',null,
+      const selector=hideCompare? null : h('div',null,
         h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:7}},'Compare your target against'),
         h('div',{style:{display:'flex',flexWrap:'wrap',gap:6}}, CMP.map(([v,l])=>{ const on=mode===v;
-          return h('button',{key:v,onClick:()=>{ this.setSimCmp(d.key,v); if(v==='peers') this.applyPeerCohort({cmp:'peers',controlOpen:true}); else if(v==='custom') this.clearCohort({cmp:'custom',controlOpen:true}); }, /* review4 item 2 */
+          /* item 37 — Custom must open the shaping engine: select it, apply a custom cohort, and reveal the sliders inline (the 'custom engine') */
+          return h('button',{key:v,onClick:()=>{ this.setSimCmp(d.key,v); if(v==='peers'){ this.applyPeerCohort({cmp:'peers',controlOpen:true}); } else if(v==='custom'){ this.clearCohort({cmp:'custom',controlOpen:true}); this.setDtog('simAdjust_'+d.key,true); } },
             style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 13px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}}, (v==='custom'||v==='peers')?'✎ '+l:l); })));
       /* item 68 — Adjust-my-target button reveals the sliders inline (any comparator, not only Custom) */
       const adjOpen=this.dtog('simAdjust_'+d.key,false);
@@ -6041,13 +6054,13 @@ class Component extends DCLogic {
           h('button',{onClick:()=>this.saveDimTarget(d.key),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'6px 12px',fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif',whiteSpace:'nowrap'}},'✓ Save '+d.label.toLowerCase()+' target')),
         children:h('div',null,
           /* review4 item 3 — make it absolutely clear: simulating YOUR target against the comparator GROUP'S target */
-          h('div',{style:{display:'flex',gap:8,alignItems:'center',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:10,padding:'9px 12px',marginBottom:12,fontSize:12,color:'var(--brand-ink)',lineHeight:1.45}},
+          hideCompare? null : h('div',{style:{display:'flex',gap:8,alignItems:'center',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:10,padding:'9px 12px',marginBottom:12,fontSize:12,color:'var(--brand-ink)',lineHeight:1.45}},
             h('span',{style:{flex:'0 0 auto'}},'◧'), h('span',null,'Simulating ',h('b',null,'your '+d.label.toLowerCase()+' target'),' against ',h('b',null,compLabel),' — target vs target, so you can shape toward where '+compShort+' aim to be.')),
           cols, h('div',{style:{borderTop:'1px solid var(--line)',marginTop:14,paddingTop:14,display:'flex',flexDirection:'column',gap:12}}, selector, adjustBlock)),
         caption:'Your '+d.label.toLowerCase()+' target vs '+compLabel+' — target against target. The Z-chart shows your target minus theirs. Press “Adjust my target” to reshape it; Peers/Custom open the group editor.'});
     };
     const grid=h('div',{style:{display:'flex',flexDirection:'column',gap:18}},
-      ordered.map(d=>h('div',{key:d.key}, dimTargetCard(d))));
+      ordered.map(d=>h('div',{key:d.key}, dimTargetCard(d, noCompare))));
 
     /* item 59 — targets are saved individually per dimension (button on each card above); no single save-all */
     const savedDims=Object.keys(s.savedDimTargets||{});
@@ -6095,7 +6108,8 @@ class Component extends DCLogic {
       h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:9,lineHeight:1.5}},'Comparisons vs peers, the model or best performers are on the levers (right). Ask Alpha for anything else.'));
 
     const anyCustom=Object.values(s.simCmp||{}).includes('custom');
-    return h('div',{style:{display:'flex',flexDirection:'column',gap:18}}, header, grid, ((dirty||anyCustom||Object.keys(s.savedDimTargets||{}).length)?actions:null), deeper, compareCard);
+    /* 'Take your target further' + saved-target compare are dropped in the advisor cockpit — the cockpit has its own next steps */
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:18}}, header, grid, ((dirty||anyCustom||Object.keys(s.savedDimTargets||{}).length)?actions:null), adv?null:deeper, adv?null:compareCard);
   }
 
   /* ====================== OPPORTUNITIES (Act) ====================== */
@@ -8100,7 +8114,7 @@ class Component extends DCLogic {
       h('div',{style:{fontSize:12.5,color:'var(--ink)',lineHeight:1.55,fontStyle:'italic'}},pm.script));
     const rail=h('div',{style:{flex:'0 0 320px',width:320,background:'var(--surface)',borderRight:'1px solid var(--line)',height:'100%',overflow:'auto',padding:'16px 16px 28px'}},
       h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14}}, h('span',{style:{fontFamily:SF,fontSize:15,fontWeight:700}},'Moonfare'), h('span',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.06em',color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:5,padding:'2px 7px'}},'ADVISOR')),
-      goalsBox, objChip, stepBox, navBtns, h('div',{style:{height:1,background:'var(--line)',margin:'2px 0 14px'}}), cfaSection, h('div',{style:{height:1,background:'var(--line)',margin:'2px 0 14px'}}), scriptBox);
+      goalsBox, objChip, stepBox, navBtns, h('div',{style:{height:1,background:'var(--line)',margin:'2px 0 14px'}}), cfaSection, h('div',{style:{height:1,background:'var(--line)',margin:'2px 0 14px'}}), scriptBox, h('div',{style:{height:1,background:'var(--line)',margin:'14px 0'}}), this.advNoteCard());
     const crumb=h('div',{style:{display:'flex',alignItems:'center',gap:8,fontSize:11.5,color:'var(--muted)',marginBottom:16,flexWrap:'wrap'}}, h('span',{style:{fontFamily:SF,fontWeight:600,color:'var(--ink)'}},'Moonfare'), h('span',{style:{color:'var(--over)'}},'●'), h('span',null,'Canvas · '+this.state.advLevel+'  ·  '+pm.crumb));
     const focusBanner=this.state.advFocus? h('div',{style:{display:'flex',alignItems:'center',gap:10,background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:10,padding:'9px 13px',marginBottom:14}}, h('span',{style:{fontSize:11,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--brand-ink)'}},'Focused'), h('span',{style:{fontSize:12.5,color:'var(--ink)'}},'Jumped from the script to '+this.state.advFocus+'.'), h('button',{onClick:()=>this.advClearFocus(),style:{marginLeft:'auto',border:'1px solid var(--brand-tint-3)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:7,padding:'3px 9px',fontSize:11,cursor:'pointer'}},'Clear ✕')) : null;
     /* short steps float centred (margin:auto safely centres when there's room, collapses to top-aligned + scrollable when content is tall); a faint footer anchors the bottom */
@@ -8155,22 +8169,39 @@ class Component extends DCLogic {
           h('button',{style:{marginTop:9,border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'6px 12px',fontSize:11.5,fontWeight:700,cursor:'pointer'}},'View →')),
         h('div',{style:{opacity:.35,filter:'blur(.4px)',pointerEvents:'none'}}, h('div',{style:{width:'46%',height:13,background:'var(--line)',borderRadius:5,marginBottom:9}}), h('div',{style:{width:'80%',height:9,background:'var(--line)',borderRadius:5,marginBottom:7}}), h('div',{style:{width:'70%',height:9,background:'var(--line)',borderRadius:5,marginBottom:7}}), h('div',{style:{width:'60%',height:9,background:'var(--line)',borderRadius:5}}))));
   }
+  /* advisor call-notes: type a note during the call, add it to the client record (persisted via /api/note when the backend is present) */
+  advNoteCard(){ const h=this.h; const SF=this.SF; const s=this.state; const notes=s.advNotes||[]; const draft=s.advNoteDraft||'';
+    const add=()=>{ const t=(this.state.advNoteDraft||'').trim(); if(!t) return; const n=(this.state.advNotes||[]).concat([{text:t, ts:'just now'}]); this.setState({advNotes:n, advNoteDraft:''});
+      try{ fetch('/api/note',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t, source:'advisor'})}); }catch(e){} };
+    return this.card({title:'Call notes', badge:this.badge('advisor','conf'),
+      children:h('div',{style:{display:'flex',flexDirection:'column',gap:10}},
+        h('textarea',{value:draft, placeholder:'Type a note from this call — saved to the client record…', onChange:e=>this.setState({advNoteDraft:e.target.value}), style:{width:'100%',boxSizing:'border-box',minHeight:64,resize:'vertical',border:'1px solid var(--line)',borderRadius:9,padding:'9px 11px',fontSize:13,fontFamily:'Inter,system-ui,sans-serif',color:'var(--ink)',background:'var(--surface)',outline:'none'}}),
+        h('div',{style:{display:'flex',justifyContent:'flex-end'}}, h('button',{onClick:add, style:{border:'none',background:draft.trim()?'var(--brand)':'var(--surface-2)',color:draft.trim()?'#fff':'var(--muted)',borderRadius:9,padding:'8px 16px',fontSize:12.5,fontWeight:700,cursor:draft.trim()?'pointer':'default'}},'＋ Add note')),
+        notes.length? h('div',{style:{display:'flex',flexDirection:'column',gap:7,marginTop:2}}, notes.slice().reverse().map((nt,i)=>h('div',{key:i,style:{display:'flex',gap:8,fontSize:13,lineHeight:1.45,background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:8,padding:'8px 10px'}}, h('span',{style:{color:'var(--brand)',flex:'0 0 auto'}},'✎'), h('div',null, h('div',null,nt.text), h('div',{style:{fontSize:10,color:'var(--muted)',marginTop:2}}, nt.ts||'saved'))))) : null),
+      caption:'Your own notes on this call — stored to the client record alongside the AI-captured notes.'}); }
   advPageRender(key){
     const h=this.h; const SF=this.SF; const c=this.advClient()||{}; const L=this.state.advLevel; const lvl=(a,b,cc)=>this.advLvl(a,b,cc);
     const P=(this.DB&&this.DB.portfolio)||{}; const pm=this.advPageMeta(key);
+    const delegWrap=(eyebrow,sub,body)=>h('div',{style:{maxWidth:1220,margin:'0 auto'}},
+      h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:12,fontSize:11,color:'var(--muted)'}}, h('span',{style:{fontSize:9,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:5,padding:'2px 7px'}}, eyebrow), h('span',null, sub)),
+      body);
+    /* Target simulator at EVERY level (incl. L1 Basic): the transcript wants an adjustable model on the
+       tailored-target page. simulatorBody adapts by level — Basic = adjust only, Advanced/Pro add compare. */
+    const SIMSET={setTarget:1,confirmTarget:1,simTarget:1,simExisting:1,simFull:1,targetSimulator:1};
+    if(SIMSET[key] && typeof this.simulatorBody==='function'){ try{ const body=this.simulatorBody({adv:true, level:L});
+        const eyebrow = L==='L1'? 'Basic · tailored target' : (L==='L2'? 'Advanced · target + comparison' : 'Pro · full simulator');
+        return delegWrap(eyebrow, 'Live for '+(c.name||'this client')+' — adjust the mix'+(L==='L1'?'.':' and compare.'), body);
+      }catch(e){ /* fall through to the light advisor composition below */ } }
     /* L2/L3 = the real command center: delegate heavy steps to the full Investor-View bodies (all
        adjustors + built-in drill-ins). L3 renders in 'pro' depth, L2 in 'guided'. L1 stays light. */
     if(L!=='L1'){ const DELEG={overview:'homeOverviewBody', modelExisting:'homeOverviewBody',
-        setTarget:'simulatorBody', confirmTarget:'simulatorBody',
-        simTarget:'simulatorBody', simExisting:'simulatorBody', simFull:'simulatorBody', targetSimulator:'simulatorBody',
         multiComparison:'comparisonBody', compareToCurrent:'comparisonBody', peerComparison:'comparisonBody',
         future:'futureBody', opportunities:'opportunitiesBody', missedOut:'opportunitiesBody',
         managerComparison:'managerOverviewBody', fundComparison:'managerOverviewBody'};
       const fn=DELEG[key];
       if(fn && typeof this[fn]==='function'){ try{ const body=this[fn]();
-        return h('div',{style:{maxWidth:1220,margin:'0 auto'}},
-          h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:12,fontSize:11,color:'var(--muted)'}}, h('span',{style:{fontSize:9,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:5,padding:'2px 7px'}}, L+' · full toolbox'), h('span',null,'The complete Investor-View '+(pm.title||key)+' — every adjustor & drill-in, live for '+(c.name||'this client')+'.')),
-          body); }catch(e){ /* fall through to the light advisor composition below */ } } }
+        return delegWrap(L+' · full toolbox', 'The complete Investor-View '+(pm.title||key)+' — every adjustor & drill-in, live for '+(c.name||'this client')+'.', body);
+        }catch(e){ /* fall through to the light advisor composition below */ } } }
     const wrap=(kids)=>h('div',{style:{maxWidth:1000,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}, kids);
     const head=(t,s)=>h('div',null, h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:600,letterSpacing:'-.01em'}},t), s?h('div',{style:{fontSize:13,color:'var(--muted)',marginTop:3,lineHeight:1.5,maxWidth:680}},s):null);
     const lvlNote=(t)=>h('div',{style:{fontSize:11,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:8,padding:'7px 11px',display:'inline-block'}},t);
@@ -8194,15 +8225,25 @@ class Component extends DCLogic {
       }
       case 'intake': case 'intakeMin': {
         const minimal=key==='intakeMin'; const ed=this.state.advEdits||{};
-        /* editable during the call (per the review) — each field is a live input feeding the model */
-        const efield=(label,kk,dv)=>{ const hot=focus&&(fieldHL[focus]||[]).indexOf(label)>=0; const val=(ed[kk]!=null?ed[kk]:dv);
+        /* editable during the call — each field is a live, controlled input (onChange, not onInput) feeding the model.
+           Transcript: wealth is prefilled from onboarding; Region & Profession are the net-new fields; everything editable. */
+        const efield=(label,kk,dv,pre)=>{ const hot=focus&&(fieldHL[focus]||[]).indexOf(label)>=0; const val=(ed[kk]!=null?ed[kk]:dv);
           return h('div',{key:kk,style:{borderRadius:9,padding:'8px 11px',background:hot?'var(--brand-wash)':'var(--surface-2)',border:'1px solid '+(hot?'var(--brand-tint-3)':'var(--line)'),boxShadow:hot?'0 0 0 2px var(--brand-tint-3)':'none'}},
-            h('div',{style:{fontSize:10.5,color:hot?'var(--brand-ink)':'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em',marginBottom:2}},label),
-            h('input',{value:val,onInput:e=>{ const n=Object.assign({},this.state.advEdits); n[kk]=e.target.value; this.setState({advEdits:n}); },style:{width:'100%',boxSizing:'border-box',border:'none',background:'transparent',outline:'none',fontFamily:SF,fontSize:16,fontWeight:600,color:'var(--ink)'}})); };
-        const efields=[efield('Investable wealth','wealth',c.investable||''), efield('Age band','age',c.age||''), efield('Risk class','risk',c.risk||'')]
-          .concat(minimal?[]:[efield('Region','region',c.region||''), efield('Profession','profession',c.occupation||''), efield('Private-markets target','target',this.myPmTarget()+'%'), efield('Liquidity needs','liquidity','Moderate · keep a 12-month buffer')]);
-        return wrap([ head(pm.title, minimal?'Just enough to show a tailored model — the rest comes after accreditation.':'Prefilled from onboarding — edit any field live as it comes up in the call; changes flow into the model.'),
-          this.card({title:'Profile',badge:this.badge('editable','conf'),children:h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:10}}, efields),caption:'Confirm & update in the call — investable wealth, risk, region, profession, target and liquidity needs.'}),
+            h('div',{style:{display:'flex',alignItems:'center',gap:6,marginBottom:2}},
+              h('span',{style:{fontSize:10.5,color:hot?'var(--brand-ink)':'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em'}},label),
+              pre? h('span',{style:{fontSize:8.5,fontWeight:700,color:'var(--muted)',background:'var(--surface)',border:'1px solid var(--line)',borderRadius:4,padding:'0 4px'}},'prefilled') : h('span',{style:{fontSize:8.5,fontWeight:700,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:4,padding:'0 4px'}},'add')),
+            h('input',{value:val, placeholder:'—', onChange:e=>{ const n=Object.assign({},this.state.advEdits); n[kk]=e.target.value; this.setState({advEdits:n}); },style:{width:'100%',boxSizing:'border-box',border:'none',background:'transparent',outline:'none',fontFamily:SF,fontSize:16,fontWeight:600,color:'var(--ink)'}})); };
+        /* wealth/age/risk/target prefilled from onboarding; region + profession are the fields to add on this page; PM-history captures whether & how much they already hold */
+        const efields=[efield('Investable wealth','wealth',c.investable||'',true), efield('Age band','age',c.age||'',true), efield('Risk class','risk',c.risk||'',true)]
+          .concat(minimal?[]:[
+            efield('Region','region',c.region||''),
+            efield('Profession','profession',c.occupation||''),
+            efield('Already in private markets?','pmInvested',c.pmInvested||'No — first-time'),
+            efield('Amount invested so far (PM)','pmInvestedAmt',c.pmInvestedAmt||'€0'),
+            efield('Private-markets target','target',this.myPmTarget()+'%',true),
+            efield('Liquidity needs','liquidity','Moderate · keep a 12-month buffer')]);
+        return wrap([ head('Client profile', minimal?'Just enough to show a tailored model — the rest comes after accreditation.':'Prefilled from onboarding — everything is editable. Add Region & Profession, and capture whether they’ve already invested in private markets and how much. Changes flow straight into the model.'),
+          this.card({title:'Profile',badge:this.badge('editable · live','conf'),children:h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:10}}, efields),caption:'Edit any field live in the call — wealth, age & risk come from onboarding; Region, Profession and existing private-markets holdings are captured here.'}),
           (c.notes&&c.notes.length)?this.card({title:'Notes from our conversation',badge:this.badge('AI','synth'),children:h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, c.notes.map((n,i)=>h('div',{key:i,style:{display:'flex',gap:8,fontSize:13,lineHeight:1.45}},h('span',{style:{color:'var(--brand)'}},'•'),n))),caption:'Captured by Ask Alpha — the client sees these too, so they know they were heard.'}):null ]);
       }
       case 'setTarget': case 'confirmTarget': {
@@ -8219,7 +8260,12 @@ class Component extends DCLogic {
         h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:600}},'Building your tailored model…'),
         h('div',{style:{fontSize:13.5,color:'var(--muted)',lineHeight:1.55,maxWidth:460}},'This is you — and this is what we think your tailored target portfolio should look like, based on your profile, risk and horizon.'),
         h('button',{onClick:()=>this.advNext(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'11px 20px',fontSize:13.5,fontWeight:700,cursor:'pointer'}},'See the model  →'));
-      case 'modelPortfolio': { const sl=toSlices(mixModel); const commit=this.advClientCommit?this.advClientCommit(c):0; const tot=commit*(this.state.cfPaceYears||4);
+      case 'modelPortfolio': {
+        /* reflect the advisor's adjusted strategy target if one has been shaped on the target step; else the base model */
+        const _adjT=(this.state.simTargets&&this.state.simTargets.strategy);
+        let _mix=mixModel, _adjusted=false;
+        if(_adjT){ const _sum=Object.keys(_adjT).reduce((a,k)=>a+(+_adjT[k]||0),0); if(_sum>0){ _mix={}; Object.keys(_adjT).forEach(k=>_mix[k]=+(( +_adjT[k]||0)/_sum*100).toFixed(1)); _adjusted=true; } }
+        const sl=toSlices(_mix); const commit=this.advClientCommit?this.advClientCommit(c):0; const tot=commit*(this.state.cfPaceYears||4);
         const th=(t,r)=>h('th',{style:{textAlign:r?'right':'left',padding:'7px 9px',fontSize:10,textTransform:'uppercase',letterSpacing:'.04em',color:'var(--muted)',borderBottom:'2px solid var(--line)'}},t);
         const td=(v,r)=>h('td',{style:{textAlign:r?'right':'left',padding:'8px 9px',borderBottom:'1px solid var(--line)',fontSize:12.5}},v);
         /* table beside the donut — what each slice is + % (+ € of the planned commitment) — per the review */
@@ -8229,8 +8275,8 @@ class Component extends DCLogic {
             td(h('span',{style:{display:'inline-flex',alignItems:'center',gap:7}}, h('span',{style:{width:10,height:10,borderRadius:2,background:'var('+s.color+')',display:'inline-block'}}), s.name)),
             td(s.p+'%',1), tot?td('€'+(+(tot*s.p/100).toFixed(1))+'m',1):null)))),
           caption:'Every strategy in the model, its target weight'+(tot?(' and its share of the €'+(+tot.toFixed(1))+'m planned commitment.'):'.')});
-        return wrap([ head('Your tailored model portfolio','Diversified across the strategies that fit your profile.'),
-          h('div',{style:{display:'flex',gap:16,flexWrap:'wrap',alignItems:'stretch'}}, this.card({title:'Strategy mix',style:{flex:'1 1 300px'},children:this.donutNamed(sl,160,'Model','mix')}), table) ]); }
+        return wrap([ head('Your tailored model portfolio', _adjusted?'Updated to reflect the strategy mix you adjusted on the target step.':'Diversified across the strategies that fit your profile.'),
+          h('div',{style:{display:'flex',gap:16,flexWrap:'wrap',alignItems:'stretch'}}, this.card({title:_adjusted?'Strategy mix · your revised target':'Strategy mix', badge:_adjusted?this.badge('revised','conf'):null, style:{flex:'1 1 300px'},children:this.donutNamed(sl,160,_adjusted?'Revised':'Model','mix')}), table) ]); }
       case 'modelExisting': return wrap([ head('Model vs your portfolio today','The gaps between the two are exactly what we can act on.'),
         h('div',{style:{display:'flex',gap:16,flexWrap:'wrap'}}, this.card({title:'You today',style:{flex:'1 1 300px'},children:this.donutNamed(toSlices(mixYou),150,'You','mix')}), this.card({title:'Recommended model',style:{flex:'1 1 300px'},children:this.donutNamed(toSlices(mixModel),150,'Model','mix')})) ]);
       case 'overview': {
@@ -8259,8 +8305,20 @@ class Component extends DCLogic {
       case 'peerComparison': { const pmYou=(this.PM&&this.PM.you)||15.7; const pmPeer=(this.DB&&this.DB.peer&&this.DB.peer.baseMedian)||8.9; const pmEnd=(this.PM&&this.PM.endow)||34; const pmFO=((this.PRESETS['family-offices']||{}).median)||18.6;
         const cats=lvl(['You','Peers','Family offices','Your target'],['You','Peers','Family offices','Your target'],['You','Peers','Family offices','Your target','Endowments']);
         const vals=lvl([pmYou,pmPeer,pmFO,this.myPmTarget()],[pmYou,pmPeer,pmFO,this.myPmTarget()],[pmYou,pmPeer,pmFO,this.myPmTarget(),pmEnd]);
+        /* suggest a fund for the private-credit gap — the cleanest diversifier from an equity/AI-heavy book */
+        const pc=(this.OPP_FUNDS&&this.OPP_FUNDS().credit)||{};
+        const creditCard=pc.fund? this.card({title:'Suggest a fund — private credit', badge:this.badge('Alpha pick','synth'),
+          children:h('div',{style:{display:'flex',gap:13,alignItems:'center',flexWrap:'wrap'}},
+            (pc.logo? h('img',{src:'assets/logos/'+pc.logo+'.png',alt:'',onError:e=>{e.target.style.display='none';},style:{width:42,height:42,flex:'0 0 42px',borderRadius:9,background:'#fff',border:'1px solid var(--line)',padding:5,objectFit:'contain'}}) : null),
+            h('div',{style:{flex:'1 1 220px',minWidth:200}},
+              h('div',{style:{fontFamily:SF,fontSize:15,fontWeight:600}}, pc.fund),
+              h('div',{style:{fontSize:11.5,color:'var(--muted)',marginTop:1}}, pc.note+' · '+(pc.mgr||'')+' · target '+(pc.tgt||'')+' · min '+(pc.min||'')),
+              h('div',{style:{fontSize:11.5,color:'var(--brand-ink)',marginTop:4}},'Closes your largest under-weight — private credit adds floating-rate, contractual income that barely correlates with your buyout & AI exposure.')),
+            h('button',{onClick:()=>this.askFromPage('Assess '+pc.fund+' ('+pc.strat+') for my private-credit gap — is it a fit and how much should I commit?'),style:{flex:'0 0 auto',border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'10px 16px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'✦ Assess this fund')),
+          caption:'A concrete next step off the peer comparison — the fund that best fills the private-credit gap for this profile.'}) : null;
         return wrap([ head('You vs your peers & family offices'+(L==='L3'?' & endowments':''),'People with a profile like yours — and single/multi-family offices — typically allocate quite differently.'),
-          this.card({title:'Private-markets allocation (%)',children:this.groupedBars(cats,[{name:'PM %',color:'--data-1',vals:vals}]),caption: L==='L1'?'Where you sit against comparable investors, family offices — and your own target.':'Against peers, family offices, your target'+(L==='L3'?' and the endowments — the institutional benchmark.':'.')}) ]); }
+          this.card({title:'Private-markets allocation (%)',children:this.groupedBars(cats,[{name:'PM %',color:'--data-1',vals:vals}]),caption: L==='L1'?'Where you sit against comparable investors, family offices — and your own target.':'Against peers, family offices, your target'+(L==='L3'?' and the endowments — the institutional benchmark.':'.')}),
+          creditCard ]); }
       case 'multiComparison': { const fd=dimByName(focus); const dimSel=(d)=>h('div',{style:{display:'flex',gap:7,flexWrap:'wrap',marginBottom:12}}, [['strategy','Strategy']].concat((L!=='L1'?DIMS.filter(x=>x.key!=='strategy').map(x=>[x.key,x.label]):[])).map(o=>{ const on=(focus?String(focus).toLowerCase():'strategy')===o[1].toLowerCase()||(o[0]==='strategy'&&!fd); return h('button',{key:o[0],onClick:()=>this.setState({advFocus:o[0]==='strategy'?null:o[1]}),style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--ink)',borderRadius:999,padding:'5px 12px',fontSize:11.5,fontWeight:600,cursor:'pointer'}},o[1]); }));
         let chart, title;
         if(fd){ const cats=Object.keys(fd.actual||{}); title=fd.label+' allocation (%)'; chart=this.groupedBars(cats,[{name:'You',color:'--data-1',vals:cats.map(k=>fd.actual[k]||0)},{name:'Your target',color:'--data-5',vals:cats.map(k=>(fd.target||{})[k]||0)}]); }

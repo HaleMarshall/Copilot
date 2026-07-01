@@ -3992,7 +3992,7 @@
       "script": "This briefing is for you, not the client. Lead with the strongest case the data makes — keep it to three moves."
     },
     "intake": {
-      "title": "Intake — confirm the profile",
+      "title": "Client profile — prefilled & editable",
       "crumb": "Pre-flow › Onboarding form + Profile",
       "cfa": [
         {
