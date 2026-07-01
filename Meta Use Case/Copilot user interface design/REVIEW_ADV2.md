@@ -30,7 +30,7 @@ Source: ~/Downloads/Advisor View 2 review.zip (click-comments.md). Status: [ ] t
 - [ ] 18. Fill-rate "at your stage": for a new investor show only the current year, not years 1–7 range (also investor view).
 
 ## Future / cash-flow
-- [ ] 19. New investor has NO historical — remove historical from the J-curve.
+- [x] 19. New investor has NO historical — remove historical from the J-curve.
 - [ ] 20. Cash-flow sliders must work: "over how many years" + Recycle Rate must move distributions & contributions (not only Commitments/Year).
 - [ ] 21. Year unit "M"/label not editable; the value is editable.
 - [ ] 22. PE Cash-Flow J-curve (Cumulative Net Cash Flows) should REPLACE the top J-curve; no historical for a new investor.

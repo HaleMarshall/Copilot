@@ -2960,18 +2960,21 @@ class Component extends DCLogic {
     else { const psc={aggressive:1.3,moderate:1.0,slow:0.7}[s.fPaceScn||'moderate']||1; plan = plan.map(v=>+(v*psc).toFixed(1)); }
     const peers=plan.map(v=>+(v*0.78).toFixed(1)), top10=plan.map(v=>+(v*1.28).toFixed(1)), platform=plan.map(v=>+(v*0.86).toFixed(1));
     const cum=[],pc=[],tc=[],fc=[]; let a=0,b=0,t=0,f=0; for(let i=0;i<5;i++){a+=plan[i];b+=peers[i];t+=top10[i];f+=platform[i];cum.push(+a.toFixed(1));pc.push(+b.toFixed(1));tc.push(+t.toFixed(1));fc.push(+f.toFixed(1));}
-    const base=[]; let nv=16.6; const g=0.15*scen; for(let i=0;i<5;i++){ nv=nv*(1+g)+plan[i]*0.5; base.push(Math.round(nv)); }
+    /* item 19 — a NEW investor (advisor new / pre-gate) has NO historical: the J-curve starts at 0 today, no past years, all projected */
+    const isNew = this.state.advView==='cockpit' && (this.state.advStage==='new'||this.state.advStage==='pregate');
+    const startNav = isNew? 0 : 16.6;
+    const base=[]; let nv=startNav; const g=0.15*scen; for(let i=0;i<5;i++){ nv=nv*(1+g)+plan[i]*0.5; base.push(Math.round(nv)); }
     const up=base.map((v,i)=>Math.round(v*(1+0.10+0.02*i))); const down=base.map((v,i)=>Math.round(v*(1-0.08-0.015*i)));
-    const histL=['2021','2022','2023','2024','2025']; const hist=[-3.2,-4.6,-3.1,-1.0,1.2];
-    let net=hist[4]; const dists=[]; const fut=[]; for(let i=0;i<5;i++){ const call=plan[i]*0.62*(1-liq*0.45); const dist=+((0.7+i*0.65)*(1+liq*0.9)*scen).toFixed(1); dists.push(dist); net=+(net+dist-call).toFixed(1); fut.push(net); }
-    const jL=histL.concat(yrs); const jVals=hist.concat(fut); const splitIdx=histL.length-1;
-    const vL=['Now','Y1','Y2','Y3','Y4','Y5']; const vbase=[]; let vv=16.6; for(let i=0;i<6;i++){ vv= i===0?16.6: vv*(1+0.14*scen); vbase.push(Math.round(vv)); }
+    const histL= isNew? [] : ['2021','2022','2023','2024','2025']; const hist= isNew? [] : [-3.2,-4.6,-3.1,-1.0,1.2];
+    let net= isNew? 0 : hist[4]; const dists=[]; const fut=[]; for(let i=0;i<5;i++){ const call=plan[i]*0.62*(1-liq*0.45); const dist=+((0.7+i*0.65)*(1+liq*0.9)*scen).toFixed(1); dists.push(dist); net=+(net+dist-call).toFixed(1); fut.push(net); }
+    const jL=histL.concat(yrs); const jVals=hist.concat(fut); const splitIdx= isNew? 0 : histL.length-1;
+    const vL= isNew? ['Now','Y1','Y2','Y3','Y4','Y5'] : ['Now','Y1','Y2','Y3','Y4','Y5']; const vbase=[]; let vv=startNav; for(let i=0;i<6;i++){ vv= i===0?startNav: vv*(1+0.14*scen)+ (isNew? plan[Math.min(i-1,4)]*0.5 : 0); vbase.push(Math.round(vv)); }
     const vadj=vbase.map((v,i)=>Math.round(v + liq*1.4*i)); const vUp=vbase.map((v,i)=>Math.round(v*(1.08+0.015*i))); const vDn=vbase.map((v,i)=>Math.round(v*(0.93-0.008*i)));
-    const navY5=base[4]; const paidIn5=13.0+cum[4]*0.55; const distCum=10.6+dists.reduce((x,y)=>x+y,0); const dpiY5=+(distCum/paidIn5).toFixed(1);
+    const navY5=base[4]; const paidIn5=(isNew?0:13.0)+cum[4]*0.55; const distCum=(isNew?0:10.6)+dists.reduce((x,y)=>x+y,0); const dpiY5=+(distCum/Math.max(0.1,paidIn5)).toFixed(1);
     const troughI=fut.indexOf(Math.min(...fut)); const troughY= Math.min(...fut)<0? ('Y'+(troughI+1)) : 'past';
     let beI=fut.findIndex(v=>v>=2.0); const beY= beI<0?'Y5+':('Y'+(beI+1));
     let dpi1I=dists.reduce((acc,d,i)=>{ const cumd=10.6+dists.slice(0,i+1).reduce((x,y)=>x+y,0); if(acc.found) return acc; if(cumd/paidIn5>=1.0){acc.found=true;acc.y=i+1;} return acc; },{found:false,y:5});
-    return {yrs,plan,peers,top10,platform,cum,pc,tc,fc,base,up,down,histL,hist,jL,jVals,splitIdx,vL,vbase,vadj,vUp,vDn,navY5,dpiY5,troughY,beY,dpi1Y:'Y'+dpi1I.y,liq,scen,pace,c,dists,fut}; /* review4 item 11 — expose dists/fut for J-curve hero */
+    return {yrs,plan,peers,top10,platform,cum,pc,tc,fc,base,up,down,histL,hist,jL,jVals,splitIdx,isNew,vL,vbase,vadj,vUp,vDn,navY5,dpiY5,troughY,beY,dpi1Y:'Y'+dpi1I.y,liq,scen,pace,c,dists,fut}; /* review4 item 11 — expose dists/fut for J-curve hero; item 19 — isNew flag */
   }
   fLegendInline(items){ const h=this.h; return h('div',{style:{display:'flex',gap:16,justifyContent:'center',marginTop:10,flexWrap:'wrap'}}, items.map((it,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',gap:6,fontSize:11.5,color:'var(--muted)'}}, h('span',{style:{width:12,height:it.bar?10:0,borderRadius:it.bar?2:0,background:it.bar?`var(${it.color})`:'transparent',borderTop:it.bar?'none':`2px ${it.dash?'dashed':'solid'} var(${it.color})`}}), it.name))); }
   futureCards(pj){
@@ -3187,7 +3190,7 @@ class Component extends DCLogic {
       h('button',{onClick:e=>{e.stopPropagation();this.saveFuturePlan();},style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'10px 18px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'✓ Save this plan'),
       s.savedFutureMsg? h('span',{style:{fontSize:11.5,color:'var(--over)',fontWeight:600}},'✓ '+s.savedFutureMsg) : null,
       (s.savedFuture&&s.savedFuture.length)? h('span',{style:{fontSize:11.5,color:'var(--muted)'}}, s.savedFuture.length+' saved plan'+(s.savedFuture.length>1?'s':'')) : null);
-    return this.card({title:'Your J-curve — historicals, today & projected', info:true, right:paceSeg,
+    return this.card({title: pj.isNew?'Your J-curve — today & projected':'Your J-curve — historicals, today & projected', info:true, right:paceSeg,
       children:h('div',null, jline, barsLegend, bars, netCallout, recyclePanel, editor, saveRow),
       caption:'The most important view: realised cash flow to today (solid) then the forward projection (dashed), with each year’s commitments (down) and distributions (up) as bars. Pick a pace, recycle distributions to self-fund commitments, edit any year, and save the plan.'});
   }
