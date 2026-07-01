@@ -715,9 +715,12 @@ class Component extends DCLogic {
   benchLabel(key){ return {model:'Model',peers:'Peers',platform:'Platform',top10:'Top 10%',family:'Family offices',custom:'Custom',suggested:'Alpha',you:'You'}[key]||'Model'; }
   setSimCmp(dim,v){ this.setState({simCmp:{...this.state.simCmp,[dim]:v}}); }
   /* a benchmark group's TARGET allocation for ANY dimension (strategy uses real mixes; other dims tilt the model target deterministically) */
+  /* collapse a fine endowment mix (lcbo/mcbo/scbo/…) into the coarse strategy buckets the simulator uses */
+  endowCoarse(key){ const e=(this.ENDOWMENTS&&this.ENDOWMENTS()[key])||{}; return {buyout:(e.lcbo||0)+(e.mcbo||0)+(e.scbo||0), growth:(e.growth||0), venture:0, credit:(e.credit||0), infra:(e.infra||0), realestate:0, secondaries:(e.secondaries||0), directs:(e.directs||0), ai:(e.ai||0), other:0}; }
   dimBench(d,bench){ const keys=Object.keys(d.actual);
     if(bench==='model') return d.target;
-    if(d.key==='strategy'){ if(bench==='peers') return this.peerData().mix; if(bench==='platform') return this.MIX.platform; if(bench==='top10') return this.topMix(); if(bench==='family') return (this.PRESETS['family-offices']||{}).mix||this.MIX.platform; }
+    const endow={harvard:1,yale:1,princeton:1,hyp:1};
+    if(d.key==='strategy'){ if(bench==='peers') return this.peerData().mix; if(bench==='platform') return this.MIX.platform; if(bench==='top10') return this.topMix(); if(bench==='family') return (this.PRESETS['family-offices']||{}).mix||this.MIX.platform; if(endow[bench]) return this.endowCoarse(bench); }
     const tilt={peers:[0.9,1.18],platform:[1.12,0.84],top10:[1.28,0.78],family:[1.06,0.9]}[bench]||[1,1];
     const out={}; keys.forEach((k,i)=>{ out[k]=Math.max(0,+(((d.target&&d.target[k])||d.actual[k]||0)*tilt[i%2]).toFixed(1)); }); return out; }
   cmpMix(cmp){
@@ -6046,7 +6049,7 @@ class Component extends DCLogic {
     };
     // ---- one card PER dimension (strategy, region, currency, sector): your target pie + side legend, with a 'compare against' selector under it; Custom opens sliders + numeric % inputs + risk strategies ----
     /* item 67 — only Model / Peers / Platform / Top 10% / Custom (no 'current' here) */
-    const CMP=[['model','Model'],['peers','Peers'],['platform','Platform'],['top10','Top 10%'],['family','Family offices'],['custom','Custom']];
+    const CMP=[['model','Model'],['peers','Peers'],['platform','Platform'],['top10','Top 10%'],['family','Family offices'],['hyp','Endowments (H+Y+P)'],['harvard','Harvard'],['yale','Yale'],['princeton','Princeton'],['custom','Custom']];
     const dimTargetCard=(d, hideCompare)=>{
       const cats=Object.keys(d.actual);
       const tObj=targets[d.key]||d.target||d.actual;
@@ -6056,8 +6059,8 @@ class Component extends DCLogic {
       const compMix = mode==='custom'? tObj : (mode==='model'? d.target : this.dimBench(d,mode));
       const compTot=cats.reduce((a,k)=>a+(+compMix[k]||0),0)||1;
       const compSlices=cats.map(k=>({color:d.colors[k]||'--data-9',p:+(((+compMix[k]||0)/compTot*100)).toFixed(1),n:nm(d.key,k)})).filter(x=>x.p>0);
-      const compLabel=hideCompare? 'the original proposal' : {model:'the Model target',peers:'the Peers’ target',platform:'the Platform target',top10:'the Top 10% target',family:'the Family-office mix',custom:'your custom group'}[mode];
-      const compShort=hideCompare? 'Original' : {model:'Model',peers:'Peers',platform:'Platform',top10:'Top 10%',family:'Family offices',custom:'Custom'}[mode];
+      const compLabel=hideCompare? 'the original proposal' : {model:'the Model target',peers:'the Peers’ target',platform:'the Platform target',top10:'the Top 10% target',family:'the Family-office mix',hyp:'the H+Y+P endowments',harvard:'the Harvard endowment',yale:'the Yale endowment',princeton:'the Princeton endowment',custom:'your custom group'}[mode]||'the comparison group';
+      const compShort=hideCompare? 'Original' : {model:'Model',peers:'Peers',platform:'Platform',top10:'Top 10%',family:'Family offices',hyp:'H+Y+P',harvard:'Harvard',yale:'Yale',princeton:'Princeton',custom:'Custom'}[mode]||'Group';
       /* item 70 — Z-chart instead of the table */
       const zRows=cats.map(k=>{ const yv=Math.round((+tObj[k]||0)/tot*100); const cv=Math.round((+compMix[k]||0)/compTot*100); const dd=+(yv-cv).toFixed(1); return {name:nm(d.key,k),delta:dd,color:d.colors[k]||'--data-9',sig:Math.abs(dd)>=2}; }).filter(r=>r.delta!==0).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
       /* item 68 — left: my target · middle: the comparator · right: the Z-chart */
