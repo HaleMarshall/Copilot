@@ -8071,6 +8071,14 @@ class Component extends DCLogic {
   advToPrep(){ this.setState({advView:'prep'}); }
   advStepTo(i){ const s=this.advSeq(); this.setState({advStep:Math.max(0,Math.min(i,s.length-1)), advFocus:null, advSeized:false}); }
   advNext(){ this.advStepTo(this.state.advStep+1); }
+  /* E1/E2 — map each cockpit step to a workspace (Understand / Shape / Act / Research) so the advisor can jump non-linearly mid-call */
+  advStepWS(key){ return {
+      execSummary:'understand', intake:'understand', intakeMin:'understand', overview:'understand', modelExisting:'understand', changesSince:'understand', confirmTarget:'understand', aiThinking:'understand', modelPortfolio:'understand',
+      setTarget:'shape', simTarget:'shape', simExisting:'shape', simFull:'shape', targetSimulator:'shape', multiComparison:'shape', compareToCurrent:'shape', peerComparison:'shape', future:'shape',
+      nextBest:'act', nextBestHints:'act', opportunities:'act', missedOut:'act', seize:'act', follower:'act', backToKyc:'act',
+      managerComparison:'research', fundComparison:'research'
+    }[key] || 'understand'; }
+  advJumpWS(ws){ const seq=this.advSeq(); const idx=seq.findIndex(k=>this.advStepWS(k)===ws); if(idx>=0) this.advStepTo(idx); }
   advPrev(){ this.advStepTo(this.state.advStep-1); }
   /* advisor-script trigger-jump: a Call-for-Action deep-links the canvas to the matching page + sub-focus */
   advJumpTargets(){ return {
@@ -8260,6 +8268,14 @@ class Component extends DCLogic {
     const rail=h('div',{style:{flex:'0 0 320px',width:320,background:'var(--surface)',borderRight:'1px solid var(--line)',height:'100%',overflow:'auto',padding:'16px 16px 28px'}},
       h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14}}, h('span',{style:{fontFamily:SF,fontSize:15,fontWeight:700}},'Moonfare'), h('span',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.06em',color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:5,padding:'2px 7px'}},'ADVISOR')),
       objChip, goalsBox, stepBox, navBtns, h('div',{style:{height:1,background:'var(--line)',margin:'2px 0 14px'}}), cfaSection, h('div',{style:{height:1,background:'var(--line)',margin:'2px 0 14px'}}), scriptBox, h('div',{style:{height:1,background:'var(--line)',margin:'14px 0'}}), this.advNoteCard());
+    /* E1/E2 — Understand → Shape → Act → Research nav in the advisor flow; free jumping for mid-call pivots */
+    const WS=[['understand','Understand','Overview & targets'],['shape','Shape','Simulator & compare'],['act','Act','Opportunities & next best'],['research','Research','Managers & funds']];
+    const curWs=this.advStepWS(key);
+    const wsNav=h('div',{style:{display:'flex',gap:8,flexWrap:'wrap',marginBottom:14}}, WS.map(([w,l,sub])=>{ const on=curWs===w; const avail=this.advSeq().some(k=>this.advStepWS(k)===w);
+      return h('button',{key:w,onClick:()=>{ if(avail) this.advJumpWS(w); },disabled:!avail,title:avail?('Jump to '+l):(l+' — not in this journey'),
+        style:{flex:'1 1 150px',textAlign:'left',border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand)':(avail?'var(--surface)':'var(--surface-2)'),color:on?'#fff':(avail?'var(--ink)':'var(--muted)'),borderRadius:11,padding:'9px 13px',cursor:avail?'pointer':'default',opacity:avail?1:.55}},
+        h('div',{style:{fontSize:12.5,fontWeight:700,fontFamily:SF}},l),
+        h('div',{style:{fontSize:10,color:on?'rgba(255,255,255,.8)':'var(--muted)',marginTop:1}},sub)); }));
     const crumb=h('div',{style:{display:'flex',alignItems:'center',gap:8,fontSize:11.5,color:'var(--muted)',marginBottom:16,flexWrap:'wrap'}}, h('span',{style:{fontFamily:SF,fontWeight:600,color:'var(--ink)'}},'Moonfare'), h('span',{style:{color:'var(--over)'}},'●'), h('span',null,'Canvas · '+this.state.advLevel+'  ·  '+pm.crumb));
     const focusBanner=this.state.advFocus? h('div',{style:{display:'flex',alignItems:'center',gap:10,background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:10,padding:'9px 13px',marginBottom:14}}, h('span',{style:{fontSize:11,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--brand-ink)'}},'Focused'), h('span',{style:{fontSize:12.5,color:'var(--ink)'}},'Jumped from the script to '+this.state.advFocus+'.'), h('button',{onClick:()=>this.advClearFocus(),style:{marginLeft:'auto',border:'1px solid var(--brand-tint-3)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:7,padding:'3px 9px',fontSize:11,cursor:'pointer'}},'Clear ✕')) : null;
     /* short steps float centred (margin:auto safely centres when there's room, collapses to top-aligned + scrollable when content is tall); a faint footer anchors the bottom */
@@ -8273,7 +8289,7 @@ class Component extends DCLogic {
       h('button',{onClick:()=>this.advPrev(),disabled:step===0,style:{display:'inline-flex',alignItems:'center',gap:8,border:'1px solid var(--line)',background:'var(--surface)',color:step===0?'var(--line)':'var(--ink)',borderRadius:10,padding:'11px 18px',fontSize:13,fontWeight:600,cursor:step===0?'default':'pointer'}},'←  Back'),
       h('span',{style:{fontSize:11.5,color:'var(--muted)'}},'Step '+(step+1)+' of '+seq.length+' · '+(pm.title||'')),
       h('button',{onClick:()=>this.advNext(),disabled:step===seq.length-1,style:{display:'inline-flex',alignItems:'center',gap:8,border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'11px 22px',fontSize:13,fontWeight:700,cursor:step===seq.length-1?'default':'pointer',opacity:step===seq.length-1?.5:1,boxShadow:'0 8px 20px -12px rgba(44,45,254,.6)'}}, (step===seq.length-1?'Finish':'Next step')+'  →'));
-    const canvas=h('div',{style:{flex:1,minWidth:0,height:'100%',overflow:'auto',background:'var(--bg)',padding:'18px 26px 22px',display:'flex',flexDirection:'column'}}, crumb, focusBanner, contentWrap, canvasNav, cFooter);
+    const canvas=h('div',{style:{flex:1,minWidth:0,height:'100%',overflow:'auto',background:'var(--bg)',padding:'18px 26px 22px',display:'flex',flexDirection:'column'}}, wsNav, crumb, focusBanner, contentWrap, canvasNav, cFooter);
     return h('div',{style:{position:'fixed',inset:0,zIndex:60,display:'flex',flexDirection:'column',background:'var(--bg)'}}, topbar, h('div',{style:{flex:1,display:'flex',minHeight:0}}, rail, canvas));
   }
   /* Follower opt-in — render a single notification exactly as the investor would receive it on their
