@@ -101,7 +101,8 @@
     </div>
   </header>
 
-  <!-- ============ BODY ============ -->
+  <!-- ============ BODY (investor shell only — the whole investor dashboard is SKIPPED for the advisor/internal view) ============ -->
+  <sc-if value="{{ investorShell }}" hint-placeholder-val="{{ true }}">
   <div style="flex:1;display:flex;min-height:0">
 
     <!-- ============ ASK ALPHA (left-docked) ============ -->
@@ -258,6 +259,7 @@
       {{ homeHeroNode }}
     </sc-if>
   </div>
+  </sc-if>
 
   <!-- ============ PROVENANCE POPOVER ============ -->
   <sc-if value="{{ pop }}" hint-placeholder-val="{{ false }}">
@@ -9229,6 +9231,7 @@ class Component extends DCLogic {
     /* advisor/internal SHELL (not impersonating): the investor top-chrome — workspace nav, Set-target, the
        Target/Risk/Wealth stat strip and the home hero — must not appear here. */
     const advShell=(s.mode==='Advisor'||s.mode==='Internal') && !s.actingAs;
+    const investorShell=!advShell; /* item 2 — the investor dashboard body is only rendered in the investor shell; skipped entirely for advisor/internal */
     const cmpName=c=>c==='platform'?'Platform':c==='model'?'the Model':c==='you'?'You':c==='family'?'Family offices':c==='top10'?'the Top 10%':'Peers';
     // BL caption
     const blCap = {
@@ -9287,6 +9290,7 @@ class Component extends DCLogic {
       cartBtn:this.cartBtn(), showCart:s.showCart, closeCart:()=>this.setState({showCart:false}), cartPanelBody:this.cartPanelBody(),
       /* the investor AskAlpha home hero (with its Understand/Shape/Act/Research nav + 'Skip to dashboard') must NOT
          appear in the advisor or internal shells — only in the investor view (incl. when an advisor impersonates a client) */
+      investorShell,
       homeHero: (s.ws==='understand' && !s.homeLaunched) && !advShell, homeHeroNode: this.homeHero(),
       actingAs:s.actingAs, exitImpersonate:()=>this.setState({actingAs:null}),
       advisorView: s.mode==='Advisor' && !s.actingAs, internalView: s.mode==='Internal' && !s.actingAs,
