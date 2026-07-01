@@ -6891,8 +6891,13 @@ class Component extends DCLogic {
           h('span',{style:{textAlign:'right',fontFamily:SF,fontWeight:700,fontSize:12,color:dd===0?'var(--muted)':(dd>0?'var(--over)':'var(--under)')}}, (dd>0?'+':'')+dd),
           h('span',{style:{textAlign:'right',color:'var(--muted)',fontSize:12}}, open?'▾':'▸')),
         open? h('div',{style:{padding:'10px 12px',borderTop:'1px solid var(--line)',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',gap:14}},
-          h('div',null, h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--muted)',marginBottom:7}},'Your funds in '+n),
-            mineFunds.length? h('div',{style:{display:'flex',flexDirection:'column',gap:6}}, mineFunds.map(f=>fundRow(f,n,true))) : h('div',{style:{fontSize:11.5,color:'var(--muted)'}},'No direct fund yet.')),
+          /* item 17 — new investor (no holdings) sees SUGGESTED funds; an existing investor sees the funds they already hold */
+          (()=>{ const isNewInv=this.state.advView==='cockpit'&&(this.state.advStage==='new'||this.state.advStage==='pregate');
+            if(!isNewInv && mineFunds.length) return h('div',null, h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--muted)',marginBottom:7}},'Your funds in '+n),
+              h('div',{style:{display:'flex',flexDirection:'column',gap:6}}, mineFunds.map(f=>fundRow(f,n,true))));
+            const sugg=(this.oppFundsForStrat?this.oppFundsForStrat(n):[]).slice(0,3);
+            return h('div',null, h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--brand-ink)',marginBottom:7}}, isNewInv? ('Suggested '+n+' funds for you') : ('Your funds in '+n)),
+              (isNewInv&&sugg.length)? h('div',{style:{display:'flex',flexDirection:'column',gap:6}}, sugg.map(f=>fundRow(f,n,false))) : h('div',{style:{fontSize:11.5,color:'var(--muted)'}}, isNewInv?'We’ll suggest '+n+' funds here.':'No direct fund yet.')); })(),
           h('div',null, h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'var(--muted)',marginBottom:7}},cmpShort+'’ funds in '+n),
             compFunds.length? h('div',{style:{display:'flex',flexDirection:'column',gap:6}}, compFunds.map(f=>fundRow(f,n,false))) : h('div',{style:{fontSize:11.5,color:'var(--muted)'}},'Representative funds for this bucket appear here.'))) : null);
     }).filter(Boolean);

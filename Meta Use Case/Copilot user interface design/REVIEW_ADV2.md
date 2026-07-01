@@ -26,7 +26,7 @@ Source: ~/Downloads/Advisor View 2 review.zip (click-comments.md). Status: [ ] t
 - [x] 14. Target adjusts based on the actual input target.
 - [x] 15. Endowments selectable individually (not only combined) — a button to open individual endowments, in PM allocation + comparison.
 - [ ] 16. De-duplicate "Compare Yourself / Strategy / Funds" (they're the same comparison).
-- [ ] 17. Strategy drill-in: new investor → suggest a fund; existing investor → different (already invested).
+- [x] 17. Strategy drill-in: new investor → suggest a fund; existing investor → different (already invested).
 - [x] 18. Fill-rate "at your stage": for a new investor show only the current year, not years 1–7 range (also investor view).
 
 ## Future / cash-flow
