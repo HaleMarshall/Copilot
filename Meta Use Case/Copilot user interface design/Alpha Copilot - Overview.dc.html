@@ -8733,9 +8733,12 @@ class Component extends DCLogic {
         if(_adjT){ const _sum=Object.keys(_adjT).reduce((a,k)=>a+(+_adjT[k]||0),0); if(_sum>0){ _mix={}; Object.keys(_adjT).forEach(k=>_mix[k]=+(( +_adjT[k]||0)/_sum*100).toFixed(1)); _adjusted=true; } }
         /* items 12/13 — Strategy is ONLY real strategies (AI/Tech is a Sector; Secondaries & Direct/Co-invest are Formats).
            Real-strategy weights are renormalised to 100 so the strategy donut shows just the strategies. */
-        const STRAT_TRUE=[['buyout','Buyout','--data-1'],['growth','Growth','--data-2'],['venture','Venture','--data-3'],['credit','Private Credit','--data-4'],['infra','Infrastructure','--data-5'],['realestate','Real Estate','--data-6'],['other','Other','--data-9']];
-        let _ss=0; STRAT_TRUE.forEach(([k])=>_ss+=(_mix[k]||0));
-        const sl=STRAT_TRUE.map(([k,n,cc])=>({name:n,color:cc,p:_ss>0?+(((_mix[k]||0)/_ss*100).toFixed(1)):0})).filter(s=>s.p>0);
+        /* item 41 — orient the strategy chart exactly like the previous (target) view: same key order, colours (HOME_DIMS strategy d.colors) and display names (STRATS via nm), from a SINGLE source instead of a separately-hardcoded list, so a strategy is the same colour + position on both slides */
+        const _stratD=this.HOME_DIMS().find(x=>x.key==='strategy')||{target:{},colors:{}};
+        const _stratKeys=Object.keys(_stratD.target||{});
+        const _snm=(k)=>(this.STRATS.find(x=>x[0]===k)||[null,k])[1];
+        let _ss=0; _stratKeys.forEach(k=>_ss+=(_mix[k]||0));
+        const sl=_stratKeys.map(k=>({name:_snm(k),color:(_stratD.colors&&_stratD.colors[k])||'--data-9',p:_ss>0?+(((_mix[k]||0)/_ss*100).toFixed(1)):0})).filter(s=>s.p>0);
         const commit=this.advClientCommit?this.advClientCommit(c):0; const tot=commit*(this.state.cfPaceYears||4);
         const th=(t,r)=>h('th',{style:{textAlign:r?'right':'left',padding:'7px 9px',fontSize:10,textTransform:'uppercase',letterSpacing:'.04em',color:'var(--muted)',borderBottom:'2px solid var(--line)'}},t);
         const td=(v,r)=>h('td',{style:{textAlign:r?'right':'left',padding:'8px 9px',borderBottom:'1px solid var(--line)',fontSize:12.5}},v);

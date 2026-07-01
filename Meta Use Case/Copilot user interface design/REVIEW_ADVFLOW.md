@@ -41,7 +41,7 @@ Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.
 - [x] 38. Tailored model portfolio (view 3 of L3) → Shape not Understand; no vintage mix.
 - [x] 39. Rename 'your tailored model portfolio full view' → 'Your tailored asset allocation for you'.
 - [x] 40. Tailored model portfolio strategy mix must match the earlier decided mix (secondaries/infra/AI&tech) — connect them.
-- [ ] 41. Orient all charts in tailored model portfolio per the previous view.
+- [x] 41. Orient all charts in tailored model portfolio per the previous view.
 - [ ] 42. Remove the useless yellow badge next to Sector mix / Format mix.
 - [ ] 43. Format mix: remove co-investments; AI/tech isn't a format.
 - [ ] 44. Sector ordering: AI at 8% shouldn't sit above Healthcare at 18% — order by value.
