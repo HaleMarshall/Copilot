@@ -8091,7 +8091,7 @@ class Component extends DCLogic {
   advClient(){ const id=this.state.advClientId; return this.advBook().find(c=>c.id===id)||null; }
   advSelf(){ return (this.DB&&this.DB.advisorSelf)||{name:'Advisor',init:'AD',role:'Relationship Manager'}; }
   advFlowKey(){ return this.state.advStage+'|'+this.state.advLevel; }
-  advSeq(){ const f=(this.DB&&this.DB.advisorFlows)||{}; return f[this.advFlowKey()]||['execSummary','intake','setTarget','aiThinking','modelPortfolio','future','nextBest','seize']; }
+  advSeq(){ const f=(this.DB&&this.DB.advisorFlows)||{}; const seq=f[this.advFlowKey()]||['intake','setTarget','aiThinking','modelPortfolio','future','nextBest','seize']; return seq.filter(k=>k!=='execSummary'); /* execSummary is a PRE-CALL artifact (prep view), never a cockpit step */ }
   advStageMeta(){ const m=(this.DB&&this.DB.advisorMeta)||{}; return m[this.state.advStage]||{objective:'',goals:[]}; }
   advGoals(){ return this.state.advPrepGoals || this.advStageMeta().goals || []; }
   advPageMeta(k){ const p=(this.DB&&this.DB.advisorPages)||{}; return p[k]||{title:k,crumb:'',cfa:[],script:''}; }
@@ -8228,6 +8228,11 @@ class Component extends DCLogic {
         h('button',{onClick:()=>this.advExit(),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:8,padding:'7px 12px',fontSize:12.5,cursor:'pointer'}},'← Book'),
         h('div',{style:{fontFamily:SF,fontSize:22,fontWeight:600}},'Call preparation')),
       h('div',{style:{display:'flex',gap:16,flexWrap:'wrap',marginBottom:16}}, left, right),
+      /* Prepare-for-call summary — the case for this call lives HERE, before the call begins (not in the cockpit Understand section) */
+      h('div',{style:{marginBottom:16}},
+        h('div',{style:{fontFamily:SF,fontSize:17,fontWeight:600,margin:'6px 0 3px'}},'Prepare-for-call summary'),
+        h('div',{style:{fontSize:12.5,color:'var(--muted)',lineHeight:1.5,marginBottom:10,maxWidth:720}},'Objective → observations → the move to open each. Reviewed now; each becomes a numbered target once you enter the investor view. Objective: '+(meta.objective||'')+'.'),
+        this.advCaseForCallCard(true)),
       h('button',{onClick:()=>this.advEnterCockpit(),style:{width:'100%',border:'none',background:'var(--brand)',color:'#fff',borderRadius:12,padding:'15px',fontSize:15,fontWeight:700,cursor:'pointer',boxShadow:'0 12px 30px -16px rgba(44,45,254,.7)'}},'Enter investor view →'));
   }
   advCFAextraItems(){ return [{t:'Surface a timely opportunity',tag:'→ Opportunities · Deal'},{t:'Position the follower feed',tag:'→ Follower · Opt-in'},{t:'Check liquidity headroom',tag:'→ Profile · Liquidity'}]; }
@@ -8481,6 +8486,33 @@ class Component extends DCLogic {
         h('div',{style:{display:'flex',justifyContent:'flex-end'}}, h('button',{onClick:add, style:{border:'none',background:draft.trim()?'var(--brand)':'var(--surface-2)',color:draft.trim()?'#fff':'var(--muted)',borderRadius:9,padding:'8px 16px',fontSize:12.5,fontWeight:700,cursor:draft.trim()?'pointer':'default'}},'＋ Add note')),
         notes.length? h('div',{style:{display:'flex',flexDirection:'column',gap:7,marginTop:2}}, notes.slice().reverse().map((nt,i)=>h('div',{key:i,style:{display:'flex',gap:8,fontSize:13,lineHeight:1.45,background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:8,padding:'8px 10px'}}, h('span',{style:{color:'var(--brand)',flex:'0 0 auto'}},'✎'), h('div',null, h('div',null,nt.text), h('div',{style:{fontSize:10,color:'var(--muted)',marginTop:2}}, nt.ts||'saved'))))) : null),
       caption:'Your own notes on this call — stored to the client record alongside the AI-captured notes.'}); }
+  /* The 'case for this call' — Observation → Why it matters → How to open it. This is a PRE-CALL artifact:
+     it lives in the prep view (before the call begins), NOT inside the cockpit Understand section. Each move
+     maps 1↔1 to a left-rail target once the advisor enters the investor view. */
+  advCaseForCallCard(preCall){
+    const h=this.h; const SF=this.SF; const plan=this.advCallPlan(); const open=this.state.advCaseOpen;
+    const moveCard=(m,i)=>{ const isOpen=open===i;
+      return h('div',{key:i,style:{background:'var(--surface)',border:'1px solid '+(isOpen?'var(--brand-tint-3)':'var(--line)'),borderRadius:11,padding:'13px 15px'}},
+        h('div',{onClick:()=>this.setState({advCaseOpen:isOpen?null:i}),style:{display:'flex',gap:11,alignItems:'flex-start',cursor:'pointer'}},
+          h('span',{style:{width:22,height:22,flex:'0 0 22px',borderRadius:'50%',background:'var(--brand)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:700}},String(i+1)),
+          h('div',{style:{flex:1,minWidth:0}},
+            h('div',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)'}},'Observation'),
+            h('div',{style:{fontSize:14,fontWeight:600,lineHeight:1.3}},m.obs)),
+          h('span',{style:{fontSize:11,color:'var(--brand-ink)',fontWeight:700}}, isOpen?'▾':'▸')),
+        h('div',{style:{marginTop:9,paddingLeft:33}},
+          h('div',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:2}},'Why it matters'),
+          h('div',{style:{fontSize:12.5,color:'var(--ink)',lineHeight:1.5}},m.why),
+          h('div',{style:{marginTop:10,paddingTop:10,borderTop:'1px solid var(--line)',display:'flex',alignItems:'center',gap:9,flexWrap:'wrap'}},
+            h('span',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--brand-ink)'}},'How to open it'),
+            preCall
+              ? h('span',{style:{fontSize:12.5,fontWeight:700,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:8,padding:'6px 12px'}}, m.action)
+              : h('button',{onClick:()=>this.advNext(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:9,padding:'7px 14px',fontSize:12.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}}, m.action+'  →'),
+            h('span',{style:{fontSize:10.5,color:'var(--muted)'}},'target #'+(i+1)+(preCall?'':' on the left')))),
+        isOpen? h('div',{style:{marginTop:9,paddingLeft:33,fontSize:11.5,color:'var(--muted)',lineHeight:1.5}}, 'Compliance-neutralised — a check-list prompt, not advice. Signal content is from the platform data & sales notes.') : null); };
+    return this.card({title:'The case for this call — '+plan.moves.length+' moves',badge:this.badge('AI · advisor-only','synth'),
+      children:h('div',{style:{display:'flex',flexDirection:'column',gap:10}}, plan.moves.map(moveCard)),
+      caption: preCall? 'Reviewed before the call — observation → why it matters → the move to open. Each maps to a numbered target you’ll open live once you enter the investor view.' : 'Observation → why it matters → how to open it. The action on each block is word-for-word the matching left-rail target.'});
+  }
   advPageRender(key){
     const h=this.h; const SF=this.SF; const c=this.advClient()||{}; const L=this.state.advLevel; const lvl=(a,b,cc)=>this.advLvl(a,b,cc);
     const P=(this.DB&&this.DB.portfolio)||{}; const pm=this.advPageMeta(key);
@@ -8648,22 +8680,24 @@ class Component extends DCLogic {
           const bh=(t,r)=>h('th',{style:{textAlign:r?'right':'left',padding:'7px 9px',fontSize:10,textTransform:'uppercase',letterSpacing:'.04em',color:'var(--muted)',borderBottom:'2px solid var(--line)'}},t);
           const bd=(v,r,bold,topline)=>h('td',{style:{textAlign:r?'right':'left',padding:'8px 9px',borderBottom:'1px solid var(--line)',borderTop:topline?'2px solid var(--ink)':'none',fontSize:12.5,fontWeight:bold?700:400}},v);
           const bTable=(label,entries)=>{ const sum=entries.reduce((a,e)=>a+(e.p||0),0)||1; const norm=entries.map(e=>({name:e.name,color:e.color,pn:+((e.p||0)/sum*100).toFixed(1)}));
-            return this.card({title:label+' breakdown',style:{flex:'1 1 340px'},children:h('table',{style:{width:'100%',borderCollapse:'collapse'}},
+            return h('table',{style:{width:'100%',borderCollapse:'collapse'}},
               h('thead',null,h('tr',null,bh(label),bh('%',1),tot?bh('€ of plan',1):null)),
               h('tbody',null, norm.map(e=>h('tr',{key:e.name},
                   bd(h('span',{style:{display:'inline-flex',alignItems:'center',gap:7}}, h('span',{style:{width:10,height:10,borderRadius:2,background:'var('+(e.color||'--data-9')+')',display:'inline-block'}}), e.name)),
                   bd(e.pn+'%',1), tot?bd('€'+(+(tot*e.pn/100).toFixed(1))+'m',1):null))
-                .concat([ h('tr',{key:'__t',style:{background:'var(--surface-2)'}}, bd('Total',false,true,true), bd('100%',1,true,true), tot?bd('€'+(+tot.toFixed(1))+'m',1,true,true):null) ]) )),
-              caption:label==='Currency'||label==='Region'||label==='Vintage'?'Model target for this dimension — the € column shows how the €'+(tot?(+tot.toFixed(1)):'—')+'m plan spreads across '+label.toLowerCase()+'.':null}); };
-          const donut=(title,slices,badge)=>this.card({title:title,badge:badge||null,style:{flex:'1 1 210px'},children:this.donutNamed(slices,150,title.split(' ')[0],'mix')});
-          return wrap([ head('Your tailored model portfolio · full view', _adjusted?'Reflecting the strategy mix you just adjusted — the complete institutional breakdown across every dimension.':'The complete institutional breakdown — strategy, sector, format, region, currency and vintage, each with € of plan and a total.'),
-            h('div',{style:{display:'flex',gap:14,flexWrap:'wrap',alignItems:'stretch'}},
-              this.card({title:_adjusted?'Strategy · revised':'Strategy mix',badge:_adjusted?this.badge('revised','conf'):null,style:{flex:'1 1 210px'},children:this.donutNamed(sl,150,_adjusted?'Revised':'Model','mix')}),
-              donut('Sector mix',secSl,this.badge('AI / Tech','synth')), donut('Format mix',fmtSl,this.badge('Secondaries · Co-invest','synth')),
-              donut('Region mix',regSl), donut('Currency mix',curSl), donut('Vintage mix',vintSl)),
-            h('div',{style:{fontFamily:SF,fontSize:16,fontWeight:600,margin:'22px 0 2px'}},'Full allocation breakdown'),
-            h('div',{style:{fontSize:12,color:'var(--muted)',marginBottom:10}}, tot?('Every dimension against the €'+(+tot.toFixed(1))+'m planned commitment — each totals to 100% and the full plan.'):'Every dimension of the target — each totals to 100%.'),
-            h('div',{style:{display:'flex',gap:16,flexWrap:'wrap',alignItems:'flex-start'}}, bTable('Strategy',sl), bTable('Sector',secSl), bTable('Format',fmtSl), bTable('Region',regSl), bTable('Currency',curSl), bTable('Vintage',vintSl)) ]);
+                .concat([ h('tr',{key:'__t',style:{background:'var(--surface-2)'}}, bd('Total',false,true,true), bd('100%',1,true,true), tot?bd('€'+(+tot.toFixed(1))+'m',1,true,true):null) ]) )); };
+          /* each dimension = pie on the LEFT, its line-item list (with % · € of plan · Total) on the RIGHT */
+          const dimBlock=(label,slices,center,badge)=>this.card({title:label+' mix',badge:badge||null,children:
+            h('div',{style:{display:'flex',gap:24,flexWrap:'wrap',alignItems:'center'}},
+              h('div',{style:{flex:'0 0 210px',display:'flex',justifyContent:'center'}}, this.donutNamed(slices,175,center,'mix')),
+              h('div',{style:{flex:'1 1 340px',minWidth:290}}, bTable(label,slices)))});
+          return wrap([ head('Your tailored model portfolio · full view', (_adjusted?'Reflecting the strategy mix you just adjusted — ':'')+'the complete institutional breakdown across every dimension'+(tot?(', each against the €'+(+tot.toFixed(1))+'m planned commitment and totalling 100%.'):'.')),
+            dimBlock(_adjusted?'Strategy · revised':'Strategy', sl, _adjusted?'Revised':'Model', _adjusted?this.badge('revised','conf'):null),
+            dimBlock('Sector', secSl, 'Sector', this.badge('AI / Tech','synth')),
+            dimBlock('Format', fmtSl, 'Format', this.badge('Secondaries · Co-invest','synth')),
+            dimBlock('Region', regSl, 'Region'),
+            dimBlock('Currency', curSl, 'Currency'),
+            dimBlock('Vintage', vintSl, 'Vintage') ]);
         }
         return wrap([ head('Your tailored model portfolio', _adjusted?'Updated to reflect the strategy mix you adjusted on the target step.':'Diversified across the strategies that fit your profile.'),
           h('div',{style:{display:'flex',gap:16,flexWrap:'wrap',alignItems:'stretch'}}, stratCard, table) ]); }
