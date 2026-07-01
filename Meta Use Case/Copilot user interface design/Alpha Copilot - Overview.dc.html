@@ -5561,10 +5561,14 @@ class Component extends DCLogic {
     /* items 24-26 — STRATEGY holds only real strategies. Secondaries & Direct/Co-Invest are FORMATS, AI/Tech is a SECTOR — excluded here and the remaining strategies renormalised to 100%. */
     const REAL_STRATS=['buyout','growth','venture','credit','infra','realestate','other'];
     const stratRenorm=(src)=>{ src=src||{}; let sum=0; REAL_STRATS.forEach(k=>sum+=(+src[k]||0)); const o={}; REAL_STRATS.forEach(k=>o[k]= sum>0? +(((+src[k]||0)/sum*100).toFixed(1)) : 0); return o; };
+    /* item 43 — the Format mix shows only TRUE access formats: co-investments / direct deals are NOT a format the reviewer wants here, and AI/Tech is a SECTOR (never a format) — filter both out and let the remaining formats renormalise to 100% */
+    const NOT_FORMAT=new Set(['Direct deals','Direct & Co-Invest','Direct & Co-Investments','Co-investment','Co-investments','Co-Investments','directs','AI','AI / Tech','ai']);
+    const dropFmtKeys=(o)=>{ const r={}; Object.keys(o||{}).forEach(k=>{ if(!NOT_FORMAT.has(k)) r[k]=o[k]; }); return r; };
+    const fmtDim=()=>{ const d=dim('format','Format'); return {key:d.key,label:d.label, actual:dropFmtKeys(d.actual), target:dropFmtKeys(d.target), colors:dropFmtKeys(d.colors)}; };
     return [
       {key:'strategy',label:'Strategy',actual:stratRenorm((this.MIX&&this.MIX.you)||{}),target:stratRenorm(this.modelMix()),
         colors:Object.fromEntries((this.STRATS||[]).filter(([k])=>REAL_STRATS.includes(k)).map(([k,n,c])=>[k,c]))},
-      dim('region','Region'), dim('currency','Currency'), dim('sector','Sector'), dim('format','Format') /* PDF#3 */
+      dim('region','Region'), dim('currency','Currency'), dim('sector','Sector'), fmtDim() /* PDF#3; item 43 — format excludes co-invest/direct + AI */
     ];
   }
   /* item 47 — 'Suggest funds to fill the gaps' must always be present on every breakdown view */
