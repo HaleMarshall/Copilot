@@ -8753,8 +8753,8 @@ class Component extends DCLogic {
         const DIMS2=this.HOME_DIMS(); const secD=DIMS2.find(d=>d.key==='sector')||{}; const fmtD=DIMS2.find(d=>d.key==='format')||{};
         /* item 40 — connect every dimension mix to what the advisor DECIDED on the target step: prefer this.state.simTargets[dim] (the adjusted mix incl. secondaries/infra/AI&tech) and fall back to the model d.target only when that dimension wasn't adjusted, so the model-portfolio page matches the previous slide instead of a disconnected default */
         const dimSlices=(d)=>{ const _st=(this.state.simTargets&&this.state.simTargets[d.key]); const _src=(_st&&Object.keys(_st).length)? _st : (d.target||{}); return Object.keys(_src).map(k=>({name:k,color:(d.colors&&d.colors[k])||'--data-9',p:+_src[k]||0})).filter(s=>s.p>0); };
-        const secCard=this.card({title:'Sector mix', badge:this.badge('AI / Tech lives here','synth'), style:{flex:'1 1 240px'},children:this.donutNamed(dimSlices(secD),150,'Sector','mix'),caption:'Sector exposure — AI & Tech is a sector, not a strategy.'});
-        const fmtCard=this.card({title:'Format mix', badge:this.badge('Secondaries · Co-invest','synth'), style:{flex:'1 1 240px'},children:this.donutNamed(dimSlices(fmtD),150,'Format','mix'),caption:'Access format — Secondaries and Direct / Co-investment are formats, not strategies.'});
+        const secCard=this.card({title:'Sector mix', badge:null /* item 42 — removed useless yellow badge */, style:{flex:'1 1 240px'},children:this.donutNamed(dimSlices(secD),150,'Sector','mix'),caption:'Sector exposure — AI & Tech is a sector, not a strategy.'});
+        const fmtCard=this.card({title:'Format mix', badge:null /* item 42 — removed useless yellow badge */, style:{flex:'1 1 240px'},children:this.donutNamed(dimSlices(fmtD),150,'Format','mix'),caption:'Access format — Secondaries and Direct / Co-investment are formats, not strategies.'});
         if(L==='L3'){
           /* L3 — FULL institutional breakdown: every dimension (strategy, sector, format, region, currency)
              gets both a donut AND a line-item table with % and € of plan, each with a TOTAL row. This is the
@@ -8778,8 +8778,8 @@ class Component extends DCLogic {
               h('div',{style:{flex:'1 1 340px',minWidth:290}}, bTable(label,slices)))});
           return wrap([ head('Your tailored asset allocation for you', (_adjusted?'Reflecting the strategy mix you just adjusted — ':'')+'the complete institutional breakdown across every dimension'+(tot?(', each against the €'+(+tot.toFixed(1))+'m planned commitment and totalling 100%.'):'.')),
             dimBlock(_adjusted?'Strategy · revised':'Strategy', sl, _adjusted?'Revised':'Model', _adjusted?this.badge('revised','conf'):null),
-            dimBlock('Sector', secSl, 'Sector', this.badge('AI / Tech','synth')),
-            dimBlock('Format', fmtSl, 'Format', this.badge('Secondaries · Co-invest','synth')),
+            dimBlock('Sector', secSl, 'Sector', null) /* item 42 — removed useless yellow badge */,
+            dimBlock('Format', fmtSl, 'Format', null) /* item 42 — removed useless yellow badge */,
             dimBlock('Region', regSl, 'Region'),
             dimBlock('Currency', curSl, 'Currency') ]);
         }
