@@ -6191,10 +6191,11 @@ class Component extends DCLogic {
           h('button',{'data-testid':'reset-target-'+d.key,onClick:()=>this.setState({simTargets:null}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:9,padding:'8px 13px',fontSize:12,fontWeight:600,cursor:'pointer'}},'Reset to model')) : null,
         h('div',{style:{display:'flex',flexDirection:'column',gap:10,marginTop:2}}, riskToggle, h('div',{style:{display:'flex',flexDirection:'column',gap:9}}, sliders))) : null;
       /* item 28 — the per-dimension %/€/Total line-item table was removed from the tailored-target cards; the donuts + Z-chart + comparator selector carry the story, no redundant table */
-      const savedThis=(s.savedDimMsg===d.key);
+      /* item 31 — the '✓ Saved' pill goes away the moment the target changes from the saved baseline (reuses item 30's dimChanged) */
+      const savedThis=(s.savedDimMsg===d.key) && !dimChanged;
       return this.card({title:'Your '+d.label.toLowerCase()+' target',info:true,
         right:h('div',{style:{display:'flex',gap:8,alignItems:'center'}},
-          savedThis? h('span',{style:{fontSize:11,color:'var(--over)',fontWeight:700,whiteSpace:'nowrap'}},'✓ Saved') : null,
+          savedThis? h('span',{'data-testid':'saved-pill-'+d.key,style:{fontSize:11,color:'var(--over)',fontWeight:700,whiteSpace:'nowrap'}},'✓ Saved') : null,
           h('button',{onClick:()=>this.setState({simSuggest:d.key}),style:{border:'1px solid var(--line)',background:'var(--surface)',borderRadius:8,padding:'6px 12px',fontSize:12,fontWeight:600,color:'var(--brand)',cursor:'pointer'}},'✦ Suggest funds'),
           /* item 59/70 — save THIS dimension's target individually */
           h('button',{onClick:()=>this.saveDimTarget(d.key),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'6px 12px',fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif',whiteSpace:'nowrap'}},'✓ Save '+d.label.toLowerCase()+' target')),
