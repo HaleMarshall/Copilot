@@ -2991,7 +2991,13 @@ class Component extends DCLogic {
     const g=0.15*scen*exq*(1 + growthy/400 - incomey/600);   /* growth sleeves lift NAV growth; income sleeves damp it */
     const base=[]; let nv=startNav; for(let i=0;i<5;i++){ nv=nv*(1+g)+plan[i]*0.5; base.push(Math.round(nv)); }
     const up=base.map((v,i)=>Math.round(v*(1+0.10+0.02*i))); const down=base.map((v,i)=>Math.round(v*(1-0.08-0.015*i)));
-    const histL= isNew? [] : ['2021','2022','2023','2024','2025']; const hist= isNew? [] : [-3.2,-4.6,-3.1,-1.0,1.2];
+    const histL= isNew? [] : ['2021','2022','2023','2024','2025'];
+    /* item — historical J-curve (cumulative net cash) DERIVED from the held funds, not hardcoded:
+       ends at today's net position (distributions − paid-in), with a J-curve trough scaled to paid-in. */
+    let hist;
+    if(isNew){ hist=[]; }
+    else { const pm=this.portfolioMetrics(); const pin=pm.paidIn||13; const netToday=+(pm.dist-pm.paidIn).toFixed(1); const tr=-(pin*0.32);
+      hist=[ +(tr*0.72).toFixed(1), +tr.toFixed(1), +(tr*0.86).toFixed(1), +((tr+netToday)/2).toFixed(1), +netToday.toFixed(1) ]; }
     let net= isNew? 0 : hist[4]; const dists=[]; const fut=[];
     for(let i=0;i<5;i++){
       const call=plan[i]*0.62*(1-liq*0.45);
@@ -8696,12 +8702,25 @@ class Component extends DCLogic {
         const impMix=Object.assign({}, baseMix); const perFund=nSel? Math.min(6, 18/Math.max(1,nSel)) : 0;
         selArr.forEach(f=>{ if(f.stratKey) impMix[f.stratKey]=(impMix[f.stratKey]||0)+perFund; });
         const impSlices=toSlices(impMix);
+        /* item — the simulation must RECOMPUTE expected return/TVPI, not just redraw the pie:
+           blend the current portfolio's IRR/TVPI with the selected funds' strategy expected returns, € weighted */
+        const expIRRby={buyout:16,growth:19,venture:24,credit:10,infra:12,realestate:11,secondaries:14,ai:23,directs:15,other:12};
+        const expTVPIby={buyout:2.0,growth:2.3,venture:3.0,credit:1.4,infra:1.7,realestate:1.6,secondaries:1.7,ai:2.8,directs:1.9,other:1.6};
+        const _pmN=this.portfolioMetrics(); const ticket=Math.max(0.5,(this.advClientCommit?this.advClientCommit(c):2));
+        const baseW=Math.max(1,_pmN.nav||1), addW=nSel*ticket;
+        const selIRR=nSel? selArr.reduce((a,f)=>a+(expIRRby[f.stratKey]||14),0)/nSel : 0;
+        const selTVPI=nSel? selArr.reduce((a,f)=>a+(expTVPIby[f.stratKey]||1.8),0)/nSel : 0;
+        const blendIRR=nSel? +(((_pmN.irr*baseW + selIRR*addW)/(baseW+addW)).toFixed(1)) : _pmN.irr;
+        const blendTVPI=nSel? +(((_pmN.tvpi*baseW + selTVPI*addW)/(baseW+addW)).toFixed(2)) : _pmN.tvpi;
+        const dIRR=+(blendIRR-_pmN.irr).toFixed(1);
+        const metricRow=(l,v,d)=>h('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'baseline',padding:'6px 0',borderBottom:'1px solid var(--line)'}}, h('span',{style:{fontSize:12,color:'var(--muted)'}},l), h('span',{style:{display:'flex',alignItems:'baseline',gap:8}}, h('span',{style:{fontFamily:SF,fontWeight:700,fontSize:15}},v), d!=null&&d!==0? h('span',{style:{fontSize:11,fontWeight:700,color:d>0?'var(--over)':'var(--under)'}}, (d>0?'+':'')+d) : null));
         const impactCard=this.card({title:'Your portfolio with these picks', badge:this.badge(nSel+' selected','conf'),
           children:h('div',null,
-            nSel? this.donutNamed(impSlices,160,'New','mix') : h('div',{style:{fontSize:12.5,color:'var(--muted)',padding:'24px 0',textAlign:'center'}},'Select funds on the left to see how they reshape the portfolio.'),
-            nSel? h('div',{style:{marginTop:10,fontSize:12,color:'var(--ink)',lineHeight:1.5}}, nSel+' fund'+(nSel>1?'s':'')+' across '+(new Set(selArr.map(f=>f.stratKey)).size)+' '+(new Set(selArr.map(f=>f.stratKey)).size>1?'strategies':'strategy')+' — this is the portfolio you’d take into commitment.') : null,
+            nSel? this.donutNamed(impSlices,160,'New','mix') : h('div',{style:{fontSize:12.5,color:'var(--muted)',padding:'24px 0',textAlign:'center'}},'Select funds on the left to see how they reshape the portfolio and its expected return.'),
+            nSel? h('div',{style:{marginTop:12}}, metricRow('Expected blended net IRR', blendIRR+'%', dIRR), metricRow('Expected net TVPI', blendTVPI+'x', null)) : null,
+            nSel? h('div',{style:{marginTop:8,fontSize:12,color:'var(--ink)',lineHeight:1.5}}, nSel+' fund'+(nSel>1?'s':'')+' across '+(new Set(selArr.map(f=>f.stratKey)).size)+' '+(new Set(selArr.map(f=>f.stratKey)).size>1?'strategies':'strategy')+' — €'+(+(addW).toFixed(1))+'m added; blended with your €'+baseW+'m book.') : null,
             nSel? h('button',{onClick:()=>this.advNext(),style:{marginTop:12,border:'none',background:'var(--brand)',color:'#fff',borderRadius:9,padding:'10px 16px',fontSize:12.5,fontWeight:700,cursor:'pointer'}},'Take these to commitment  →') : null),
-          caption:'Live impact of the funds you select — compared against your current mix. No need to re-simulate or re-benchmark; you’ve already done that.'});
+          caption:'Live impact — mix AND expected return recompute from the funds you pick (growth/AI lift IRR, credit lowers it), € weighted against your current book.'});
         /* G1 — current allocation vs target as the FIRST element (for a new client it's zero across the board — that frames what to build) */
         const allocVsTarget=this.card({title:'Current allocation vs target (%)', badge:this.badge(isNew?'new — building from zero':'gap to target','conf'),
           children:this.groupedBars(strat.map(kv=>kv[1]),[{name:'Current',color:'--data-9',vals:strat.map(kv=>isNew?0:Math.round(mixYou[kv[0]]||0))},{name:'Target',color:'--data-1',vals:strat.map(kv=>Math.round(mixModel[kv[0]]||0))}]),
