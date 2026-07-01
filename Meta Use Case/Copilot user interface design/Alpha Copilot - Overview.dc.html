@@ -807,7 +807,7 @@ class Component extends DCLogic {
   }
   /* items 57/64 — generic per-dimension comparison mixes: current, target, or any comparator group (peers/platform/top10/model/custom/endowments) */
   cmpDimDef(k){ return this.HOME_DIMS().find(d=>d.key===k)||this.HOME_DIMS()[0]; }
-  cmpDimItems(k){ if(k==='strategy') return this.FINE_STRATS(); const d=this.cmpDimDef(k); return Object.keys(d.actual||{}).map((kk)=>[kk,kk,(d.colors&&d.colors[kk])||'--data-9']); }
+  cmpDimItems(k){ if(k==='strategy') return this.FINE_STRATS().filter(kv=>!['secondaries','directs','ai'].includes(kv[0])); /* items 24-26 — strategy comparison excludes Secondaries/Direct&Co-Invest (formats) + AI (sector) */ const d=this.cmpDimDef(k); return Object.keys(d.actual||{}).map((kk)=>[kk,kk,(d.colors&&d.colors[kk])||'--data-9']); }
   cmpDimMix(k,which){
     if(k==='strategy'){ if(which==='current') return this.fineMix('you');
       /* item 14 — 'your target' reflects the target the advisor actually set (simTargets), not just the house model */
@@ -852,8 +852,9 @@ class Component extends DCLogic {
   ]}; }
   zDeltas(cmp){
     const base = this.cmpMix(cmp);
-    return this.STRATS.map(([k,name,color])=>{
-      const delta = +(this.MIX.you[k]-(base[k]||0)).toFixed(1);
+    /* items 24-26 — strategy comparison over real strategies only (Direct/Co-Invest & Secondaries are formats, AI a sector) */
+    return this.STRATS_REAL().map(([k,name,color])=>{
+      const delta = +((this.MIX.you[k]||0)-(base[k]||0)).toFixed(1);
       return { k, name, color, delta, sig: Math.abs(delta)>=2 };
     }).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
   }
@@ -9298,12 +9299,13 @@ class Component extends DCLogic {
     }[s.cmp];
     // BR caption
     const zr=this.zDeltas(s.cmp);
-    const ai=zr.find(r=>r.k==='ai'), cr=zr.find(r=>r.k==='credit');
+    /* items 24-26 — AI is no longer a strategy, so caption references the top overweight REAL strategy (guarded) */
+    const cr=zr.find(r=>r.k==='credit')||{delta:0}; const topOver=zr.slice().sort((a,b)=>b.delta-a.delta)[0]||{name:'your lead strategy',delta:0};
     const brCap = s.demoState==='cold'
       ? 'You hold no funds yet — we\u2019ll surface your over/under-weights once you do.'
       : (s.cmp==='model'
         ? `Versus the model, your biggest gap is private credit (${cr.delta}pp). Click a bar to drill in.`
-        : `You\u2019re ${ai.delta>0?'+':''}${ai.delta}pp overweight AI and ${cr.delta}pp underweight private credit versus ${cmpName(s.cmp).toLowerCase()} — click a bar to see the funds behind it.`);
+        : `You\u2019re ${topOver.delta>0?'+':''}${topOver.delta}pp overweight ${topOver.name} and ${cr.delta}pp ${cr.delta<0?'underweight':'overweight'} private credit versus ${cmpName(s.cmp).toLowerCase()} — click a bar to see the funds behind it.`);
     // TR caption
     const peerFill=Math.round(this.PM.you/pd.target*100), modelFill=Math.round(this.PM.you/18*100);
     const trCap = s.demoState==='cold'
