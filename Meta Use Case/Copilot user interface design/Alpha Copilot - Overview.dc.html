@@ -495,6 +495,8 @@ class Component extends DCLogic {
       advCFAextra:0,         /* 'I need more' counter */
       advFocus:null,         /* deep-link focus set by a Call-for-Action jump (e.g. 'Wealth','Region') */
       advSeized:false,        /* reserve-of-interest confirmation shown on the Seize step */
+      advActionOpen:null,     /* which 'action for this call' is expanded (signal/observation/why) */
+      advEdits:{},            /* live edits to the intake profile during the call */
       advPrepGoals:null,     /* editable 3-goal list in the prep view (null = use stage defaults) */
       advPrepMode:'preset',  /* prepare-for-call input: 'preset' | 'prompt' */
       advPrepPrompt:'',
@@ -7847,7 +7849,8 @@ class Component extends DCLogic {
     if(L!=='L1') ctls.push(ctlRow('Distribution method', seg([{label:'Catch-Up',value:'Catch-Up'},{label:'Scale factor',value:'Scale'}],method,v=>this.setState({cfMethod:v}))));
     if(L==='L3') ctls.push(ctlRow('GP near-term', seg([{label:'Low',value:'LOW'},{label:'Mid',value:'MID'},{label:'High',value:'HIGH'}],gp,v=>this.setState({cfGP:v}))));
     if(L==='L3') ctls.push(ctlRow('Display currency', h('select',{value:this.state.displayCcy,onChange:e=>this.setState({displayCcy:e.target.value}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--ink)',borderRadius:8,padding:'5px 10px',fontSize:12,fontWeight:600,cursor:'pointer'}}, this.ccyList().map(cc=>h('option',{key:cc,value:cc},cc+' '+this.ccySym(cc).trim())))));
-    const commitSlider=slider('Annual commitment',total,1,50,1,v=>'€'+v+'m',v=>this.setState({cfCommitM:v}));
+    const _wl=parseFloat(String((this.advClient&&this.advClient()||{}).investable||'').replace(/[^0-9.]/g,''))||0; const _tg=this.myPmTarget()||35;
+    const commitSlider=h('div',{style:{flex:'1 1 240px'}}, slider('Annual commitment',total,0.5,50,0.5,v=>'€'+v+'m',v=>this.setState({cfCommitM:v})), _wl?h('div',{style:{fontSize:10,color:'var(--muted)',marginTop:2}},'≈ '+_tg+'% target × €'+_wl+'m ÷ '+pace+'y ('+'€'+(+(total*pace).toFixed(1))+'m committed over the plan)'):null);
     const paceSlider=slider('Deploy over (years)',pace,1,5,1,v=>v+'y',v=>this.setState({cfPaceYears:v}));
     /* charts */
     const _cCur=this.state.displayCcy||'EUR'; const _cRate=this.ccyRate(_cCur); const _cSym=(_cCur==='EUR'?'€':this.ccySym(_cCur).trim()); const _sc=v=>+(v*_cRate).toFixed(2);
@@ -7890,8 +7893,9 @@ class Component extends DCLogic {
   advCurKey(){ const s=this.advSeq(); return s[Math.max(0,Math.min(this.state.advStep,s.length-1))]; }
   advLvl(a,b,c){ const l=this.state.advLevel; return l==='L1'?a:(l==='L3'?c:b); }
   /* ---- controls ---- */
-  advOpenClient(id){ const c=this.advBook().find(x=>x.id===id); const lv=(c&&c.level)||'L2'; this.setState({advClientId:id, advStage:(c&&c.stage)||'new', advLevel:lv, advView:'prep', advPrepGoals:null, advStep:0, advReact:{}, advCFAextra:0, advPrepPrompt:'', advPrepMode:'preset', persona2:(lv==='L3'?'pro':'guided')}); }
-  advEnterCockpit(){ this.setState({advView:'cockpit', advStep:0, advReact:{}, advCFAextra:0, persona2:(this.state.advLevel==='L3'?'pro':'guided')}); }
+  advClientCommit(c){ const w=parseFloat(String((c&&c.investable)||'').replace(/[^0-9.]/g,''))||10; const tgt=this.myPmTarget()||35; const pace=this.state.cfPaceYears||4; return Math.max(0.5, Math.round(w*tgt/100/pace*2)/2); }
+  advOpenClient(id){ const c=this.advBook().find(x=>x.id===id); const lv=(c&&c.level)||'L2'; this.setState({advClientId:id, advStage:(c&&c.stage)||'new', advLevel:lv, advView:'prep', advPrepGoals:null, advStep:0, advReact:{}, advCFAextra:0, advPrepPrompt:'', advPrepMode:'preset', persona2:(lv==='L3'?'pro':'guided'), advActionOpen:null, advEdits:{}, cfCommitM:this.advClientCommit(c)}); }
+  advEnterCockpit(){ this.setState({advView:'cockpit', advStep:0, advReact:{}, advCFAextra:0, persona2:(this.state.advLevel==='L3'?'pro':'guided'), cfCommitM:this.advClientCommit(this.advClient())}); }
   advExit(){ this.setState({advView:'desk', advClientId:null}); }
   advToPrep(){ this.setState({advView:'prep'}); }
   advStepTo(i){ const s=this.advSeq(); this.setState({advStep:Math.max(0,Math.min(i,s.length-1)), advFocus:null, advSeized:false}); }
@@ -7968,7 +7972,7 @@ class Component extends DCLogic {
           ? h('input',{value:this.state.advPrepPrompt,onInput:e=>this.setState({advPrepPrompt:e.target.value}),placeholder:'What is this call for?',style:{width:'100%',boxSizing:'border-box',border:'1px solid var(--line)',borderRadius:9,padding:'10px 12px',fontSize:13}})
           : h('div',{style:{display:'flex',gap:8,flexWrap:'wrap'}}, presets.map((p,i)=>h('button',{key:i,onClick:()=>this.setState({advPrepPrompt:p}),style:{border:'1px solid '+(this.state.advPrepPrompt===p?'var(--brand)':'var(--line)'),background:this.state.advPrepPrompt===p?'var(--brand-wash)':'var(--surface)',color:'var(--ink)',borderRadius:999,padding:'7px 12px',fontSize:12,cursor:'pointer'}},p)))),
         caption:'Sales prep: '+(c.prep||'')}),
-      this.card({title:'Top 3 goals for this call',badge:this.badge('Ask Alpha','synth'),right:h('div',{style:{display:'flex',gap:6}}, h('button',{onClick:()=>this.advGoalAdd(),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:8,padding:'5px 10px',fontSize:11.5,fontWeight:600,cursor:'pointer'}},'+ Suggest'), h('button',{onClick:()=>this.setState({advPrepGoals:null}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:8,padding:'5px 10px',fontSize:11.5,cursor:'pointer'}},'Reset')),
+      this.card({title:'Top 3 actions for this call',badge:this.badge('Ask Alpha','synth'),right:h('div',{style:{display:'flex',gap:6}}, h('button',{onClick:()=>this.advGoalAdd(),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--brand-ink)',borderRadius:8,padding:'5px 10px',fontSize:11.5,fontWeight:600,cursor:'pointer'}},'+ Suggest'), h('button',{onClick:()=>this.setState({advPrepGoals:null}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:8,padding:'5px 10px',fontSize:11.5,cursor:'pointer'}},'Reset')),
         children:h('div',{style:{display:'flex',flexDirection:'column',gap:8}}, goals.map(goalCard)),
         caption:'Keep the ones you like, delete the rest and Alpha suggests more. Objective: '+meta.objective}));
     return h('div',{style:{maxWidth:1040,margin:'0 auto',padding:'20px 24px 48px'}},
@@ -7999,9 +8003,20 @@ class Component extends DCLogic {
         h('div',{style:{width:1,height:30,background:'rgba(255,255,255,.14)'}}),
         h('div',{style:{textAlign:'right'}}, h('div',{style:{fontSize:12.5,fontWeight:600}},self.name), h('div',{style:{fontSize:10,color:'rgba(255,255,255,.55)'}},self.role)),
         h('button',{onClick:()=>this.advToPrep(),style:{border:'1px solid rgba(255,255,255,.3)',background:'rgba(255,255,255,.1)',color:'#fff',borderRadius:8,padding:'6px 11px',fontSize:11.5,cursor:'pointer'}},'Exit')));
+    const actDetail=(meta.actionsDetail)||[]; const openA=this.state.advActionOpen;
     const goalsBox=h('div',{style:{background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:12,padding:'13px 14px',marginBottom:12}},
-      h('div',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--brand-ink)',marginBottom:8}},'Top 3 goals for this call'),
-      h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, goals.slice(0,3).map((g,i)=>h('div',{key:i,style:{display:'flex',gap:8,alignItems:'flex-start',fontSize:12,color:'var(--ink)',lineHeight:1.35}}, h('span',{style:{width:17,height:17,flex:'0 0 17px',borderRadius:'50%',background:'var(--brand)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700}},String(i+1)), g))));
+      h('div',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--brand-ink)',marginBottom:8}},'Top 3 actions for this call'),
+      h('div',{style:{display:'flex',flexDirection:'column',gap:6}}, goals.slice(0,3).map((g,i)=>{ const d=actDetail[i]; const on=openA===i;
+        return h('div',{key:i},
+          h('div',{onClick:d?()=>this.setState({advActionOpen:on?null:i}):null,style:{display:'flex',gap:8,alignItems:'flex-start',fontSize:12,color:'var(--ink)',lineHeight:1.35,cursor:d?'pointer':'default'}},
+            h('span',{style:{width:17,height:17,flex:'0 0 17px',borderRadius:'50%',background:'var(--brand)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700}},String(i+1)),
+            h('span',{style:{flex:1}},g),
+            d?h('span',{style:{fontSize:11,color:'var(--brand-ink)'}}, on?'▾':'›'):null),
+          (on&&d)? h('div',{style:{margin:'6px 0 2px 25px',padding:'8px 10px',background:'var(--surface)',border:'1px solid var(--brand-tint-3)',borderRadius:8,fontSize:11,lineHeight:1.5,color:'var(--ink)'}},
+            h('div',null, h('b',{style:{color:'var(--brand-ink)'}},'Signal: '), d.signal),
+            h('div',{style:{marginTop:3}}, h('b',{style:{color:'var(--brand-ink)'}},'Observation: '), d.observation),
+            h('div',{style:{marginTop:3}}, h('b',{style:{color:'var(--brand-ink)'}},'Why: '), d.why),
+            h('div',{style:{marginTop:4,fontSize:9.5,color:'var(--muted)',fontStyle:'italic'}},'AI-generated from call signals & platform data')):null); })));
     const objChip=h('div',{style:{display:'flex',alignItems:'center',gap:7,marginBottom:12,flexWrap:'wrap'}}, h('span',{style:{fontSize:9,fontWeight:700,letterSpacing:'.06em',color:'#fff',background:'var(--brand)',borderRadius:5,padding:'2px 7px'}},'OBJECTIVE'), h('span',{style:{fontSize:12,color:'var(--ink)',lineHeight:1.35}},meta.objective));
     const prog=(step+1)/seq.length;
     const stepBox=h('div',{style:{marginBottom:12}},
@@ -8078,10 +8093,16 @@ class Component extends DCLogic {
             caption:'Compliance-neutralised — these are check-list prompts, not advice. Use “I need more” in the rail to reveal additional arguments.'}) ]);
       }
       case 'intake': case 'intakeMin': {
-        const minimal=key==='intakeMin';
-        const fields=[['Investable wealth',c.investable||'—'],['Age band',c.age||'—'],['Risk class',c.risk||'—']].concat(minimal?[]:[['Region',c.region||'—'],['Profession',c.occupation||'—'],['Private-markets target',this.myPmTarget()+'%']]);
-        return wrap([ head(pm.title, minimal?'Just enough to show a tailored model — the rest comes after accreditation.':'Most of this is prefilled from onboarding — confirm it and capture what’s missing (region & profession).'),
-          this.card({title:'Profile',children:h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))',gap:12}}, fields.map((f,i)=>{ const hot=focus&&(fieldHL[focus]||[]).indexOf(f[0])>=0; return h('div',{key:i,style:{borderRadius:9,padding:'8px 10px',background:hot?'var(--brand-wash)':'transparent',border:'1px solid '+(hot?'var(--brand-tint-3)':'transparent'),boxShadow:hot?'0 0 0 2px var(--brand-tint-3)':'none'}},h('div',{style:{fontSize:10.5,color:hot?'var(--brand-ink)':'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em'}},f[0]),h('div',{style:{fontFamily:SF,fontSize:16,fontWeight:600,marginTop:3}},f[1])); }))}),
+        const minimal=key==='intakeMin'; const ed=this.state.advEdits||{};
+        /* editable during the call (per the review) — each field is a live input feeding the model */
+        const efield=(label,kk,dv)=>{ const hot=focus&&(fieldHL[focus]||[]).indexOf(label)>=0; const val=(ed[kk]!=null?ed[kk]:dv);
+          return h('div',{key:kk,style:{borderRadius:9,padding:'8px 11px',background:hot?'var(--brand-wash)':'var(--surface-2)',border:'1px solid '+(hot?'var(--brand-tint-3)':'var(--line)'),boxShadow:hot?'0 0 0 2px var(--brand-tint-3)':'none'}},
+            h('div',{style:{fontSize:10.5,color:hot?'var(--brand-ink)':'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em',marginBottom:2}},label),
+            h('input',{value:val,onInput:e=>{ const n=Object.assign({},this.state.advEdits); n[kk]=e.target.value; this.setState({advEdits:n}); },style:{width:'100%',boxSizing:'border-box',border:'none',background:'transparent',outline:'none',fontFamily:SF,fontSize:16,fontWeight:600,color:'var(--ink)'}})); };
+        const efields=[efield('Investable wealth','wealth',c.investable||''), efield('Age band','age',c.age||''), efield('Risk class','risk',c.risk||'')]
+          .concat(minimal?[]:[efield('Region','region',c.region||''), efield('Profession','profession',c.occupation||''), efield('Private-markets target','target',this.myPmTarget()+'%'), efield('Liquidity needs','liquidity','Moderate · keep a 12-month buffer')]);
+        return wrap([ head(pm.title, minimal?'Just enough to show a tailored model — the rest comes after accreditation.':'Prefilled from onboarding — edit any field live as it comes up in the call; changes flow into the model.'),
+          this.card({title:'Profile',badge:this.badge('editable','conf'),children:h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:10}}, efields),caption:'Confirm & update in the call — investable wealth, risk, region, profession, target and liquidity needs.'}),
           (c.notes&&c.notes.length)?this.card({title:'Notes from our conversation',badge:this.badge('AI','synth'),children:h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, c.notes.map((n,i)=>h('div',{key:i,style:{display:'flex',gap:8,fontSize:13,lineHeight:1.45}},h('span',{style:{color:'var(--brand)'}},'•'),n))),caption:'Captured by Ask Alpha — the client sees these too, so they know they were heard.'}):null ]);
       }
       case 'setTarget': case 'confirmTarget': {
@@ -8098,9 +8119,18 @@ class Component extends DCLogic {
         h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:600}},'Building your tailored model…'),
         h('div',{style:{fontSize:13.5,color:'var(--muted)',lineHeight:1.55,maxWidth:460}},'This is you — and this is what we think your tailored target portfolio should look like, based on your profile, risk and horizon.'),
         h('button',{onClick:()=>this.advNext(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'11px 20px',fontSize:13.5,fontWeight:700,cursor:'pointer'}},'See the model  →'));
-      case 'modelPortfolio': return wrap([ head('Your tailored model portfolio','Diversified across the strategies that fit your profile.'),
-        h('div',{style:{display:'flex',gap:16,flexWrap:'wrap'}}, this.card({title:'Strategy mix',style:{flex:'1 1 320px'},children:this.donutNamed(toSlices(mixModel),160,'Model','mix')}),
-          this.card({title:'At a glance',style:{flex:'1 1 240px'},children:this.kpiTiles([['Strategies',String(toSlices(mixModel).length)],['PM target',this.myPmTarget()+'%'],['Horizon',(c.age?'long':'long')+'-term']])})) ]);
+      case 'modelPortfolio': { const sl=toSlices(mixModel); const commit=this.advClientCommit?this.advClientCommit(c):0; const tot=commit*(this.state.cfPaceYears||4);
+        const th=(t,r)=>h('th',{style:{textAlign:r?'right':'left',padding:'7px 9px',fontSize:10,textTransform:'uppercase',letterSpacing:'.04em',color:'var(--muted)',borderBottom:'2px solid var(--line)'}},t);
+        const td=(v,r)=>h('td',{style:{textAlign:r?'right':'left',padding:'8px 9px',borderBottom:'1px solid var(--line)',fontSize:12.5}},v);
+        /* table beside the donut — what each slice is + % (+ € of the planned commitment) — per the review */
+        const table=this.card({title:'Allocation breakdown',style:{flex:'1 1 340px'},children:h('table',{style:{width:'100%',borderCollapse:'collapse'}},
+          h('thead',null,h('tr',null,th('Strategy'),th('%',1),tot?th('€ of plan',1):null)),
+          h('tbody',null, sl.map(s=>h('tr',{key:s.name},
+            td(h('span',{style:{display:'inline-flex',alignItems:'center',gap:7}}, h('span',{style:{width:10,height:10,borderRadius:2,background:'var('+s.color+')',display:'inline-block'}}), s.name)),
+            td(s.p+'%',1), tot?td('€'+(+(tot*s.p/100).toFixed(1))+'m',1):null)))),
+          caption:'Every strategy in the model, its target weight'+(tot?(' and its share of the €'+(+tot.toFixed(1))+'m planned commitment.'):'.')});
+        return wrap([ head('Your tailored model portfolio','Diversified across the strategies that fit your profile.'),
+          h('div',{style:{display:'flex',gap:16,flexWrap:'wrap',alignItems:'stretch'}}, this.card({title:'Strategy mix',style:{flex:'1 1 300px'},children:this.donutNamed(sl,160,'Model','mix')}), table) ]); }
       case 'modelExisting': return wrap([ head('Model vs your portfolio today','The gaps between the two are exactly what we can act on.'),
         h('div',{style:{display:'flex',gap:16,flexWrap:'wrap'}}, this.card({title:'You today',style:{flex:'1 1 300px'},children:this.donutNamed(toSlices(mixYou),150,'You','mix')}), this.card({title:'Recommended model',style:{flex:'1 1 300px'},children:this.donutNamed(toSlices(mixModel),150,'Model','mix')})) ]);
       case 'overview': {

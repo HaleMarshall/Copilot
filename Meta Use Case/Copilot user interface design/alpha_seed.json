@@ -3768,7 +3768,6 @@
       "execSummary",
       "intake",
       "setTarget",
-      "aiThinking",
       "modelPortfolio",
       "multiComparison",
       "future",
@@ -3890,6 +3889,23 @@
         "Confirm the profile & investable wealth",
         "Agree the target allocation & first commitment",
         "Secure the follow-up & market-news opt-in"
+      ],
+      "actionsDetail": [
+        {
+          "signal": "Recent liquidity event · large investable cash",
+          "observation": "Investable wealth likely understated vs a profile like this",
+          "why": "Confirming the true figure right-sizes the whole plan."
+        },
+        {
+          "signal": "New to private markets · 0% deployed",
+          "observation": "Behind the private-markets target with clear room to deploy",
+          "why": "A first commitment gets the J-curve started now, not next year."
+        },
+        {
+          "signal": "L3 · high-value relationship",
+          "observation": "No follower / market-news opt-in yet",
+          "why": "Keeps the relationship warm and the pipeline in front of them."
+        }
       ]
     },
     "existing": {
@@ -3898,6 +3914,23 @@
         "Review since last talk & confirm the profile",
         "Close the gap to target with the next commitment",
         "Opt-in to follower & market-news"
+      ],
+      "actionsDetail": [
+        {
+          "signal": "Since-last-talk activity · Databricks mark-up",
+          "observation": "Profile & wealth may have shifted since the last review",
+          "why": "Re-confirming keeps every recommendation grounded."
+        },
+        {
+          "signal": "15.7% filled vs 35% target · lagging peers",
+          "observation": "Under-allocated across the book",
+          "why": "The next commitment closes the single largest gap."
+        },
+        {
+          "signal": "Engaged, high-value",
+          "observation": "Not opted into follower / market-news",
+          "why": "Follower feed is the best between-call touchpoint."
+        }
       ]
     },
     "inactive": {
@@ -3906,6 +3939,23 @@
         "Re-engage on a missed / live deal",
         "Reserve interest on the open opportunity",
         "Book a structured portfolio review"
+      ],
+      "actionsDetail": [
+        {
+          "signal": "Watch-listed deal just opened (Lexington)",
+          "observation": "Away ~8 months · missed Databricks & Anthropic",
+          "why": "Catch with the live deal before anything structural."
+        },
+        {
+          "signal": "Open allocation window",
+          "observation": "Reserve-of-interest not yet placed",
+          "why": "Lock the spot while it's open."
+        },
+        {
+          "signal": "Re-engaging",
+          "observation": "No structured review on file this year",
+          "why": "Book the portfolio review to convert re-engagement into a plan."
+        }
       ]
     },
     "pregate": {
@@ -3914,6 +3964,23 @@
         "Capture the minimum intake",
         "Show the tailored model & peer position",
         "Drive to Moonfare accreditation"
+      ],
+      "actionsDetail": [
+        {
+          "signal": "No Moonfare account yet",
+          "observation": "Only minimal intake captured",
+          "why": "Enough to show a tailored model without an account."
+        },
+        {
+          "signal": "Profile fits a clear model",
+          "observation": "Model & peer position computed from age/risk/wealth",
+          "why": "Seeing the tailored model builds conviction to accredit."
+        },
+        {
+          "signal": "Warm lead",
+          "observation": "Not yet accredited",
+          "why": "Route to KYC while interest is high."
+        }
       ]
     }
   },
