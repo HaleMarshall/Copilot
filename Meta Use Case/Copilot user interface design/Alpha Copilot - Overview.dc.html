@@ -8597,10 +8597,11 @@ class Component extends DCLogic {
         const riskOpts=(this.RISKS||[]).map(r=>r.label||r.short||r.id);
         /* one field — read-only chip when not editing, the right control (text/number/select) when editing */
         const efield=(label,kk,dv,opts)=>{ opts=opts||{}; const hot=focus&&(fieldHL[focus]||[]).indexOf(label)>=0; const val=get(kk,dv);
-          const box=(inner)=>h('div',{key:kk,style:{borderRadius:9,padding:'8px 11px',background:hot?'var(--brand-wash)':'var(--surface-2)',border:'1px solid '+(hot?'var(--brand-tint-3)':(editing?'var(--brand-tint-3)':'var(--line)')),boxShadow:hot?'0 0 0 2px var(--brand-tint-3)':'none'}},
-            h('div',{style:{fontSize:10.5,color:hot?'var(--brand-ink)':'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em',marginBottom:2}},label), inner);
-          if(!editing) return box(h('div',{style:{fontFamily:SF,fontSize:16,fontWeight:600,color:'var(--ink)',minHeight:22}}, (val===''||val==null)?'—':val));
-          const st={width:'100%',boxSizing:'border-box',border:'1px solid var(--line)',borderRadius:7,background:'var(--surface)',outline:'none',fontFamily:SF,fontSize:16,fontWeight:600,color:'var(--ink)',padding:'6px 8px'};
+          /* item 9 — the field HEADER (label) reads larger/more prominent than the value/input below it */
+          const box=(inner)=>h('div',{key:kk,style:{borderRadius:9,padding:'9px 12px',background:hot?'var(--brand-wash)':'var(--surface-2)',border:'1px solid '+(hot?'var(--brand-tint-3)':(editing?'var(--brand-tint-3)':'var(--line)')),boxShadow:hot?'0 0 0 2px var(--brand-tint-3)':'none'}},
+            h('div',{style:{fontFamily:SF,fontSize:14.5,fontWeight:700,color:hot?'var(--brand-ink)':'var(--ink)',letterSpacing:'.005em',marginBottom:3,lineHeight:1.2}},label), inner);
+          if(!editing) return box(h('div',{style:{fontSize:13.5,fontWeight:500,color:'var(--muted)',minHeight:19}}, (val===''||val==null)?'—':val));
+          const st={width:'100%',boxSizing:'border-box',border:'1px solid var(--line)',borderRadius:7,background:'var(--surface)',outline:'none',fontFamily:'Inter,system-ui,sans-serif',fontSize:13.5,fontWeight:500,color:'var(--ink)',padding:'6px 8px'};
           if(opts.type==='select') return box(h('select',{value:val,onChange:e=>{ set(kk,e.target.value); if(opts.onPick) opts.onPick(e.target.value); },style:Object.assign({cursor:'pointer'},st)}, (opts.options||[]).map(o=>h('option',{key:o,value:o},o))));
           return box(h('input',{type:opts.type==='num'?'number':'text',value:val,placeholder:'—',onChange:e=>set(kk,e.target.value),style:st})); };
         const already=get('pmInvested', c.pmInvested||'No');
