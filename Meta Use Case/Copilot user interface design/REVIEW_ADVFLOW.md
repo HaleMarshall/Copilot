@@ -25,7 +25,7 @@ Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.
 - [x] 22. Too-small peer selection → paywall (paid clients only).
 - [x] 23. Advisor flow: too many filters yielding too few results → take next-closest-largest before the gap-closing filter.
 - [x] 24. Direct/co-investments and secondaries are FORMATS not strategies — remove from strategy section.
-- [ ] 25. Keep strategies in strategy target; remove direct & co-investments entirely.
+- [x] 25. Keep strategies in strategy target; remove direct & co-investments entirely.
 - [ ] 26. Remove Direct & Co-Investments from the investor view too.
 - [ ] 27. All three charts: equal space + equal distance from each other and the card walls.
 - [ ] 28. Remove the entire strategy/region table (%, totals, base ccy) from tailored-target — keep only compare-against (model/peers/platform/top).

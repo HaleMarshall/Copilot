@@ -731,8 +731,10 @@ class Component extends DCLogic {
     return { median, target, mix, c };
   }
   /* items 175/178 — strategy mix → donut slices using the fixed strategy→color map */
-  stratSlices(m){ m=m||{}; const tot=this.STRATS.reduce((a,kv)=>a+(+m[kv[0]]||0),0)||1;
-    return this.STRATS.filter(kv=>(+m[kv[0]]||0)>0).map(kv=>({color:kv[2],p:+((+m[kv[0]]||0)/tot*100).toFixed(1),n:kv[1]})); }
+  /* items 24-26 — real strategies only for STRATEGY donuts/legends; Secondaries & Direct/Co-Invest are FORMATS, AI/Tech a SECTOR */
+  STRATS_REAL(){ return (this.STRATS||[]).filter(kv=>!['secondaries','ai','directs'].includes(kv[0])); }
+  stratSlices(m){ m=m||{}; const S=this.STRATS_REAL(); const tot=S.reduce((a,kv)=>a+(+m[kv[0]]||0),0)||1;
+    return S.filter(kv=>(+m[kv[0]]||0)>0).map(kv=>({color:kv[2],p:+((+m[kv[0]]||0)/tot*100).toFixed(1),n:kv[1]})); }
   /* the strategy TARGET allocation of a benchmark group (their model/representative forward mix) */
   benchTargetMix(key){
     if(key==='custom'||key==='you') { const t=(this.state.simTargets||this.defaultTargets()).strategy; return t||this.MIX.you; }
@@ -8576,7 +8578,7 @@ class Component extends DCLogic {
     const wrap=(kids)=>h('div',{style:{maxWidth:1000,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}, kids);
     const head=(t,s)=>h('div',null, h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:600,letterSpacing:'-.01em'}},t), s?h('div',{style:{fontSize:13,color:'var(--muted)',marginTop:3,lineHeight:1.5,maxWidth:680}},s):null);
     const lvlNote=(t)=>h('div',{style:{fontSize:11,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:8,padding:'7px 11px',display:'inline-block'}},t);
-    const strat=this.STRATS||[]; const mixYou=(this.MIX&&this.MIX.you)||{}; const mixModel=this.modelMix()||{}; const mixPlat=(this.DB&&this.DB.mix&&this.DB.mix.platform)||{};
+    const strat=this.STRATS_REAL(); const mixYou=(this.MIX&&this.MIX.you)||{}; const mixModel=this.modelMix()||{}; const mixPlat=(this.DB&&this.DB.mix&&this.DB.mix.platform)||{}; /* items 24-26 — strategy donuts exclude formats/sector */
     const toSlices=(mix)=>strat.map(kv=>({name:kv[1],p:mix[kv[0]]||0,color:kv[2]})).filter(s=>s.p>0);
     const catLabels=strat.map(kv=>kv[1]); const catVals=(mix)=>strat.map(kv=>mix[kv[0]]||0);
     const focus=this.state.advFocus; const DIMS=(typeof this.HOME_DIMS==='function')?this.HOME_DIMS():[];
