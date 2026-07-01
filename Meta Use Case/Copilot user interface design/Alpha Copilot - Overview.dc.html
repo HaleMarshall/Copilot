@@ -931,7 +931,9 @@ class Component extends DCLogic {
   /* review4 item 5 — lifecycle-aware fill rate: where peers/model/platform were at THIS investor's stage (+ projection to maturity); endowments shown rolling (deployed over decades) */
   fillRateLifecycle(){
     const h=this.h, SF=this.SF; const L=(this.DB&&this.DB.lifecycle)||{}; const F=L.fill||{stage:{},proj:{}};
-    const yrs=L.yearsIn||7; const stage=F.stage||{}; const proj=F.proj||{};
+    /* item 18 — a NEW investor is at the very start: show the year they're in (year 1), not year 7, and don't imply a 1–7 range */
+    const isNewInv=this.state.advView==='cockpit'&&(this.state.advStage==='new'||this.state.advStage==='pregate');
+    const yrs=isNewInv?1:(L.yearsIn||7); const stage=F.stage||{}; const proj=F.proj||{};
     const rows=[
       {k:'you',label:'You',color:'--brand'},
       {k:'peers',label:'Peers',color:'--data-4'},
@@ -3047,7 +3049,7 @@ class Component extends DCLogic {
         h('div',{style:{fontFamily:SF,fontSize:19,fontWeight:700}},t[1]),
         h('div',{style:{fontSize:9.5,color:'var(--muted)',marginTop:2}},t[2]))));
   }
-  futureFilters(pj){
+  futureFilters(pj, simple){
     const h=this.h; const SF=this.SF; const s=this.state;
     const wseg=(opts,val,on)=>h('div',{style:{display:'flex',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:9,padding:2,gap:2,flexWrap:'wrap'}},
       opts.map(o=>{const a=o.value===val;return h('button',{key:o.value,onClick:()=>on(o.value),style:{flex:'1 0 auto',border:'none',cursor:'pointer',borderRadius:7,padding:'5px 9px',fontSize:11.5,fontWeight:a?700:500,fontFamily:'Inter,system-ui,sans-serif',whiteSpace:'nowrap',background:a?'var(--brand)':'transparent',color:a?'#fff':'var(--muted)'}},o.label);}));
@@ -3065,8 +3067,10 @@ class Component extends DCLogic {
           h('input',{type:'range',min:0.5,max:6,step:0.1,value:s.fCommit,onChange:e=>this.setState({fCommit:+e.target.value}),style:{flex:1,accentColor:'var(--brand)',cursor:'pointer'}}),
           h('span',{style:{fontFamily:SF,fontWeight:700,fontSize:15,minWidth:54,textAlign:'right'}}, '€'+(+s.fCommit).toFixed(1)+'m')))),
       sec('Macro scenario',null, wseg([{label:'Base',value:'base'},{label:'Soft landing',value:'soft'},{label:'Higher-for-longer',value:'hfl'},{label:'AI super-cycle',value:'ai'}], s.fScenario, v=>this.setState({fScenario:v}))),
+      /* item 35 — simple mode (pre-gate) stops here: pacing, commitment & scenario only. Advanced programme + product-mix are hidden. */
+      simple? h('div',{style:{fontSize:10.5,color:'var(--muted)',lineHeight:1.45}},'Kept simple for a first look — the full programme & product-mix controls unlock after accreditation.') : null,
       /* items 106-109 — Programme Inputs adopted from Michael Blome (Commitment Years, Recycle Year, Recycle Rate, Execution). NOT adopted: DPI target / performance targets / max drawdown (items 110-112). */
-      sec('Programme inputs','how your commitment programme runs', h('div',null,
+      simple? null : sec('Programme inputs','how your commitment programme runs', h('div',null,
         h('div',{style:{display:'flex',justifyContent:'space-between',fontSize:11.5,marginBottom:3}}, h('span',null,'Commitment years'), h('span',{style:{fontFamily:SF,fontWeight:700}}, s.fCommitYears+' yr')),
         h('input',{type:'range',min:1,max:25,value:s.fCommitYears,onChange:e=>this.setState({fCommitYears:+e.target.value}),style:{width:'100%',accentColor:'var(--brand)',cursor:'pointer',marginBottom:10}}),
         h('div',{style:{display:'flex',justifyContent:'space-between',fontSize:11.5,marginBottom:3}}, h('span',null,'Recycle until year'), h('span',{style:{fontFamily:SF,fontWeight:700}}, 'yr '+s.fRecycleYear)),
@@ -3076,7 +3080,7 @@ class Component extends DCLogic {
         h('input',{type:'range',min:0,max:100,step:5,value:s.fRecycleRate,onChange:e=>this.setState({fRecycleRate:+e.target.value}),style:{width:'100%',accentColor:'var(--brand)',cursor:'pointer',marginBottom:10}}),
         h('div',{style:{fontSize:11.5,marginBottom:4}},'Execution — quality of funds you invest into'),
         wseg([{label:'Top quartile',value:'topq'},{label:'Average',value:'avg'}], s.fExecution, v=>this.setState({fExecution:v})))),
-      sec('Product mix','future commitments', h('div',null,
+      simple? null : sec('Product mix','future commitments', h('div',null,
         h('div',{style:{fontSize:11,color:'var(--muted)',lineHeight:1.45,marginBottom:10}},'Every Moonfare product. Lifting Secondaries / Semi-liquid pulls value & distributions forward.'),
         PRODUCTS.map(prodSlider))),
       h('div',{style:{fontSize:10.5,color:'var(--brand-ink)',background:'var(--brand-wash)',borderRadius:8,padding:'9px 11px',lineHeight:1.45}},'✦ Alpha: at €'+pj.c+'m/yr on the '+s.fScenario+' case, you reach €'+pj.navY5+'m NAV and DPI '+pj.dpiY5+'x by Y5.'));
@@ -3238,7 +3242,7 @@ class Component extends DCLogic {
     const filters=h('div',{style:{background:'var(--surface)',border:'1px solid var(--line)',borderRadius:14,padding:'16px 16px 18px'}},
       h('div',{style:{fontSize:14,fontWeight:700,fontFamily:SF,marginBottom:3}},'Future filters'),
       h('div',{style:{fontSize:11,color:'var(--muted)',marginBottom:14}},'Tune the forward view — every chart recomputes live.'),
-      this.futureFilters(pj));
+      this.futureFilters(pj, (this.state.advView==='cockpit'&&this.state.advStage==='pregate'))); /* item 35 — pre-gate keeps it simple */
     const right=h('aside',{style:{flex:'0 0 300px',width:300,alignSelf:'flex-start',position:'sticky',top:0,display:'flex',flexDirection:'column',gap:14}}, filters);
     return h('div',null,
       h('div',{style:{display:'flex',gap:18,alignItems:'flex-start'}}, main, right),
@@ -6694,10 +6698,11 @@ class Component extends DCLogic {
       right:h('span',{style:{fontSize:11.5,color:'var(--muted)'}},'% of investable wealth · actual'),
       children:h('div',{style:{paddingTop:6}}, empty? this.cmpEmpty() : this.tlChart()),
       caption:'Actual share of investable wealth in private markets — You / Peers / Platform are real and move with your cohort filters; Model · target is the Moonfare house-view for your risk class.'});
+    const _fillYr=(this.state.advView==='cockpit'&&(this.state.advStage==='new'||this.state.advStage==='pregate'))?1:(((this.DB&&this.DB.lifecycle&&this.DB.lifecycle.yearsIn)||7)); /* item 18 — new investor is at year 1 */
     const fillCard=this.card({title:'Fill rate', info:true,
-      right:h('span',{style:{fontSize:11.5,color:'var(--muted)'}},'At your stage · year '+(((this.DB&&this.DB.lifecycle&&this.DB.lifecycle.yearsIn)||7))),
+      right:h('span',{style:{fontSize:11.5,color:'var(--muted)'}},'At your stage · year '+_fillYr),
       children:h('div',{style:{paddingTop:6}}, empty? this.cmpEmpty() : this.fillRateLifecycle()),
-      caption:'Lifecycle-matched: where peers, the model and the platform were at the SAME point in their journey as you (year '+(((this.DB&&this.DB.lifecycle&&this.DB.lifecycle.yearsIn)||7))+'), plus a faded projection to maturity. Endowments are shown rolling — they’ve deployed continuously over decades, so they sit fully ramped.'});
+      caption:'Lifecycle-matched: where peers, the model and the platform were at the SAME point in their journey as you (year '+_fillYr+'), plus a faded projection to maturity. Endowments are shown rolling — they’ve deployed continuously over decades, so they sit fully ramped.'});
 
     // ---- row 2: You vs [comparator] — strategy (pp), toggle-driven (the headline comparison chart) ----
     const targetCard=this.card({title:'You vs '+cmpLong+' — strategy (pp)', badge:this.badge('vs '+cmpShort,'synth'),
@@ -8496,8 +8501,10 @@ class Component extends DCLogic {
           this.card({title:'Gap to model (pp)',children:this.miniZ(rows),caption:'Where you’re under- or over-weight versus the recommended model.'}),
           oppCard ]); }
       case 'future': { const stg=this.state.advStage; const fScope=(stg==='existing'||stg==='inactive')?'combined':'new';
+        /* item 35 — pre-gate keeps the future simple (fewest toggles), regardless of advice level */
+        const fLevel = stg==='pregate' ? 'L1' : L;
         return wrap([ head('Your future — commitments & J-curve', lvl('A simple projection — we’ve set sensible defaults.','Model the commitment pace and see the J-curve with percentile bands.','Full PitchBook engine — per-strategy curves, percentile & distribution-method toggles.')),
-        this.cfModel({level:L, mix:this.modelMix(), forceScope:fScope}) ]); }
+        this.cfModel({level:fLevel, mix:this.modelMix(), forceScope:fScope}) ]); }
       case 'nextBest': case 'nextBestHints': { const hints=key==='nextBestHints';
         /* items 29/30 — next-best is derived from the client's actual gaps (not hard-coded), and each strategy
            is filled with a CURATED PORTFOLIO of funds (not one fund, not the whole fund page). Selecting funds

@@ -27,7 +27,7 @@ Source: ~/Downloads/Advisor View 2 review.zip (click-comments.md). Status: [ ] t
 - [x] 15. Endowments selectable individually (not only combined) — a button to open individual endowments, in PM allocation + comparison.
 - [ ] 16. De-duplicate "Compare Yourself / Strategy / Funds" (they're the same comparison).
 - [ ] 17. Strategy drill-in: new investor → suggest a fund; existing investor → different (already invested).
-- [ ] 18. Fill-rate "at your stage": for a new investor show only the current year, not years 1–7 range (also investor view).
+- [x] 18. Fill-rate "at your stage": for a new investor show only the current year, not years 1–7 range (also investor view).
 
 ## Future / cash-flow
 - [x] 19. New investor has NO historical — remove historical from the J-curve.
@@ -51,8 +51,8 @@ Source: ~/Downloads/Advisor View 2 review.zip (click-comments.md). Status: [ ] t
 - [x] 33. Add a final "Next" button to end the flow.
 
 ## Levels & lifecycle
-- [ ] 34. L2 visibly differs: simple/fewer toggles; only strategy adjustable (OK).
-- [ ] 35. Pre-gate: no peer benchmarking (esp L2); simple future toggles; show opportunities to L2 (funds like EQT); selectable ideas → Moonfare accreditation.
+- [x] 34. L2 visibly differs: simple/fewer toggles; only strategy adjustable (OK).
+- [x] 35. Pre-gate: no peer benchmarking (esp L2); simple future toggles; show opportunities to L2 (funds like EQT); selectable ideas → Moonfare accreditation.
 - [x] 36. L1 existing: "Model vs your portfolio today" shows the actual invested strategies; headline = 4 metrics (DPI etc.) + a performance graph.
 - [x] 37. "What's changed": no emojis; use logos + a graph; make it look real.
 - [x] 38. "Suggested vs current portfolio": add suggest-opportunities beneath.
