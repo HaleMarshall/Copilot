@@ -6150,15 +6150,21 @@ class Component extends DCLogic {
         h('div',{style:Object.assign({},simCell,{alignItems:'stretch'})}, h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:8,textAlign:'center'}}, hideCompare? 'Your change vs the original proposal (pp)' : ('Your target vs '+compShort+'’s target (pp)')),
           /* item 20 — always show the Z-chart; when your target is in line with the comparator, draw the ZEROED bars (every category at 0pp on the axis), never a text fallback or fictional gray bars */
           h('div',{style:{width:'100%'}}, this.miniZ(zRows.length? zRows : cats.map(k=>({name:nm(d.key,k),delta:0,color:d.colors[k]||'--data-9'}))))));
+      /* item 68 — Adjust-my-target reveals the sliders inline (any comparator, not only Custom) */
+      const adjOpen=this.dtog('simAdjust_'+d.key,false);
+      /* item 29 — 'Adjust my target' gets a DISTINCT color (filled ink, not the blue comparator pills) and lives IN the comparator row, immediately to the left of Model, so it reads as the primary edit control right next to the compare choices */
+      const adjustBtn=hideCompare? null : h('button',{'data-testid':'adjust-target-'+d.key,onClick:()=>this.setDtog('simAdjust_'+d.key,!adjOpen),
+        style:{border:'1px solid var(--ink)',background:'var(--ink)',color:'#fff',borderRadius:999,padding:'6px 15px',fontSize:11.5,fontWeight:700,cursor:'pointer',whiteSpace:'nowrap',display:'inline-flex',alignItems:'center',gap:6}}, h('span',{style:{fontSize:12,lineHeight:1}}, adjOpen?'▾':'✎'), 'Adjust my target');
       /* item 67/69 — comparator selector; Peers & Custom open the group editor (same one as the comparison page) */
       const selector=hideCompare? null : h('div',null,
-        h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:7}},'Compare your target against'),
-        h('div',{style:{display:'flex',flexWrap:'wrap',gap:6}}, CMP.map(([v,l])=>{ const on=mode===v;
+        h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:7}},'Adjust your target · or compare it against'),
+        h('div',{style:{display:'flex',flexWrap:'wrap',gap:6,alignItems:'center'}},
+          adjustBtn,
+          h('span',{style:{width:1,alignSelf:'stretch',minHeight:22,background:'var(--line)',margin:'0 4px'}}),
+          CMP.map(([v,l])=>{ const on=mode===v;
           /* item 37 — Custom must open the shaping engine: select it, apply a custom cohort, and reveal the sliders inline (the 'custom engine') */
           return h('button',{key:v,onClick:()=>{ this.setSimCmp(d.key,v); if(v==='peers'){ this.applyPeerCohort({cmp:'peers',controlOpen:true}); } else if(v==='custom'){ this.clearCohort({cmp:'custom',controlOpen:true}); this.setDtog('simAdjust_'+d.key,true); } },
             style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 13px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}}, (v==='custom'||v==='peers')?'✎ '+l:l); })));
-      /* item 68 — Adjust-my-target button reveals the sliders inline (any comparator, not only Custom) */
-      const adjOpen=this.dtog('simAdjust_'+d.key,false);
       const riskToggle = (adjOpen && d.key==='strategy') ? h('div',{style:{marginBottom:4}},
         h('div',{style:{fontSize:10.5,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)',marginBottom:6}},'Risk strategy — feeds your target'),
         h('div',{style:{display:'flex',flexWrap:'wrap',gap:6}}, this.RISKS.map(r=>{ const on=s.riskId===r.id;
@@ -6175,11 +6181,11 @@ class Component extends DCLogic {
             h('span',{style:{fontSize:11,color:'var(--muted)'}},'%')),
           h('div',{style:{textAlign:'right',fontSize:11,fontFamily:SF,fontWeight:600,color:'var(--muted)'}}, cur+'→'+tgt));
       }) : null;
-      const adjustBlock=h('div',{style:{display:'flex',flexDirection:'column',gap:10}},
+      /* item 29 — the Adjust button now lives in the comparator row; this block only reveals (when open) Reset + risk toggle + sliders */
+      const adjustBlock=adjOpen? h('div',{style:{display:'flex',flexDirection:'column',gap:10,marginTop:2}},
         h('div',{style:{display:'flex',gap:9,flexWrap:'wrap',alignItems:'center'}},
-          h('button',{onClick:()=>this.setDtog('simAdjust_'+d.key,!adjOpen),style:{border:'1px solid var(--brand)',background:adjOpen?'var(--brand-wash)':'var(--surface)',color:'var(--brand-ink)',borderRadius:9,padding:'8px 14px',fontSize:12,fontWeight:700,cursor:'pointer'}}, (adjOpen?'▾ ':'✎ ')+'Adjust my target'),
-          adjOpen? h('button',{onClick:()=>this.setState({simTargets:null}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:9,padding:'8px 13px',fontSize:12,fontWeight:600,cursor:'pointer'}},'Reset to model') : null),
-        adjOpen? h('div',{style:{display:'flex',flexDirection:'column',gap:10,marginTop:2}}, riskToggle, h('div',{style:{display:'flex',flexDirection:'column',gap:9}}, sliders)) : null);
+          h('button',{onClick:()=>this.setState({simTargets:null}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:9,padding:'8px 13px',fontSize:12,fontWeight:600,cursor:'pointer'}},'Reset to model')),
+        h('div',{style:{display:'flex',flexDirection:'column',gap:10,marginTop:2}}, riskToggle, h('div',{style:{display:'flex',flexDirection:'column',gap:9}}, sliders))) : null;
       /* item 28 — the per-dimension %/€/Total line-item table was removed from the tailored-target cards; the donuts + Z-chart + comparator selector carry the story, no redundant table */
       const savedThis=(s.savedDimMsg===d.key);
       return this.card({title:'Your '+d.label.toLowerCase()+' target',info:true,
