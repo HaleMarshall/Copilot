@@ -5555,9 +5555,12 @@ class Component extends DCLogic {
       format:{actual:{'Direct deals':18,'Fund of funds':12,'Secondaries':14,'Primary funds':56},target:{'Direct deals':14,'Fund of funds':10,'Secondaries':18,'Primary funds':58},colors:{'Direct deals':'--data-10','Fund of funds':'--data-5','Secondaries':'--data-6','Primary funds':'--data-1'}}
     };
     const dim=(key,label)=>{ const src= D&&D[key]? D[key] : (empty? {actual:{},target:{},colors:FB[key].colors} : FB[key]); return {key,label,actual:src.actual,target:src.target,colors:src.colors}; };
+    /* items 24-26 — STRATEGY holds only real strategies. Secondaries & Direct/Co-Invest are FORMATS, AI/Tech is a SECTOR — excluded here and the remaining strategies renormalised to 100%. */
+    const REAL_STRATS=['buyout','growth','venture','credit','infra','realestate','other'];
+    const stratRenorm=(src)=>{ src=src||{}; let sum=0; REAL_STRATS.forEach(k=>sum+=(+src[k]||0)); const o={}; REAL_STRATS.forEach(k=>o[k]= sum>0? +(((+src[k]||0)/sum*100).toFixed(1)) : 0); return o; };
     return [
-      {key:'strategy',label:'Strategy',actual:(this.MIX&&this.MIX.you)||{},target:this.modelMix(),
-        colors:Object.fromEntries((this.STRATS||[]).map(([k,n,c])=>[k,c]))},
+      {key:'strategy',label:'Strategy',actual:stratRenorm((this.MIX&&this.MIX.you)||{}),target:stratRenorm(this.modelMix()),
+        colors:Object.fromEntries((this.STRATS||[]).filter(([k])=>REAL_STRATS.includes(k)).map(([k,n,c])=>[k,c]))},
       dim('region','Region'), dim('currency','Currency'), dim('sector','Sector'), dim('format','Format') /* PDF#3 */
     ];
   }
