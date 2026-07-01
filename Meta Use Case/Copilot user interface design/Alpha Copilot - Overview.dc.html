@@ -8742,32 +8742,148 @@ class Component extends DCLogic {
     h('div',{style:{width:42,height:42,borderRadius:11,border:'2px dashed var(--muted)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--muted)',fontSize:18,marginBottom:12}},''),
     h('div',{style:{fontFamily:this.SF,fontSize:15,fontWeight:600,marginBottom:6}},title),
     h('div',{style:{fontSize:12,color:'var(--muted)',lineHeight:1.5,maxWidth:320}},sub)); }
+  /* ===================== INTERNAL — firm-level consoles (aggregate only) ===================== */
+  _intKpis(tiles){ const h=this.h,SF=this.SF;
+    return h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(158px,1fr))',gap:12}}, tiles.map((t,i)=>
+      h('div',{key:i,style:{border:'1px solid var(--line)',borderRadius:12,padding:'13px 15px',background:'var(--surface)'}},
+        h('div',{style:{fontSize:10.5,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em',marginBottom:6}},t[0]),
+        h('div',{style:{display:'flex',alignItems:'baseline',gap:7}}, h('span',{style:{fontFamily:SF,fontSize:22,fontWeight:600}},t[1]), t[3]?h('span',{style:{fontSize:12,fontWeight:700,color:t[3]==='down'?'var(--under)':'var(--over)'}}, t[3]==='down'?'▼':'▲'):null),
+        h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:3}},t[2])))); }
+  _intFunnel(stages,color){ const h=this.h,SF=this.SF; color=color||'--data-1'; const max=(stages[0]&&stages[0].n)||1;
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:8}}, stages.map((st,i)=>{ const w=Math.max(9,Math.round(st.n/max*100)); const conv=i>0?Math.round(st.n/(stages[i-1].n||1)*100):null;
+      return h('div',{key:i,style:{display:'flex',alignItems:'center',gap:12}},
+        h('div',{style:{flex:'0 0 148px',fontSize:12.5,fontWeight:600}}, st.label, st.note?h('div',{style:{fontSize:10,color:'var(--muted)',fontWeight:400}},st.note):null),
+        h('div',{style:{flex:1,background:'var(--surface-2)',borderRadius:8,height:32,position:'relative',overflow:'hidden'}},
+          h('div',{style:{position:'absolute',left:0,top:0,bottom:0,width:w+'%',background:'var('+color+')',borderRadius:8,display:'flex',alignItems:'center',paddingLeft:11,minWidth:52}}, h('span',{style:{fontFamily:SF,fontWeight:700,color:'#fff',fontSize:12.5}}, (st.n||0).toLocaleString()))),
+        h('div',{style:{flex:'0 0 66px',textAlign:'right',fontSize:11.5,fontWeight:600,color: conv==null?'var(--muted)':(conv>=45?'var(--over)':conv>=20?'var(--ink)':'var(--under)')}}, conv==null?'entry':conv+'%')); })); }
+  _intTable(cols,rows){ const h=this.h,SF=this.SF;
+    const th=(c)=>h('th',{key:c.k,style:{textAlign:c.right?'right':'left',padding:'7px 9px',fontSize:10,textTransform:'uppercase',letterSpacing:'.04em',color:'var(--muted)',borderBottom:'2px solid var(--line)',whiteSpace:'nowrap'}},c.label);
+    const td=(r,c)=>h('td',{key:c.k,style:{textAlign:c.right?'right':'left',padding:'8px 9px',borderBottom:'1px solid var(--line)',fontSize:12.5,fontFamily:c.mono?SF:'inherit',fontWeight:c.bold?600:400,color:c.color?c.color(r[c.k],r):'var(--ink)'}}, c.fmt?c.fmt(r[c.k],r):r[c.k]);
+    return h('div',{style:{overflowX:'auto'}}, h('table',{style:{width:'100%',borderCollapse:'collapse',minWidth:520}}, h('thead',null,h('tr',null,cols.map(th))), h('tbody',null, rows.map((r,i)=>h('tr',{key:i}, cols.map(c=>td(r,c))))))); }
+  _intPill(txt,tone){ const h=this.h; const c={ok:['var(--over)','rgba(45,143,111,.12)'],warn:['var(--data-2)','rgba(232,115,44,.12)'],bad:['var(--under)','rgba(20,23,194,.10)'],mute:['var(--muted)','var(--surface-2)']}[tone||'mute'];
+    return h('span',{style:{fontSize:11,fontWeight:700,color:c[0],background:c[1],borderRadius:999,padding:'2px 9px',whiteSpace:'nowrap'}},txt); }
+  _intGrid(cards,cols){ const h=this.h; return h('div',{style:{display:'grid',gridTemplateColumns:'repeat('+(cols||2)+',minmax(0,1fr))',gap:14,marginTop:14}}, cards.filter(Boolean)); }
   internalBody(){
-    const h=this.h; const SF=this.SF;
-    /* item 121 — presentation-ready firm-level KPI consoles (deck-droppable), aggregate only */
-    const kpi=(l,v,sub,up)=>h('div',{style:{border:'1px solid var(--line)',borderRadius:12,padding:'13px 15px',background:'var(--surface)'}},
-      h('div',{style:{fontSize:10.5,color:'var(--muted)',textTransform:'uppercase',letterSpacing:'.04em',marginBottom:6}},l),
-      h('div',{style:{display:'flex',alignItems:'baseline',gap:7}}, h('span',{style:{fontFamily:SF,fontSize:23,fontWeight:600}},v), up?h('span',{style:{fontSize:12,color:'var(--over)',fontWeight:700}},'▲'):null),
-      h('div',{style:{fontSize:11,color:'var(--muted)',marginTop:3}},sub));
-    return h('div',{style:{maxWidth:1080,margin:'0 auto',padding:'22px 24px 40px'}},
-      h('div',{style:{marginBottom:18}},
-        h('div',{style:{fontSize:10.5,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Internal · Moonfare — aggregate only'),
-        h('div',{style:{fontFamily:SF,fontSize:26,fontWeight:600,margin:'3px 0 2px'}},'Firm-level intelligence'),
-        h('div',{style:{fontSize:12.5,color:'var(--muted)'}},'Aggregate consoles for sales, product and IC — never per-identifiable client.')),
-      // KPI strip (deck-ready)
-      h('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:12,marginBottom:14}},
-        kpi('Platform AUM','€4.2bn','+9% QoQ',true),
-        kpi('Active investors','2,140','+126 this quarter',true),
-        kpi('Net new commitments','€310m','this quarter',true),
-        kpi('Avg fund fill rate','71%','+4pp QoQ',true)),
-      h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}},
-        this.card({title:'Platform AUM growth (€bn, last 6 quarters)',children:this.fAxisLine([{name:'AUM',color:'--data-1',main:true,vals:this.vz(55,[3.1, 3.4, 3.6, 3.9, 4.0, 4.2])}],['Q1','Q2','Q3','Q4','Q1','Q2'],{H:210,fmt:v=>'€'+v+'bn'}),caption:'Total assets on the platform — steady compounding across all investors.'}),
-        this.card({title:'Net new commitments by strategy (€m, this quarter)',children:this.groupedBars(['Buyout','Credit','Secondaries','Infra','Growth'],[{name:'€m',color:'--data-1',vals:this.vz(56,[120, 78, 52, 34, 26])}],{unit:'m'}),caption:'Where this quarter’s new capital went — private credit and secondaries gaining share.'}),
-        this.card({title:'Cohort allocation trend (last 6 quarters)',children:this.groupedBars(['Q1','Q2','Q3','Q4','Q1','Q2'],[{name:'Private credit %',color:'--data-4',vals:this.vz(57,[8, 9, 11, 12, 13, 15])},{name:'Secondaries %',color:'--data-7',vals:this.vz(58,[5, 5, 6, 7, 8, 9])}]),caption:'Platform-wide drift toward private credit and secondaries — aggregate across all investors.'}),
-        this.card({title:'Manager-pattern intelligence',children:this.groupedBars(['Software','Health','Industrials','Energy','Consumer'],[{name:'Top-manager focus',color:'--data-1',vals:this.vz(59,[9, 6, 4, 3, 2])}]),caption:'Where top-ranked managers concentrate — aggregated from the manager universe.'}),
-        this.card({title:'Fund fill rate by strategy (%)',children:this.groupedBars(['Buyout','Credit','Secondaries','Infra','Growth'],[{name:'Fill %',color:'--data-5',vals:this.vz(60,[82, 74, 68, 61, 55])}]),caption:'How fast each strategy’s funds fill — a demand signal for product & sales.'}),
-        h('div',null,this.ncPanel('Investor sentiment heatmap','Live when the advisory-transcript & intent feed connects.'))));
+    const h=this.h; const SF=this.SF; const s=this.state; const tab=s.intTab||'overview';
+    const TABS=[['overview','Overview'],['sales','Sales'],['product','Product'],['ic','Investment Committee'],['ops','Operations & Risk']];
+    const tabBar=h('div',{style:{display:'flex',gap:6,flexWrap:'wrap',borderBottom:'1px solid var(--line)',marginBottom:16,paddingBottom:2}}, TABS.map(([v,l])=>{ const on=tab===v;
+      return h('button',{key:v,onClick:()=>this.setState({intTab:v}),style:{border:'none',borderBottom:'2px solid '+(on?'var(--brand)':'transparent'),background:'transparent',color:on?'var(--brand-ink)':'var(--muted)',padding:'9px 14px',fontSize:13,fontWeight:on?700:500,cursor:'pointer',marginBottom:-3}},l); }));
+    const period=s.intPeriod||'QTD';
+    const periodSeg=h('div',{style:{display:'inline-flex',border:'1px solid var(--line)',borderRadius:999,overflow:'hidden'}}, [['QTD','This quarter'],['YTD','Year to date'],['T12M','Trailing 12m']].map(([v,l])=>{ const on=period===v;
+      return h('button',{key:v,onClick:()=>this.setState({intPeriod:v}),style:{border:'none',background:on?'var(--brand)':'transparent',color:on?'#fff':'var(--muted)',padding:'6px 13px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}},l); }));
+    const body={overview:this.intOverview(period),sales:this.intSales(period),product:this.intProduct(period),ic:this.intIC(),ops:this.intOps()}[tab]||this.intOverview(period);
+    return h('div',{style:{maxWidth:1180,margin:'0 auto',padding:'22px 24px 48px'}},
+      h('div',{style:{display:'flex',alignItems:'flex-end',justifyContent:'space-between',gap:12,flexWrap:'wrap',marginBottom:16}},
+        h('div',null,
+          h('div',{style:{fontSize:10.5,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Internal · Moonfare — aggregate only'),
+          h('div',{style:{fontFamily:SF,fontSize:26,fontWeight:600,margin:'3px 0 2px'}},'Firm-level intelligence'),
+          h('div',{style:{fontSize:12.5,color:'var(--muted)',maxWidth:640,lineHeight:1.5}},'Aggregate consoles for sales, product, IC, and operations — never per-identifiable client. Synthetic demo data.')),
+        (tab==='overview'||tab==='sales'||tab==='product')? periodSeg : null),
+      tabBar,
+      body);
   }
+  /* ---- Overview ---- */
+  intOverview(period){ const h=this.h; const SF=this.SF;
+    const P={QTD:{flow:'€310m',flowN:310,rev:'€38m',inv:'+126',aum:'€4.2bn'},YTD:{flow:'€1.02bn',flowN:1020,rev:'€142m',inv:'+512',aum:'€4.2bn'},T12M:{flow:'€1.38bn',flowN:1380,rev:'€196m',inv:'+690',aum:'€4.2bn'}}[period]||{};
+    const kpis=this._intKpis([
+      ['Platform AUM',P.aum,'+9% QoQ · €3.8bn a year ago','up'],
+      ['Net new commitments',P.flow,period+' inflows','up'],
+      ['Active investors','2,140',P.inv+' '+(period==='QTD'?'this quarter':period),'up'],
+      ['Net fee revenue',P.rev,'mgmt + performance, '+period,'up'],
+      ['Avg fund fill rate','71%','+4pp QoQ','up'],
+      ['Investor NPS','62','+5 vs last survey','up']]);
+    return h('div',null, kpis, this._intGrid([
+      this.card({title:'Platform AUM (€bn, 8 quarters)',children:this.fAxisLine([{name:'AUM',color:'--data-1',main:true,vals:[3.1,3.3,3.5,3.7,3.9,4.0,4.1,4.2]}],['Q1','Q2','Q3','Q4','Q1','Q2','Q3','Q4'],{H:210,fmt:v=>'€'+v+'bn'}),caption:'Total assets on the platform — steady compounding across all investors.'}),
+      this.card({title:'Net flows (€m/quarter)',children:this.groupedBars(['Q1','Q2','Q3','Q4','Q1','Q2'],[{name:'Inflows',color:'--data-1',vals:[210,240,255,280,295,310]},{name:'Distributions out',color:'--data-6',vals:[80,95,90,120,110,135]}],{unit:'m'}),caption:'Gross commitments in vs distributions returned — net inflow positive every quarter.'}),
+      this.card({title:'AUM by strategy',children:this.donutNamed([{name:'Buyout',p:34,color:'--data-1'},{name:'Growth',p:16,color:'--data-2'},{name:'Private Credit',p:15,color:'--data-4'},{name:'Infrastructure',p:11,color:'--data-5'},{name:'Secondaries',p:9,color:'--data-6'},{name:'Venture',p:8,color:'--data-3'},{name:'Real Estate',p:7,color:'--data-7'}],170,'€4.2bn','AUM'),caption:'Blended book across the platform — buyout-led, credit growing fastest.'}),
+      this.card({title:'AUM by region',children:this.donutNamed([{name:'DACH',p:38,color:'--data-1'},{name:'UK & Ireland',p:19,color:'--data-5'},{name:'Nordics',p:14,color:'--data-3'},{name:'Rest of EU',p:17,color:'--data-7'},{name:'US & Row',p:12,color:'--data-9'}],170,'Region','share'),caption:'DACH-anchored investor base with growing Nordic & UK share.'}),
+      this.card({title:'Cohort allocation drift (%, 6 quarters)',children:this.groupedBars(['Q1','Q2','Q3','Q4','Q1','Q2'],[{name:'Private credit',color:'--data-4',vals:[8,9,11,12,13,15]},{name:'Secondaries',color:'--data-6',vals:[5,5,6,7,8,9]}]),caption:'Platform-wide drift toward private credit and secondaries.'}),
+      this.card({title:'Quarter highlights',children:h('div',{style:{display:'flex',flexDirection:'column',gap:9}}, [['Record net inflows','€310m committed, +11% QoQ, led by two credit closes.'],['Fill rate up','Avg fund fill rate reached 71% (+4pp) — demand outpacing supply in secondaries.'],['Retention strong','94% of committing investors returned for a second fund within 18 months.'],['Fee revenue','Net fee revenue €38m, performance fees crystallising on 2019–20 vintages.']].map((x,i)=>h('div',{key:i,style:{display:'flex',gap:10,alignItems:'flex-start'}}, h('span',{style:{width:6,height:6,borderRadius:'50%',background:'var(--brand)',marginTop:6,flex:'0 0 6px'}}), h('div',null, h('div',{style:{fontSize:13,fontWeight:600}},x[0]), h('div',{style:{fontSize:12,color:'var(--muted)',lineHeight:1.45}},x[1]))))),caption:'The four points to open the partner meeting with.'})
+    ],2)); }
+  /* ---- Sales ---- */
+  intSales(period){ const h=this.h;
+    const mult={QTD:1,YTD:3.9,T12M:5.4}[period]||1; const sc=(n)=>Math.round(n*mult);
+    const kpis=this._intKpis([
+      ['New investors',sc(126).toLocaleString(),period+' onboarded','up'],
+      ['Lead → commit','2.6%','+0.4pp vs prior','up'],
+      ['Avg first ticket','€95k','+€8k QoQ','up'],
+      ['Sales cycle','34 days','−5 days','up'],
+      ['Open pipeline','€148m','1,640 qualified leads',null],
+      ['CAC payback','7.2 mo','improving','up']]);
+    const funnel=this.card({title:'Acquisition funnel ('+period+')',children:this._intFunnel([
+      {label:'Leads',n:sc(4820),note:'marketing + referral'},{label:'Qualified',n:sc(1640),note:'ICP + intent'},{label:'Accredited / KYC',n:sc(720),note:'passed onboarding'},{label:'First commitment',n:sc(126),note:'funded'},{label:'Repeat committer',n:sc(61),note:'2nd fund'}]),
+      caption:'Stage-to-stage conversion — the biggest drop is Qualified → KYC (accreditation friction).'});
+    const channel=this.card({title:'New AUM by acquisition channel (€m)',children:this.groupedBars(['Referral','Advisor','Direct','Events','Paid'],[{name:'€m',color:'--data-1',vals:[46,38,22,14,8]}],{unit:'m'}),caption:'Referrals and the advisor channel drive the majority of new capital.'});
+    const conv=this.card({title:'Conversion by channel (%)',children:this.groupedBars(['Referral','Advisor','Direct','Events','Paid'],[{name:'Lead→commit %',color:'--data-5',vals:[6.1,4.8,2.2,1.9,0.9]}]),caption:'Referral and advisor leads convert 3–6× better than paid.'});
+    const reps=this.card({title:'Relationship-manager leaderboard ('+period+')',children:this._intTable(
+      [{k:'rep',label:'RM'},{k:'region',label:'Region'},{k:'aum',label:'New AUM',right:true,mono:true,bold:true},{k:'deals',label:'Commits',right:true,mono:true},{k:'conv',label:'Conv.',right:true,mono:true},{k:'nps',label:'NPS',right:true,mono:true}],
+      [{rep:'S. Vogel',region:'DACH',aum:'€22.4m',deals:31,conv:'5.2%',nps:71},{rep:'A. Lindqvist',region:'Nordics',aum:'€18.1m',deals:24,conv:'4.9%',nps:68},{rep:'M. Rossi',region:'Rest of EU',aum:'€14.6m',deals:19,conv:'3.8%',nps:64},{rep:'J. Clarke',region:'UK & IE',aum:'€12.2m',deals:17,conv:'4.1%',nps:66},{rep:'P. Novak',region:'DACH',aum:'€9.8m',deals:14,conv:'3.2%',nps:59}]),
+      caption:'By new AUM — DACH and Nordics leading; conversion tracks referral density.'});
+    const churn=this.card({title:'Churn & at-risk signals',children:h('div',{style:{display:'flex',flexDirection:'column',gap:9}},
+      [['12-mo logo retention','94%','ok'],['Net revenue retention','118%','ok'],['At-risk AUM (no activity 9m+)','€64m','warn'],['Redemption requests (QTD)','€21m','warn'],['Dormant investors','182','mute']].map((x,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,borderBottom:'1px solid var(--line)',paddingBottom:8}},
+        h('span',{style:{fontSize:12.5,color:'var(--ink)'}},x[0]), h('div',{style:{display:'flex',alignItems:'center',gap:8}}, h('span',{style:{fontFamily:this.SF,fontWeight:700,fontSize:13.5}},x[1]), this._intPill(x[2]==='ok'?'healthy':x[2]==='warn'?'watch':'monitor',x[2]))))),
+      caption:'Retention is strong; €64m sits idle 9m+ — a re-engagement target for the advisor desk.'});
+    return h('div',null, kpis, this._intGrid([funnel, channel, conv, reps, churn],2)); }
+  /* ---- Product ---- */
+  intProduct(period){ const h=this.h;
+    const kpis=this._intKpis([
+      ['Live offerings','14','4 closing this quarter',null],
+      ['Avg fill rate','71%','+4pp QoQ','up'],
+      ['Waitlist depth','€212m','across closed funds',null],
+      ['Fee revenue run-rate','€152m','annualised','up'],
+      ['Blended net margin','61%','+2pp','up'],
+      ['Time-to-first-close','4.1 mo','−0.6 mo','up']]);
+    const fill=this.card({title:'Fund fill rate by strategy (%)',children:this.groupedBars(['Buyout','Credit','Secondaries','Infra','Growth','Venture'],[{name:'Fill %',color:'--data-5',vals:[82,86,68,61,55,48]}]),caption:'Credit and buyout fill fastest — a demand signal for the product roadmap.'});
+    const demand=this.card({title:'Demand index vs supply (by strategy)',children:this.miniZ([{name:'Private Credit',delta:22,color:'--data-4',sig:true},{name:'Secondaries',delta:15,color:'--data-6',sig:true},{name:'Infrastructure',delta:6,color:'--data-5',sig:true},{name:'Buyout',delta:2,color:'--data-1',sig:false},{name:'Growth',delta:-8,color:'--data-2',sig:true},{name:'Venture',delta:-14,color:'--data-3',sig:true}]),caption:'Positive = demand outstrips current supply; credit & secondaries are under-supplied.'});
+    const pipeline=this.card({title:'Offering pipeline',children:this._intTable(
+      [{k:'fund',label:'Fund',bold:true},{k:'strat',label:'Strategy'},{k:'size',label:'Target',right:true,mono:true},{k:'filled',label:'Filled',right:true,mono:true},{k:'close',label:'Close'},{k:'st',label:'Status',fmt:(v)=>this._intPill(v, v==='On track'?'ok':v==='At risk'?'bad':'warn')}],
+      [{fund:'Ares Private Credit IV',strat:'Credit',size:'€120m',filled:'86%',close:'Dec 2026',st:'On track'},{fund:'Lexington Secondaries XI',strat:'Secondaries',size:'€100m',filled:'68%',close:'Jan 2027',st:'On track'},{fund:'Antin Infrastructure V',strat:'Infra',size:'€90m',filled:'54%',close:'Mar 2027',st:'Watch'},{fund:'Moonfare Technology Fund',strat:'Venture',size:'€100m',filled:'41%',close:'Jun 2026',st:'Watch'},{fund:'EQT X',strat:'Buyout',size:'€150m',filled:'92%',close:'Nov 2026',st:'On track'}]),
+      caption:'Live and upcoming offerings, with fill progress and close timing.'});
+    const waitlist=this.card({title:'Waitlist depth by closed fund (€m)',children:this.groupedBars(['KKR NA XIII','CVC IX','Cinven 8','EQT IX','Ardian Sec IX'],[{name:'€m demand',color:'--data-1',vals:[64,48,38,34,28]}],{unit:'m'}),caption:'Unmet demand on closed funds — the case for successor vehicles & secondaries.'});
+    const feemix=this.card({title:'Fee revenue by strategy (€m, annualised)',children:this.donutNamed([{name:'Buyout',p:52,color:'--data-1'},{name:'Credit',p:34,color:'--data-4'},{name:'Secondaries',p:22,color:'--data-6'},{name:'Infra',p:18,color:'--data-5'},{name:'Growth/VC',p:16,color:'--data-2'},{name:'Other',p:10,color:'--data-9'}],170,'€152m','fees'),caption:'Buyout still the fee engine; credit the fastest-growing line.'});
+    return h('div',null, kpis, this._intGrid([fill, demand, pipeline, waitlist, feemix],2)); }
+  /* ---- Investment Committee ---- */
+  intIC(){ const h=this.h;
+    const kpis=this._intKpis([
+      ['Managers under DD','9','3 to committee this month',null],
+      ['Approved (YTD)','12','of 21 reviewed',null],
+      ['Rejection rate','43%','discipline held','up'],
+      ['Avg manager score','82','of 100',null],
+      ['GP concentration','Top-5 = 38%','of platform AUM',null],
+      ['Top-quartile funds','61%','of live book','up']]);
+    const dd=this.card({title:'Due-diligence pipeline',children:this._intTable(
+      [{k:'mgr',label:'Manager',bold:true},{k:'strat',label:'Strategy'},{k:'stage',label:'Stage'},{k:'score',label:'Score',right:true,mono:true},{k:'rec',label:'Recommendation',fmt:(v)=>this._intPill(v, v==='Advance'?'ok':v==='Decline'?'bad':'warn')}],
+      [{mgr:'Hg Capital',strat:'Buyout',stage:'IC memo',score:88,rec:'Advance'},{mgr:'Park Square',strat:'Credit',stage:'Ops DD',score:84,rec:'Advance'},{mgr:'Nordic Capital',strat:'Buyout',stage:'On-site',score:81,rec:'Watch'},{mgr:'Vitruvian',strat:'Growth',stage:'Screening',score:76,rec:'Watch'},{mgr:'Northvolt Growth',strat:'Venture',stage:'Screening',score:58,rec:'Decline'}]),
+      caption:'Managers moving through screening → on-site → ops DD → IC memo.'});
+    const disp=this.card({title:'Net IRR dispersion by strategy (%)',children:this.groupedBars(['Buyout','Credit','Secondaries','Infra','Growth','Venture'],[{name:'Bottom quartile',color:'--data-9',vals:[9,6,8,7,4,-2]},{name:'Median',color:'--data-1',vals:[17,11,14,12,15,12]},{name:'Top quartile',color:'--data-5',vals:[26,15,19,17,29,34]}]),caption:'Manager selection matters most where dispersion is widest — venture & growth.'});
+    const conc=this.card({title:'GP concentration (% of platform AUM)',children:this.groupedBars(['KKR','EQT','Ares','CVC','General Atlantic','Lexington','Others'],[{name:'% AUM',color:'--data-1',vals:[10,9,8,6,5,4,58]}]),caption:'Top-5 GPs hold 38% of AUM — within the 45% single-firm exposure limit.'});
+    const vintage=this.card({title:'Vintage exposure (€m committed)',children:this.groupedBars(['2019','2020','2021','2022','2023','2024','2025'],[{name:'€m',color:'--data-3',vals:[380,420,560,610,540,690,720]}],{unit:'m'}),caption:'Well-spread across vintages — no single-year concentration risk.'});
+    const limits=this.card({title:'Risk limits — utilisation',children:h('div',{style:{display:'flex',flexDirection:'column',gap:11}},
+      [['Single GP','38%','45%',84],['Single strategy','34%','40%',85],['Single vintage','18%','25%',72],['Illiquid / evergreen split','92% / 8%','85% min primary',null],['Venture / high-beta','8%','12%',67]].map((x,i)=>h('div',{key:i},
+        h('div',{style:{display:'flex',justifyContent:'space-between',fontSize:12,marginBottom:4}}, h('span',null,x[0]), h('span',{style:{fontFamily:this.SF,fontWeight:600}}, x[1]+(x[2]?' / '+x[2]:''))),
+        x[3]!=null? h('div',{style:{background:'var(--surface-2)',borderRadius:6,height:8,overflow:'hidden'}}, h('div',{style:{width:x[3]+'%',height:'100%',background: x[3]>=90?'var(--under)':x[3]>=80?'var(--data-2)':'var(--over)',borderRadius:6}})):null))),
+      caption:'All exposures within IC-mandated limits; single-GP utilisation is the closest to cap.'});
+    return h('div',null, kpis, this._intGrid([dd, disp, conc, vintage, limits],2)); }
+  /* ---- Operations & Risk ---- */
+  intOps(){ const h=this.h;
+    const kpis=this._intKpis([
+      ['Capital calls (QTD)','€186m','98.9% settled on time','up'],
+      ['Distributions processed','€135m','avg 3.1 days','up'],
+      ['Cash reconciliation','100%','0 breaks',null],
+      ['KYC / AML cleared','96%','of pending queue','up'],
+      ['Open incidents','2','both low severity',null],
+      ['Platform uptime','99.98%','trailing 90 days','up']]);
+    const calls=this.card({title:'Capital calls vs distributions (€m/quarter)',children:this.groupedBars(['Q1','Q2','Q3','Q4','Q1','Q2'],[{name:'Calls',color:'--data-4',vals:[140,152,160,171,180,186]},{name:'Distributions',color:'--data-5',vals:[80,95,90,120,110,135]}],{unit:'m'}),caption:'Operational throughput — calls and distributions both scaling with AUM.'});
+    const kyc=this.card({title:'KYC / AML onboarding queue',children:this._intFunnel([
+      {label:'Submitted',n:720},{label:'In review',n:540},{label:'Cleared',n:498,note:'passed'},{label:'Flagged',n:22,note:'enhanced DD'}],'--data-5'),
+      caption:'96% clear-through; 22 flagged for enhanced due diligence.'});
+    const settle=this.card({title:'Distribution settlement time (days)',children:this.fAxisLine([{name:'Avg days',color:'--data-1',main:true,vals:[4.8,4.4,4.0,3.6,3.3,3.1]}],['Q1','Q2','Q3','Q4','Q1','Q2'],{H:200,fmt:v=>v+'d'}),caption:'Straight-through processing brought settlement under 3.5 days.'});
+    const compliance=this.card({title:'Compliance & controls',children:h('div',{style:{display:'flex',flexDirection:'column',gap:9}},
+      [['Document turnaround SLA','1.8 days','ok'],['Suitability checks passed','99.4%','ok'],['GDPR / data requests (QTD)','14 · all in SLA','ok'],['Audit findings (open)','1 · low','warn'],['Regulatory filings','on schedule','ok']].map((x,i)=>h('div',{key:i,style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,borderBottom:'1px solid var(--line)',paddingBottom:8}},
+        h('span',{style:{fontSize:12.5}},x[0]), h('div',{style:{display:'flex',alignItems:'center',gap:8}}, h('span',{style:{fontFamily:this.SF,fontWeight:600,fontSize:12.5}},x[1]), this._intPill(x[2]==='ok'?'clear':'review',x[2]))))),
+      caption:'Controls green across the board; one low-severity audit item open.'});
+    const liq=this.card({title:'Platform liquidity buffer (€m)',children:this.fAxisLine([{name:'Buffer',color:'--data-6',main:true,vals:[210,224,238,246,255,268]},{name:'Min policy',color:'--data-9',dash:true,vals:[180,180,180,180,180,180]}],['Q1','Q2','Q3','Q4','Q1','Q2'],{H:200,fmt:v=>'€'+v+'m'}),caption:'Operating liquidity comfortably above the €180m policy floor.'});
+    return h('div',null, kpis, this._intGrid([calls, kyc, settle, compliance, liq],2)); }
 
   /* ---------- captions / badges ---------- */
   renderVals(){
