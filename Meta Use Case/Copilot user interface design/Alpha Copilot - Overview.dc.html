@@ -5938,6 +5938,7 @@ class Component extends DCLogic {
     this.setState({savedDimTargets:saved, savedDimMsg:dimKey});
     this.saveSimToDB('Target · '+d.label, {[dimKey]:mix});
     if(dimKey==='strategy') this.saveTargetSim(); /* keep the strategy compare card working */
+    if(this.state.advClientId) this.advSaveProfile(); /* persist the saved target to the client's profile */
   }
   saveSim(){
     if(this.state.savedSims.length>=5) return;
@@ -7918,7 +7919,8 @@ class Component extends DCLogic {
   ]; }
   setFb(id,v){ this.setState({fb:{...this.state.fb,[id]:v}}); }
   /* items 222/223 — impersonate carries the real name and lands on the investor's Home/portfolio (not peer benchmarking) */
-  impersonate(c){ this.setState({actingAs:c.name, ws:'understand', uc:'home', page:'home', homeLaunched:true, deepLink:null, homeDrill:null, homePop:null}); }
+  impersonate(c){ const sv=this.advSavedProfile(c.id)||{}; /* load the advisor's saved target/risk so the investor sees the same profile */
+    this.setState(Object.assign({actingAs:c.name, ws:'understand', uc:'home', page:'home', homeLaunched:true, deepLink:null, homeDrill:null, homePop:null, displayCcy:this.advHomeCcy(c)}, sv.simTargets?{simTargets:sv.simTargets}:{}, sv.riskId?{riskId:sv.riskId}:{})); }
   fbBtns(id){ const h=this.h; const opts=['Helpful','Wrong product','Wrong timing','Wrong context','Client not ready','Compliance','Better action']; const sel=this.state.fb[id];
     return h('div',{style:{display:'flex',gap:6,flexWrap:'wrap',marginTop:11}}, opts.map(o=>{ const on=sel===o;
       return h('button',{key:o,onClick:()=>this.setFb(id,o),style:{fontSize:11,padding:'4px 10px',borderRadius:999,border:`1px solid ${on?'var(--brand)':'var(--line)'}`,background:on?'var(--brand)':'var(--surface)',color:on?'#fff':'var(--muted)',cursor:'pointer'}}, (o==='Helpful'&&on?'✓ ':'')+o); })); }
@@ -8065,11 +8067,19 @@ class Component extends DCLogic {
     if(/innov|\bai\b/.test(label)) return 'innovation_ai_alpha';
     if(/aggress|opportun|advanced/.test(label)) return 'opportunistic_advanced';
     return this.state.riskId||'balanced_compounding'; }
-  advOpenClient(id){ const c=this.advBook().find(x=>x.id===id); const lv=(this.state.advLevelOverride&&this.state.advLevelOverride[id])||(c&&c.level)||'L2'; this.setState({advClientId:id, advStage:(c&&c.stage)||'new', advLevel:lv, advView:'prep', advPrepGoals:null, advStep:0, advReact:{}, advCFAextra:0, advPrepPrompt:'', advPrepMode:'preset', persona2:(lv==='L3'?'pro':'guided'), advActionOpen:null, advEdits:{}, riskId:this.advRiskId(c&&c.risk), simTargets:null, cfCommitM:this.advClientCommit(c)}); }
+  /* the client's home currency (from region 'US / USD' → USD, or an explicit currency) — drives the display currency so figures show in their money */
+  advHomeCcy(c){ c=c||{}; const fromCur=(c.currency||'').toUpperCase(); if(/^[A-Z]{3}$/.test(fromCur)) return fromCur; const seg=String(c.region||'').split('/').pop().trim().toUpperCase(); if(/^[A-Z]{3}$/.test(seg)) return seg; return 'EUR'; }
+  advOpenClient(id){ const c=this.advBook().find(x=>x.id===id); const lv=(this.state.advLevelOverride&&this.state.advLevelOverride[id])||(c&&c.level)||'L2';
+    const saved=this.advSavedProfile(id)||{};
+    this.setState({advClientId:id, advStage:(c&&c.stage)||'new', advLevel:lv, advView:'prep', advPrepGoals:null, advStep:0, advReact:{}, advCFAextra:0, advPrepPrompt:'', advPrepMode:'preset', persona2:(lv==='L3'?'pro':'guided'), advActionOpen:null,
+      advEdits: saved.edits||{}, riskId: saved.riskId||this.advRiskId(c&&c.risk), simTargets: saved.simTargets||null, displayCcy: this.advHomeCcy(c), cfCommitM:this.advClientCommit(c)}); }
+  /* per-client persistence (target/profile) so an advisor's changes stick and an impersonated investor sees them */
+  advSavedProfile(id){ try{ return JSON.parse(localStorage.getItem('advProfile:'+id)||'null'); }catch(e){ return null; } }
+  advSaveProfile(){ const id=this.state.advClientId; if(!id) return; setTimeout(()=>{ try{ localStorage.setItem('advProfile:'+id, JSON.stringify({edits:this.state.advEdits||{}, riskId:this.state.riskId, simTargets:this.state.simTargets||null, ts:1})); }catch(e){} },0); }
   advEnterCockpit(){ this.setState({advView:'cockpit', advStep:0, advReact:{}, advCFAextra:0, persona2:(this.state.advLevel==='L3'?'pro':'guided'), cfCommitM:this.advClientCommit(this.advClient())}); }
   advExit(){ this.setState({advView:'desk', advClientId:null}); }
   advToPrep(){ this.setState({advView:'prep'}); }
-  advStepTo(i){ const s=this.advSeq(); this.setState({advStep:Math.max(0,Math.min(i,s.length-1)), advFocus:null, advSeized:false}); }
+  advStepTo(i){ const s=this.advSeq(); this.setState({advStep:Math.max(0,Math.min(i,s.length-1)), advFocus:null, advSeized:false}); this.advSaveProfile(); }
   advNext(){ this.advStepTo(this.state.advStep+1); }
   /* E1/E2 — map each cockpit step to a workspace (Understand / Shape / Act / Research) so the advisor can jump non-linearly mid-call */
   advStepWS(key){ return {
@@ -8221,7 +8231,7 @@ class Component extends DCLogic {
         h('div',{style:{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:2,background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.14)',borderRadius:8,padding:'5px 10px'}}, h('span',{style:{fontSize:8.5,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(255,255,255,.45)'}},'Grounded'), h('span',{style:{fontSize:11,fontWeight:600,color:'rgba(255,255,255,.85)'}},'snap_8f3c · live data')),
         labelled('Journey', dseg([{label:'Pre Gate',value:'pregate'},{label:'New',value:'new'},{label:'Existing',value:'existing'},{label:'Inactive',value:'inactive'}], this.state.advStage, v=>this.advSetStage(v))),
         labelled('Advice level', dseg([{label:'L1',value:'L1'},{label:'L2',value:'L2'},{label:'L3',value:'L3'}], this.state.advLevel, v=>this.advSetLevel(v))),
-        this.state.advLevel==='L3'? labelled('Currency', h('select',{value:this.state.displayCcy,onChange:e=>this.setState({displayCcy:e.target.value}),style:{background:'rgba(255,255,255,.1)',color:'#fff',border:'1px solid rgba(255,255,255,.22)',borderRadius:7,padding:'5px 8px',fontSize:11.5,fontWeight:700,cursor:'pointer'}}, this.ccyList().map(c=>h('option',{key:c,value:c,style:{color:'#111'}},c)))) : null,
+        labelled('Currency', h('select',{value:this.state.displayCcy,onChange:e=>this.setState({displayCcy:e.target.value}),style:{background:'rgba(255,255,255,.1)',color:'#fff',border:'1px solid rgba(255,255,255,.22)',borderRadius:7,padding:'5px 8px',fontSize:11.5,fontWeight:700,cursor:'pointer'}}, this.ccyList().map(c=>h('option',{key:c,value:c,style:{color:'#111'}},c)))),
         h('div',{style:{width:1,height:30,background:'rgba(255,255,255,.14)'}}),
         h('div',{style:{textAlign:'right'}}, h('div',{style:{fontSize:12.5,fontWeight:600}},self.name), h('div',{style:{fontSize:10,color:'rgba(255,255,255,.55)'}},self.role)),
         h('button',{onClick:()=>this.advToPrep(),style:{border:'1px solid rgba(255,255,255,.3)',background:'rgba(255,255,255,.1)',color:'#fff',borderRadius:8,padding:'6px 11px',fontSize:11.5,cursor:'pointer'}},'Exit')));
@@ -8433,7 +8443,7 @@ class Component extends DCLogic {
         const minimal=key==='intakeMin'; const ed=this.state.advEdits||{};
         const editing=!!this.state.advEditMode;                 /* item 7 — explicit Edit toggle so it's obvious the fields are editable */
         const get=(kk,dv)=>(ed[kk]!=null?ed[kk]:dv);
-        const set=(kk,v)=>{ const n=Object.assign({},this.state.advEdits); n[kk]=v; this.setState({advEdits:n}); };
+        const set=(kk,v)=>{ const n=Object.assign({},this.state.advEdits); n[kk]=v; this.setState({advEdits:n}); this.advSaveProfile(); };
         const riskOpts=(this.RISKS||[]).map(r=>r.label||r.short||r.id);
         /* one field — read-only chip when not editing, the right control (text/number/select) when editing */
         const efield=(label,kk,dv,opts)=>{ opts=opts||{}; const hot=focus&&(fieldHL[focus]||[]).indexOf(label)>=0; const val=get(kk,dv);
@@ -8463,7 +8473,7 @@ class Component extends DCLogic {
           efield('Age','age',c.age||'',{type:'num'}),
           /* D1 — risk class bound to the model: prefilled from the agreed risk, editing it re-derives the target */
           efield('Risk class','risk',(this.RISKS.find(r=>r.id===this.state.riskId)||{}).short||c.risk||'',{type:'select',options:riskOpts,onPick:(v)=>this.setState({riskId:this.advRiskId(v),simTargets:null})}),
-          efield('Currency','currency',homeCcy,{type:'select',options:ccyList}),
+          efield('Currency','currency',homeCcy,{type:'select',options:ccyList,onPick:(v)=>this.setState({displayCcy:/^[A-Z]{3}$/.test(v)?v:this.state.displayCcy})}),
           efield('Region','region',curRegion,{type:'select',options:regionOpts}),
           efield('Profession','profession',c.occupation||''),
           efield('Company','company',(c.company&&c.company!=='—')?c.company:'')
