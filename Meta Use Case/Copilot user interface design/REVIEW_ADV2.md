@@ -47,8 +47,8 @@ Source: ~/Downloads/Advisor View 2 review.zip (click-comments.md). Status: [ ] t
 - [x] 31. Prefer an "Invest Now" button (over reserve-interest).
 
 ## Follower / notifications
-- [ ] 32. "Follow what matters": realistic iPhone frame; fix in-app + website; correct favicon; real Moonfare site + logo in the note.
-- [ ] 33. Add a final "Next" button to end the flow.
+- [x] 32. "Follow what matters": realistic iPhone frame; fix in-app + website; correct favicon; real Moonfare site + logo in the note.
+- [x] 33. Add a final "Next" button to end the flow.
 
 ## Levels & lifecycle
 - [ ] 34. L2 visibly differs: simple/fewer toggles; only strategy adjustable (OK).

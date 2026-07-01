@@ -8186,44 +8186,64 @@ class Component extends DCLogic {
      preferred channel (WhatsApp business message / in-app push / on-website toast). Skeuomorphic device
      mocks: WhatsApp keeps its native greens for authenticity; in-app & website use the Moonfare surface. */
   followerChannelPreview(chan, n){
-    const h=this.h; const SF=this.SF; const brand='var(--brand)'; const ink='var(--ink)';
-    const mIcon=(sz,fs)=>h('div',{style:{width:sz,height:sz,flex:'0 0 '+sz+'px',borderRadius:sz>34?10:'50%',background:'var(--brand)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:800,fontSize:fs||14}},'M');
-    const verified=h('span',{title:'Verified business',style:{display:'inline-flex',alignItems:'center',justifyContent:'center',width:13,height:13,borderRadius:'50%',background:'#34B7F1',color:'#fff',fontSize:9,fontWeight:900,marginLeft:4}},'✓');
+    const h=this.h; const SF=this.SF; const ink='var(--ink)';
+    /* Moonfare app icon — the real logo mark on a brand tile, with a monogram fallback if the asset is missing */
+    const appIcon=(sz,rad)=>h('div',{style:{width:sz,height:sz,flex:'0 0 '+sz+'px',borderRadius:(rad!=null?rad:Math.round(sz*0.26)),background:'linear-gradient(135deg,#2C2DFE,#1417C2)',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden',boxShadow:'0 1px 3px rgba(0,0,0,.25)'}},
+      h('img',{src:'assets/moonfare_logo_white.png',alt:'Moonfare',onError:e=>{e.target.style.display='none';e.target.parentNode.appendChild(document.createTextNode('M'));},style:{maxWidth:'72%',maxHeight:'46%',objectFit:'contain'}}));
+    const verified=h('span',{title:'Verified business',style:{display:'inline-flex',alignItems:'center',justifyContent:'center',width:14,height:14,borderRadius:'50%',background:'#34B7F1',color:'#fff',fontSize:9,fontWeight:900,marginLeft:4,flex:'0 0 14px'}},'✓');
+    const statusIcons=(dark)=>{ const col=dark?'#fff':'#111';
+      return h('div',{style:{display:'flex',alignItems:'center',gap:5,color:col}},
+        h('span',{style:{fontSize:11,fontWeight:700,letterSpacing:'.5px'}},'●●●'),
+        h('span',{style:{fontSize:10.5,fontWeight:700}},'Wi-Fi'),
+        h('span',{style:{display:'inline-block',width:22,height:11,border:'1.5px solid '+col,borderRadius:3,position:'relative'}}, h('span',{style:{position:'absolute',left:1.5,top:1.5,bottom:1.5,width:14,background:col,borderRadius:1}}))); };
+    /* a realistic iPhone frame: titanium edge, rounded screen, dynamic island + status bar (time · signal/wifi/battery) */
+    const iphone=(screen,dark)=>h('div',{style:{width:300,maxWidth:'100%',borderRadius:46,padding:11,background:'linear-gradient(145deg,#3a3a3e,#141416)',boxShadow:'0 24px 60px -18px rgba(0,0,0,.5)'}},
+      h('div',{style:{position:'relative',borderRadius:36,overflow:'hidden',background:dark?'#000':'#fff',minHeight:420}},
+        h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'9px 20px 6px',background:'transparent',position:'relative',zIndex:2}},
+          h('span',{style:{fontSize:13,fontWeight:700,fontFamily:SF,color:dark?'#fff':'#111'}},'9:41'), statusIcons(dark)),
+        h('div',{style:{position:'absolute',top:9,left:'50%',transform:'translateX(-50%)',width:86,height:24,background:'#000',borderRadius:16,zIndex:3}}),
+        screen));
     if(chan==='whatsapp'){
-      return h('div',{style:{width:320,maxWidth:'100%',borderRadius:26,overflow:'hidden',border:'8px solid #111',background:'#ECE5DD',boxShadow:'0 18px 44px rgba(0,0,0,.22)'}},
-        h('div',{style:{background:'#075E54',color:'#fff',padding:'12px 14px',display:'flex',alignItems:'center',gap:10}},
-          h('span',{style:{fontSize:16,opacity:.85}},'‹'),
-          h('div',{style:{width:34,height:34,borderRadius:'50%',background:'#fff',color:'#075E54',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:800}},'M'),
-          h('div',{style:{lineHeight:1.2}}, h('div',{style:{fontSize:14,fontWeight:600,display:'flex',alignItems:'center'}},'Moonfare',verified), h('div',{style:{fontSize:10.5,opacity:.8}},'business account · online'))),
-        h('div',{style:{padding:'16px 12px 20px',minHeight:190,backgroundImage:'radial-gradient(rgba(0,0,0,.035) 1px, transparent 1px)',backgroundSize:'14px 14px'}},
+      const screen=h('div',null,
+        h('div',{style:{background:'#075E54',color:'#fff',padding:'8px 14px 10px',display:'flex',alignItems:'center',gap:9}},
+          h('span',{style:{fontSize:17,opacity:.85}},'‹'), appIcon(32,'50%'),
+          h('div',{style:{lineHeight:1.2}}, h('div',{style:{fontSize:14,fontWeight:600,display:'flex',alignItems:'center'}},'Moonfare',verified), h('div',{style:{fontSize:10.5,opacity:.82}},'business account · online'))),
+        h('div',{style:{padding:'16px 12px 22px',minHeight:320,background:'#ECE5DD',backgroundImage:'radial-gradient(rgba(0,0,0,.04) 1px, transparent 1px)',backgroundSize:'16px 16px'}},
           h('div',{style:{textAlign:'center',margin:'0 auto 14px',width:'fit-content',background:'#FCF4CB',color:'#5b5638',fontSize:10.5,borderRadius:7,padding:'3px 10px'}},'Today'),
-          h('div',{style:{maxWidth:'86%',background:'#fff',borderRadius:'2px 12px 12px 12px',padding:'9px 11px',boxShadow:'0 1px 1px rgba(0,0,0,.08)'}},
+          h('div',{style:{maxWidth:'88%',background:'#fff',borderRadius:'3px 14px 14px 14px',padding:'10px 12px',boxShadow:'0 1px 1px rgba(0,0,0,.1)'}},
             h('div',{style:{fontSize:13,fontWeight:700,color:'#111',marginBottom:3}}, (n.emoji||'🔔')+' '+n.title),
             h('div',{style:{fontSize:12.5,color:'#222',lineHeight:1.5}}, n.body),
-            h('div',{style:{marginTop:8,paddingTop:8,borderTop:'1px solid #eee'}}, h('span',{style:{color:'#075E54',fontSize:12.5,fontWeight:600}},'📄 Open in Moonfare')),
-            h('div',{style:{textAlign:'right',fontSize:9.5,color:'#8a8a8a',marginTop:5}}, n.time))));
+            h('div',{style:{marginTop:9,paddingTop:8,borderTop:'1px solid #eee',display:'flex',alignItems:'center',gap:6}}, appIcon(16,4), h('span',{style:{color:'#075E54',fontSize:12.5,fontWeight:600}},'Open in Moonfare')),
+            h('div',{style:{textAlign:'right',fontSize:9.5,color:'#8a8a8a',marginTop:5}}, n.time+' ✓✓'))));
+      return iphone(screen,false);
     }
     if(chan==='inapp'){
-      return h('div',{style:{width:320,maxWidth:'100%',borderRadius:26,overflow:'hidden',border:'8px solid #111',minHeight:230,background:'linear-gradient(160deg,#20243A,#3a3f63)',boxShadow:'0 18px 44px rgba(0,0,0,.22)',position:'relative',padding:'18px 12px'}},
-        h('div',{style:{textAlign:'center',color:'rgba(255,255,255,.9)'}}, h('div',{style:{fontFamily:SF,fontSize:40,fontWeight:300,letterSpacing:'-.02em'}},'9:41'), h('div',{style:{fontSize:12,opacity:.75,marginTop:-2}},'Tuesday, 1 July')),
-        h('div',{style:{marginTop:20,background:'rgba(250,250,248,.94)',backdropFilter:'blur(8px)',borderRadius:16,padding:'11px 12px',boxShadow:'0 8px 24px rgba(0,0,0,.28)'}},
-          h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:6}}, mIcon(22,11), h('span',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)'}},'Moonfare'), h('span',{style:{marginLeft:'auto',fontSize:10.5,color:'var(--muted)'}}, n.time)),
-          h('div',{style:{fontSize:13.5,fontWeight:700,color:ink,marginBottom:2}}, n.title),
+      const screen=h('div',{style:{minHeight:390,background:'linear-gradient(165deg,#20243A 0%,#3a3f63 60%,#525a86 100%)',padding:'26px 14px 18px',display:'flex',flexDirection:'column'}},
+        h('div',{style:{textAlign:'center',color:'#fff'}}, h('div',{style:{fontSize:15,opacity:.85}},'Tuesday, 1 July'), h('div',{style:{fontFamily:SF,fontSize:64,fontWeight:300,letterSpacing:'-.02em',lineHeight:1.05}},'9:41')),
+        h('div',{style:{marginTop:26,background:'rgba(250,250,248,.96)',backdropFilter:'blur(10px)',borderRadius:18,padding:'12px 13px',boxShadow:'0 10px 30px rgba(0,0,0,.32)'}},
+          h('div',{style:{display:'flex',alignItems:'center',gap:9,marginBottom:7}}, appIcon(26,7), h('span',{style:{fontSize:11,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'#555'}},'Moonfare'), h('span',{style:{marginLeft:'auto',fontSize:10.5,color:'#888'}}, n.time)),
+          h('div',{style:{fontSize:14,fontWeight:700,color:'#111',marginBottom:2}}, n.title),
           h('div',{style:{fontSize:12.5,color:'#333',lineHeight:1.5}}, n.body)),
-        h('div',{style:{textAlign:'center',color:'rgba(255,255,255,.55)',fontSize:11,position:'absolute',left:0,right:0,bottom:12}},'swipe to open →'));
+        h('div',{style:{marginTop:'auto',textAlign:'center',color:'rgba(255,255,255,.6)',fontSize:11}},'swipe up to open →'));
+      return iphone(screen,true);
     }
-    /* website — a Moonfare web toast in the corner of a browser frame */
-    return h('div',{style:{width:'100%',borderRadius:12,overflow:'hidden',border:'1px solid var(--line)',background:'var(--surface-2)',boxShadow:'0 14px 34px rgba(0,0,0,.10)'}},
-      h('div',{style:{display:'flex',alignItems:'center',gap:6,padding:'9px 12px',borderBottom:'1px solid var(--line)',background:'var(--surface)'}},
-        h('span',{style:{width:9,height:9,borderRadius:'50%',background:'#ff5f56'}}),h('span',{style:{width:9,height:9,borderRadius:'50%',background:'#ffbd2e'}}),h('span',{style:{width:9,height:9,borderRadius:'50%',background:'#27c93f'}}),
-        h('div',{style:{marginLeft:10,flex:1,background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:7,padding:'4px 10px',fontSize:11,color:'var(--muted)'}},'🔒 app.moonfare.com/portfolio')),
-      h('div',{style:{position:'relative',minHeight:150,padding:14,background:'var(--surface-2)'}},
-        h('div',{style:{position:'absolute',top:14,right:14,width:290,maxWidth:'80%',background:'var(--surface)',border:'1px solid var(--line)',borderLeft:'3px solid var(--brand)',borderRadius:12,padding:'12px 13px',boxShadow:'0 10px 28px rgba(0,0,0,.14)'}},
-          h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:6}}, mIcon(24,11), h('div',{style:{lineHeight:1.15}}, h('div',{style:{fontSize:12.5,fontWeight:700,color:ink}},'Moonfare'), h('div',{style:{fontSize:10,color:'var(--muted)'}},'Notification · '+n.time)), h('span',{style:{marginLeft:'auto',color:'var(--muted)',fontSize:14,cursor:'pointer'}},'✕')),
+    /* website — the real moonfare.com chrome with a favicon in the tab + a branded in-product toast */
+    const favicon=appIcon(15,4);
+    return h('div',{style:{width:'100%',borderRadius:12,overflow:'hidden',border:'1px solid var(--line)',background:'var(--surface-2)',boxShadow:'0 14px 34px rgba(0,0,0,.12)'}},
+      h('div',{style:{display:'flex',alignItems:'center',gap:6,padding:'8px 12px 0',background:'#dfe1e5'}},
+        h('div',{style:{display:'flex',alignItems:'center',gap:7,background:'var(--surface)',borderRadius:'9px 9px 0 0',padding:'7px 12px',fontSize:11,color:'var(--ink)',maxWidth:210}}, favicon, h('span',{style:{whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',fontWeight:600}},'Moonfare — Private Markets'), h('span',{style:{color:'var(--muted)'}},'✕'))),
+      h('div',{style:{display:'flex',alignItems:'center',gap:6,padding:'8px 12px',borderBottom:'1px solid var(--line)',background:'var(--surface)'}},
+        h('span',{style:{color:'var(--muted)',fontSize:13}},'‹ ›'),
+        h('div',{style:{marginLeft:6,flex:1,display:'flex',alignItems:'center',gap:7,background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:999,padding:'5px 12px',fontSize:11.5,color:'var(--ink)'}}, h('span',{style:{color:'var(--over)'}},'🔒'), h('span',null,'app.moonfare.com/portfolio'))),
+      h('div',{style:{position:'relative',minHeight:180,padding:14,background:'linear-gradient(180deg,var(--surface),var(--surface-2))'}},
+        /* faux page header with the Moonfare wordmark */
+        h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:14,opacity:.9}}, appIcon(22,6), h('span',{style:{fontFamily:SF,fontWeight:700,fontSize:15,color:'var(--ink)'}},'Moonfare')),
+        h('div',{style:{opacity:.4,filter:'blur(.3px)',pointerEvents:'none'}}, h('div',{style:{width:'42%',height:13,background:'var(--line)',borderRadius:5,marginBottom:10}}), h('div',{style:{width:'82%',height:9,background:'var(--line)',borderRadius:5,marginBottom:7}}), h('div',{style:{width:'72%',height:9,background:'var(--line)',borderRadius:5,marginBottom:7}}), h('div',{style:{width:'64%',height:9,background:'var(--line)',borderRadius:5}})),
+        h('div',{style:{position:'absolute',top:14,right:14,width:290,maxWidth:'82%',background:'var(--surface)',border:'1px solid var(--line)',borderLeft:'3px solid var(--brand)',borderRadius:12,padding:'12px 13px',boxShadow:'0 12px 30px rgba(0,0,0,.16)'}},
+          h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:6}}, appIcon(24,6), h('div',{style:{lineHeight:1.15}}, h('div',{style:{fontSize:12.5,fontWeight:700,color:ink}},'Moonfare'), h('div',{style:{fontSize:10,color:'var(--muted)'}},'Notification · '+n.time)), h('span',{style:{marginLeft:'auto',color:'var(--muted)',fontSize:14,cursor:'pointer'}},'✕')),
           h('div',{style:{fontSize:13,fontWeight:700,color:ink,marginBottom:2}}, n.title),
           h('div',{style:{fontSize:12,color:'var(--muted)',lineHeight:1.5}}, n.body),
-          h('button',{style:{marginTop:9,border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'6px 12px',fontSize:11.5,fontWeight:700,cursor:'pointer'}},'View →')),
-        h('div',{style:{opacity:.35,filter:'blur(.4px)',pointerEvents:'none'}}, h('div',{style:{width:'46%',height:13,background:'var(--line)',borderRadius:5,marginBottom:9}}), h('div',{style:{width:'80%',height:9,background:'var(--line)',borderRadius:5,marginBottom:7}}), h('div',{style:{width:'70%',height:9,background:'var(--line)',borderRadius:5,marginBottom:7}}), h('div',{style:{width:'60%',height:9,background:'var(--line)',borderRadius:5}}))));
+          h('button',{style:{marginTop:9,border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'6px 12px',fontSize:11.5,fontWeight:700,cursor:'pointer'}},'View →'))));
   }
   /* advisor call-notes: type a note during the call, add it to the client record (persisted via /api/note when the backend is present) */
   advNoteCard(){ const h=this.h; const SF=this.SF; const s=this.state; const notes=s.advNotes||[]; const draft=s.advNoteDraft||'';
@@ -8520,10 +8540,15 @@ class Component extends DCLogic {
           h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)',alignSelf:'flex-start'}},'Live preview — '+({whatsapp:'WhatsApp',inapp:'In-app push',website:'On website'}[chan])),
           preview,
           h('div',{style:{fontSize:11.5,color:'var(--muted)',textAlign:'center',lineHeight:1.45,maxWidth:320}},'Exactly what ' + (c.name||'the investor') + ' would receive — content follows the topics selected on the left.'));
+        /* item 33 — a clear final action to END the call flow after the follower step (the last step of the journey) */
+        const finishRow=h('div',{style:{display:'flex',gap:10,flexWrap:'wrap',alignItems:'center',borderTop:'1px solid var(--line)',paddingTop:14,marginTop:2}},
+          h('button',{onClick:()=>this.advExit(),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'11px 20px',fontSize:13.5,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'✓ Finish the call'),
+          h('span',{style:{fontSize:12,color:'var(--muted)'}},'Saves the follow preferences and returns you to your investor book.'));
         return wrap([ head('Follow what matters','Stay close between calls — pick the topics and see precisely how each alert lands on their preferred channel.'),
           h('div',{style:{display:'grid',gridTemplateColumns:'minmax(0,1fr) minmax(320px,0.9fr)',gap:18,alignItems:'start'}},
             h('div',{style:{display:'flex',flexDirection:'column',gap:16}}, optCard, chanCard),
-            this.card({title:'Notification preview',children:right})) ]);
+            this.card({title:'Notification preview',children:right})),
+          finishRow ]);
       }
       case 'backToKyc': return wrap([ head('Continue on Moonfare','You’ve seen the tease — now the handoff to accreditation.'),
         this.card({title:'What you’ve seen so far',children:h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, ['A tailored model portfolio built for your profile','Where you’d sit versus your peer group','How it could build out over the next years'].map((t,i)=>h('div',{key:i,style:{display:'flex',gap:8,fontSize:13,lineHeight:1.45}}, h('span',{style:{color:'var(--over)'}},'✓'), t))),caption:'Pre-Gate tease complete — no account needed up to here.'}),
