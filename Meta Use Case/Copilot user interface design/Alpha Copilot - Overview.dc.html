@@ -8772,7 +8772,7 @@ class Component extends DCLogic {
             h('div',{style:{display:'flex',gap:24,flexWrap:'wrap',alignItems:'center'}},
               h('div',{style:{flex:'0 0 210px',display:'flex',justifyContent:'center'}}, this.donutNamed(slices,175,center,'mix')),
               h('div',{style:{flex:'1 1 340px',minWidth:290}}, bTable(label,slices)))});
-          return wrap([ head('Your tailored model portfolio · full view', (_adjusted?'Reflecting the strategy mix you just adjusted — ':'')+'the complete institutional breakdown across every dimension'+(tot?(', each against the €'+(+tot.toFixed(1))+'m planned commitment and totalling 100%.'):'.')),
+          return wrap([ head('Your tailored asset allocation for you', (_adjusted?'Reflecting the strategy mix you just adjusted — ':'')+'the complete institutional breakdown across every dimension'+(tot?(', each against the €'+(+tot.toFixed(1))+'m planned commitment and totalling 100%.'):'.')),
             dimBlock(_adjusted?'Strategy · revised':'Strategy', sl, _adjusted?'Revised':'Model', _adjusted?this.badge('revised','conf'):null),
             dimBlock('Sector', secSl, 'Sector', this.badge('AI / Tech','synth')),
             dimBlock('Format', fmtSl, 'Format', this.badge('Secondaries · Co-invest','synth')),
