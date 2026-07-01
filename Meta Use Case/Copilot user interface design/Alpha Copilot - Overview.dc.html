@@ -7247,7 +7247,7 @@ class Component extends DCLogic {
   }; }
   mgrMeta(m){ const id=typeof m==='string'?m:m.id; return this.MGR_META()[id]||{}; }
   /* brand assets from the first Copilot iteration — manager logos + hero backgrounds */
-  MGR_LOGO(){ return {eqt:'eqt',kkr:'kkr',blackstone:'blackstone',carlyle:'carlyle',ares:'ares',cvc:'cvc',genatl:'general-atlantic',lexington:'lexington-partners',insight:'insight-partners',hg:'silver-lake',thomabravo:'clearlake',index:'17capital',cinven:'permira'}; }
+  MGR_LOGO(){ return {eqt:'eqt',kkr:'kkr',blackstone:'blackstone',carlyle:'carlyle',ares:'ares',cvc:'cvc',genatl:'general-atlantic',lexington:'lexington-partners',insight:'insight-partners',cinven:'cinven',thomabravo:'thoma-bravo',hg:'hg',antin:'antin',thrive:'thrive-capital',index:'index-ventures'}; }
   mgrLogo(m){ const id=typeof m==='string'?m:m.id; return this.MGR_LOGO()[id]||null; }
   MGR_HEROES(){ return ['header_06','header_03','header_01','header_07','header_10','header_12']; }
   mgrHero(m){ const ids=this.MANAGERS().map(x=>x.id); const i=Math.max(0,ids.indexOf(typeof m==='string'?m:m.id)); const H=this.MGR_HEROES(); return H[i%H.length]; }
@@ -7581,7 +7581,7 @@ class Component extends DCLogic {
   }
   /* nature / city landscape backdrops for manager logos on the Funds & Managers list (deterministic per key) */
   /* review7 item 31 — locally-downloaded city-skyline / landscape backgrounds (assets/bg), consistent ~640px format, no remote dependency */
-  LANDSCAPES(){ return ['1506744038136-46273834b3fb','1470071459604-3b5ec3a7fe05','1441974231531-c6227db76b6e','1501785888041-af3ef285b470','1444723121867-7a241cacace9','1490806843957-31f4c9a91c65','1469474968028-56623f02e42e','1433086966358-54859d0ed716','1518495973542-4542c06a5843','1480714378408-67cf0d13bc1b','1486406146926-c627a92ad1ab','1496568816309-51d7c20e3b21','1449824913935-59a10b8d2000','1493514789931-586cb221d7a7','1460472178825-e5240623afd5']; }
+  LANDSCAPES(){ return ['skyline-nyc-dusk','skyline-nyc-bridge','skyline-nyc-harbor','skyline-london-bridge','skyline-london-aerial','skyline-chicago','skyline-paris','skyline-sanfrancisco','skyline-singapore','skyline-hongkong','skyline-tokyo-shibuya','skyline-tokyo-neon','nature-usa-yosemite','nature-usa-monumentvalley','nature-usa-peaks','nature-asia-fuji','nature-asia-greatwall','nature-asia-riceterrace','nature-asia-bali','nature-asia-beach']; }
   landscapeUrl(key){ const arr=this.LANDSCAPES(); let n=0; const k=String(key||'x'); for(let i=0;i<k.length;i++) n=(n*31+k.charCodeAt(i))>>>0; return 'assets/bg/'+arr[n%arr.length]+'.jpg'; }
   mgrTile(logo,mgrName,key,size){ const h=this.h; size=size||46;
     return h('div',{style:{position:'relative',width:size,height:size,borderRadius:9,overflow:'hidden',flex:'0 0 '+size+'px',background:'linear-gradient(135deg,#20243a,#3a3f63)'}},
