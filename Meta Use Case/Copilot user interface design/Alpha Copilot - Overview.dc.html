@@ -7890,8 +7890,8 @@ class Component extends DCLogic {
   advCurKey(){ const s=this.advSeq(); return s[Math.max(0,Math.min(this.state.advStep,s.length-1))]; }
   advLvl(a,b,c){ const l=this.state.advLevel; return l==='L1'?a:(l==='L3'?c:b); }
   /* ---- controls ---- */
-  advOpenClient(id){ const c=this.advBook().find(x=>x.id===id); this.setState({advClientId:id, advStage:(c&&c.stage)||'new', advLevel:(c&&c.level)||'L2', advView:'prep', advPrepGoals:null, advStep:0, advReact:{}, advCFAextra:0, advPrepPrompt:'', advPrepMode:'preset'}); }
-  advEnterCockpit(){ this.setState({advView:'cockpit', advStep:0, advReact:{}, advCFAextra:0}); }
+  advOpenClient(id){ const c=this.advBook().find(x=>x.id===id); const lv=(c&&c.level)||'L2'; this.setState({advClientId:id, advStage:(c&&c.stage)||'new', advLevel:lv, advView:'prep', advPrepGoals:null, advStep:0, advReact:{}, advCFAextra:0, advPrepPrompt:'', advPrepMode:'preset', persona2:(lv==='L3'?'pro':'guided')}); }
+  advEnterCockpit(){ this.setState({advView:'cockpit', advStep:0, advReact:{}, advCFAextra:0, persona2:(this.state.advLevel==='L3'?'pro':'guided')}); }
   advExit(){ this.setState({advView:'desk', advClientId:null}); }
   advToPrep(){ this.setState({advView:'prep'}); }
   advStepTo(i){ const s=this.advSeq(); this.setState({advStep:Math.max(0,Math.min(i,s.length-1)), advFocus:null, advSeized:false}); }
@@ -7910,7 +7910,7 @@ class Component extends DCLogic {
     'Follower':['follower'] }; }
   advJump(jump){ if(!jump) return; const seq=this.advSeq(); const cands=(this.advJumpTargets()[jump.tab])||[]; let idx=-1; for(let j=0;j<cands.length;j++){ const i=seq.indexOf(cands[j]); if(i>=0){ idx=i; break; } } if(idx>=0) this.setState({advStep:idx, advFocus:jump.sub||null}); else this.setState({advFocus:jump.sub||null}); }
   advClearFocus(){ this.setState({advFocus:null}); }
-  advSetLevel(l){ const cur=this.advCurKey(); const f=(this.DB&&this.DB.advisorFlows)||{}; const ns=f[this.state.advStage+'|'+l]||[]; let i=ns.indexOf(cur); if(i<0) i=Math.min(this.state.advStep, Math.max(0,ns.length-1)); this.setState({advLevel:l, advStep:Math.max(0,i)}); }
+  advSetLevel(l){ const cur=this.advCurKey(); const f=(this.DB&&this.DB.advisorFlows)||{}; const ns=f[this.state.advStage+'|'+l]||[]; let i=ns.indexOf(cur); if(i<0) i=Math.min(this.state.advStep, Math.max(0,ns.length-1)); this.setState({advLevel:l, advStep:Math.max(0,i), persona2:(l==='L3'?'pro':'guided')}); }
   advSetStage(st){ const cur=this.advCurKey(); const f=(this.DB&&this.DB.advisorFlows)||{}; const ns=f[st+'|'+this.state.advLevel]||[]; let i=ns.indexOf(cur); if(i<0) i=0; this.setState({advStage:st, advStep:Math.max(0,i)}); }
   advReactCFA(k,v){ const r=Object.assign({}, this.state.advReact); r[k]=(r[k]===v?null:v); this.setState({advReact:r}); }
   advNeedMore(){ this.setState({advCFAextra:this.state.advCFAextra+1}); }
@@ -8043,6 +8043,18 @@ class Component extends DCLogic {
   advPageRender(key){
     const h=this.h; const SF=this.SF; const c=this.advClient()||{}; const L=this.state.advLevel; const lvl=(a,b,cc)=>this.advLvl(a,b,cc);
     const P=(this.DB&&this.DB.portfolio)||{}; const pm=this.advPageMeta(key);
+    /* L2/L3 = the real command center: delegate heavy steps to the full Investor-View bodies (all
+       adjustors + built-in drill-ins). L3 renders in 'pro' depth, L2 in 'guided'. L1 stays light. */
+    if(L!=='L1'){ const DELEG={overview:'homeOverviewBody', modelExisting:'homeOverviewBody',
+        simTarget:'simulatorBody', simExisting:'simulatorBody', simFull:'simulatorBody', targetSimulator:'simulatorBody',
+        multiComparison:'comparisonBody', compareToCurrent:'comparisonBody', peerComparison:'comparisonBody',
+        future:'futureBody', opportunities:'opportunitiesBody', missedOut:'opportunitiesBody',
+        managerComparison:'managerOverviewBody', fundComparison:'managerOverviewBody'};
+      const fn=DELEG[key];
+      if(fn && typeof this[fn]==='function'){ try{ const body=this[fn]();
+        return h('div',{style:{maxWidth:1220,margin:'0 auto'}},
+          h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:12,fontSize:11,color:'var(--muted)'}}, h('span',{style:{fontSize:9,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:5,padding:'2px 7px'}}, L+' · full toolbox'), h('span',null,'The complete Investor-View '+(pm.title||key)+' — every adjustor & drill-in, live for '+(c.name||'this client')+'.')),
+          body); }catch(e){ /* fall through to the light advisor composition below */ } } }
     const wrap=(kids)=>h('div',{style:{maxWidth:1000,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}, kids);
     const head=(t,s)=>h('div',null, h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:600,letterSpacing:'-.01em'}},t), s?h('div',{style:{fontSize:13,color:'var(--muted)',marginTop:3,lineHeight:1.5,maxWidth:680}},s):null);
     const lvlNote=(t)=>h('div',{style:{fontSize:11,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:8,padding:'7px 11px',display:'inline-block'}},t);
