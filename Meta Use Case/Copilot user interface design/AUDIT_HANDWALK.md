@@ -48,9 +48,40 @@ Legend: [x] verified working & data-real · [!] bug found (with fix) · [ ] not 
 ## KNOWN GAP (low priority, honest)
 - [~] 19 numeric `vals:[...]` inline arrays remain, ALL in the internal ops console (lines 9000-9089: platform AUM, net flows, channel conversion, fill-rate, waitlist, capital calls, liquidity buffer). These are synthetic internal business KPIs (Moonfare staff view), NOT investor financial figures — they'd be synthetic in the DB too, so wiring only relocates mock numbers. Candidate for a future `internalOps` DB atom if the internal console needs to be DB-backed; not a financial-correctness issue for the investor/advisor audit.
 
-## STILL TO WALK
-- [ ] Lifecycle / what's-changed / follower iPhone previews render (logos+graph, look real) — spot-render check.
-- [ ] Fund pages consume filled CSV (pending user's data at ~/Downloads/moonfare_funds/).
+## Lifecycle / follower / full render sweep — VERIFIED 2026-07-01
+- [x] Full advisor render sweep: ALL 133 steps × 4 journeys(pregate/new/existing/inactive) × 3 levels(L1/L2/L3) render — 0 errors, 0 empty outputs, logicError null.
+- [x] Follower (existing/L3): iPhone-preview notification with real Moonfare logo (moonfare_logo_white.png), no emoji, real copy.
+- [x] What's-changed (existing/L2): 3 real manager logos (General Atlantic/KKR/EQT) + NAV graph (svg), no emoji — item 37 satisfied.
+
+# ===== AUDIT COMPLETE (2026-07-01) =====
+All non-CSV advisor+investor screens hand-walked and verified with tool-call evidence. logicError null throughout.
+
+## Financial correctness (the core ask)
+- IRR/MOIC/TVPI/DPI: capital-weighted from held funds (portfolioMetrics), not static. ✓
+- Cash-flow history: DERIVED from held funds (trough=−paidIn·0.32, ends at dist−paidIn), empty for new/pregate. ✓
+- Cash-flow projection: every control moves it (commit-years, recycle, execution, macro, pace, product-mix), coherent economics. ✓
+- Portfolio-combination simulation: recomputes blended net IRR/TVPI €-weighted from picks (credit lowers, growth/AI raises), not just the pie. ✓
+- Peer data: parametric from DB, statistically coherent across age/wealth/profession/region cohorts. ✓
+- Model portfolios: 5 distinct coherent mixes by risk profile. ✓
+- Manager research: DB managerTree, real per-class IRR, working filter/sort. ✓
+
+## UX / mechanics
+- Every slider/button/input verified to do what's expected (simulator target, cash-flow controls, AC filter, currency). ✓
+- Levels differentiate (L1<L2≤L3 step counts + control density); journeys differ (new builds, existing reviews). ✓
+- Currency conversion works; advisor header shows client's home currency (region-derived USD/CHF/EUR). ✓
+- Profile saves round-trip (investor→DB, advisor→localStorage restored on impersonate). ✓
+- Zero pictographic emoji; functional glyphs + mandated over/under triangles only. ✓
+
+## Bugs found & fixed this audit
+1. Cash-flow history was hardcoded [-3.2..1.2] → derived from held funds. (2a41e98)
+2. Portfolio sim showed only a pie → now recomputes expected IRR/TVPI. (2a41e98)
+3. advClientCohort mis-classified "PE executive"→Exec/Owner + loose bare-'pe' matched "developer" → fixed with ordered word-boundary regex. (dc69aea)
+
+## Known gap (honest, low priority)
+- Internal ops console (lines 9000-9089): 19 inline vals[] arrays are synthetic staff-facing business KPIs, not investor financial data. Candidate for a future `internalOps` DB atom; no financial-correctness impact.
+
+## Blocked on user
+- Fund pages: awaiting the user's filled CSV (~/Downloads/moonfare_funds/moonfare_funds_template.csv, 140 funds/46 cols). Once delivered, wire a `funds` DB atom + accessor to populate fund detail pages with real per-fund data.
 - [ ] Model-portfolio page: strategy mix reflects target/inputs (L1/L2 real strategies; L3 redundant page removed).
 - [ ] Manager research (L3): filters/toggles change firm/fund tables from DB managerTree.
 - [ ] Currency: displayCcy change converts every €-figure incl. advisor header; home-ccy derives from region.
