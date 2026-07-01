@@ -8142,8 +8142,10 @@ class Component extends DCLogic {
   advNext(){ this.advStepTo(this.state.advStep+1); }
   /* E1/E2 — map each cockpit step to a workspace (Understand / Shape / Act / Research) so the advisor can jump non-linearly mid-call */
   advStepWS(key){ return {
-      execSummary:'understand', intake:'understand', intakeMin:'understand', overview:'understand', modelExisting:'understand', changesSince:'understand', confirmTarget:'understand', aiThinking:'understand', modelPortfolio:'understand',
-      setTarget:'shape', simTarget:'shape', simExisting:'shape', simFull:'shape', targetSimulator:'shape', multiComparison:'shape', compareToCurrent:'shape', peerComparison:'shape', future:'shape',
+      /* item 13 — Understand is only the investor profile overview; the tailored TARGET (adjust & compare) lives in Shape.
+         setTarget + confirmTarget are both the tailored-target simulator (simulatorBody), so both map to 'shape'. */
+      execSummary:'understand', intake:'understand', intakeMin:'understand', overview:'understand', modelExisting:'understand', changesSince:'understand', aiThinking:'understand', modelPortfolio:'understand',
+      setTarget:'shape', confirmTarget:'shape', simTarget:'shape', simExisting:'shape', simFull:'shape', targetSimulator:'shape', multiComparison:'shape', compareToCurrent:'shape', peerComparison:'shape', future:'shape',
       nextBest:'act', nextBestHints:'act', opportunities:'act', missedOut:'act', seize:'act', follower:'act', backToKyc:'act',
       managerComparison:'research', fundComparison:'research'
     }[key] || 'understand'; }
