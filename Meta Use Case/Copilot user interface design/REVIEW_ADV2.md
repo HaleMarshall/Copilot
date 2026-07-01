@@ -56,4 +56,4 @@ Source: ~/Downloads/Advisor View 2 review.zip (click-comments.md). Status: [ ] t
 - [x] 36. L1 existing: "Model vs your portfolio today" shows the actual invested strategies; headline = 4 metrics (DPI etc.) + a performance graph.
 - [x] 37. "What's changed": no emojis; use logos + a graph; make it look real.
 - [x] 38. "Suggested vs current portfolio": add suggest-opportunities beneath.
-- [ ] 39. Existing flow: remove the duplicate "your tailored target"; make opportunities selectable so reserve-interest/new-portfolio has something.
+- [x] 39. Existing flow: remove the duplicate "your tailored target"; make opportunities selectable so reserve-interest/new-portfolio has something.
