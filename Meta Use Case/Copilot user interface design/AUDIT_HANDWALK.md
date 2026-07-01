@@ -23,10 +23,25 @@ Legend: [x] verified working & data-real · [!] bug found (with fix) · [ ] not 
   senior-FO(65+,FamOffice,100M+)→median 24.5, ai 0.2%, infra 17%, credit 13.9%; PE-pro(50-65)→21.4 buyout-tilt.
   Medians: FO 24.5 > PE-pro 21.4 > young 10.2 > mid 9.6 (wealth/profession lift returns); AI∝1/age; credit/infra∝age. Coherent.
 
+## Intake / profile save round-trip — VERIFIED 2026-07-01
+- [x] Investor profile → DB: POST /api/profile (id 12) then GET /api/state returns it (goal/targetPct/risk/ts). Persists to profile_saves.
+- [x] Advisor profile → localStorage: advSaveProfile() → advSavedProfile(id) returns edits(age/profession), riskId, simTargets; impersonate() reloads it (line 7941/8104) so an impersonated client sees the advisor-set target.
+
+## Simulator L1/L2/L3 — VERIFIED 2026-07-01
+- [x] Level escalation correct: L1 "Your tailored target" = strategy-only, sliders behind ✎Adjust toggle, compares only vs the original proposal (no peer world); L2 "adjust & compare" = strategy + peer/model/family/endowment compare in €&%; L3 adds Vintage dimension. hasVintage L1/L2 false, L3 true.
+- [x] Slider moves the target: setSimTarget('strategy','buyout',+15) → benchTargetMix('you').buyout 30→45 (verified with sync-setState shim; detached-instance setState no-op was a harness artifact, not a bug).
+
+## Currency — VERIFIED 2026-07-01
+- [x] ccyConv converts every €-figure: €16.6m → $18.0m (×1.083) / £14.1m (×0.848) / Fr 16.0m, correct symbols.
+- [x] advHomeCcy derives home ccy from client region (real book encodes it as "US / USD","CH / CHF","DE / EUR"): Reuter→USD, Meier→CHF, German→EUR. Advisor header shows the client's home currency on impersonate. (First test used wrong region format {region:'US/CA'}→EUR — harness artifact, not a bug.)
+
 ## STILL TO WALK
-- [ ] Intake/profile: age/profession/PM-yes-no/amount/target/risk edits persist + save round-trips to DB profile_saves.
-- [ ] Simulator/comparison page L1 (adjust-only) vs L2 (strategy+compare) vs L3 (all dims incl. Vintage €/%): each control moves outputs; benchmark data DB-sourced.
-- [ ] advClientCohort maps client→cohort (fc) correctly for each book client.
+- [ ] advClientCohort maps client→cohort (fc) correctly for each book client (5 clients).
+- [ ] Model-portfolio page strategy mix reflects target/inputs (L1/L2 real strategies; L3 redundant page removed).
+- [ ] Manager research (L3) filters/toggles change firm/fund tables from DB managerTree.
+- [ ] Lifecycle / what's-changed / follower iPhone previews: no emojis, logos+graph, real.
+- [ ] Level differentiation across pregate/new/existing/inactive (advSeq step counts + body density per level).
+- [ ] Fund pages consume filled CSV (pending user's data).
 - [ ] Model-portfolio page: strategy mix reflects target/inputs (L1/L2 real strategies; L3 redundant page removed).
 - [ ] Manager research (L3): filters/toggles change firm/fund tables from DB managerTree.
 - [ ] Currency: displayCcy change converts every €-figure incl. advisor header; home-ccy derives from region.
