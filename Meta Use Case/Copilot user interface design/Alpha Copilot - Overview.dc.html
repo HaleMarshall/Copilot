@@ -3149,8 +3149,8 @@ class Component extends DCLogic {
   }
   saveFuturePlan(){ const list=(this.state.savedFuture||[]).slice(); list.push({name:'Plan '+(list.length+1), pace:this.state.fPaceScn||'moderate', commit:+this.state.fCommit||2, recycle:+this.state.fRecycleRate||0, years:+this.state.fCommitYears||10, byYear:Array.isArray(this.state.fCommitByYear)?this.state.fCommitByYear.slice():null}); this.setState({savedFuture:list, savedFutureMsg:list[list.length-1].name+' saved'}); }
   /* review4 item 11 — prominent J-curve: historicals + today + projected distributions, pace scenarios, recycle modelling, per-year commitment editing, save */
-  futureJCurveHero(pj){
-    const h=this.h, SF=this.SF; const s=this.state;
+  futureJCurveHero(pj, opts){
+    const h=this.h, SF=this.SF; const s=this.state; const controlsOnly=!!(opts&&opts.controlsOnly);
     const scn=s.fPaceScn||'moderate';
     const paceSeg=h('div',{onClick:e=>e.stopPropagation()}, this.seg([{label:'Slow growth',value:'slow'},{label:'Moderate',value:'moderate'},{label:'Aggressive',value:'aggressive'}], scn, v=>this.setState({fPaceScn:v}),{sm:true}));
     /* the J-curve line — historical solid, projected dashed, split at TODAY */
@@ -3207,6 +3207,10 @@ class Component extends DCLogic {
       h('button',{onClick:e=>{e.stopPropagation();this.saveFuturePlan();},style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'10px 18px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'Inter,system-ui,sans-serif'}},'✓ Save this plan'),
       s.savedFutureMsg? h('span',{style:{fontSize:11.5,color:'var(--over)',fontWeight:600}},'✓ '+s.savedFutureMsg) : null,
       (s.savedFuture&&s.savedFuture.length)? h('span',{style:{fontSize:11.5,color:'var(--muted)'}}, s.savedFuture.length+' saved plan'+(s.savedFuture.length>1?'s':'')) : null);
+    /* item 22 — controlsOnly drops the duplicate J-curve chart (the PE cash-flow model owns the single J-curve) but keeps the valued recycle panel + per-year commitment editor */
+    if(controlsOnly) return this.card({title:'Commitment planning & recycling', info:true, right:paceSeg,
+      children:h('div',null, recyclePanel, editor, saveRow),
+      caption:'Plan the pace, recycle distributions and edit each year’s commitment — the J-curve above updates live.'});
     return this.card({title: pj.isNew?'Your J-curve — today & projected':'Your J-curve — historicals, today & projected', info:true, right:paceSeg,
       children:h('div',null, jline, barsLegend, bars, netCallout, recyclePanel, editor, saveRow),
       caption:'The most important view: realised cash flow to today (solid) then the forward projection (dashed), with each year’s commitments (down) and distributions (up) as bars. Pick a pace, recycle distributions to self-fund commitments, edit any year, and save the plan.'});
@@ -3227,7 +3231,9 @@ class Component extends DCLogic {
     const pairs=[pair(c[0],'commits'),pair(c[1],'cumulative'),pair(c[2],'nav'),pair(c[4],'products')];
     const grid=h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(600px,1fr))',gap:16,alignItems:'stretch'}}, pairs);
     const cfCard=this.card({title:'PE cash-flow model — PitchBook-calibrated',badge:this.badge('engine','synth'),children:this.cfModel({level: this.state.persona2==='pro'?'L3':'L2', mix:this.modelMix()}),caption:'Forward cash flows from PitchBook strategy curves: contributions, distributions, the J-curve with percentile bands, and expected DPI / TVPI. Catch-Up vs Scale-factor distribution method; percentile 25th–90th selectable.'});
-    const main=h('div',{style:{flex:1,minWidth:0,display:'flex',flexDirection:'column',gap:16}}, header, this.fKpiTiles(pj), this.futureJCurveHero(pj), cfCard, grid);
+    /* items 22/24 — one J-curve: the PE cash-flow model is the hero (J-curve on top, contributions vs distributions below);
+       the recycle/per-year commitment controls follow; the smaller pacing/NAV charts sit at the bottom. */
+    const main=h('div',{style:{flex:1,minWidth:0,display:'flex',flexDirection:'column',gap:16}}, header, this.fKpiTiles(pj), cfCard, this.futureJCurveHero(pj,{controlsOnly:true}), grid);
     /* item 28 — 'Act on your prediction' CTA removed per review (next-best action is a dedicated later step) */
     const filters=h('div',{style:{background:'var(--surface)',border:'1px solid var(--line)',borderRadius:14,padding:'16px 16px 18px'}},
       h('div',{style:{fontSize:14,fontWeight:700,fontFamily:SF,marginBottom:3}},'Future filters'),
@@ -7982,13 +7988,13 @@ class Component extends DCLogic {
     const grid=L==='L3'? this.card({title:'Commitment plan by strategy',children:(()=>{ const byS={}; commitments.forEach(c=>{byS[c.label]=(byS[c.label]||0)+c.commitment;}); const rows=Object.keys(byS); const th=(t,r)=>h('th',{style:{textAlign:r?'right':'left',padding:'6px 9px',fontSize:10,textTransform:'uppercase',color:'var(--muted)',borderBottom:'2px solid var(--line)'}},t); const td=(v,r)=>h('td',{style:{textAlign:r?'right':'left',padding:'7px 9px',borderBottom:'1px solid var(--line)',fontSize:12.5}},v);
       return h('table',{style:{width:'100%',borderCollapse:'collapse'}}, h('thead',null,h('tr',null,th('Strategy'),th('Commitment €m',1),th('% of plan',1),th('Bench TVPI ('+pct+'th)',1))), h('tbody',null, rows.map(s=>{ const amt=byS[s]; const sk=(this.peCurveFor(s,pct)||{}); return h('tr',{key:s}, td(s), td('€'+amt.toFixed(1)+'m',1), td(Math.round(amt/total*100)+'%',1), td((sk.term||'—')+'x',1)); }))); })(), caption:'Each strategy projected on its own PitchBook curve, staggered across the deployment window.'}) : null;
     const methodNote=h('div',{style:{fontSize:11,color:'var(--muted)',lineHeight:1.45}}, method==='Catch-Up'?'Catch-Up: ahead-of-curve funds hold flat until the benchmark catches up (conservative).':'Scale factor: out/under-performance scales future curve distributions (cap '+(M.settings.sfCap)+'×, floor '+(M.settings.sfFloor)+'×).',' Expected-TVPI blend over 15y, terminal top-up closes the gap. Percentile = '+pct+'th PitchBook curve.');
+    /* items 22/23 — the cumulative-net-cash J-curve is the hero (full width, on top); Contributions vs Distributions sits BELOW it */
     return h('div',{style:{display:'flex',flexDirection:'column',gap:14}},
       h('div',{style:{display:'flex',gap:18,flexWrap:'wrap'}}, commitSlider, paceSlider),
       ctls.length?h('div',{style:{display:'flex',flexDirection:'column',gap:8}}, ctls):null,
       perf,
-      h('div',{style:{display:'flex',gap:14,flexWrap:'wrap'}},
-        this.card({title:'Contributions vs distributions ('+_cSym+'m / yr)',style:{flex:'1 1 360px'},children:cfBars,caption:'Capital calls (early) then distributions (later) — the engine of the J-curve.'}),
-        this.card({title:'Cumulative net cash flow — the J-curve',style:{flex:'1 1 360px'},children:jcurve,caption: combinedView?'Existing portfolio + new commitments = combined ('+pct+'th percentile). Existing funds anchored at their real age.':(L==='L1'?'Your projected net position over 15 years.':'Selected '+pct+'th percentile with 50th/90th bands. Toggle percentile above.')})),
+      this.card({title:'Cumulative net cash flow — the J-curve',children:jcurve,caption: combinedView?'Existing portfolio + new commitments = combined ('+pct+'th percentile). Existing funds anchored at their real age.':(L==='L1'?'Your projected net position over 15 years.':'Selected '+pct+'th percentile with 50th/90th bands. Toggle percentile above.')}),
+      this.card({title:'Contributions vs distributions ('+_cSym+'m / yr)',children:cfBars,caption:'Capital calls (early) then distributions (later) — the engine of the J-curve above.'}),
       grid,
       this.card({title:'How this is modelled',tight:true,children:methodNote}));
   }
