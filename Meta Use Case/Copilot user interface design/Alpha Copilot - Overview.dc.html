@@ -8046,6 +8046,7 @@ class Component extends DCLogic {
     /* L2/L3 = the real command center: delegate heavy steps to the full Investor-View bodies (all
        adjustors + built-in drill-ins). L3 renders in 'pro' depth, L2 in 'guided'. L1 stays light. */
     if(L!=='L1'){ const DELEG={overview:'homeOverviewBody', modelExisting:'homeOverviewBody',
+        setTarget:'simulatorBody', confirmTarget:'simulatorBody',
         simTarget:'simulatorBody', simExisting:'simulatorBody', simFull:'simulatorBody', targetSimulator:'simulatorBody',
         multiComparison:'comparisonBody', compareToCurrent:'comparisonBody', peerComparison:'comparisonBody',
         future:'futureBody', opportunities:'opportunitiesBody', missedOut:'opportunitiesBody',
