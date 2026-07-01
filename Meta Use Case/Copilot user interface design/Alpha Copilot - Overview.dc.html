@@ -711,13 +711,13 @@ class Component extends DCLogic {
     if(key==='platform') return this.MIX.platform;
     return this.peerData().mix; // peers
   }
-  benchLabel(key){ return {model:'Model',peers:'Peers',platform:'Platform',top10:'Top 10%',custom:'Custom',suggested:'Alpha',you:'You'}[key]||'Model'; }
+  benchLabel(key){ return {model:'Model',peers:'Peers',platform:'Platform',top10:'Top 10%',family:'Family offices',custom:'Custom',suggested:'Alpha',you:'You'}[key]||'Model'; }
   setSimCmp(dim,v){ this.setState({simCmp:{...this.state.simCmp,[dim]:v}}); }
   /* a benchmark group's TARGET allocation for ANY dimension (strategy uses real mixes; other dims tilt the model target deterministically) */
   dimBench(d,bench){ const keys=Object.keys(d.actual);
     if(bench==='model') return d.target;
-    if(d.key==='strategy'){ if(bench==='peers') return this.peerData().mix; if(bench==='platform') return this.MIX.platform; if(bench==='top10') return this.topMix(); }
-    const tilt={peers:[0.9,1.18],platform:[1.12,0.84],top10:[1.28,0.78]}[bench]||[1,1];
+    if(d.key==='strategy'){ if(bench==='peers') return this.peerData().mix; if(bench==='platform') return this.MIX.platform; if(bench==='top10') return this.topMix(); if(bench==='family') return (this.PRESETS['family-offices']||{}).mix||this.MIX.platform; }
+    const tilt={peers:[0.9,1.18],platform:[1.12,0.84],top10:[1.28,0.78],family:[1.06,0.9]}[bench]||[1,1];
     const out={}; keys.forEach((k,i)=>{ out[k]=Math.max(0,+(((d.target&&d.target[k])||d.actual[k]||0)*tilt[i%2]).toFixed(1)); }); return out; }
   cmpMix(cmp){
     if(cmp==='you') return this.MIX.you;
@@ -725,6 +725,7 @@ class Component extends DCLogic {
     if(cmp==='platform') return this.MIX.platform;
     if(cmp==='model') return this.modelMix();
     if(cmp==='top10') return this.topMix();
+    if(cmp==='family') return (this.PRESETS['family-offices']||{}).mix||this.MIX.platform; /* family-office peer group */
     return this.peerData().mix; // peers · custom
   }
   /* ---------- fine-grained strategy buckets (Comparison page) ---------- */
@@ -765,6 +766,7 @@ class Component extends DCLogic {
     if(key==='top10') return this.fineFromCoarse(this.topMix());
     if(key==='model') return this.modelFineMix();
     if(key==='harvard'||key==='yale'||key==='princeton'||key==='hyp') return this.ENDOWMENTS()[key]||{};
+    if(key==='family') return this.fineFromCoarse((this.PRESETS['family-offices']||{}).mix||this.MIX.platform); // family-office peer group
     return this.fineFromCoarse(this.peerData().mix); // peers · custom
   }
   /* items 57/64 — generic per-dimension comparison mixes: current, target, or any comparator group (peers/platform/top10/model/custom/endowments) */
@@ -1009,7 +1011,7 @@ class Component extends DCLogic {
   blChart(){
     const h=this.h; const cold=this.state.demoState==='cold';
     const cmp=this.state.cmp;
-    const cmpName = cmp==='platform'?'Platform':cmp==='model'?'Model':'Peers';
+    const cmpName = cmp==='platform'?'Platform':cmp==='model'?'Model':cmp==='family'?'Family offices':cmp==='top10'?'Top 10%':'Peers';
     const gated = (this.cohort().gated && cmp==='peers');
     const size='min(180px, 19vh)';
     const left = h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center'}},
@@ -1867,6 +1869,8 @@ class Component extends DCLogic {
     return follow.concat([
       {icon:'⏳',logo:'ares',fund:'Ares Private Credit III',unread:true,title:'Ares Private Credit III is closing soon',body:'The fund that closes your biggest gap (private credit) is 64% filled — first close imminent.',cta:'Ensure your allocation',act:()=>this.goOppFromNotif()},
       {icon:'⏳',logo:'general-atlantic',fund:'GA AI Opportunities',unread:true,title:'GA AI Opportunities is closing soon',body:'A top-ten performing manager just invested; the first-close window is open.',cta:'Ensure your first-close discount',act:()=>this.goOppFromNotif()},
+      {icon:'📤',logo:'kkr',fund:'KKR North America XIII',unread:true,title:'KKR just exited Axel Springer',body:'A position in KKR North America XIII — a fund you hold — was realised at ~2.4×. A distribution to LPs is expected to follow.',cta:'See the news',act:()=>this.goOppFromNotif()},
+      {icon:'🚀',logo:'general-atlantic',fund:'GA AI Opportunities',unread:true,title:'Anthropic has filed to IPO',body:'A company held in your AI sleeve (via GA AI Opportunities) is going public — secondary access may open for followers.',cta:'See the news',act:()=>this.goOppFromNotif()},
       {icon:'💶',logo:'eqt',fund:'EQT IX',unread:true,title:'Distribution received — EQT IX',body:'EQT IX returned €120k to your account; your DPI moved to 1.1×.',cta:'Put it back to work',act:()=>this.goOppFromNotif()},
       {icon:'📈',fund:null,unread:false,title:'Quarterly NAV updated',body:'Your portfolio NAV is €16.6m (+€0.6m this quarter).',cta:'View your performance',act:()=>this.setState({showNotif:false,ws:'understand',uc:'t1-12',page:'review',homeLaunched:true,deepLink:null,homePop:null})},
       {icon:'📄',logo:'ares',fund:'Northwind Infra III',unread:false,title:'New capital call — Northwind Infra III',body:'A €60k call is scheduled for next quarter; your liquidity buffer covers it comfortably.',cta:'Review liquidity',act:()=>this.setState({showNotif:false,ws:'understand',uc:'t1-7',page:'calls',homeLaunched:true,deepLink:null,homePop:null})}
@@ -2430,7 +2434,7 @@ class Component extends DCLogic {
       'Peers = people like you (age group \u00b7 risk class \u00b7 profession). Custom = any profile you define. Click to refine.');
 
     const cmpLever = this.leverRow('Compare canvas against',
-      wseg([{label:'Peers',value:'peers'},{label:'Platform',value:'platform'},{label:'Model',value:'model'}], s.cmp, v=>this.setState({cmp:v})),
+      wseg([{label:'Peers',value:'peers'},{label:'Platform',value:'platform'},{label:'Model',value:'model'},{label:'Family offices',value:'family'}], s.cmp, v=>this.setState({cmp:v})),
       'The reference series drawn beside “You” on every chart.');
 
     const optimiseLever = this.leverRow('Optimise for',
@@ -5972,7 +5976,7 @@ class Component extends DCLogic {
     };
     // ---- one card PER dimension (strategy, region, currency, sector): your target pie + side legend, with a 'compare against' selector under it; Custom opens sliders + numeric % inputs + risk strategies ----
     /* item 67 — only Model / Peers / Platform / Top 10% / Custom (no 'current' here) */
-    const CMP=[['model','Model'],['peers','Peers'],['platform','Platform'],['top10','Top 10%'],['custom','Custom']];
+    const CMP=[['model','Model'],['peers','Peers'],['platform','Platform'],['top10','Top 10%'],['family','Family offices'],['custom','Custom']];
     const dimTargetCard=(d)=>{
       const cats=Object.keys(d.actual);
       const tObj=targets[d.key]||d.target||d.actual;
@@ -5982,8 +5986,8 @@ class Component extends DCLogic {
       const compMix = mode==='custom'? tObj : (mode==='model'? d.target : this.dimBench(d,mode));
       const compTot=cats.reduce((a,k)=>a+(+compMix[k]||0),0)||1;
       const compSlices=cats.map(k=>({color:d.colors[k]||'--data-9',p:+(((+compMix[k]||0)/compTot*100)).toFixed(1),n:nm(d.key,k)})).filter(x=>x.p>0);
-      const compLabel={model:'the Model target',peers:'the Peers’ target',platform:'the Platform target',top10:'the Top 10% target',custom:'your custom group'}[mode];
-      const compShort={model:'Model',peers:'Peers',platform:'Platform',top10:'Top 10%',custom:'Custom'}[mode];
+      const compLabel={model:'the Model target',peers:'the Peers’ target',platform:'the Platform target',top10:'the Top 10% target',family:'the Family-office mix',custom:'your custom group'}[mode];
+      const compShort={model:'Model',peers:'Peers',platform:'Platform',top10:'Top 10%',family:'Family offices',custom:'Custom'}[mode];
       /* item 70 — Z-chart instead of the table */
       const zRows=cats.map(k=>{ const yv=Math.round((+tObj[k]||0)/tot*100); const cv=Math.round((+compMix[k]||0)/compTot*100); const dd=+(yv-cv).toFixed(1); return {name:nm(d.key,k),delta:dd,color:d.colors[k]||'--data-9',sig:Math.abs(dd)>=2}; }).filter(r=>r.delta!==0).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
       /* item 68 — left: my target · middle: the comparator · right: the Z-chart */
@@ -6579,8 +6583,8 @@ class Component extends DCLogic {
     const h=this.h; const SF=this.SF; const s=this.state;
     const cmp=(s.cmp==='you'?'peers':s.cmp)||'peers';
     const co=this.cohort(); const empty=this.dbEmpty();
-    const cmpShort={peers:'Peer avg',model:'Model',platform:'Platform',top10:'Top 10%',custom:'Custom group'}[cmp]||this.cmp2Short(cmp)||'Peer avg'; /* items 60/61 — endowment labels */
-    const cmpLong={peers:'your peer group',model:'the Moonfare model',platform:'the platform',top10:'the top 10%',custom:'your custom group'}[cmp]||(this.cmp2Label(cmp)+' (endowment)')||'your peers';
+    const cmpShort={peers:'Peer avg',model:'Model',platform:'Platform',top10:'Top 10%',family:'Family offices',custom:'Custom group'}[cmp]||this.cmp2Short(cmp)||'Peer avg'; /* items 60/61 — endowment labels; family-office peer group */
+    const cmpLong={peers:'your peer group',model:'the Moonfare model',platform:'the platform',top10:'the top 10%',family:'family offices',custom:'your custom group'}[cmp]||(this.cmp2Label(cmp)+' (endowment)')||'your peers';
 
     // ---- Ask Alpha insights (respond to the comparator + cohort filters) ----
     const youFine=this.fineMix('you'); const cFine=this.fineMix(cmp);
@@ -6611,10 +6615,10 @@ class Component extends DCLogic {
               style:{border:'1px solid rgba(140,141,255,.5)',background:'rgba(140,141,255,.14)',color:'#cfd0ff',borderRadius:9,padding:'7px 12px',fontSize:12,fontWeight:600,cursor:'pointer',textAlign:'left'}}, '✦ '+q)))));
 
     // ---- benchmark-against toggle: Peers · Model · Platform · Top 10% · Custom (drives every strategy chart below) ----
-    const cmpHint={peers:'n = '+co.n+' investors like you',model:'Moonfare house-view · '+this.riskLabel(),platform:'all '+this.PLATFORM_TOTAL+' platform investors',top10:'top 10% performers on the platform',custom:'n = '+co.n+' · refine the group in the control panel →'}[cmp]||'';
+    const cmpHint={peers:'n = '+co.n+' investors like you',model:'Moonfare house-view · '+this.riskLabel(),platform:'all '+this.PLATFORM_TOTAL+' platform investors',top10:'top 10% performers on the platform',family:'n = '+(((this.PRESETS['family-offices']||{}).n)||64)+' single & multi-family offices',custom:'n = '+co.n+' · refine the group in the control panel →'}[cmp]||'';
     const toggleRow=h('div',{style:{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}},
       h('span',{style:{fontSize:11,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)'}},'Benchmark against'),
-      this.seg([{label:'Peers',value:'peers'},{label:'Model',value:'model'},{label:'Platform',value:'platform'},{label:'Top 10%',value:'top10'},{label:'Custom',value:'custom'}], cmp, v=>this.setComparator(v,true),{sm:true}), /* review4 item 2 — Peers auto-selects investor's profile; Custom clears */
+      this.seg([{label:'Peers',value:'peers'},{label:'Model',value:'model'},{label:'Platform',value:'platform'},{label:'Top 10%',value:'top10'},{label:'Family offices',value:'family'},{label:'Custom',value:'custom'}], cmp, v=>this.setComparator(v,true),{sm:true}), /* review4 item 2 — Peers auto-selects investor's profile; Custom clears; family = family-office peer group */
       h('span',{style:{fontSize:11.5,color:'var(--muted)'}}, cmpHint));
 
     // ---- row 1 (STATIC — never changes with the toggle): Private Markets allocation · Fill rate ----
@@ -6662,7 +6666,7 @@ class Component extends DCLogic {
       endowOpts.map(([v,l])=>{ const on=cmp===v; return h('button',{key:v,onClick:()=>this.setState({cmp:v}),
         style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 12px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}}, '🎓 '+l); })) : null;
     /* review4 items 9-10 — the page 'Benchmark against' section is gone; give this card its own comparator selector in 'others' mode */
-    const dimCmpSel = pieMode==='others'? this.seg([{label:'Peers',value:'peers'},{label:'Model',value:'model'},{label:'Platform',value:'platform'},{label:'Top 10%',value:'top10'},{label:'Custom',value:'custom'}], cmp, v=>this.setComparator(v,false),{sm:true}) : null;
+    const dimCmpSel = pieMode==='others'? this.seg([{label:'Peers',value:'peers'},{label:'Model',value:'model'},{label:'Platform',value:'platform'},{label:'Top 10%',value:'top10'},{label:'Family offices',value:'family'},{label:'Custom',value:'custom'}], cmp, v=>this.setComparator(v,false),{sm:true}) : null;
     const dimControls=h('div',{style:{display:'flex',gap:10,flexWrap:'wrap',marginBottom:12,alignItems:'center'}}, modeSel, pieMode==='others'? selfSel : null, dimCmpSel, endowRow);
     const dimPieCard=this.card({title:dimLabel+' — your mix', right:dimSel,
       children: empty? this.cmpEmpty() : h('div',null, dimControls, dimDonutPair, dimLegend),
@@ -7173,6 +7177,48 @@ class Component extends DCLogic {
     if(since>=14) return {tag:'Solid — worth following',tone:'brand',why:'Dependable '+since+'% since inception with steady delivery. A core hold; follow for the next platform offering.'};
     return {tag:'Selective',tone:'muted',why:'Returns are mid-pack — follow, but be selective about which fund you back.'};
   }
+  /* ================= NEWS FEED — fund pages · manager pages · personalised to the portfolio ================= */
+  NEWS(){ return (this.DB&&!this.dbEmpty()&&this.DB.news) || this._newsFallback(); }
+  _newsFallback(){ return { events:[
+    {logo:'kkr', mgr:'KKR', tag:'Exit', title:'KKR exits Axel Springer at ~2.4×', body:'KKR has completed the sale of its remaining stake in Axel Springer, crystallising a ~2.4× gross return. LPs in KKR North America XIII should expect a distribution in the coming weeks.', time:'2h ago'},
+    {logo:'general-atlantic', mgr:'Anthropic', tag:'IPO', title:'Anthropic files to go public', body:'Anthropic — held across several growth & AI vehicles on the platform — has confidentially filed for an IPO, a potential liquidity event for AI-sleeve holders.', time:'1d ago'},
+    {logo:'ares', mgr:'Ares', tag:'Fundraise', title:'Ares closes its latest private-credit fund above target', body:'Ares held a final close on its newest private-credit vehicle above its target size — a signal of continued institutional demand for the strategy.', time:'2d ago'},
+    {logo:'eqt', mgr:'EQT', tag:'Deal', title:'EQT to acquire a European healthcare platform', body:'EQT agreed to take a majority position in a healthcare-services group, deepening its buyout healthcare exposure.', time:'3d ago'},
+    {logo:'general-atlantic', mgr:'General Atlantic', tag:'IPO', title:'Databricks weighs a 2026 public listing', body:'A widely-held late-stage growth name is reportedly preparing to list — closely watched by growth & venture LPs.', time:'5d ago'}
+  ] }; }
+  newsTagColor(tag){ return {Exit:'--over', IPO:'--data-2', Fundraise:'--data-1', Deal:'--data-6', Distribution:'--over', Performance:'--data-5', Strategy:'--data-3', 'New fund':'--brand', Portfolio:'--brand'}[tag]||'--brand'; }
+  newsRow(n){ const h=this.h; const col='var('+(this.newsTagColor(n.tag))+')';
+    return h('div',{key:n.title,style:{display:'flex',gap:12,padding:'12px 0',borderBottom:'1px solid var(--line)'}},
+      (n.logo? h('img',{src:'assets/logos/'+n.logo+'.png',alt:'',onError:e=>{e.target.style.display='none';},style:{width:34,height:34,flex:'0 0 34px',borderRadius:8,background:'#fff',border:'1px solid var(--line)',padding:4,objectFit:'contain'}}) : h('div',{style:{width:34,height:34,flex:'0 0 34px',borderRadius:8,background:'var(--surface-2)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:15}},'📰')),
+      h('div',{style:{flex:1,minWidth:0}},
+        h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:2,flexWrap:'wrap'}},
+          h('span',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:'#fff',background:col,borderRadius:5,padding:'1px 7px'}},n.tag),
+          h('span',{style:{fontSize:10.5,color:'var(--muted)'}}, n.time)),
+        h('div',{style:{fontSize:13.5,fontWeight:600,color:'var(--ink)',lineHeight:1.35}}, n.title),
+        h('div',{style:{fontSize:12,color:'var(--muted)',lineHeight:1.5,marginTop:2}}, n.body))); }
+  newsCard(title, items, caption, opts){ const h=this.h; opts=opts||{}; items=(items||[]).slice(0, opts.limit||6); if(!items.length) return null;
+    return this.card({title:title, badge: opts.badge===false? null : this.badge('news feed','synth'), right: opts.right||null,
+      children: h('div',null, items.map((n)=>this.newsRow(n))),
+      caption: caption||'Recent activity — exits, IPOs, fundraises and deals.'}); }
+  _evByLogo(logo){ if(!logo) return []; return (this.NEWS().events||[]).filter(e=>e.logo===logo); }
+  mgrNews(m){ if(!m) return []; const logo=this.mgrLogo?this.mgrLogo(m):null; const md=(this.mgrMeta?this.mgrMeta(m):{})||{}; const strategies=(m.classes||[]).map(c=>c.ac); const bw=(this.mgrBestWorst?this.mgrBestWorst(m):{})||{};
+    const gen=[];
+    if(bw.best) gen.push({logo:logo, tag:'Performance', title:m.name+' marks up '+bw.best.name, body:'Latest quarterly marks lift '+bw.best.name+' to '+bw.best.irr+'% net IRR ('+bw.best.ac+', vintage '+bw.best.vintage+') — among the firm’s strongest funds.', time:'1w ago'});
+    if(md.offering) gen.push({logo:logo, tag:'New fund', title:m.name+' opens '+md.offering+' on Moonfare', body:md.offering+' is now accessible to qualified investors — first-close pricing while the window is open.', time:'2w ago'});
+    if(strategies[0]) gen.push({logo:logo, tag:'Strategy', title:m.name+' concentrates further in '+strategies[0], body:'The firm continues to deploy into '+strategies.slice(0,2).join(' & ')+', its core competency across '+(md.nFunds||'multiple')+' funds.', time:'3w ago'});
+    return this._evByLogo(logo).concat(gen); }
+  fundNews(f, m){ if(!f) return []; const det=(this.fundDetail?this.fundDetail(f):{})||{}; const logo=f.logo||(m&&this.mgrLogo?this.mgrLogo(m):null); const gen=[];
+    if(det.pipeline) gen.push({logo:logo, tag:'Fundraise', title:f.name+' is drawing down capital', body:'About '+det.called+'% of commitments have been called as the fund deploys into '+f.ac+'.', time:'2w ago'});
+    else gen.push({logo:logo, tag:'Distribution', title:f.name+' returned capital to LPs', body:f.name+' now sits at '+det.dpi+'x DPI ('+f.irr+'% net IRR) after its latest distribution.', time:'2w ago'});
+    gen.push({logo:logo, tag:'Deal', title:(m?m.name:'The manager')+' adds a '+f.ac+' position in '+f.name, body:'A new portfolio company joined '+f.name+' this quarter, extending its '+f.ac+' exposure.', time:'1mo ago'});
+    return this._evByLogo(logo).concat(gen); }
+  portfolioNews(){ const held=this.HELD_FUNDS()||[]; const byLogo={}; held.forEach(f=>{ if(f.logo && !byLogo[f.logo]) byLogo[f.logo]=f; });
+    const ev=(this.NEWS().events||[]).filter(e=>byLogo[e.logo]).map(e=>{ const f=byLogo[e.logo]; return Object.assign({}, e, {body:e.body+' You hold '+f.name+' ('+f.strat+').'}); });
+    const gen=[]; const num=(x)=>parseFloat(String(x).replace(/[^0-9.\-]/g,''))||0;
+    const top=held.slice().sort((a,b)=>num(b.contrib)-num(a.contrib)); const best=top[0], worst=top[top.length-1];
+    if(best) gen.push({logo:best.logo, tag:'Portfolio', title:best.name+' is your top contributor this quarter', body:best.note||(best.name+' moved up on the latest marks.'), time:'This quarter'});
+    if(worst&&worst!==best) gen.push({logo:worst.logo, tag:'Portfolio', title:'Watch — '+worst.name, body:worst.note||(worst.name+' is the biggest detractor this quarter.'), time:'This quarter'});
+    return ev.concat(gen); }
   managerProfileBody(){
     const h=this.h; const SF=this.SF; const s=this.state; const m=this.mgrById(s.mgrProfile); if(!m) return this.managerOverviewBody();
     const md=this.mgrMeta(m); const since=md.since||this.mgrAllTimeIrr(m); const cons=this.mgrCons(m);
@@ -7288,9 +7334,10 @@ class Component extends DCLogic {
           h('button',{onClick:()=>this.askFromPage('How does '+m.name+' fit my goals and where are the risks for me?'),style:{border:'1px solid rgba(255,255,255,.55)',background:'transparent',color:'#fff',borderRadius:9,padding:'9px 14px',fontSize:12,fontWeight:600,cursor:'pointer'}},'Ask Alpha a follow-up →'))),
       caption:'Tailored to your profile — not a generic fund pitch.'});
 
+    const mgrNewsCard=this.newsCard('News — '+m.name, this.mgrNews(m), m.name+' in the news — exits, fundraises, deals and performance updates across the firm.');
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}}, back, heroBanner, header, kpis, aiBest, decision, actions,
       this.twoCol(scoresCard, callDistCard, '1.1fr .9fr'),
-      bestWorst, fundsListCard, docsCard);
+      bestWorst, fundsListCard, mgrNewsCard, docsCard);
   }
   /* individual FUND research page — fund-specific only (no consistency score; a single fund has no consistency) */
   fundResearchBody(){
@@ -7331,7 +7378,8 @@ class Component extends DCLogic {
             : [f.name+' has delivered ',h('strong',{key:'i',style:{color:'#fff'}},f.irr+'% net IRR'),' ('+det.dpi+'x DPI). For your '+this.riskLabel()+' profile it adds '+f.ac+' exposure — assess it against your current '+f.ac+' weight before committing.']),
         h('button',{onClick:()=>this.askFromPage('Is '+f.name+' a good fit for my portfolio and my '+f.ac+' exposure?'),style:{alignSelf:'flex-start',border:'1px solid rgba(255,255,255,.55)',background:'transparent',color:'#fff',borderRadius:9,padding:'9px 14px',fontSize:12,fontWeight:600,cursor:'pointer'}},'Ask Alpha a follow-up →')),
       caption:'Tailored to your profile — what this single fund means for you.'});
-    return h('div',{style:{display:'flex',flexDirection:'column',gap:16}}, back, header, kpis, aiBest, cdCard);
+    const fundNewsCard=this.newsCard('News — '+f.name, this.fundNews(f,m), 'Recent activity on '+f.name+' and '+(m?m.name:'its manager')+'.');
+    return h('div',{style:{display:'flex',flexDirection:'column',gap:16}}, back, header, kpis, aiBest, cdCard, fundNewsCard);
   }
   /* highlighted product on Funds & Managers — Moonfare Technology Fund (data-driven via DB.featured) */
   FEATURED_FUND(){ return (this.DB&&!this.dbEmpty()&&this.DB.featured) || {
@@ -7589,9 +7637,13 @@ class Component extends DCLogic {
     const waitlistSection = wl.length? h('div',{style:{display:'flex',flexDirection:'column',gap:12,marginTop:8}},
       h('div',{style:{fontFamily:SF,fontSize:20,fontWeight:700}},'Waitlist Funds ('+wl.length+')'),
       wl.map(f=>this.waitlistCard(f))) : null;
+    const newsSection=h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(320px,1fr))',gap:16}},
+      this.newsCard('News for your portfolio', this.portfolioNews(), 'Personalised to the funds & managers you hold — exits, IPOs and updates that touch your positions.'),
+      this.newsCard('Across the platform', (this.NEWS().events||[]), 'Notable moves from managers on Moonfare — KKR exits, IPO filings, fund closes and deals.'));
     return h('div',{style:{display:'flex',flexDirection:'column',gap:16}},
       hero,
       featuredHead, this.featuredFundCard(), /* highlight Moonfare Technology Fund at the top */
+      newsSection, /* news feed — personalised + platform-wide */
       scopeNote,
       searchBar,
       h('div',{style:{display:'flex',gap:16,justifyContent:'space-between',flexWrap:'wrap',alignItems:'center'}}, viewToggle, sortRow),
@@ -8055,6 +8107,49 @@ class Component extends DCLogic {
     const canvas=h('div',{style:{flex:1,minWidth:0,height:'100%',overflow:'auto',background:'var(--bg)',padding:'18px 26px 22px',display:'flex',flexDirection:'column'}}, crumb, focusBanner, contentWrap, cFooter);
     return h('div',{style:{position:'fixed',inset:0,zIndex:60,display:'flex',flexDirection:'column',background:'var(--bg)'}}, topbar, h('div',{style:{flex:1,display:'flex',minHeight:0}}, rail, canvas));
   }
+  /* Follower opt-in — render a single notification exactly as the investor would receive it on their
+     preferred channel (WhatsApp business message / in-app push / on-website toast). Skeuomorphic device
+     mocks: WhatsApp keeps its native greens for authenticity; in-app & website use the Moonfare surface. */
+  followerChannelPreview(chan, n){
+    const h=this.h; const SF=this.SF; const brand='var(--brand)'; const ink='var(--ink)';
+    const mIcon=(sz,fs)=>h('div',{style:{width:sz,height:sz,flex:'0 0 '+sz+'px',borderRadius:sz>34?10:'50%',background:'var(--brand)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:800,fontSize:fs||14}},'M');
+    const verified=h('span',{title:'Verified business',style:{display:'inline-flex',alignItems:'center',justifyContent:'center',width:13,height:13,borderRadius:'50%',background:'#34B7F1',color:'#fff',fontSize:9,fontWeight:900,marginLeft:4}},'✓');
+    if(chan==='whatsapp'){
+      return h('div',{style:{width:320,maxWidth:'100%',borderRadius:26,overflow:'hidden',border:'8px solid #111',background:'#ECE5DD',boxShadow:'0 18px 44px rgba(0,0,0,.22)'}},
+        h('div',{style:{background:'#075E54',color:'#fff',padding:'12px 14px',display:'flex',alignItems:'center',gap:10}},
+          h('span',{style:{fontSize:16,opacity:.85}},'‹'),
+          h('div',{style:{width:34,height:34,borderRadius:'50%',background:'#fff',color:'#075E54',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:800}},'M'),
+          h('div',{style:{lineHeight:1.2}}, h('div',{style:{fontSize:14,fontWeight:600,display:'flex',alignItems:'center'}},'Moonfare',verified), h('div',{style:{fontSize:10.5,opacity:.8}},'business account · online'))),
+        h('div',{style:{padding:'16px 12px 20px',minHeight:190,backgroundImage:'radial-gradient(rgba(0,0,0,.035) 1px, transparent 1px)',backgroundSize:'14px 14px'}},
+          h('div',{style:{textAlign:'center',margin:'0 auto 14px',width:'fit-content',background:'#FCF4CB',color:'#5b5638',fontSize:10.5,borderRadius:7,padding:'3px 10px'}},'Today'),
+          h('div',{style:{maxWidth:'86%',background:'#fff',borderRadius:'2px 12px 12px 12px',padding:'9px 11px',boxShadow:'0 1px 1px rgba(0,0,0,.08)'}},
+            h('div',{style:{fontSize:13,fontWeight:700,color:'#111',marginBottom:3}}, (n.emoji||'🔔')+' '+n.title),
+            h('div',{style:{fontSize:12.5,color:'#222',lineHeight:1.5}}, n.body),
+            h('div',{style:{marginTop:8,paddingTop:8,borderTop:'1px solid #eee'}}, h('span',{style:{color:'#075E54',fontSize:12.5,fontWeight:600}},'📄 Open in Moonfare')),
+            h('div',{style:{textAlign:'right',fontSize:9.5,color:'#8a8a8a',marginTop:5}}, n.time))));
+    }
+    if(chan==='inapp'){
+      return h('div',{style:{width:320,maxWidth:'100%',borderRadius:26,overflow:'hidden',border:'8px solid #111',minHeight:230,background:'linear-gradient(160deg,#20243A,#3a3f63)',boxShadow:'0 18px 44px rgba(0,0,0,.22)',position:'relative',padding:'18px 12px'}},
+        h('div',{style:{textAlign:'center',color:'rgba(255,255,255,.9)'}}, h('div',{style:{fontFamily:SF,fontSize:40,fontWeight:300,letterSpacing:'-.02em'}},'9:41'), h('div',{style:{fontSize:12,opacity:.75,marginTop:-2}},'Tuesday, 1 July')),
+        h('div',{style:{marginTop:20,background:'rgba(250,250,248,.94)',backdropFilter:'blur(8px)',borderRadius:16,padding:'11px 12px',boxShadow:'0 8px 24px rgba(0,0,0,.28)'}},
+          h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:6}}, mIcon(22,11), h('span',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)'}},'Moonfare'), h('span',{style:{marginLeft:'auto',fontSize:10.5,color:'var(--muted)'}}, n.time)),
+          h('div',{style:{fontSize:13.5,fontWeight:700,color:ink,marginBottom:2}}, n.title),
+          h('div',{style:{fontSize:12.5,color:'#333',lineHeight:1.5}}, n.body)),
+        h('div',{style:{textAlign:'center',color:'rgba(255,255,255,.55)',fontSize:11,position:'absolute',left:0,right:0,bottom:12}},'swipe to open →'));
+    }
+    /* website — a Moonfare web toast in the corner of a browser frame */
+    return h('div',{style:{width:'100%',borderRadius:12,overflow:'hidden',border:'1px solid var(--line)',background:'var(--surface-2)',boxShadow:'0 14px 34px rgba(0,0,0,.10)'}},
+      h('div',{style:{display:'flex',alignItems:'center',gap:6,padding:'9px 12px',borderBottom:'1px solid var(--line)',background:'var(--surface)'}},
+        h('span',{style:{width:9,height:9,borderRadius:'50%',background:'#ff5f56'}}),h('span',{style:{width:9,height:9,borderRadius:'50%',background:'#ffbd2e'}}),h('span',{style:{width:9,height:9,borderRadius:'50%',background:'#27c93f'}}),
+        h('div',{style:{marginLeft:10,flex:1,background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:7,padding:'4px 10px',fontSize:11,color:'var(--muted)'}},'🔒 app.moonfare.com/portfolio')),
+      h('div',{style:{position:'relative',minHeight:150,padding:14,background:'var(--surface-2)'}},
+        h('div',{style:{position:'absolute',top:14,right:14,width:290,maxWidth:'80%',background:'var(--surface)',border:'1px solid var(--line)',borderLeft:'3px solid var(--brand)',borderRadius:12,padding:'12px 13px',boxShadow:'0 10px 28px rgba(0,0,0,.14)'}},
+          h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:6}}, mIcon(24,11), h('div',{style:{lineHeight:1.15}}, h('div',{style:{fontSize:12.5,fontWeight:700,color:ink}},'Moonfare'), h('div',{style:{fontSize:10,color:'var(--muted)'}},'Notification · '+n.time)), h('span',{style:{marginLeft:'auto',color:'var(--muted)',fontSize:14,cursor:'pointer'}},'✕')),
+          h('div',{style:{fontSize:13,fontWeight:700,color:ink,marginBottom:2}}, n.title),
+          h('div',{style:{fontSize:12,color:'var(--muted)',lineHeight:1.5}}, n.body),
+          h('button',{style:{marginTop:9,border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'6px 12px',fontSize:11.5,fontWeight:700,cursor:'pointer'}},'View →')),
+        h('div',{style:{opacity:.35,filter:'blur(.4px)',pointerEvents:'none'}}, h('div',{style:{width:'46%',height:13,background:'var(--line)',borderRadius:5,marginBottom:9}}), h('div',{style:{width:'80%',height:9,background:'var(--line)',borderRadius:5,marginBottom:7}}), h('div',{style:{width:'70%',height:9,background:'var(--line)',borderRadius:5,marginBottom:7}}), h('div',{style:{width:'60%',height:9,background:'var(--line)',borderRadius:5}}))));
+  }
   advPageRender(key){
     const h=this.h; const SF=this.SF; const c=this.advClient()||{}; const L=this.state.advLevel; const lvl=(a,b,cc)=>this.advLvl(a,b,cc);
     const P=(this.DB&&this.DB.portfolio)||{}; const pm=this.advPageMeta(key);
@@ -8156,16 +8251,16 @@ class Component extends DCLogic {
       }
       case 'changesSince': return wrap([ head('Since our last conversation','The highlights worth walking through.'),
         this.card({title:'What’s changed',badge:this.badge('talking points','synth'),children:h('div',{style:{display:'flex',flexDirection:'column',gap:10}}, [['📈','Databricks marked up','An outperformer in your book drove a quarter-on-quarter gain.'],['🤖','Heavy activity in AI & Tech','Several peers and top performers added exposure this quarter.'],['💶','Distribution received','Capital returned that we can put back to work.']].map((x,i)=>h('div',{key:i,style:{display:'flex',gap:11,alignItems:'flex-start'}}, h('span',{style:{fontSize:18}},x[0]), h('div',null, h('div',{style:{fontSize:13.5,fontWeight:600}},x[1]), h('div',{style:{fontSize:12,color:'var(--muted)',marginTop:2,lineHeight:1.45}},x[2])))))}) ]);
-      case 'peerComparison': { const pmYou=(this.PM&&this.PM.you)||15.7; const pmPeer=(this.DB&&this.DB.peer&&this.DB.peer.baseMedian)||8.9; const pmEnd=(this.PM&&this.PM.endow)||34;
-        const cats=lvl(['You','Peers','Your target'],['You','Peers','Your target'],['You','Peers','Your target','Endowments']);
-        const vals=lvl([pmYou,pmPeer,this.myPmTarget()],[pmYou,pmPeer,this.myPmTarget()],[pmYou,pmPeer,this.myPmTarget(),pmEnd]);
-        return wrap([ head('You vs your peers'+(L!=='L1'?' & endowments':''),'People with a profile like yours typically allocate quite differently.'),
-          this.card({title:'Private-markets allocation (%)',children:this.groupedBars(cats,[{name:'PM %',color:'--data-1',vals:vals}]),caption: L==='L1'?'Where you sit against comparable investors — and your own target.':'Against peers, your target'+(L==='L3'?' and the endowments — the institutional benchmark.':'.')}) ]); }
+      case 'peerComparison': { const pmYou=(this.PM&&this.PM.you)||15.7; const pmPeer=(this.DB&&this.DB.peer&&this.DB.peer.baseMedian)||8.9; const pmEnd=(this.PM&&this.PM.endow)||34; const pmFO=((this.PRESETS['family-offices']||{}).median)||18.6;
+        const cats=lvl(['You','Peers','Family offices','Your target'],['You','Peers','Family offices','Your target'],['You','Peers','Family offices','Your target','Endowments']);
+        const vals=lvl([pmYou,pmPeer,pmFO,this.myPmTarget()],[pmYou,pmPeer,pmFO,this.myPmTarget()],[pmYou,pmPeer,pmFO,this.myPmTarget(),pmEnd]);
+        return wrap([ head('You vs your peers & family offices'+(L==='L3'?' & endowments':''),'People with a profile like yours — and single/multi-family offices — typically allocate quite differently.'),
+          this.card({title:'Private-markets allocation (%)',children:this.groupedBars(cats,[{name:'PM %',color:'--data-1',vals:vals}]),caption: L==='L1'?'Where you sit against comparable investors, family offices — and your own target.':'Against peers, family offices, your target'+(L==='L3'?' and the endowments — the institutional benchmark.':'.')}) ]); }
       case 'multiComparison': { const fd=dimByName(focus); const dimSel=(d)=>h('div',{style:{display:'flex',gap:7,flexWrap:'wrap',marginBottom:12}}, [['strategy','Strategy']].concat((L!=='L1'?DIMS.filter(x=>x.key!=='strategy').map(x=>[x.key,x.label]):[])).map(o=>{ const on=(focus?String(focus).toLowerCase():'strategy')===o[1].toLowerCase()||(o[0]==='strategy'&&!fd); return h('button',{key:o[0],onClick:()=>this.setState({advFocus:o[0]==='strategy'?null:o[1]}),style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--ink)',borderRadius:999,padding:'5px 12px',fontSize:11.5,fontWeight:600,cursor:'pointer'}},o[1]); }));
         let chart, title;
         if(fd){ const cats=Object.keys(fd.actual||{}); title=fd.label+' allocation (%)'; chart=this.groupedBars(cats,[{name:'You',color:'--data-1',vals:cats.map(k=>fd.actual[k]||0)},{name:'Your target',color:'--data-5',vals:cats.map(k=>(fd.target||{})[k]||0)}]); }
-        else { const series=[{name:'You',color:'--data-1',vals:catVals(mixYou)},{name:'Platform',color:'--data-7',vals:catVals(mixPlat)},{name:'Model',color:'--data-5',vals:catVals(mixModel)}]; if(L==='L3'){ const endow=(this.DB&&this.DB.endowments&&this.DB.endowments.harvard)||{}; series.push({name:'Endowments',color:'--data-8',vals:strat.map(kv=>endow[kv[0]]||0)}); } title='Strategy allocation (%)'; chart=this.groupedBars(catLabels,series); }
-        return wrap([ head('Compare — peers, platform, model'+(L==='L3'?', endowments':''), lvl('','You against the platform and our model.','The full lens: platform, model, endowments and top-10% — the institutional view.')),
+        else { const foMix=(this.PRESETS['family-offices']||{}).mix||{}; const series=[{name:'You',color:'--data-1',vals:catVals(mixYou)},{name:'Platform',color:'--data-7',vals:catVals(mixPlat)},{name:'Model',color:'--data-5',vals:catVals(mixModel)},{name:'Family offices',color:'--data-10',vals:strat.map(kv=>foMix[kv[0]]||0)}]; if(L==='L3'){ const endow=(this.DB&&this.DB.endowments&&this.DB.endowments.harvard)||{}; series.push({name:'Endowments',color:'--data-8',vals:strat.map(kv=>endow[kv[0]]||0)}); } title='Strategy allocation (%)'; chart=this.groupedBars(catLabels,series); }
+        return wrap([ head('Compare — peers, platform, model, family offices'+(L==='L3'?', endowments':''), lvl('You against the platform, our model and family offices.','You against the platform, our model and family offices.','The full lens: platform, model, family offices, endowments and top-10% — the institutional view.')),
           dimSel(),
           this.card({title:title,children:chart,caption:fd?('Your '+fd.label.toLowerCase()+' mix vs your target — jumped here from the advisor script.'):'Higher bars = more weight to that strategy.'}) ]); }
       case 'compareToCurrent': { const fd=dimByName(focus);
@@ -8224,8 +8319,37 @@ class Component extends DCLogic {
         return wrap([ head('Seize this opportunity','Reserve interest now — you’ll be first in line when it opens. No commitment yet.'),
         this.card({title:'Reserve of interest',tone:'alpha',children:h('div',{style:{display:'flex',flexDirection:'column',gap:12}}, h('div',{style:{fontSize:14,lineHeight:1.55,color:'rgba(255,255,255,.92)'}},'Shall I reserve your interest? You’ll get a note the moment the allocation opens — and we’ll line up the paperwork so you don’t miss the window.'),
           h('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}}, h('button',{onClick:()=>this.setState({advSeized:true}),style:{border:'none',background:'#fff',color:'var(--brand-ink)',borderRadius:9,padding:'11px 18px',fontSize:13.5,fontWeight:700,cursor:'pointer'}},'Reserve interest →'), h('button',{onClick:()=>this.setState({advSeized:true}),style:{border:'1px solid rgba(255,255,255,.5)',background:'transparent',color:'#fff',borderRadius:9,padding:'11px 18px',fontSize:13.5,fontWeight:600,cursor:'pointer'}},'Request allocation')))}) ]); }
-      case 'follower': return wrap([ head('Follow what matters','Stay close between calls — the best way to keep the relationship warm.'),
-        this.card({title:'Opt-in',children:h('div',{style:{display:'flex',flexDirection:'column',gap:10}}, [['Your peer group','See what comparable investors are committing to.'],['Top-10% performers','Follow the platform’s strongest allocators.'],['Market & fund news','Alerts on your funds and timely themes.']].map((x,i)=>h('label',{key:i,style:{display:'flex',gap:11,alignItems:'flex-start',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:10,padding:'11px 13px',cursor:'pointer'}}, h('input',{type:'checkbox',defaultChecked:i<2,style:{marginTop:3}}), h('div',null,h('div',{style:{fontSize:13.5,fontWeight:600}},x[0]),h('div',{style:{fontSize:12,color:'var(--muted)',marginTop:2}},x[1]))))),caption:'Subscription to the follower feed — our most reliable way to keep nudging.'}) ]);
+      case 'follower': {
+        const chan=this.state.folChannel||'whatsapp';
+        const defTopics={peers:true,top10:true,news:false};
+        const topics=this.state.folTopics||defTopics;
+        const setTopic=(k)=>{ const n=Object.assign({},this.state.folTopics||defTopics); n[k]=!n[k]; this.setState({folTopics:n}); };
+        const OPT=[['peers','Your peer group','See what comparable investors — and family offices — are committing to.'],['top10','Top-10% performers','Follow the platform’s strongest allocators.'],['news','Market & fund news','KKR exits, IPOs and timely themes on the funds & managers you hold.']];
+        const optCard=this.card({title:'What to follow',children:h('div',{style:{display:'flex',flexDirection:'column',gap:10}}, OPT.map(x=>{ const on=!!topics[x[0]];
+          return h('label',{key:x[0],onClick:()=>setTopic(x[0]),style:{display:'flex',gap:11,alignItems:'flex-start',background:on?'var(--brand-wash)':'var(--surface-2)',border:'1px solid '+(on?'var(--brand-tint-3)':'var(--line)'),borderRadius:10,padding:'11px 13px',cursor:'pointer'}},
+            h('span',{style:{marginTop:2,width:17,height:17,flex:'0 0 17px',borderRadius:5,border:'1px solid '+(on?'var(--brand)':'var(--muted)'),background:on?'var(--brand)':'transparent',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:800}},on?'✓':''),
+            h('div',null,h('div',{style:{fontSize:13.5,fontWeight:600}},x[1]),h('div',{style:{fontSize:12,color:'var(--muted)',marginTop:2,lineHeight:1.4}},x[2]))); })),caption:'Subscription to the follower feed — our most reliable way to keep nudging between calls.'});
+        const CH=[['whatsapp','WhatsApp','🟢'],['inapp','In-app','📱'],['website','On website','🖥️']];
+        const chanCard=this.card({title:'Preferred notification method',children:h('div',null,
+          h('div',{style:{display:'flex',gap:8,flexWrap:'wrap'}}, CH.map(x=>{ const on=chan===x[0];
+            return h('button',{key:x[0],onClick:()=>this.setState({folChannel:x[0]}),style:{display:'flex',alignItems:'center',gap:7,border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--ink)',borderRadius:999,padding:'8px 15px',fontSize:12.5,fontWeight:on?700:500,cursor:'pointer'}}, h('span',null,x[2]), x[1]); })),
+          h('div',{style:{fontSize:12,color:'var(--muted)',marginTop:9,lineHeight:1.45}}, {whatsapp:'Delivered as a WhatsApp message from Moonfare’s verified business account.',inapp:'A push notification on the Moonfare mobile app — lands on the lock screen.',website:'An in-product toast the next time they’re signed in to moonfare.com.'}[chan])),caption:'Choose how ' + (c.name||'this investor') + ' hears from us — the preview updates live.'});
+        /* a real, relevant event drawn from the follow topics they’ve turned on */
+        const sample = topics.news
+          ? {emoji:'📈',title:'KKR just exited Axel Springer',body:'A holding inside KKR North America XIII — a fund you follow — was realised at ~2.4×. A distribution to LPs may follow in the coming weeks.',time:'2m ago'}
+          : topics.top10
+          ? {emoji:'🏆',title:'Top-10% allocators moved into Secondaries',body:'The platform’s strongest performers added Ardian Secondaries IX this quarter. It fits your under-weight in secondaries.',time:'1h ago'}
+          : {emoji:'👥',title:'3 investors like you committed to Buyout',body:'Peers and family offices in your band are deploying into large-cap buyout — see how you compare.',time:'Today'};
+        const preview=this.followerChannelPreview(chan, sample);
+        const right=h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:10}},
+          h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',color:'var(--muted)',alignSelf:'flex-start'}},'Live preview — '+({whatsapp:'WhatsApp',inapp:'In-app push',website:'On website'}[chan])),
+          preview,
+          h('div',{style:{fontSize:11.5,color:'var(--muted)',textAlign:'center',lineHeight:1.45,maxWidth:320}},'Exactly what ' + (c.name||'the investor') + ' would receive — content follows the topics selected on the left.'));
+        return wrap([ head('Follow what matters','Stay close between calls — pick the topics and see precisely how each alert lands on their preferred channel.'),
+          h('div',{style:{display:'grid',gridTemplateColumns:'minmax(0,1fr) minmax(320px,0.9fr)',gap:18,alignItems:'start'}},
+            h('div',{style:{display:'flex',flexDirection:'column',gap:16}}, optCard, chanCard),
+            this.card({title:'Notification preview',children:right})) ]);
+      }
       case 'backToKyc': return wrap([ head('Continue on Moonfare','You’ve seen the tease — now the handoff to accreditation.'),
         this.card({title:'What you’ve seen so far',children:h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, ['A tailored model portfolio built for your profile','Where you’d sit versus your peer group','How it could build out over the next years'].map((t,i)=>h('div',{key:i,style:{display:'flex',gap:8,fontSize:13,lineHeight:1.45}}, h('span',{style:{color:'var(--over)'}},'✓'), t))),caption:'Pre-Gate tease complete — no account needed up to here.'}),
         this.card({title:'Open your account — 3 quick steps',tone:'alpha',children:h('div',{style:{display:'flex',flexDirection:'column',gap:12}},
@@ -8369,12 +8493,13 @@ class Component extends DCLogic {
   /* ---------- captions / badges ---------- */
   renderVals(){
     const h=this.h; const s=this.state; const co=this.cohort(); const pd=this.peerData();
-    const cmpName=c=>c==='platform'?'Platform':c==='model'?'the Model':c==='you'?'You':'Peers';
+    const cmpName=c=>c==='platform'?'Platform':c==='model'?'the Model':c==='you'?'You':c==='family'?'Family offices':c==='top10'?'the Top 10%':'Peers';
     // BL caption
     const blCap = {
       peers:'Your buyout-heavy mix leans further into AI than your peers and lighter on private credit.',
       platform:'Compared with the whole platform, your mix concentrates more in growth and AI.',
       model:'Versus the recommended model for your risk profile, you over-index AI and under-index private credit.',
+      family:'Versus family offices, you run lighter on real assets and secondaries and heavier on AI and growth.',
       you:'Pick a comparison to see how your mix differs.'
     }[s.cmp];
     // BR caption
@@ -8442,7 +8567,7 @@ class Component extends DCLogic {
       // TR
       trBadge:this.badge(`n = ${pd.c.n} · ±1.5`), trChart:this.trChart(), trCaption:trCap, openTrData:()=>this.setState({dataModal:'tr'}),
       // BL
-      blBadge, blSelector:this.seg([{label:'Peers',value:'peers'},{label:'Platform',value:'platform'},{label:'Model',value:'model'}], s.cmp, v=>this.setState({cmp:v}),{sm:true}),
+      blBadge, blSelector:this.seg([{label:'Peers',value:'peers'},{label:'Platform',value:'platform'},{label:'Model',value:'model'},{label:'Family offices',value:'family'}], s.cmp, v=>this.setState({cmp:v}),{sm:true}),
       blChart:this.blChart(), blCaption:blCap,
       // BR
       brTitle:`Over / Under-weight vs ${cmpName(s.cmp)}`, brBadge,

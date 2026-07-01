@@ -12285,5 +12285,49 @@
       }
     },
     "step": 0.25
+  },
+  "news": {
+    "events": [
+      {
+        "logo": "kkr",
+        "mgr": "KKR",
+        "tag": "Exit",
+        "title": "KKR exits Axel Springer at ~2.4×",
+        "body": "KKR has completed the sale of its remaining stake in Axel Springer, crystallising a ~2.4× gross return. LPs in KKR North America XIII should expect a distribution in the coming weeks.",
+        "time": "2h ago"
+      },
+      {
+        "logo": "general-atlantic",
+        "mgr": "Anthropic",
+        "tag": "IPO",
+        "title": "Anthropic files to go public",
+        "body": "Anthropic — held across several growth & AI vehicles on the platform — has confidentially filed for an IPO, a potential liquidity event for AI-sleeve holders.",
+        "time": "1d ago"
+      },
+      {
+        "logo": "ares",
+        "mgr": "Ares",
+        "tag": "Fundraise",
+        "title": "Ares closes its latest private-credit fund above target",
+        "body": "Ares held a final close on its newest private-credit vehicle above its target size — a signal of continued institutional demand for the strategy.",
+        "time": "2d ago"
+      },
+      {
+        "logo": "eqt",
+        "mgr": "EQT",
+        "tag": "Deal",
+        "title": "EQT to acquire a European healthcare platform",
+        "body": "EQT agreed to take a majority position in a healthcare-services group, deepening its buyout healthcare exposure.",
+        "time": "3d ago"
+      },
+      {
+        "logo": "general-atlantic",
+        "mgr": "General Atlantic",
+        "tag": "IPO",
+        "title": "Databricks weighs a 2026 public listing",
+        "body": "A widely-held late-stage growth name is reportedly preparing to list — closely watched by growth & venture LPs.",
+        "time": "5d ago"
+      }
+    ]
   }
 }
