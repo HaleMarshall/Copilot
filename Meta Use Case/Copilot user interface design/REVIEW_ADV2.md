@@ -42,8 +42,8 @@ Source: ~/Downloads/Advisor View 2 review.zip (click-comments.md). Status: [ ] t
 - [x] 28. Remove the "act on your prediction" part.
 
 ## Next best / opportunities
-- [ ] 29. Next-best based on prior steps (not hard-coded); curated multi-fund PORTFOLIOS per strategy (buyout, AI&tech, etc.), not a single fund or the whole fund page.
-- [ ] 30. After selecting funds: show right-side pie of portfolio impact + comparison; drop the redundant re-simulate-target / re-peer-benchmark / re-manager-comparison steps.
+- [x] 29. Next-best based on prior steps (not hard-coded); curated multi-fund PORTFOLIOS per strategy (buyout, AI&tech, etc.), not a single fund or the whole fund page.
+- [x] 30. After selecting funds: show right-side pie of portfolio impact + comparison; drop the redundant re-simulate-target / re-peer-benchmark / re-manager-comparison steps.
 - [x] 31. Prefer an "Invest Now" button (over reserve-interest).
 
 ## Follower / notifications

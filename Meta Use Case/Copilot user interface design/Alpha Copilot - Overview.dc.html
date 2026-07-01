@@ -8463,11 +8463,39 @@ class Component extends DCLogic {
       case 'future': { const stg=this.state.advStage; const fScope=(stg==='existing'||stg==='inactive')?'combined':'new';
         return wrap([ head('Your future — commitments & J-curve', lvl('A simple projection — we’ve set sensible defaults.','Model the commitment pace and see the J-curve with percentile bands.','Full PitchBook engine — per-strategy curves, percentile & distribution-method toggles.')),
         this.cfModel({level:L, mix:this.modelMix(), forceScope:fScope}) ]); }
-      case 'nextBest': case 'nextBestHints': { const hints=key==='nextBestHints'; const items=[['1','Buy-out — the core building block','Start here: the largest, most proven block of a private-markets portfolio.'],['2','AI & Tech','A timely theme you signalled interest in — don’t miss the cycle.'],['3','Anthropic IPO access','A capacity-constrained opportunity we can offer right now.']];
-        return wrap([ head(hints?'A few ideas to get started':'Next best action — recommended sequence', hints?'Once your account’s set up, this is roughly the sequence we’d walk through.':'The sequence I’d suggest — start with what matters most for you.'),
-          h('div',{style:{display:'flex',flexDirection:'column',gap:12}}, items.map((it,i)=>this.card({key:i,title:it[1],children:h('div',{style:{fontSize:13,color:'var(--ink)',lineHeight:1.5}},it[2]),
-            right: hints?null:h('button',{onClick:()=>this.advStepTo(this.state.advStep+1),style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'8px 13px',fontSize:12,fontWeight:700,cursor:'pointer'}},'Open  →')}))),
-          lvl(lvlNote('L1 · portfolio products only — no individual funds or direct deals.'), lvlNote('L2 · portfolio products + individual funds (toggle).'), lvlNote('L3 · full universe incl. direct deals & co-invest.')) ]);
+      case 'nextBest': case 'nextBestHints': { const hints=key==='nextBestHints';
+        /* items 29/30 — next-best is derived from the client's actual gaps (not hard-coded), and each strategy
+           is filled with a CURATED PORTFOLIO of funds (not one fund, not the whole fund page). Selecting funds
+           updates a live portfolio-impact pie on the right — no need to re-simulate or re-benchmark afterwards. */
+        const isNew=this.state.advStage==='new'||this.state.advStage==='pregate';
+        const sel=this.state.advSelFunds||{};
+        const toggleFund=(f)=>{ const n=Object.assign({},this.state.advSelFunds||{}); if(n[f.id]) delete n[f.id]; else n[f.id]=f; this.setState({advSelFunds:n}); };
+        const gaps=strat.map(kv=>({k:kv[0],name:kv[1],color:kv[2], gap:+(((mixModel[kv[0]]||0)-(isNew?0:(mixYou[kv[0]]||0)))).toFixed(1)})).filter(g=>g.gap>1).sort((a,b)=>b.gap-a.gap).slice(0,3);
+        const fundRow=(f,stratKey)=>{ const on=!!sel[f.id];
+          return h('label',{key:f.id,onClick:()=>toggleFund({id:f.id,name:f.name,logo:f.logo,mgr:f.mgr,stratKey:stratKey}),style:{display:'flex',alignItems:'center',gap:10,padding:'9px 11px',border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',borderRadius:10,cursor:'pointer'}},
+            h('span',{style:{width:16,height:16,flex:'0 0 16px',borderRadius:5,border:'1px solid '+(on?'var(--brand)':'var(--muted)'),background:on?'var(--brand)':'transparent',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:800}},on?'✓':''),
+            (f.logo? h('img',{src:'assets/logos/'+f.logo+'.png',alt:'',onError:e=>{e.target.style.display='none';},style:{width:26,height:26,flex:'0 0 26px',borderRadius:6,background:'#fff',border:'1px solid var(--line)',padding:3,objectFit:'contain'}}):null),
+            h('div',{style:{flex:1,minWidth:0}}, h('div',{style:{fontSize:13,fontWeight:600}},f.name), h('div',{style:{fontSize:10.5,color:'var(--muted)'}},(f.mgr||'')+(f.close?' · closes '+f.close:'')))); };
+        const stratCards=gaps.map(g=>{ const funds=(this.oppFundsForStrat?this.oppFundsForStrat(g.name):[]).slice(0,3);
+          return this.card({key:g.k,title:g.name+' — a portfolio of funds', badge:this.badge('+'+g.gap+'pp to target','synth'),
+            children: funds.length? h('div',{style:{display:'flex',flexDirection:'column',gap:8}}, funds.map(f=>fundRow(f,g.k))) : h('div',{style:{fontSize:12.5,color:'var(--muted)'}},'Curated '+g.name+' funds load here.'),
+            caption:'A curated set of '+g.name+' funds — spread the sleeve across managers rather than a single fund.'}); });
+        /* portfolio impact of the picks */
+        const selArr=Object.keys(sel).map(k=>sel[k]); const nSel=selArr.length;
+        const baseMix=isNew? Object.assign({}, mixModel) : Object.assign({}, mixYou);
+        const impMix=Object.assign({}, baseMix); const perFund=nSel? Math.min(6, 18/Math.max(1,nSel)) : 0;
+        selArr.forEach(f=>{ if(f.stratKey) impMix[f.stratKey]=(impMix[f.stratKey]||0)+perFund; });
+        const impSlices=toSlices(impMix);
+        const impactCard=this.card({title:'Your portfolio with these picks', badge:this.badge(nSel+' selected','conf'),
+          children:h('div',null,
+            nSel? this.donutNamed(impSlices,160,'New','mix') : h('div',{style:{fontSize:12.5,color:'var(--muted)',padding:'24px 0',textAlign:'center'}},'Select funds on the left to see how they reshape the portfolio.'),
+            nSel? h('div',{style:{marginTop:10,fontSize:12,color:'var(--ink)',lineHeight:1.5}}, nSel+' fund'+(nSel>1?'s':'')+' across '+(new Set(selArr.map(f=>f.stratKey)).size)+' '+(new Set(selArr.map(f=>f.stratKey)).size>1?'strategies':'strategy')+' — this is the portfolio you’d take into commitment.') : null,
+            nSel? h('button',{onClick:()=>this.advNext(),style:{marginTop:12,border:'none',background:'var(--brand)',color:'#fff',borderRadius:9,padding:'10px 16px',fontSize:12.5,fontWeight:700,cursor:'pointer'}},'Take these to commitment  →') : null),
+          caption:'Live impact of the funds you select — compared against your current mix. No need to re-simulate or re-benchmark; you’ve already done that.'});
+        return wrap([ head(hints?'A few ideas to get started':'Next best action — curated portfolios', hints?'Once the account’s set up, these are the sleeves we’d build — each as a small portfolio of funds.':'Filled from your actual gaps — each strategy is a curated portfolio of funds. Tick the ones to take forward and watch the portfolio update.'),
+          h('div',{style:{display:'grid',gridTemplateColumns:'minmax(0,1.3fr) minmax(280px,1fr)',gap:16,alignItems:'start'}},
+            h('div',{style:{display:'flex',flexDirection:'column',gap:14}}, stratCards.length?stratCards:h('div',{style:{fontSize:13,color:'var(--muted)'}},'Your mix is close to target — no material gaps to fill.')),
+            impactCard) ]);
       }
       case 'simTarget': case 'simExisting': case 'simFull': case 'targetSimulator': {
         const dimChoices=lvl(['Strategy'],['Strategy','Region','Currency','Sector'],['Strategy','Region','Currency','Sector','Vintage','Format']);

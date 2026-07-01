@@ -3714,7 +3714,6 @@
       "intakeMin",
       "aiThinking",
       "modelPortfolio",
-      "peerComparison",
       "future",
       "nextBestHints",
       "backToKyc"
@@ -3724,7 +3723,6 @@
       "intakeMin",
       "aiThinking",
       "modelPortfolio",
-      "peerComparison",
       "future",
       "nextBestHints",
       "backToKyc"
@@ -3734,7 +3732,6 @@
       "intakeMin",
       "aiThinking",
       "modelPortfolio",
-      "peerComparison",
       "future",
       "nextBestHints",
       "backToKyc"
@@ -3747,7 +3744,6 @@
       "modelPortfolio",
       "future",
       "nextBest",
-      "simTarget",
       "seize"
     ],
     "new|L2": [
@@ -3759,8 +3755,6 @@
       "multiComparison",
       "future",
       "nextBest",
-      "simTarget",
-      "peerComparison",
       "seize",
       "follower"
     ],
@@ -3770,13 +3764,10 @@
       "setTarget",
       "modelPortfolio",
       "multiComparison",
-      "future",
-      "nextBest",
-      "fundComparison",
-      "simTarget",
-      "multiComparison",
       "managerComparison",
       "fundComparison",
+      "future",
+      "nextBest",
       "seize",
       "follower"
     ],
@@ -3791,7 +3782,6 @@
       "compareToCurrent",
       "future",
       "nextBest",
-      "simExisting",
       "seize"
     ],
     "existing|L2": [
@@ -3803,10 +3793,9 @@
       "overview",
       "changesSince",
       "multiComparison",
-      "future",
       "compareToCurrent",
+      "future",
       "nextBest",
-      "simExisting",
       "seize",
       "follower"
     ],
@@ -3814,15 +3803,14 @@
       "execSummary",
       "intake",
       "confirmTarget",
-      "simFull",
       "overview",
       "changesSince",
-      "targetSimulator",
       "compareToCurrent",
-      "future",
-      "nextBest",
+      "multiComparison",
       "managerComparison",
       "fundComparison",
+      "future",
+      "nextBest",
       "seize",
       "follower"
     ],
@@ -3840,7 +3828,6 @@
       "compareToCurrent",
       "future",
       "nextBest",
-      "simExisting",
       "seize"
     ],
     "inactive|L2": [
@@ -3858,7 +3845,6 @@
       "multiComparison",
       "future",
       "nextBest",
-      "simExisting",
       "seize",
       "follower"
     ],
@@ -3869,15 +3855,14 @@
       "seize",
       "intake",
       "confirmTarget",
-      "simFull",
       "overview",
       "changesSince",
-      "targetSimulator",
       "compareToCurrent",
-      "future",
-      "nextBest",
+      "multiComparison",
       "managerComparison",
       "fundComparison",
+      "future",
+      "nextBest",
       "seize",
       "follower"
     ]
