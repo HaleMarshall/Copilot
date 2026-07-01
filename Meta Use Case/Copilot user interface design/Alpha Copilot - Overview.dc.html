@@ -403,10 +403,11 @@
         <h1 style="font-family:'Source Serif 4',Georgia,serif;font-size:42px;font-weight:600;margin:0 0 12px;letter-spacing:-.01em">Welcome to Alpha</h1>
         <p style="font-size:17px;margin:0 0 18px;color:var(--ink)">Your AI-augmented private-markets advisor.</p>
         <p style="font-size:14px;line-height:1.6;color:var(--muted);margin:0 0 10px">This tool allows you to build your tailored private-markets portfolio by your own. You can simulate your portfolio. You can compare yourself against peers, the platform, house view, model portfolios, or Harvard / Princeton endowments and many more applications.</p>
-        <p style="font-size:14px;line-height:1.6;color:var(--muted);margin:0 0 26px">Ask Alpha for context only. The chart answers are grounded on Moonfare's set of proprietary data.</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <p style="font-size:14px;line-height:1.6;color:var(--muted);margin:0 0 22px">Ask Alpha for context only. The chart answers are grounded on Moonfare's set of proprietary data.</p>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Choose your view</div>
+        {{ welcomeRoles }}
+        <div style="display:flex;align-items:center;justify-content:flex-start;gap:12px;margin-top:20px">
           <span style="font-size:11px;color:var(--muted)">Synthetic demo data · snapshot 2026-06-14</span>
-          <button onClick="{{ enterApp }}" style="background:var(--brand);color:#fff;border:none;border-radius:999px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer">Enter Alpha →</button>
         </div>
       </div>
     </div>
@@ -1623,6 +1624,25 @@ class Component extends DCLogic {
   modeMenu(){
     const h=this.h;
     return this.seg([{label:'Investor',value:'Investor'},{label:'Advisor',value:'Advisor'},{label:'Internal',value:'Internal'}], this.state.mode, v=>this.setState({mode:v,actingAs:null}), {sm:true});
+  }
+  /* welcome screen — pick a view (Investor / Advisor / Internal); the app view changes by choice */
+  enterAs(mode){ const base={welcome:false, mode:mode, actingAs:null, homeLaunched:false};
+    if(mode==='Advisor'){ base.advView='desk'; base.ws='understand'; }
+    else { base.ws='understand'; base.showOnboardForm=(mode==='Investor')?this.obFirstTime():false; }
+    this.setState(base); }
+  welcomeRoles(){ const h=this.h; const SF=this.SF;
+    const ROLES=[
+      ['Investor','👤','Your own tailored portfolio — build, simulate and compare against peers, the model and endowments.'],
+      ['Advisor','🎧','The advisor cockpit — prepare for a call, walk a client through their tailored plan across L1–L3.'],
+      ['Internal','🏢','Aggregate platform consoles for sales, product and IC — never per-identifiable client.']];
+    return h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:12}},
+      ROLES.map(r=>h('button',{key:r[0],onClick:()=>this.enterAs(r[0]),
+        style:{textAlign:'left',border:'1px solid var(--line)',background:'var(--surface)',borderRadius:14,padding:'16px 16px',cursor:'pointer',display:'flex',flexDirection:'column',gap:7,transition:'all .12s'},
+        onMouseEnter:e=>{e.currentTarget.style.borderColor='var(--brand)';e.currentTarget.style.boxShadow='0 8px 22px -14px rgba(44,45,254,.5)';},
+        onMouseLeave:e=>{e.currentTarget.style.borderColor='var(--line)';e.currentTarget.style.boxShadow='none';}},
+        h('div',{style:{display:'flex',alignItems:'center',gap:9}}, h('span',{style:{fontSize:20}},r[1]), h('span',{style:{fontFamily:SF,fontSize:17,fontWeight:600}},r[0])),
+        h('div',{style:{fontSize:11.5,color:'var(--muted)',lineHeight:1.5}},r[2]),
+        h('div',{style:{marginTop:2,fontSize:11.5,fontWeight:700,color:'var(--brand-ink)'}}, 'Enter '+r[0]+' →'))));
   }
   /* top-right: static read-only summary of the investor's inputs (edited via the profile) */
   allocInfo(){
@@ -7965,7 +7985,7 @@ class Component extends DCLogic {
   advLvl(a,b,c){ const l=this.state.advLevel; return l==='L1'?a:(l==='L3'?c:b); }
   /* ---- controls ---- */
   advClientCommit(c){ const w=parseFloat(String((c&&c.investable)||'').replace(/[^0-9.]/g,''))||10; const tgt=this.myPmTarget()||35; const pace=this.state.cfPaceYears||4; return Math.max(0.5, Math.round(w*tgt/100/pace*2)/2); }
-  advOpenClient(id){ const c=this.advBook().find(x=>x.id===id); const lv=(c&&c.level)||'L2'; this.setState({advClientId:id, advStage:(c&&c.stage)||'new', advLevel:lv, advView:'prep', advPrepGoals:null, advStep:0, advReact:{}, advCFAextra:0, advPrepPrompt:'', advPrepMode:'preset', persona2:(lv==='L3'?'pro':'guided'), advActionOpen:null, advEdits:{}, cfCommitM:this.advClientCommit(c)}); }
+  advOpenClient(id){ const c=this.advBook().find(x=>x.id===id); const lv=(this.state.advLevelOverride&&this.state.advLevelOverride[id])||(c&&c.level)||'L2'; this.setState({advClientId:id, advStage:(c&&c.stage)||'new', advLevel:lv, advView:'prep', advPrepGoals:null, advStep:0, advReact:{}, advCFAextra:0, advPrepPrompt:'', advPrepMode:'preset', persona2:(lv==='L3'?'pro':'guided'), advActionOpen:null, advEdits:{}, cfCommitM:this.advClientCommit(c)}); }
   advEnterCockpit(){ this.setState({advView:'cockpit', advStep:0, advReact:{}, advCFAextra:0, persona2:(this.state.advLevel==='L3'?'pro':'guided'), cfCommitM:this.advClientCommit(this.advClient())}); }
   advExit(){ this.setState({advView:'desk', advClientId:null}); }
   advToPrep(){ this.setState({advView:'prep'}); }
@@ -7997,6 +8017,13 @@ class Component extends DCLogic {
     const h=this.h; const SF=this.SF; const self=this.advSelf();
     const book=this.advBook().slice().sort((a,b)=>(((a.lead&&a.lead.priority)||9)-((b.lead&&b.lead.priority)||9)));
     const levelChip=(l)=>h('span',{style:{fontSize:10.5,fontWeight:700,color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:6,padding:'1px 7px'}},l);
+    /* item 2 — change the suggested advice level per client right on the desk, without opening the client */
+    const ov=this.state.advLevelOverride||{};
+    const levelSel=(x)=>{ const cur=ov[x.id]||x.level;
+      return h('span',{title:'Suggested advice level — change without opening', style:{display:'inline-flex',border:'1px solid var(--brand-tint-3)',borderRadius:7,overflow:'hidden'}},
+        ['L1','L2','L3'].map(l=>{ const on=cur===l;
+          return h('button',{key:l,onClick:(e)=>{ e.stopPropagation(); this.setState({advLevelOverride:Object.assign({},this.state.advLevelOverride,{[x.id]:l})}); },
+            style:{border:'none',background:on?'var(--brand)':'var(--brand-wash)',color:on?'#fff':'var(--brand-ink)',padding:'2px 8px',fontSize:10.5,fontWeight:700,cursor:'pointer'}}, l); })); };
     const stageChip=(s)=>h('span',{style:{fontSize:10.5,fontWeight:600,color:'var(--muted)',background:'var(--surface-2)',border:'1px solid var(--line)',borderRadius:6,padding:'1px 7px',textTransform:'capitalize'}},s);
     const kindIcon=(k)=>k==='fund'?'⭐':(k==='news'?'📰':'📊');
     const av=(x)=>h('div',{style:{width:40,height:40,flex:'0 0 40px',borderRadius:'50%',background:'var(--brand)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:700}},x.init);
@@ -8006,7 +8033,7 @@ class Component extends DCLogic {
         h('div',{style:{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap',marginBottom:4}},
           h('span',{style:{fontFamily:SF,fontSize:15,fontWeight:600}},x.name),
           x.badge?h('span',{style:{fontSize:10,fontWeight:700,letterSpacing:'.06em',color:'#fff',background:'var(--brand)',borderRadius:5,padding:'1px 7px'}},x.badge):null,
-          levelChip(x.level), stageChip(x.stage),
+          levelSel(x), stageChip(x.stage),
           h('span',{style:{fontSize:11.5,color:'var(--muted)'}},x.occupation+' · '+x.investable)),
         h('div',{style:{fontSize:13,color:'var(--ink)',lineHeight:1.5}}, h('b',{style:{color:'var(--brand)'}},kindIcon(x.lead&&x.lead.kind)+' Why now: '), (x.lead&&x.lead.reason)||'Due a check-in.')),
       h('button',{onClick:()=>this.advOpenClient(x.id),style:{flex:'0 0 auto',alignSelf:'center',background:'var(--brand)',color:'#fff',border:'none',borderRadius:9,padding:'10px 16px',fontSize:12.5,fontWeight:700,cursor:'pointer'}},'Prepare for call →'));
@@ -8604,7 +8631,7 @@ class Component extends DCLogic {
       showPageHead: this.curPage().view!=='home' && this.curPage().view!=='sim', /* home & target-simulator bodies render their own title row; avoid the duplicate chrome title ('we don't need this twice') */
       showOverview: this.curPage().view==='overview', showOther: this.curPage().view!=='overview', surfaceBody:this.surfaceBody(),
       cohortLabel: this.cohortSummary(),
-      welcome:s.welcome, enterApp:()=>{ this.setState({welcome:false,ws:'understand',homeLaunched:false, showOnboardForm:this.obFirstTime()}); },
+      welcome:s.welcome, welcomeRoles:this.welcomeRoles(), enterApp:()=>{ this.setState({welcome:false,ws:'understand',homeLaunched:false, showOnboardForm:this.obFirstTime()}); },
       showThemePicker:s.showThemePicker, themePickerBody:this.themePickerBody(),
       showOnboardForm:s.showOnboardForm, onboardFormBody: s.showOnboardForm? this.onboardFormBody() : null,
       showProfile:s.showProfile, closeProfile:()=>this.setState({showProfile:false}), profileModalBody:this.profileModalBody(),
