@@ -31,14 +31,14 @@ Source: ~/Downloads/Advisor View 2 review.zip (click-comments.md). Status: [ ] t
 
 ## Future / cash-flow
 - [x] 19. New investor has NO historical — remove historical from the J-curve.
-- [ ] 20. Cash-flow sliders must work: "over how many years" + Recycle Rate must move distributions & contributions (not only Commitments/Year).
+- [x] 20. Cash-flow sliders must work: "over how many years" + Recycle Rate must move distributions & contributions (not only Commitments/Year).
 - [ ] 21. Year unit "M"/label not editable; the value is editable.
 - [ ] 22. PE Cash-Flow J-curve (Cumulative Net Cash Flows) should REPLACE the top J-curve; no historical for a new investor.
 - [ ] 23. Contributions vs Distributions rendered below the J-curve; fix off-page overflow.
 - [ ] 24. Layout: small charts (Planned Commitments, Cumulative Commitment, Projected NAV, Projections w/ product mix, Alpha's Read) to the side of the main charts / at bottom.
-- [ ] 25. Macro toggle Slow Growth / Moderate / Aggressive must move the J-curve.
-- [ ] 26. Execution Quality (Top Quartile / Average) must do something.
-- [ ] 27. Product-mix sliders (Buyout/Growth/…/Direct) must affect the projection.
+- [x] 25. Macro toggle Slow Growth / Moderate / Aggressive must move the J-curve.
+- [x] 26. Execution Quality (Top Quartile / Average) must do something.
+- [x] 27. Product-mix sliders (Buyout/Growth/…/Direct) must affect the projection.
 - [x] 28. Remove the "act on your prediction" part.
 
 ## Next best / opportunities
