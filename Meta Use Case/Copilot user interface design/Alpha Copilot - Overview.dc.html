@@ -534,6 +534,7 @@ class Component extends DCLogic {
       mgrProfile:null, cmpList:[], cmpCrit:'since', cmpMetricDetail:null, mgrListed:'all', mgrHasOffering:false, /* items 199-219 — manager profile, comparison-list builder (GPs/funds/strategies), priority criterion, drill-in detail, list filters */
       simDials:{pm:20, growth:0, secondaries:6, us:38},
       simTargets:null, simFocus:null, simSuggest:null,
+      vw:(typeof window!=='undefined'&&window.innerWidth)||1440, /* live viewport width for responsive layout (item 5) */
       shareMode:false, /* advisor 'Share screen' present-mode: strips all advisor-only chrome, shows only the client-safe page */
       presenting:false, /* advisor window has opened a separate client-view window and is syncing to it */
       isPresentWindow:false, /* THIS window is the standalone client-view (opened with ?present=1) — a pure mirror */
@@ -558,6 +559,7 @@ class Component extends DCLogic {
        'client view' window (?present=1) that renders ONLY the investor rectangle. The advisor shares that
        single window in their video call, so their rail/notes/script are never captured. The two windows
        stay in sync over a BroadcastChannel — the advisor drives from the cockpit, the client window mirrors. */
+    this._armResize();
     let isPresent=false; try{ isPresent=new URLSearchParams(location.search).get('present')==='1'; }catch(e){}
     try{ if('BroadcastChannel' in window){ this.pchan=new BroadcastChannel('moonfare_present');
       this.pchan.onmessage=(e)=>{ const m=e.data||{};
@@ -567,7 +569,8 @@ class Component extends DCLogic {
     fetch('/api/state',{cache:'no-store'}).then(r=>r.json()).then(d=>{ this.applyDB(d); const u={dbLoaded:true}; const profs=((d&&d.profiles)||[]); const p=profs[0]; if(p&&p.theme) u.theme=p.theme; if(d && !d.empty && profs.length===0 && !this.state.seenOnboard && !isPresent) u.showThemePicker=true; this.setState(u); })
       .catch(()=>{ this.applyDB({empty:true}); this.setState({dbLoaded:true, dbError:true}); });
   }
-  componentWillUnmount(){ try{ if(this.pchan) this.pchan.close(); }catch(e){} }
+  componentWillUnmount(){ try{ if(this.pchan) this.pchan.close(); }catch(e){} try{ if(this._onResize) window.removeEventListener('resize',this._onResize); }catch(e){} }
+  _armResize(){ if(this._onResize) return; this._onResize=()=>{ if(this._rzRaf) return; this._rzRaf=requestAnimationFrame(()=>{ this._rzRaf=null; const w=window.innerWidth; if(Math.abs((this.state.vw||0)-w)>=8) this.setState({vw:w}); }); }; try{ window.addEventListener('resize',this._onResize); }catch(e){} }
   componentDidUpdate(pp, ps){
     if(ps && this.state.presenting && !this.state.isPresentWindow){
       if(ps.advStep!==this.state.advStep||ps.advStage!==this.state.advStage||ps.advLevel!==this.state.advLevel||ps.advClientId!==this.state.advClientId||ps.advFocus!==this.state.advFocus||ps.displayCcy!==this.state.displayCcy) this.broadcastPresent();
@@ -8276,24 +8279,25 @@ class Component extends DCLogic {
     const topChip=(t)=>h('span',{style:{fontSize:11,color:'rgba(255,255,255,.82)',background:'rgba(255,255,255,.1)',border:'1px solid rgba(255,255,255,.16)',borderRadius:6,padding:'2px 8px'}},t);
     const dseg=(opts,val,on)=>h('div',{style:{display:'inline-flex',background:'rgba(255,255,255,.08)',border:'1px solid rgba(255,255,255,.16)',borderRadius:9,padding:2}}, opts.map(o=>h('button',{key:o.value,onClick:()=>on(o.value),style:{border:'none',background:val===o.value?'var(--brand)':'transparent',color:val===o.value?'#fff':'rgba(255,255,255,.7)',borderRadius:7,padding:'5px 11px',fontSize:11.5,fontWeight:700,cursor:'pointer'}},o.label)));
     const labelled=(l,el)=>h('div',{style:{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:3}}, h('span',{style:{fontSize:9,letterSpacing:'.1em',textTransform:'uppercase',color:'rgba(255,255,255,.5)'}},l), el);
-    const topbar=h('div',{style:{height:62,flex:'0 0 62px',background:'var(--navy)',color:'#fff',display:'flex',alignItems:'center',gap:16,padding:'0 18px',borderBottom:'1px solid rgba(255,255,255,.1)'}},
+    const vw=this.state.vw||1440; const narrow=vw<1180; /* item 5 — responsive cockpit topbar */
+    const topbar=h('div',{style:{minHeight:62,flex:'0 0 auto',background:'var(--navy)',color:'#fff',display:'flex',alignItems:'center',gap:narrow?10:16,rowGap:8,padding:narrow?'9px 14px':'0 18px',flexWrap:'wrap',borderBottom:'1px solid rgba(255,255,255,.1)'}},
       h('div',{style:{display:'flex',alignItems:'center',gap:9}}, h('div',{style:{width:30,height:30,borderRadius:8,background:'var(--brand)',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:700,fontSize:12}},'Aα'), h('div',null, h('div',{style:{fontSize:13,fontWeight:700,fontFamily:SF}},'AskAlpha'), h('div',{style:{fontSize:9,letterSpacing:'.1em',color:'rgba(255,255,255,.55)'}},'ADVISOR COCKPIT'))),
       h('div',{style:{width:1,height:30,background:'rgba(255,255,255,.14)'}}),
       h('div',{style:{display:'flex',alignItems:'center',gap:10,minWidth:0}}, h('div',{style:{width:34,height:34,borderRadius:'50%',background:'var(--brand)',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:700,fontSize:13}},c.init),
         h('div',{style:{minWidth:0}}, h('div',{style:{display:'flex',alignItems:'center',gap:7,flexWrap:'wrap'}}, h('span',{style:{fontFamily:SF,fontSize:14,fontWeight:700}},c.name), c.badge?h('span',{style:{fontSize:9,fontWeight:700,color:'#fff',background:'var(--over)',borderRadius:4,padding:'1px 6px'}},c.badge):null, h('span',{style:{fontSize:11,color:'rgba(255,255,255,.7)'}},'Investable '+(c.investable||'—'))),
-          /* item 7 — top bar adapts to the journey: a NEW client has no profile data yet (Age · Founder · Company · Home currency, no Risk); an EXISTING client carries the essential profile (Target · Risk · Region). Firm shown either way. */
-          (()=>{ const isNew=this.state.advStage==='new'||this.state.advStage==='pregate'; const homeCcy=((c.region||'').split('/').pop()||'EUR').trim(); const firm=(c.company&&c.company!=='—')?c.company:null;
+          /* item 7 — journey-adaptive chips; hidden on narrow screens so the topbar stays clean (item 5) */
+          narrow? null : (()=>{ const isNew=this.state.advStage==='new'||this.state.advStage==='pregate'; const homeCcy=((c.region||'').split('/').pop()||'EUR').trim(); const firm=(c.company&&c.company!=='—')?c.company:null;
             const chips = isNew
               ? [topChip('Age '+(c.age||'—')), topChip(c.occupation||'Founder'), firm?topChip(firm):null, topChip('Home '+homeCcy)]
               : [topChip('Target '+(this.myPmTarget()||20)+'%'), topChip('Risk: '+(c.risk||'—')), c.region?topChip(c.region):null, firm?topChip(firm):null];
             return h('div',{style:{display:'flex',gap:6,marginTop:3,flexWrap:'wrap'}}, chips.filter(Boolean)); })())),
-      h('div',{style:{marginLeft:'auto',display:'flex',alignItems:'center',gap:16}},
-        h('div',{style:{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:2,background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.14)',borderRadius:8,padding:'5px 10px'}}, h('span',{style:{fontSize:8.5,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(255,255,255,.45)'}},'Grounded'), h('span',{style:{fontSize:11,fontWeight:600,color:'rgba(255,255,255,.85)'}},'snap_8f3c · live data')),
+      h('div',{style:{marginLeft:'auto',display:'flex',alignItems:'center',gap:narrow?10:16,flexWrap:'wrap',rowGap:8,justifyContent:'flex-end'}},
+        narrow? null : h('div',{style:{display:'flex',flexDirection:'column',alignItems:'flex-start',gap:2,background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.14)',borderRadius:8,padding:'5px 10px'}}, h('span',{style:{fontSize:8.5,letterSpacing:'.12em',textTransform:'uppercase',color:'rgba(255,255,255,.45)'}},'Grounded'), h('span',{style:{fontSize:11,fontWeight:600,color:'rgba(255,255,255,.85)'}},'snap_8f3c · live data')),
         labelled('Journey', dseg([{label:'Pre Gate',value:'pregate'},{label:'New',value:'new'},{label:'Existing',value:'existing'},{label:'Inactive',value:'inactive'}], this.state.advStage, v=>this.advSetStage(v))),
         labelled('Advice level', dseg([{label:'L1',value:'L1'},{label:'L2',value:'L2'},{label:'L3',value:'L3'}], this.state.advLevel, v=>this.advSetLevel(v))),
         labelled('Currency', h('select',{value:this.state.displayCcy,onChange:e=>this.setState({displayCcy:e.target.value}),style:{background:'rgba(255,255,255,.1)',color:'#fff',border:'1px solid rgba(255,255,255,.22)',borderRadius:7,padding:'5px 8px',fontSize:11.5,fontWeight:700,cursor:'pointer'}}, this.ccyList().map(c=>h('option',{key:c,value:c,style:{color:'#111'}},c)))),
-        h('div',{style:{width:1,height:30,background:'rgba(255,255,255,.14)'}}),
-        h('div',{style:{textAlign:'right'}}, h('div',{style:{fontSize:12.5,fontWeight:600}},self.name), h('div',{style:{fontSize:10,color:'rgba(255,255,255,.55)'}},self.role)),
+        narrow? null : h('div',{style:{width:1,height:30,background:'rgba(255,255,255,.14)'}}),
+        narrow? null : h('div',{style:{textAlign:'right'}}, h('div',{style:{fontSize:12.5,fontWeight:600}},self.name), h('div',{style:{fontSize:10,color:'rgba(255,255,255,.55)'}},self.role)),
         /* Share to client — opens a SEPARATE window that shows only the investor rectangle; the advisor keeps
            this full cockpit (rail/notes/script) private and shares just that window in their video call */
         this.state.presenting
@@ -8342,7 +8346,8 @@ class Component extends DCLogic {
     const scriptBox=h('div',null,
       h('div',{style:{display:'flex',alignItems:'center',gap:7,marginBottom:7,flexWrap:'wrap'}}, h('span',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--muted)'}},'Advisor script'), h('span',{style:{fontSize:9,fontWeight:700,color:'var(--over)',background:'rgba(45,143,111,.12)',borderRadius:5,padding:'1px 6px'}},'COMPLIANCE-NEUTRALISED')),
       h('div',{style:{fontSize:12.5,color:'var(--ink)',lineHeight:1.55,fontStyle:'italic'}},pm.script));
-    const rail=h('div',{style:{flex:'0 0 320px',width:320,background:'var(--surface)',borderRight:'1px solid var(--line)',height:'100%',overflow:'auto',padding:'16px 16px 28px'}},
+    const railW=vw<900?264:320; /* item 5 — narrower rail on compressed screens so the canvas keeps room */
+    const rail=h('div',{style:{flex:'0 0 '+railW+'px',width:railW,background:'var(--surface)',borderRight:'1px solid var(--line)',height:'100%',overflow:'auto',padding:vw<900?'14px 12px 24px':'16px 16px 28px'}},
       h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14}}, h('span',{style:{fontFamily:SF,fontSize:15,fontWeight:700}},'Moonfare'), h('span',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.06em',color:'var(--brand-ink)',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:5,padding:'2px 7px'}},'ADVISOR')),
       objChip, goalsBox, stepBox, navBtns, h('div',{style:{height:1,background:'var(--line)',margin:'2px 0 14px'}}), cfaSection, h('div',{style:{height:1,background:'var(--line)',margin:'2px 0 14px'}}), scriptBox, h('div',{style:{height:1,background:'var(--line)',margin:'14px 0'}}), this.advNoteCard());
     /* E1/E2 — Understand → Shape → Act → Research nav, SAME design as the investor view's wsNav() (compact

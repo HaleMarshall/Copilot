@@ -5,7 +5,7 @@ Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.
 - [x] 2. Skip the dashboard section for the advisor view (advisor IS the advisor).
 - [x] 3. When clicking Share to client, it should hide the client view.
 - [x] 4. Understand/Shape/Act/Research should be the same design as the normal investor view.
-- [ ] 5. When compressing the screen it looks weird (responsive).
+- [x] 5. When compressing the screen it looks weird (responsive).
 - [ ] 6. Move private-markets target next to investable wealth.
 - [ ] 7. 'already in private markets' → 'already invested in private markets'.
 - [ ] 8. Regions → Europe, Middle East, Asia, America, Rest of World.
