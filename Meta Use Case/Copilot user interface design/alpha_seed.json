@@ -4046,20 +4046,28 @@
 "crumb": "Shape › Confirm target",
 "cfa": [
 {
-"t": "Re-confirm investable wealth",
+"t": "Adjust the strategy mix",
 "jump": {
-"tab": "Profile",
-"sub": "Wealth"
+"tab": "Target",
+"sub": "Strategy"
 },
-"tag": "→ Profile · Wealth"
+"tag": "→ Target · strategy"
 },
 {
-"t": "Re-confirm risk class",
+"t": "Compare vs peers & the Moonfare model",
 "jump": {
-"tab": "Profile",
-"sub": "Risk"
+"tab": "Target",
+"sub": "Compare"
 },
-"tag": "→ Profile · Risk"
+"tag": "→ Target · compare"
+},
+{
+"t": "Raise the private-markets allocation",
+"jump": {
+"tab": "Target",
+"sub": "PM target"
+},
+"tag": "→ Target · allocation"
 }
 ],
 "script": "We haven't spoken in a while — let me make sure nothing's changed. Is this still your investable wealth and risk appetite?"

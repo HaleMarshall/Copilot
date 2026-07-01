@@ -17,7 +17,7 @@ Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.
 - [x] 14. Risk class wrong: classed Opportunistic/Advanced but headline says Aggressive; changing doesn't work.
 - [x] 15. Region change doesn't apply (still same).
 - [x] 16. Move the new Profile section up under investor name / investable wealth (top part).
-- [ ] 17. On Tailored Target adjust/compare, Calls-for-Action must match THIS page (not previous page).
+- [x] 17. On Tailored Target adjust/compare, Calls-for-Action must match THIS page (not previous page).
 - [ ] 18. Remove Vintage target (wasn't in investor view).
 - [ ] 19. On all tailored-target graphs, break small numbers out with an arrow showing the %.
 - [ ] 20. 'in line with model' → show the chart with zeros, not fictional gray bars (investor view too).
