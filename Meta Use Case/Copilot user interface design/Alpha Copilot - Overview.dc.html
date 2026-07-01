@@ -6015,12 +6015,8 @@ class Component extends DCLogic {
     const noCompare=adv && advL==='L1';                 /* Basic: adjust only */
     const stratOnly=adv && (advL==='L1'||advL==='L2');  /* Basic & Advanced: strategy dimension only */
     const proAdv=adv && advL==='L3';                    /* Pro: every dimension, € and % */
-    /* D2 — L3 expands every dimension incl. Vintage ('freedom mix'); each shown in € and %. */
-    const vintageDim={key:'vintage',label:'Vintage',
-      actual:{'2021':10,'2022':14,'2023':18,'2024':22,'2025':20,'2026':16},
-      target:{'2021':8,'2022':12,'2023':16,'2024':22,'2025':22,'2026':20},
-      colors:{'2021':'--data-1','2022':'--data-2','2023':'--data-3','2024':'--data-5','2025':'--data-6','2026':'--data-7'}};
-    let dims=this.HOME_DIMS(); if(proAdv) dims=dims.concat([vintageDim]);
+    /* item 18 — Vintage is NOT a target dimension (it wasn't in the investor view), so it's removed from the tailored-target simulator entirely. Target dims = HOME_DIMS (strategy/region/currency/sector/format). */
+    let dims=this.HOME_DIMS();
     /* D3 — € pool for the totals row: investable wealth × PM target */
     const _c=(this.advClient&&this.advClient())||{}; const _invM=parseFloat(String(_c.investable||this.state.investWealthM||'0').replace(/[^0-9.]/g,''))||0;
     const poolEur=+((_invM*((this.myPmTarget()||20)/100))||0).toFixed(1); const eurStr=(pct)=>poolEur? ('€'+(+(poolEur*pct/100).toFixed(1))+'m') : '—';
