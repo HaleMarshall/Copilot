@@ -676,7 +676,10 @@ class Component extends DCLogic {
     if(this.state.demoState==='gated'){ belowFloor=!paid; }
     else if(this.state.demoState==='thin'){ relaxed=true; n=Math.max(strictN, FLOOR+9); relaxedDims=active.slice(-1); }
     else if(strictN < 8){ belowFloor=!paid; }                      // k-anonymity floor → paywall (unless paid)
-    else if(strictN < FLOOR){ relaxed=true; n=Math.max(strictN*3, 26); relaxedDims=active.slice(-1); }
+    else if(strictN < FLOOR){ /* item 23 — a filter closed the gap too much: drop the SINGLE most-restrictive (gap-closing) dimension and fall back to the next-largest cohort */
+      let worst=null, worstFrac=1; active.forEach(d=>{ const f=dimFrac(d); if(f<worstFrac){ worstFrac=f; worst=d; } });
+      const broadenedFrac = worst? Math.min(frac/(worstFrac||1),1) : frac; n=Math.max(Math.round(T*broadenedFrac), 26);
+      relaxed=true; const LBL={age:'Age',wealth:'Wealth',risk:'Risk',region:'Region',prof:'Profession',marital:'Marital status',kids:'Children'}; relaxedDims=[worst?(LBL[worst]||worst):(active.slice(-1)[0]||'')].filter(Boolean); }
     return { n: belowFloor? strictN : n, strictN, total:T, frac, relaxed, relaxedDims, belowFloor, gated:belowFloor, active, p:{n:strictN} };
   }
   cohortSummary(){
