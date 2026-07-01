@@ -19,8 +19,8 @@ Source: ~/Downloads/Advisor View 2 review.zip (click-comments.md). Status: [ ] t
 - [x] 11. "Notes from our conversation" — de-emphasize / make optional (called unnecessary).
 
 ## Tailored model portfolio
-- [ ] 12. Taxonomy: AI/Tech is a SECTOR (not strategy); Direct & Co-investments is a FORMAT; Secondaries is a FORMAT. Fix STRATS to real strategies; move AI→sector, directs/secondaries→format.
-- [ ] 13. L3 tailored-model page: strategy mix already shown prior page — remove the redundant page for L3, show more/other; L1/L2 strategy mix must show real strategies.
+- [x] 12. Taxonomy: AI/Tech is a SECTOR (not strategy); Direct & Co-investments is a FORMAT; Secondaries is a FORMAT. Fix STRATS to real strategies; move AI→sector, directs/secondaries→format.
+- [x] 13. L3 tailored-model page: strategy mix already shown prior page — remove the redundant page for L3, show more/other; L1/L2 strategy mix must show real strategies.
 
 ## Comparison
 - [ ] 14. Target adjusts based on the actual input target.

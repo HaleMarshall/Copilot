@@ -8318,18 +8318,34 @@ class Component extends DCLogic {
         const _adjT=(this.state.simTargets&&this.state.simTargets.strategy);
         let _mix=mixModel, _adjusted=false;
         if(_adjT){ const _sum=Object.keys(_adjT).reduce((a,k)=>a+(+_adjT[k]||0),0); if(_sum>0){ _mix={}; Object.keys(_adjT).forEach(k=>_mix[k]=+(( +_adjT[k]||0)/_sum*100).toFixed(1)); _adjusted=true; } }
-        const sl=toSlices(_mix); const commit=this.advClientCommit?this.advClientCommit(c):0; const tot=commit*(this.state.cfPaceYears||4);
+        /* items 12/13 — Strategy is ONLY real strategies (AI/Tech is a Sector; Secondaries & Direct/Co-invest are Formats).
+           Real-strategy weights are renormalised to 100 so the strategy donut shows just the strategies. */
+        const STRAT_TRUE=[['buyout','Buyout','--data-1'],['growth','Growth','--data-2'],['venture','Venture','--data-3'],['credit','Private Credit','--data-4'],['infra','Infrastructure','--data-5'],['realestate','Real Estate','--data-6'],['other','Other','--data-9']];
+        let _ss=0; STRAT_TRUE.forEach(([k])=>_ss+=(_mix[k]||0));
+        const sl=STRAT_TRUE.map(([k,n,cc])=>({name:n,color:cc,p:_ss>0?+(((_mix[k]||0)/_ss*100).toFixed(1)):0})).filter(s=>s.p>0);
+        const commit=this.advClientCommit?this.advClientCommit(c):0; const tot=commit*(this.state.cfPaceYears||4);
         const th=(t,r)=>h('th',{style:{textAlign:r?'right':'left',padding:'7px 9px',fontSize:10,textTransform:'uppercase',letterSpacing:'.04em',color:'var(--muted)',borderBottom:'2px solid var(--line)'}},t);
         const td=(v,r)=>h('td',{style:{textAlign:r?'right':'left',padding:'8px 9px',borderBottom:'1px solid var(--line)',fontSize:12.5}},v);
-        /* table beside the donut — what each slice is + % (+ € of the planned commitment) — per the review */
-        const table=this.card({title:'Allocation breakdown',style:{flex:'1 1 340px'},children:h('table',{style:{width:'100%',borderCollapse:'collapse'}},
+        const table=this.card({title:'Allocation breakdown',style:{flex:'1 1 320px'},children:h('table',{style:{width:'100%',borderCollapse:'collapse'}},
           h('thead',null,h('tr',null,th('Strategy'),th('%',1),tot?th('€ of plan',1):null)),
           h('tbody',null, sl.map(s=>h('tr',{key:s.name},
             td(h('span',{style:{display:'inline-flex',alignItems:'center',gap:7}}, h('span',{style:{width:10,height:10,borderRadius:2,background:'var('+s.color+')',display:'inline-block'}}), s.name)),
             td(s.p+'%',1), tot?td('€'+(+(tot*s.p/100).toFixed(1))+'m',1):null)))),
-          caption:'Every strategy in the model, its target weight'+(tot?(' and its share of the €'+(+tot.toFixed(1))+'m planned commitment.'):'.')});
+          caption:'Real strategies only'+(tot?(', each with its share of the €'+(+tot.toFixed(1))+'m planned commitment.'):'.')});
+        const stratCard=this.card({title:_adjusted?'Strategy mix · your revised target':'Strategy mix', badge:_adjusted?this.badge('revised','conf'):null, style:{flex:'1 1 280px'},children:this.donutNamed(sl,160,_adjusted?'Revised':'Model','mix')});
+        /* Sector (incl. AI/Tech) + Format (incl. Secondaries, Co-invest/Direct) — the correctly-classified extra dimensions */
+        const DIMS2=this.HOME_DIMS(); const secD=DIMS2.find(d=>d.key==='sector')||{}; const fmtD=DIMS2.find(d=>d.key==='format')||{};
+        const dimSlices=(d)=>Object.keys(d.target||{}).map(k=>({name:k,color:(d.colors&&d.colors[k])||'--data-9',p:(d.target||{})[k]||0})).filter(s=>s.p>0);
+        const secCard=this.card({title:'Sector mix', badge:this.badge('AI / Tech lives here','synth'), style:{flex:'1 1 240px'},children:this.donutNamed(dimSlices(secD),150,'Sector','mix'),caption:'Sector exposure — AI & Tech is a sector, not a strategy.'});
+        const fmtCard=this.card({title:'Format mix', badge:this.badge('Secondaries · Co-invest','synth'), style:{flex:'1 1 240px'},children:this.donutNamed(dimSlices(fmtD),150,'Format','mix'),caption:'Access format — Secondaries and Direct / Co-investment are formats, not strategies.'});
+        if(L==='L3'){
+          /* L3 — the strategy mix was already set on the target step; show MORE: strategy + sector + format + the €-plan */
+          return wrap([ head('Your tailored model portfolio · full view', _adjusted?'Reflecting the strategy mix you just adjusted — now across strategy, sector and format.':'Across strategy, sector and access format — the complete institutional view.'),
+            h('div',{style:{display:'flex',gap:16,flexWrap:'wrap',alignItems:'stretch'}}, stratCard, secCard, fmtCard),
+            table ]);
+        }
         return wrap([ head('Your tailored model portfolio', _adjusted?'Updated to reflect the strategy mix you adjusted on the target step.':'Diversified across the strategies that fit your profile.'),
-          h('div',{style:{display:'flex',gap:16,flexWrap:'wrap',alignItems:'stretch'}}, this.card({title:_adjusted?'Strategy mix · your revised target':'Strategy mix', badge:_adjusted?this.badge('revised','conf'):null, style:{flex:'1 1 300px'},children:this.donutNamed(sl,160,_adjusted?'Revised':'Model','mix')}), table) ]); }
+          h('div',{style:{display:'flex',gap:16,flexWrap:'wrap',alignItems:'stretch'}}, stratCard, table) ]); }
       case 'modelExisting': return wrap([ head('Model vs your portfolio today','The gaps between the two are exactly what we can act on.'),
         h('div',{style:{display:'flex',gap:16,flexWrap:'wrap'}}, this.card({title:'You today',style:{flex:'1 1 300px'},children:this.donutNamed(toSlices(mixYou),150,'You','mix')}), this.card({title:'Recommended model',style:{flex:'1 1 300px'},children:this.donutNamed(toSlices(mixModel),150,'Model','mix')})) ]);
       case 'overview': {
