@@ -6180,18 +6180,7 @@ class Component extends DCLogic {
           h('button',{onClick:()=>this.setDtog('simAdjust_'+d.key,!adjOpen),style:{border:'1px solid var(--brand)',background:adjOpen?'var(--brand-wash)':'var(--surface)',color:'var(--brand-ink)',borderRadius:9,padding:'8px 14px',fontSize:12,fontWeight:700,cursor:'pointer'}}, (adjOpen?'▾ ':'✎ ')+'Adjust my target'),
           adjOpen? h('button',{onClick:()=>this.setState({simTargets:null}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:9,padding:'8px 13px',fontSize:12,fontWeight:600,cursor:'pointer'}},'Reset to model') : null),
         adjOpen? h('div',{style:{display:'flex',flexDirection:'column',gap:10,marginTop:2}}, riskToggle, h('div',{style:{display:'flex',flexDirection:'column',gap:9}}, sliders)) : null);
-      /* D2/D3 — % and € breakdown with a totals row (% sums to 100, € sums to the pool). Shown for L2/L3; L1 stays summary-only. */
-      const bdRows=cats.map(k=>{ const pct=Math.round((+tObj[k]||0)/tot*100); return {n:nm(d.key,k), color:d.colors[k]||'--data-9', pct}; }).filter(r=>r.pct>0);
-      const bdSumPct=bdRows.reduce((a,r)=>a+r.pct,0);
-      const _th=(t,r)=>h('th',{style:{textAlign:r?'right':'left',padding:'6px 9px',fontSize:9.5,textTransform:'uppercase',letterSpacing:'.04em',color:'var(--muted)',borderBottom:'2px solid var(--line)'}},t);
-      const _td=(v,r,bold)=>h('td',{style:{textAlign:r?'right':'left',padding:'6px 9px',borderBottom:'1px solid var(--line)',fontSize:12.5,fontFamily:r?SF:'inherit',fontWeight:bold?700:400}},v);
-      const bdTable=(adv && !hideCompare)? h('div',{style:{borderTop:'1px solid var(--line)',marginTop:14,paddingTop:14}},
-        h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:6}}, d.label+' target — % and €'),
-        h('table',{style:{width:'100%',borderCollapse:'collapse'}},
-          h('thead',null,h('tr',null,_th(d.label),_th('%',1),_th('€',1))),
-          h('tbody',null,
-            bdRows.map(r=>h('tr',{key:r.n}, _td(h('span',{style:{display:'inline-flex',alignItems:'center',gap:7}}, h('span',{style:{width:9,height:9,borderRadius:2,background:'var('+r.color+')',display:'inline-block'}}), r.n)), _td(r.pct+'%',1,true), _td(eurStr(r.pct),1))),
-            h('tr',{style:{background:'var(--surface-2)'}}, _td('Total',false,true), _td(bdSumPct+'%',1,true), _td(poolEur?('€'+poolEur+'m'):'—',1,true))))) : null;
+      /* item 28 — the per-dimension %/€/Total line-item table was removed from the tailored-target cards; the donuts + Z-chart + comparator selector carry the story, no redundant table */
       const savedThis=(s.savedDimMsg===d.key);
       return this.card({title:'Your '+d.label.toLowerCase()+' target',info:true,
         right:h('div',{style:{display:'flex',gap:8,alignItems:'center'}},
@@ -6203,8 +6192,8 @@ class Component extends DCLogic {
           /* review4 item 3 — make it absolutely clear: simulating YOUR target against the comparator GROUP'S target */
           hideCompare? null : h('div',{style:{display:'flex',gap:8,alignItems:'center',background:'var(--brand-wash)',border:'1px solid var(--brand-tint-3)',borderRadius:10,padding:'9px 12px',marginBottom:12,fontSize:12,color:'var(--brand-ink)',lineHeight:1.45}},
             h('span',{style:{flex:'0 0 auto'}},'◧'), h('span',null,'Simulating ',h('b',null,'your '+d.label.toLowerCase()+' target'),' against ',h('b',null,compLabel),' — target vs target, so you can shape toward where '+compShort+' aim to be.')),
-          cols, bdTable, h('div',{style:{borderTop:'1px solid var(--line)',marginTop:14,paddingTop:14,display:'flex',flexDirection:'column',gap:12}}, selector, adjustBlock)),
-        caption:'Your '+d.label.toLowerCase()+' target vs '+compLabel+' — target against target, in € and %. The Z-chart shows your target minus theirs. Press “Adjust my target” to reshape it; Peers/Custom open the group editor.'});
+          cols, h('div',{style:{borderTop:'1px solid var(--line)',marginTop:14,paddingTop:14,display:'flex',flexDirection:'column',gap:12}}, selector, adjustBlock)),
+        caption:'Your '+d.label.toLowerCase()+' target vs '+compLabel+' — target against target. The Z-chart shows your target minus theirs. Press “Adjust my target” to reshape it; Peers/Custom open the group editor.'});
     };
     const grid=h('div',{style:{display:'flex',flexDirection:'column',gap:18}},
       ordered.map(d=>h('div',{key:d.key}, dimTargetCard(d, noCompare))));

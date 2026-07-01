@@ -28,7 +28,7 @@ Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.
 - [x] 25. Keep strategies in strategy target; remove direct & co-investments entirely.
 - [x] 26. Remove Direct & Co-Investments from the investor view too.
 - [x] 27. All three charts: equal space + equal distance from each other and the card walls.
-- [ ] 28. Remove the entire strategy/region table (%, totals, base ccy) from tailored-target — keep only compare-against (model/peers/platform/top).
+- [x] 28. Remove the entire strategy/region table (%, totals, base ccy) from tailored-target — keep only compare-against (model/peers/platform/top).
 - [ ] 29. 'Adjust my target' in a distinct color, next to Model.
 - [ ] 30. 'Reset to model' only appears if sliders changed from saved target.
 - [ ] 31. 'Saved' button disappears once something is changed.
