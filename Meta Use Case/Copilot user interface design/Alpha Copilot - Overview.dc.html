@@ -1828,7 +1828,8 @@ class Component extends DCLogic {
       h('div',{style:{fontFamily:SF,fontSize:15,fontWeight:700,color:'#111'}},title));
     const foot=(n)=>h('div',{style:{display:'flex',justifyContent:'space-between',marginTop:14,paddingTop:8,borderTop:'1px solid #e6e6e6',fontSize:9.5,color:'#999'}}, h('span',null,'Moonfare · Alpha — Portfolio Report · Confidential'), h('span',null,'Page '+n+' · as of '+asOf));
     const pageWrap=(title,n,body)=>h('div',{className:'sc-pdf-page',style:{padding:'10px 0 18px',marginBottom:18,borderBottom:'1px dashed #ddd'}}, brand(title), body, foot(n));
-    const kpis=[['Net asset value',P.navText||'€16.6m'],['Net IRR',(P.irr||'11.0')+'%'],['Net MOIC',P.moicTableNet||'1.80x'],['TVPI',P.tvpiTableNet||'2.10x'],['DPI',P.dpiTableNet||'0.82x'],['Committed',P.committed||'€20.5m']];
+    const _pm=this.portfolioMetrics();
+    const kpis=[['Net asset value','€'+_pm.nav+'m'],['Net IRR',_pm.irr+'%'],['Net MOIC',_pm.moic+'x'],['TVPI',_pm.tvpi+'x'],['DPI',_pm.dpi+'x'],['Committed','€'+_pm.committed+'m']];
     const kpiGrid=h('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10}}, kpis.map((t,i)=>h('div',{key:i,style:{border:'1px solid #e6e6e6',borderRadius:10,padding:'10px 12px',background:'#fafafa'}}, h('div',{style:{fontSize:10.5,color:'#777',marginBottom:2}},t[0]), h('div',{style:{fontFamily:SF,fontSize:18,fontWeight:700,color:'#111'}},t[1]))));
     const dims=[['strategy','Strategy'],['region','Region'],['currency','Currency'],['sector','Sector']];
     const cover=h('div',{className:'sc-pdf-page',style:{marginBottom:18,borderBottom:'1px dashed #ddd',borderRadius:12,overflow:'hidden'}},
@@ -1837,7 +1838,7 @@ class Component extends DCLogic {
         h('div',{style:{fontSize:12,letterSpacing:'.14em',textTransform:'uppercase',color:'#8C8DFF',fontWeight:700}},'Portfolio Report'),
         h('div',{style:{fontFamily:SF,fontSize:34,fontWeight:700,margin:'8px 0 6px'}},'Your Private-Markets Portfolio'),
         h('div',{style:{fontSize:13,color:'rgba(234,235,255,.8)'}}, investor+' · prepared by Alpha · as of '+asOf),
-        h('div',{style:{display:'flex',gap:26,marginTop:30,flexWrap:'wrap'}}, [['Portfolio value',P.navText||'€16.6m'],['TVPI',(P.tvpi||'2.1')+'x'],['Net IRR',(P.irr||'14.4')+'%']].map((t,i)=>h('div',{key:i}, h('div',{style:{fontSize:10.5,color:'rgba(255,255,255,.65)'}},t[0]), h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:700}},t[1]))))));
+        h('div',{style:{display:'flex',gap:26,marginTop:30,flexWrap:'wrap'}}, (()=>{ const pm=this.portfolioMetrics(); return [['Portfolio value','€'+pm.nav+'m'],['TVPI',pm.tvpi+'x'],['Net IRR',pm.irr+'%']]; })().map((t,i)=>h('div',{key:i}, h('div',{style:{fontSize:10.5,color:'rgba(255,255,255,.65)'}},t[0]), h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:700}},t[1]))))));
     const allocPage=h('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'18px 24px'}}, dims.map(([k,l],i)=>{ const pct=this.basisPct(k); const colorsFor=(k==='strategy')?null:((this.HOME_DIMS().find(d=>d.key===k)||{colors:{}}).colors); const slices=Object.keys(pct).filter(x=>pct[x]>0).map(x=>({n:k==='strategy'?((this.STRATS.find(s=>s[0]===x)||[0,x])[1]):x, p:pct[x], color:(k==='strategy'?((this.STRATS.find(s=>s[0]===x)||[0,0,'--data-1'])[2]):(colorsFor[x]||'--data-9'))}));
       return h('div',{key:i,style:{display:'flex',alignItems:'center',gap:12}}, this.donutNamed(slices,104,l,'mix'), h('div',{style:{flex:1}}, this.pdfDimTable(k,l))); }));
     const cf=(this.DB&&this.DB.cashflows)||{cats:[],calls:[],distributions:[]}; const cmx=Math.max.apply(null,(cf.calls||[]).concat(cf.distributions||[]).concat([1]));
@@ -2848,6 +2849,17 @@ class Component extends DCLogic {
   fundCommitted(f){ return this.eurNum(f.nav)+this.eurNum(f.navUncommitted); }
   committedTotal(){ return this.HELD_FUNDS().reduce((a,f)=>a+this.fundCommitted(f),0); }
   navTotal(){ return this.HELD_FUNDS().reduce((a,f)=>a+this.eurNum(f.nav),0); }
+  /* portfolioMetrics — headline IRR/MOIC/TVPI/DPI computed from the ACTUAL held funds (capital-weighted),
+     not a static number. paid-in = committed × called%; distributions = paid-in × fund DPI; NAV = fund NAV.
+     Falls back to the DB atoms only when there are no held funds. */
+  portfolioMetrics(){ const F=this.HELD_FUNDS()||[]; const P=(this.DB&&this.DB.portfolio)||{};
+    if(!F.length) return {nav:this.eurNum(P.navText||'0'), irr:parseFloat(P.irr||'0')||0, moic:parseFloat(P.moicTableNet||'0')||0, tvpi:parseFloat(P.tvpi||'0')||0, dpi:parseFloat(P.dpiTableNet||'0')||0, committed:0, paidIn:0, dist:0, n:0};
+    let nav=0,paidIn=0,dist=0,committed=0,irrW=0;
+    F.forEach(f=>{ const com=this.fundCommitted(f); const called=(this.eurNum(f.called)||70)/100; const pin=com*called; const dpi=parseFloat(String(f.dpi))||0; const nv=this.eurNum(f.nav); const irr=parseFloat(String(f.irr))||0;
+      committed+=com; paidIn+=pin; nav+=nv; dist+=pin*dpi; irrW+=irr*pin; });
+    const tvpi=paidIn? (nav+dist)/paidIn : 0; const dpiP=paidIn? dist/paidIn : 0; const irr=paidIn? irrW/paidIn : 0;
+    return {nav:+nav.toFixed(1), irr:+irr.toFixed(1), moic:+tvpi.toFixed(2), tvpi:+tvpi.toFixed(2), dpi:+dpiP.toFixed(2), committed:+committed.toFixed(1), paidIn:+paidIn.toFixed(1), dist:+dist.toFixed(1), n:F.length}; }
+  pIRR(){ return this.portfolioMetrics().irr; } pTVPI(){ return this.portfolioMetrics().tvpi; } pDPI(){ return this.portfolioMetrics().dpi; } pMOIC(){ return this.portfolioMetrics().moic; }
   /* basis-aware % map for a dimension. NAV → look-through HOME_DIMS .actual; Committed → recomputed from held funds' committed weight. */
   basisPct(key){ const d=this.HOME_DIMS().find(x=>x.key===key); const actual=(d&&d.actual)||{};
     if(this.allocBasis()!=='Committed') return actual;
@@ -5234,6 +5246,7 @@ class Component extends DCLogic {
       h('div',{style:{writingMode:'vertical-rl',transform:'rotate(180deg)',fontSize:9.5,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',whiteSpace:'nowrap'}},t));
 
     // ============ COLUMN 1 — PERFORMANCE ============
+    const _pm2=this.portfolioMetrics(); /* portfolio-derived IRR/DPI/TVPI/MOIC (from held funds, not static) */
     const perfMini=(title,val,unit,frac,col,ticks)=>h('div',{style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',minWidth:0}},
       h('div',{style:{fontFamily:SF,fontSize:13.5,fontWeight:600,color:'var(--muted)'}},title),
       h('div',{style:{fontFamily:SF,fontSize:20,fontWeight:600,marginTop:1,color:col}},val,h('span',{style:{fontSize:12.5}},unit)),
@@ -5246,10 +5259,10 @@ class Component extends DCLogic {
       children:h('div',{style:{flex:1,display:'flex',flexDirection:'column'}},
         h('div',{style:{display:'flex',gap:6,flex:1,minHeight:150}},
           yAxis('Return · multiple'),
-          perfMini('IRR',P.irr,'%',(parseFloat(P.irr)||0)/14,'var(--brand)',['0%','7%','14%']),
-          perfMini('DPI',P.dpi,'x',(parseFloat(P.dpi)||0)/3,'var(--data-4)',['0.0x','1.5x','3.0x']),
-          perfMini('TVPI',P.tvpi,'x',(parseFloat(P.tvpi)||0)/3,'var(--data-7)',['0.0x','1.5x','3.0x']), /* item 2 — TVPI chart */
-          perfMini('MOIC',P.moic,'x',(parseFloat(P.moic)||0)/2,'var(--data-5)',['0.0x','1.0x','2.0x'])),
+          perfMini('IRR',_pm2.irr,'%',(_pm2.irr||0)/14,'var(--brand)',['0%','7%','14%']),
+          perfMini('DPI',_pm2.dpi,'x',(_pm2.dpi||0)/3,'var(--data-4)',['0.0x','1.5x','3.0x']),
+          perfMini('TVPI',_pm2.tvpi,'x',(_pm2.tvpi||0)/3,'var(--data-7)',['0.0x','1.5x','3.0x']), /* item 2 — TVPI chart, portfolio-derived */
+          perfMini('MOIC',_pm2.moic,'x',(_pm2.moic||0)/2,'var(--data-5)',['0.0x','1.0x','2.0x'])),
         h('div',{style:{textAlign:'center',fontSize:10,color:'var(--muted)',marginTop:5}},'Since inception · net of fees'),
         h('div',{style:{marginTop:16}}, this.perfTiles([['MOIC',P.moicTableNet,P.moicTableGross],['TVPI',P.tvpiTableNet,P.tvpiTableGross],['DPI',P.dpiTableNet,P.dpiTableGross],['IRR',P.irrTable,P.irrGross]])),
         h('div',{style:{marginTop:16}}, kpiGrid([
@@ -8571,7 +8584,7 @@ class Component extends DCLogic {
         const tiles=this.kpiTiles(lvl(
           [['Portfolio value',P.navText||'€16.6m'],['TVPI',(P.tvpi||'2.1')+'x'],['DPI',(P.dpiTableNet||'0.82x')],['Funds',String(P.fundsHeld||8)]],
           [['Portfolio value',P.navText||'€16.6m'],['TVPI',(P.tvpi||'2.1')+'x'],['DPI',(P.dpiTableNet||'0.82x')],['Committed',P.committed||'€20.5m'],['Funds',String(P.fundsHeld||8)]],
-          [['Portfolio value',P.navText||'€16.6m'],['TVPI',(P.tvpi||'2.1')+'x'],['Net IRR',(P.irr||'11.0')+'%'],['DPI',(P.dpiTableNet||'0.82x')],['Companies',String(P.companies||187)],['Countries',String(P.countries||19)]]));
+          (()=>{ const pm=this.portfolioMetrics(); return [['Portfolio value','€'+pm.nav+'m'],['TVPI',pm.tvpi+'x'],['Net IRR',pm.irr+'%'],['DPI',pm.dpi+'x'],['Companies',String(P.companies||187)],['Countries',String(P.countries||19)]]; })()));
         const perfGraph=this.card({title:'Performance — NAV trend (€m)', children:this.fAxisLine([{name:'NAV',color:'--data-1',main:true,vals:this.vz(2,[9.8,11.2,12.6,13.9,14.8,15.7,16.6])}],['Q1','Q2','Q3','Q4','Q1','Q2','Q3'],{H:180,fmt:v=>'€'+v+'m'}),caption:'Portfolio value over the last seven quarters — steady compounding.'});
         const dims=lvl(
           [],
