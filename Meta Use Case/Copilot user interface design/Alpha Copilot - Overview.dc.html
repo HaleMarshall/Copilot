@@ -9226,6 +9226,9 @@ class Component extends DCLogic {
     /* keep the client-view window in sync — broadcast on every render whose nav signature changed (the DC
        framework re-renders via renderVals; it does not call componentDidUpdate, so we sync from here). */
     if(s.presenting && !s.isPresentWindow){ const sig=[s.advClientId,s.advStage,s.advLevel,s.advStep,s.advFocus,s.displayCcy].join('|'); if(sig!==this._presentSig){ this._presentSig=sig; this.broadcastPresent(); } }
+    /* advisor/internal SHELL (not impersonating): the investor top-chrome — workspace nav, Set-target, the
+       Target/Risk/Wealth stat strip and the home hero — must not appear here. */
+    const advShell=(s.mode==='Advisor'||s.mode==='Internal') && !s.actingAs;
     const cmpName=c=>c==='platform'?'Platform':c==='model'?'the Model':c==='you'?'You':c==='family'?'Family offices':c==='top10'?'the Top 10%':'Peers';
     // BL caption
     const blCap = {
@@ -9262,11 +9265,11 @@ class Component extends DCLogic {
       cohortOpen:s.cohortOpen, cohortClosed:!s.cohortOpen,
       synthChipWealth: h('span',{style:{fontSize:8,color:'var(--synthetic)',background:'var(--synthetic-wash)',padding:'1px 4px',borderRadius:3}},'illus.'),
       synthChipTarget: h('span',{style:{fontSize:8,color:'var(--synthetic)',background:'var(--synthetic-wash)',padding:'1px 4px',borderRadius:3}},'illus.'),
-      allocInfo:this.allocInfo(), setTargetBtn:this.setTargetBtn(),
+      allocInfo: advShell? null : this.allocInfo(), setTargetBtn: advShell? null : this.setTargetBtn(),
       themeToggle:this.themeToggle(), modeMenu:this.modeMenu(),
       ucNav:this.ucNav(), pageTabs:this.pageTabs(), cohortPanel:this.cohortPanel(),
       showRail: (this.state.uc !== this.wsUCs(this.curWS().id)[0].id) && this.curPage().view!=='home',
-      wsNav:this.wsNav(), personaToggle:this.personaToggle(), controlPanel:this.controlPanel(),
+      wsNav: advShell? null : this.wsNav(), personaToggle:this.personaToggle(), controlPanel:this.controlPanel(),
       wsCount:this.curWS().ids.length,
       controlClosed: this.controlIsLeverPanel() && !s.controlOpen, openControl:()=>this.setState({controlOpen:true}),
       stageEyebrow: (()=>{ const u=this.curUC(); const w=this.curWS(); const idx=this.wsUCs(w.id).findIndex(x=>x.id===u.id)+1; return `${w.label} · ${w.verb} · use case ${idx} of ${w.ids.length}`; })(), /* item 157 — clarify '1 of 11' = use cases */
@@ -9282,7 +9285,9 @@ class Component extends DCLogic {
       showToast: s.showToast && s.homeLaunched && this.curPage().view==='home' && !s.welcome, toastBody:this.toastBody(),
       notifBell:this.notifBell(), profileBtn:this.profileBtn(),
       cartBtn:this.cartBtn(), showCart:s.showCart, closeCart:()=>this.setState({showCart:false}), cartPanelBody:this.cartPanelBody(),
-      homeHero: (s.ws==='understand' && !s.homeLaunched), homeHeroNode: this.homeHero(),
+      /* the investor AskAlpha home hero (with its Understand/Shape/Act/Research nav + 'Skip to dashboard') must NOT
+         appear in the advisor or internal shells — only in the investor view (incl. when an advisor impersonates a client) */
+      homeHero: (s.ws==='understand' && !s.homeLaunched) && !advShell, homeHeroNode: this.homeHero(),
       actingAs:s.actingAs, exitImpersonate:()=>this.setState({actingAs:null}),
       advisorView: s.mode==='Advisor' && !s.actingAs, internalView: s.mode==='Internal' && !s.actingAs,
       advisorBody:this.advisorBody(), internalBody:this.internalBody(),
