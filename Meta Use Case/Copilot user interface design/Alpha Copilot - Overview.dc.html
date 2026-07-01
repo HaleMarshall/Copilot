@@ -8382,19 +8382,38 @@ class Component extends DCLogic {
           return box(h('input',{type:opts.type==='num'?'number':'text',value:val,placeholder:'—',onChange:e=>set(kk,e.target.value),style:st})); };
         const already=get('pmInvested', c.pmInvested||'No');
         const yes = /^y/i.test(String(already));
-        const fields=[efield('Investable wealth','wealth',c.investable||''), efield('Age','age',c.age||'',{type:'num'}), efield('Risk class','risk',c.risk||'',{type:'select',options:riskOpts})]
-          .concat(minimal?[]:[
-            efield('Region','region',c.region||''),
-            efield('Profession','profession',c.occupation||''),
-            efield('Company','company',(c.company&&c.company!=='—')?c.company:''),   /* item 8 — Founder of <company> */
-            efield('Already in private markets?','pmInvested',already,{type:'select',options:['No','Yes']}), /* item 9 — Yes/No dropdown */
-            yes? efield('Amount invested so far (PM)','pmInvestedAmt',c.pmInvestedAmt||'€0') : null,        /* item 9 — only when Yes */
-            efield('Private-markets target','target',this.myPmTarget()+'%'),                                /* item 10 — editable */
-            efield('Liquidity needs','liquidity','Moderate · keep a 12-month buffer')]).filter(Boolean);
+        /* C6 — preset dropdowns for constrained fields (currency, region, liquidity) instead of free text */
+        const ccyOpts=['EUR','USD','GBP','CHF','SGD','JPY','Other'];
+        const homeCcy=((c.region||'').split('/').pop()||'EUR').trim(); const ccyList=ccyOpts.indexOf(homeCcy)>=0?ccyOpts:[homeCcy].concat(ccyOpts);
+        const regionPreset=['DACH','UK & Ireland','Nordics','Rest of EU','US / USD','APAC','Rest of World'];
+        const curRegion=get('region',c.region||''); const regionOpts=(curRegion&&regionPreset.indexOf(curRegion)<0)?[curRegion].concat(regionPreset):regionPreset;
+        const liqOpts=['6-month buffer','12-month buffer','24-month buffer','No specific buffer'];
+        /* C1/C2/C3 — investable wealth first, then the private-markets allocation (current + target) right beside it;
+           then liquidity, Age → Risk class (adjacent, exact age), currency, region, profession, company */
+        const fields=[
+          efield('Investable wealth','wealth',c.investable||''),
+          efield('Already in private markets?','pmInvested',already,{type:'select',options:['No','Yes']}),
+          yes? efield('Current PM invested','pmInvestedAmt',c.pmInvestedAmt||'€0') : null,
+          efield('Private-markets target','target',this.myPmTarget()+'%')
+        ].concat(minimal?[]:[
+          efield('Liquidity buffer','liquidity','12-month buffer',{type:'select',options:liqOpts}),
+          efield('Age','age',c.age||'',{type:'num'}),
+          efield('Risk class','risk',c.risk||'',{type:'select',options:riskOpts}),
+          efield('Currency','currency',homeCcy,{type:'select',options:ccyList}),
+          efield('Region','region',curRegion,{type:'select',options:regionOpts}),
+          efield('Profession','profession',c.occupation||''),
+          efield('Company','company',(c.company&&c.company!=='—')?c.company:'')
+        ]).filter(Boolean);
         const editBtn=h('button',{onClick:()=>this.setState({advEditMode:!editing}),style:{border:'1px solid '+(editing?'var(--brand)':'var(--line)'),background:editing?'var(--brand)':'var(--surface)',color:editing?'#fff':'var(--brand-ink)',borderRadius:8,padding:'6px 14px',fontSize:12,fontWeight:700,cursor:'pointer'}}, editing?'✓ Done':'✎ Edit');
         const notesOpen=this.dtog('advConvNotes',false);
-        return wrap([ head('Client profile', minimal?'Just enough to show a tailored model — the rest comes after accreditation.':'Prefilled from onboarding. Press ✎ Edit to change anything — wealth, age (exact), risk, region, profession & company, and whether they already hold private markets. Changes flow into the model.'),
+        /* C5 — free-text 'Notes from your conversation' (liquidity colour, external holdings) — captured for context, NOT fed into the model math (C4) */
+        const convNotes=(this.state.advEdits&&this.state.advEdits.convNotes)||'';
+        const notesField=this.card({title:'Notes from your conversation', badge:this.badge('context · not in model math','conf'),
+          children:h('textarea',{value:convNotes,placeholder:'Liquidity colour, external holdings (e.g. €2m buyout held elsewhere), preferences — captured for context, not fed into the model.',onChange:e=>set('convNotes',e.target.value),style:{width:'100%',boxSizing:'border-box',minHeight:72,resize:'vertical',border:'1px solid var(--line)',borderRadius:9,padding:'9px 11px',fontSize:13,fontFamily:'Inter,system-ui,sans-serif',color:'var(--ink)',background:'var(--surface)',outline:'none'}}),
+          caption:'External holdings and liquidity colour live here — deliberately kept out of the model math (we only model the allocatable portion at Moonfare).'});
+        return wrap([ head('Client profile', minimal?'Just enough to show a tailored model — the rest comes after accreditation.':'Prefilled from onboarding. Press ✎ Edit to change anything. Investable wealth and the private-markets allocation sit together; external holdings go in the notes, not the model.'),
           this.card({title:'Profile', right:editBtn, badge:this.badge(editing?'editing':'tap ✎ Edit','conf'),children:h('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:10}}, fields),caption: editing?'Editing — type into any field or pick from the dropdowns; press ✓ Done when finished.':'Read-only. Press ✎ Edit to change any field, including exact age, risk class and private-markets target.'}),
+          minimal?null:notesField,
           /* item 11 — 'Notes from our conversation' de-emphasised: collapsed by default */
           (c.notes&&c.notes.length)? h('div',{style:{border:'1px solid var(--line)',borderRadius:12,background:'var(--surface)',overflow:'hidden'}},
             h('button',{onClick:()=>this.setDtog('advConvNotes',!notesOpen),style:{width:'100%',display:'flex',alignItems:'center',justifyContent:'space-between',border:'none',background:'transparent',cursor:'pointer',padding:'11px 14px',fontSize:12.5,fontWeight:600,color:'var(--muted)'}}, h('span',null,'Notes from our conversation ('+c.notes.length+') · AI-captured'), h('span',null,notesOpen?'▾':'▸')),
