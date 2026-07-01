@@ -3,7 +3,7 @@ Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.
 
 - [x] 1. Remove the top view (investor workspace-nav strip) in advisor view. (a88f7f4 — verified last turn)
 - [x] 2. Skip the dashboard section for the advisor view (advisor IS the advisor).
-- [ ] 3. When clicking Share to client, it should hide the client view.
+- [x] 3. When clicking Share to client, it should hide the client view.
 - [ ] 4. Understand/Shape/Act/Research should be the same design as the normal investor view.
 - [ ] 5. When compressing the screen it looks weird (responsive).
 - [ ] 6. Move private-markets target next to investable wealth.
