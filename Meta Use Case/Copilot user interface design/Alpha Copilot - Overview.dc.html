@@ -6839,7 +6839,7 @@ class Component extends DCLogic {
   compareYourselfCard(){
     const h=this.h, SF=this.SF; const s=this.state; const empty=this.dbEmpty();
     /* review4 item 6 — always ACTUAL vs ACTUAL; dimension toggle top-left; comparator (peers/platform/top10/custom, no endowments) top-right; two pies + Z + funds comparison */
-    const cmp=s.cmpCY||'peers'; const cmpShort={peers:'Peers',platform:'Platform',top10:'Top 10%',custom:'Custom'}[cmp]||'Peers';
+    const cmp=s.cmpCY||'peers'; const cmpShort={peers:'Peers',platform:'Platform',top10:'Top 10%',custom:'Custom',family:'Family offices',harvard:'Harvard',yale:'Yale',princeton:'Princeton',hyp:'H+Y+P'}[cmp]||'Peers';
     const dim=s.cyDim||'strategy'; const dimLabel={strategy:'Strategy',region:'Region',currency:'Currency',sector:'Sector'}[dim]||'Strategy';
     const youMix=this.cmpDimMix(dim,'current')||{}; const compMix=this.cmpDimMix(dim,cmp)||{};
     const items=this.cmpDimItems(dim);
@@ -6850,10 +6850,14 @@ class Component extends DCLogic {
     const byCat={}; roster.forEach(f=>{ const c=catOf(f); if(c==null) return; (byCat[c]=byCat[c]||[]).push(f); });
     /* top-left dimension toggle */
     const dimSel=this.seg([{label:'Strategy',value:'strategy'},{label:'Region',value:'region'},{label:'Currency',value:'currency'},{label:'Sector',value:'sector'}], dim, v=>this.setState({cyDim:v,cyFocus:null}),{sm:true});
-    /* top-right comparator toggle — no endowments */
-    const sel=h('div',{style:{display:'flex',gap:6,flexWrap:'wrap'}}, [['peers','Peers'],['platform','Platform'],['top10','Top 10%'],['custom','Custom']].map(([v,l])=>{ const on=cmp===v;
-      return h('button',{key:v,onClick:()=>{ this.setState({cmpCY:v}); if(v==='peers') this.applyPeerCohort(); else if(v==='custom') this.clearCohort({cmp:'custom',controlOpen:true}); },
-        style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 13px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}}, v==='custom'?'✎ '+l:l); }));
+    /* item 16 — this IS the single unified comparison (dimension + comparator + funds); it now carries endowments too —
+       Family offices, the combined H+Y+P, AND each individual endowment (Harvard / Yale / Princeton) */
+    const cyBtn=(v,l,pre)=>{ const on=cmp===v; return h('button',{key:v,onClick:()=>{ this.setState({cmpCY:v}); if(v==='peers') this.applyPeerCohort(); else if(v==='custom') this.clearCohort({cmp:'custom',controlOpen:true}); },
+        style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 13px',fontSize:11.5,fontWeight:on?700:500,cursor:'pointer'}}, (pre?pre+' ':'')+l); };
+    const sel=h('div',{style:{display:'flex',gap:6,flexWrap:'wrap'}},
+      [['peers','Peers'],['platform','Platform'],['top10','Top 10%'],['family','Family offices'],['custom','Custom']].map(([v,l])=>cyBtn(v,l,v==='custom'?'✎':'')),
+      h('span',{style:{width:1,alignSelf:'stretch',background:'var(--line)',margin:'0 2px'}}),
+      [['hyp','H+Y+P'],['harvard','Harvard'],['yale','Yale'],['princeton','Princeton']].map(([v,l])=>cyBtn(v,l,'🎓')));
     /* two pies — actual vs actual */
     const dsize='min(190px,22vh)';
     const pies=h('div',{style:{display:'flex',gap:'clamp(24px,5vw,70px)',justifyContent:'center',alignItems:'flex-start',flexWrap:'wrap'}},
