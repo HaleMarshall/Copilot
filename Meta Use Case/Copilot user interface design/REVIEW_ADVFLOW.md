@@ -32,7 +32,7 @@ Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.
 - [x] 29. 'Adjust my target' in a distinct color, next to Model.
 - [x] 30. 'Reset to model' only appears if sliders changed from saved target.
 - [x] 31. 'Saved' button disappears once something is changed.
-- [ ] 32. Sliders look like bar charts (not weird sliders); % more centered; sliders smaller.
+- [x] 32. Sliders look like bar charts (not weird sliders); % more centered; sliders smaller.
 - [ ] 33. Right-hand side shows allocated in millions (% AND €m).
 - [ ] 34. Slider input boxes shouldn't look like input boxes — like a normal table.
 - [ ] 35. Going-from/going-to arrows only when changed from model/old target (no static numbers).

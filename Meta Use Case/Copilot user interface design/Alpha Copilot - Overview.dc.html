@@ -6170,15 +6170,17 @@ class Component extends DCLogic {
         h('div',{style:{display:'flex',flexWrap:'wrap',gap:6}}, this.RISKS.map(r=>{ const on=s.riskId===r.id;
           return h('button',{key:r.id,onClick:()=>this.setState({riskId:r.id,simTargets:null}),title:'PM target '+r.pmTarget+'%',
             style:{border:'1px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',color:on?'var(--brand-ink)':'var(--muted)',borderRadius:999,padding:'5px 11px',fontSize:11,fontWeight:on?700:500,cursor:'pointer',whiteSpace:'nowrap'}}, r.short); }))) : null;
-      const sliders = adjOpen? cats.map(k=>{ const raw=(tObj[k]!=null?tObj[k]:d.actual[k]); const cur=Math.round(d.actual[k]||0); const tgt=Math.round((+tObj[k]||0)/tot*100);
-        return h('div',{key:k,style:{display:'grid',gridTemplateColumns:'104px 1fr 62px 50px',alignItems:'center',gap:9}},
+      /* item 32 — the target 'sliders' are now horizontal BAR CHARTS: a compact track filled to the target % in the category colour, the % centred ON the bar, dragged via an invisible range overlay (smaller/tighter than the old native range). Precise numeric entry returns as a table-like cell in item 34. */
+      const sliders = adjOpen? cats.map(k=>{ const raw=(tObj[k]!=null?tObj[k]:d.actual[k]); const cur=Math.round(d.actual[k]||0); const tgt=Math.round((+tObj[k]||0)/tot*100); const fill=Math.max(0,Math.min(100,tgt));
+        return h('div',{key:k,style:{display:'grid',gridTemplateColumns:'104px 1fr 52px',alignItems:'center',gap:9}},
           h('div',{style:{display:'flex',alignItems:'center',gap:7,minWidth:0}},
             h('span',{style:{width:9,height:9,borderRadius:2,background:`var(${d.colors[k]})`,flex:'0 0 9px'}}),
             h('span',{style:{fontSize:11.5,color:'var(--ink)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},nm(d.key,k))),
-          h('input',{type:'range',min:0,max:100,step:1,value:raw,onChange:e=>this.setSimTarget(d.key,k,e.target.value),style:{width:'100%',accentColor:`var(${d.colors[k]})`,cursor:'pointer'}}),
-          h('div',{style:{display:'flex',alignItems:'center',gap:2,border:'1px solid var(--line)',borderRadius:7,padding:'3px 5px'}},
-            h('input',{type:'number',min:0,max:100,value:Math.round(raw),onChange:e=>this.setSimTarget(d.key,k,Math.max(0,Math.min(100,+e.target.value||0))),style:{width:32,border:'none',outline:'none',background:'transparent',fontSize:12,fontFamily:SF,fontWeight:600,color:'var(--ink)',textAlign:'right'}}),
-            h('span',{style:{fontSize:11,color:'var(--muted)'}},'%')),
+          h('div',{'data-testid':'bar-'+d.key+'-'+k,style:{position:'relative',height:20,borderRadius:6,background:'var(--surface-2)',border:'1px solid var(--line)',overflow:'hidden'}},
+            h('div',{style:{position:'absolute',left:0,top:0,bottom:0,width:fill+'%',background:`var(${d.colors[k]})`,transition:'width .12s ease'}}),
+            h('div',{style:{position:'absolute',left:0,right:0,top:0,bottom:0,display:'flex',alignItems:'center',justifyContent:'center',pointerEvents:'none'}},
+              h('span',{style:{fontSize:10.5,fontFamily:SF,fontWeight:700,color:'var(--ink)',background:'rgba(255,255,255,.88)',borderRadius:5,padding:'0 6px',lineHeight:'15px'}}, tgt+'%')),
+            h('input',{type:'range',min:0,max:100,step:1,value:raw,onChange:e=>this.setSimTarget(d.key,k,e.target.value),'aria-label':nm(d.key,k)+' target %',style:{position:'absolute',left:0,top:0,width:'100%',height:'100%',margin:0,opacity:0,cursor:'ew-resize'}})),
           h('div',{style:{textAlign:'right',fontSize:11,fontFamily:SF,fontWeight:600,color:'var(--muted)'}}, cur+'→'+tgt));
       }) : null;
       /* item 30 — 'Reset to model' only appears when the current target actually DIFFERS from the saved (or, before any save, the model) baseline; comparing per-category rounded % */
