@@ -7919,8 +7919,8 @@ class Component extends DCLogic {
   ]; }
   setFb(id,v){ this.setState({fb:{...this.state.fb,[id]:v}}); }
   /* items 222/223 — impersonate carries the real name and lands on the investor's Home/portfolio (not peer benchmarking) */
-  impersonate(c){ const sv=this.advSavedProfile(c.id)||{}; /* load the advisor's saved target/risk so the investor sees the same profile */
-    this.setState(Object.assign({actingAs:c.name, ws:'understand', uc:'home', page:'home', homeLaunched:true, deepLink:null, homeDrill:null, homePop:null, displayCcy:this.advHomeCcy(c)}, sv.simTargets?{simTargets:sv.simTargets}:{}, sv.riskId?{riskId:sv.riskId}:{})); }
+  impersonate(c){ const sv=this.advSavedProfile(c.id)||{}; /* load the advisor's saved target/risk + the client's cohort so the investor sees the same profile & matched peers */
+    this.setState(Object.assign({actingAs:c.name, ws:'understand', uc:'home', page:'home', homeLaunched:true, deepLink:null, homeDrill:null, homePop:null, displayCcy:this.advHomeCcy(c), fc:this.advClientCohort(c), cohortMode:'preset'}, sv.simTargets?{simTargets:sv.simTargets}:{}, sv.riskId?{riskId:sv.riskId}:{})); }
   fbBtns(id){ const h=this.h; const opts=['Helpful','Wrong product','Wrong timing','Wrong context','Client not ready','Compliance','Better action']; const sel=this.state.fb[id];
     return h('div',{style:{display:'flex',gap:6,flexWrap:'wrap',marginTop:11}}, opts.map(o=>{ const on=sel===o;
       return h('button',{key:o,onClick:()=>this.setFb(id,o),style:{fontSize:11,padding:'4px 10px',borderRadius:999,border:`1px solid ${on?'var(--brand)':'var(--line)'}`,background:on?'var(--brand)':'var(--surface)',color:on?'#fff':'var(--muted)',cursor:'pointer'}}, (o==='Helpful'&&on?'✓ ':'')+o); })); }
@@ -8069,10 +8069,20 @@ class Component extends DCLogic {
     return this.state.riskId||'balanced_compounding'; }
   /* the client's home currency (from region 'US / USD' → USD, or an explicit currency) — drives the display currency so figures show in their money */
   advHomeCcy(c){ c=c||{}; const fromCur=(c.currency||'').toUpperCase(); if(/^[A-Z]{3}$/.test(fromCur)) return fromCur; const seg=String(c.region||'').split('/').pop().trim().toUpperCase(); if(/^[A-Z]{3}$/.test(seg)) return seg; return 'EUR'; }
+  /* map a client's profile to the peer-cohort filters so the peer comparison is matched to THIS client
+     (the parametric peer DB then yields a statistically coherent segment — a 56yo US founder ≠ a 30yo engineer) */
+  advClientCohort(c){ c=c||{};
+    const age=parseInt(String(c.age).replace(/[^0-9]/g,''),10); const ageB= isNaN(age)?'35-50':(age<35?'20-35':age<50?'35-50':age<65?'50-65':'65+');
+    const cc=String(c.region||'').split('/')[0].trim().toUpperCase();
+    const region={US:'US/CA',CA:'US/CA',DE:'DACH',AT:'DACH',CH:'DACH',SE:'N-Europe',NO:'N-Europe',DK:'N-Europe',FI:'N-Europe',UK:'UK',GB:'UK',AE:'Middle East',SA:'Middle East',SG:'Asia',HK:'Asia',JP:'Asia'}[cc]||'DACH';
+    const occ=String(c.occupation||'').toLowerCase();
+    const prof=/founder|owner|exec|ceo/.test(occ)?'Exec/Owner':/pe|invest/.test(occ)?'Investor/PE':/family office/.test(occ)?'Family Office':/law|legal/.test(occ)?'Legal':/physician|medic|doctor/.test(occ)?'Medical':/eng|tech|software/.test(occ)?'Eng/Tech':/consult/.test(occ)?'Consulting':/financ|bank/.test(occ)?'Financial Services':'Other';
+    const wN=parseFloat(String(c.investable||'').replace(/[^0-9.]/g,''))||0; const wealth= wN>=100?'100M+':wN>=25?'25-100M':wN>=5?'5-25M':'1-5M';
+    return {age:[ageB], region:[region], prof:[prof], wealth:[wealth], risk:[]}; }
   advOpenClient(id){ const c=this.advBook().find(x=>x.id===id); const lv=(this.state.advLevelOverride&&this.state.advLevelOverride[id])||(c&&c.level)||'L2';
     const saved=this.advSavedProfile(id)||{};
     this.setState({advClientId:id, advStage:(c&&c.stage)||'new', advLevel:lv, advView:'prep', advPrepGoals:null, advStep:0, advReact:{}, advCFAextra:0, advPrepPrompt:'', advPrepMode:'preset', persona2:(lv==='L3'?'pro':'guided'), advActionOpen:null,
-      advEdits: saved.edits||{}, riskId: saved.riskId||this.advRiskId(c&&c.risk), simTargets: saved.simTargets||null, displayCcy: this.advHomeCcy(c), cfCommitM:this.advClientCommit(c)}); }
+      advEdits: saved.edits||{}, riskId: saved.riskId||this.advRiskId(c&&c.risk), simTargets: saved.simTargets||null, displayCcy: this.advHomeCcy(c), fc:this.advClientCohort(c), cohortMode:'preset', cfCommitM:this.advClientCommit(c)}); }
   /* per-client persistence (target/profile) so an advisor's changes stick and an impersonated investor sees them */
   advSavedProfile(id){ try{ return JSON.parse(localStorage.getItem('advProfile:'+id)||'null'); }catch(e){ return null; } }
   advSaveProfile(){ const id=this.state.advClientId; if(!id) return; setTimeout(()=>{ try{ localStorage.setItem('advProfile:'+id, JSON.stringify({edits:this.state.advEdits||{}, riskId:this.state.riskId, simTargets:this.state.simTargets||null, ts:1})); }catch(e){} },0); }
