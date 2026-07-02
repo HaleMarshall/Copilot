@@ -8744,10 +8744,12 @@ class Component extends DCLogic {
         let _ss=0; _stratKeys.forEach(k=>_ss+=(_mix[k]||0));
         const sl=_stratKeys.map(k=>({name:_snm(k),color:(_stratD.colors&&_stratD.colors[k])||'--data-9',p:_ss>0?+(((_mix[k]||0)/_ss*100).toFixed(1)):0})).filter(s=>s.p>0);
         const commit=this.advClientCommit?this.advClientCommit(c):0; const tot=commit*(this.state.cfPaceYears||4);
+        /* item 45 — the '€ of plan' column header is a bare € (no number) so ccyConv can't convert it; use the display-currency symbol so the header matches the $ values below (investor is USD) */
+        const _plnSym=this.ccySym(this.state.displayCcy||'EUR').trim();
         const th=(t,r)=>h('th',{style:{textAlign:r?'right':'left',padding:'7px 9px',fontSize:10,textTransform:'uppercase',letterSpacing:'.04em',color:'var(--muted)',borderBottom:'2px solid var(--line)'}},t);
         const td=(v,r)=>h('td',{style:{textAlign:r?'right':'left',padding:'8px 9px',borderBottom:'1px solid var(--line)',fontSize:12.5}},v);
         const table=this.card({title:'Allocation breakdown',style:{flex:'1 1 320px'},children:h('table',{style:{width:'100%',borderCollapse:'collapse'}},
-          h('thead',null,h('tr',null,th('Strategy'),th('%',1),tot?th('€ of plan',1):null)),
+          h('thead',null,h('tr',null,th('Strategy'),th('%',1),tot?th(_plnSym+' of plan',1):null)),
           h('tbody',null, sl.map(s=>h('tr',{key:s.name},
             td(h('span',{style:{display:'inline-flex',alignItems:'center',gap:7}}, h('span',{style:{width:10,height:10,borderRadius:2,background:'var('+s.color+')',display:'inline-block'}}), s.name)),
             td(s.p+'%',1), tot?td('€'+(+(tot*s.p/100).toFixed(1))+'m',1):null)))),
@@ -8771,7 +8773,7 @@ class Component extends DCLogic {
           const bd=(v,r,bold,topline)=>h('td',{style:{textAlign:r?'right':'left',padding:'8px 9px',borderBottom:'1px solid var(--line)',borderTop:topline?'2px solid var(--ink)':'none',fontSize:12.5,fontWeight:bold?700:400}},v);
           const bTable=(label,entries)=>{ const sum=entries.reduce((a,e)=>a+(e.p||0),0)||1; const norm=entries.map(e=>({name:e.name,color:e.color,pn:+((e.p||0)/sum*100).toFixed(1)}));
             return h('table',{style:{width:'100%',borderCollapse:'collapse'}},
-              h('thead',null,h('tr',null,bh(label),bh('%',1),tot?bh('€ of plan',1):null)),
+              h('thead',null,h('tr',null,bh(label),bh('%',1),tot?bh(_plnSym+' of plan',1):null)),
               h('tbody',null, norm.map(e=>h('tr',{key:e.name},
                   bd(h('span',{style:{display:'inline-flex',alignItems:'center',gap:7}}, h('span',{style:{width:10,height:10,borderRadius:2,background:'var('+(e.color||'--data-9')+')',display:'inline-block'}}), e.name)),
                   bd(e.pn+'%',1), tot?bd('€'+(+(tot*e.pn/100).toFixed(1))+'m',1):null))
