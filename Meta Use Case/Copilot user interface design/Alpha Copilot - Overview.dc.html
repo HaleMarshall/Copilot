@@ -8147,6 +8147,8 @@ class Component extends DCLogic {
   advSeq(){ const f=(this.DB&&this.DB.advisorFlows)||{}; let seq=(f[this.advFlowKey()]||['intake','setTarget','aiThinking','modelPortfolio','future','nextBest','seize']).filter(k=>k!=='execSummary'); /* execSummary is a PRE-CALL artifact (prep view), never a cockpit step */
     /* item 49 — a NEW investor has no portfolio/holdings, so there is nothing to compare: drop the holdings comparison / peer-benchmark / portfolio-comparison steps (the TARGET compare already lives in the simulator/tailored-target step) */
     if(this.state.advStage==='new'){ const CMP={multiComparison:1,peerComparison:1,compareToCurrent:1,changesSince:1,modelExisting:1}; seq=seq.filter(k=>!CMP[k]); }
+    /* item 50 — enforce the Understand -> Shape -> Act -> Research order: research pages (manager/fund research) must never surface before the Act pages, so stable-move any research-workspace step to the end */
+    { const research=seq.filter(k=>this.advStepWS(k)==='research'); if(research.length){ seq=seq.filter(k=>this.advStepWS(k)!=='research').concat(research); } }
     return seq; }
   advStageMeta(){ const m=(this.DB&&this.DB.advisorMeta)||{}; return m[this.state.advStage]||{objective:'',goals:[]}; }
   advGoals(){ return this.state.advPrepGoals || this.advStageMeta().goals || []; }
