@@ -8629,7 +8629,8 @@ class Component extends DCLogic {
       if(fn && typeof this[fn]==='function'){ try{ const body=this[fn]();
         /* F1 — prepend the new-client caveat on comparison steps */
         const cmpKeys={multiComparison:1,peerComparison:1,compareToCurrent:1}; const cav=cmpKeys[key]?this.advCompareCaveat():null;
-        return delegWrap(L+' · full toolbox', 'The complete Investor-View '+(pm.title||key)+' — every adjustor & drill-in, live for '+(c.name||'this client')+'.', cav? h('div',null,cav,body):body);
+        /* item 48 — dropped the 'L{n} · full toolbox / The complete Investor-View … every adjustor & drill-in' noise blurb; keep the delegated body (and new-client caveat) in the same width container */
+        return h('div',{style:{maxWidth:1220,margin:'0 auto'}}, cav? h('div',null,cav,body):body);
         }catch(e){ /* fall through to the light advisor composition below */ } } }
     const wrap=(kids)=>h('div',{style:{maxWidth:1000,margin:'0 auto',display:'flex',flexDirection:'column',gap:16}}, kids);
     const head=(t,s)=>h('div',null, h('div',{style:{fontFamily:SF,fontSize:24,fontWeight:600,letterSpacing:'-.01em'}},t), s?h('div',{style:{fontSize:13,color:'var(--muted)',marginTop:3,lineHeight:1.5,maxWidth:680}},s):null);

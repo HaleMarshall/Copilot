@@ -48,7 +48,7 @@ Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.
 - [x] 45. Currency says Euro but investor is USD — make consistent.
 - [x] 46. Advisor can select done/future pages to download as PDF (plan ahead / send proposal).
 - [x] 47. New investor: change 'existing' → 'new' next to investor.
-- [ ] 48. Remove 'L3 full toolbox, the complete investor view...' noise text.
+- [x] 48. Remove 'L3 full toolbox, the complete investor view...' noise text.
 - [ ] 49. Remove comparison/peer-benchmark/portfolio-comparison for NEW investor entirely (nothing to compare).
 - [ ] 50. After Shape, next is ACT not Research (understand→shape→act→research order).
 - [ ] 51. Next-best-actions must be the SAME page as investor view (import it, don't invent).
