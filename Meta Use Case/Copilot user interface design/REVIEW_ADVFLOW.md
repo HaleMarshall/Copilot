@@ -60,3 +60,6 @@ Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.
 - [x] 57. Let me change strategy/region/currency/sector mix (what matters most) or one goal to optimize all fast.
 - [x] 58. Add whom to follow + platform.
 - [x] 59. Add a Call Summary + Next Actions page (reminders + notes).
+
+## FINAL REVIEW — all journeys render, 0 errors
+Playwright end-to-end sweep (2026-07-02): 137 renders across all 12 advisor journeys (pregate/new/existing/inactive × L1/L2/L3, every step) + 6 investor bodies (homeOverview/opportunities/comparison/future/managerOverview/simulator). 0 render errors, logicError null, 0 console errors. All 59 advisor-flow review items complete.
