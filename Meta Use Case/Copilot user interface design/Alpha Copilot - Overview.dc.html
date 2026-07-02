@@ -6327,7 +6327,8 @@ class Component extends DCLogic {
     const src=this.oppSourceModel(); const tgt=this.oppLiveTargetMix('strategy'); const w=this.state.oppWeights; /* item 2 — live, weight-adjusted target so the funds change with the sliders */
     const funds=this.OPP_FUNDS();
     // per-strategy gap to target (target - current); positive => add, negative => trim
-    const gaps=this.STRATS.map(([k,name,color])=>({k,name,color,gap:+((tgt[k]||0)-(src.mix[k]||0)).toFixed(1)}));
+    /* item 54 — strategy gaps over REAL strategies only: Direct & Co-Invest / Secondaries are FORMATS, AI a SECTOR, so they must not appear (or jump up) in the strategy chart */
+    const gaps=this.STRATS_REAL().map(([k,name,color])=>({k,name,color,gap:+((tgt[k]||0)-(src.mix[k]||0)).toFixed(1)}));
     // item 122 — weighted mode now ranks purely by target-fit gap × strategy emphasis (no Performance tilt; we can't predict returns)
     const single=this.state.oppMode==='single';
     const retAdd={growth:1,ai:1,secondaries:0.4,buyout:0.5,credit:0.2,infra:0.2,venture:0.8,realestate:0.1,other:0};
@@ -6444,7 +6445,9 @@ class Component extends DCLogic {
     const distDimLabel={strategy:'Strategy',region:'Region',currency:'Currency',sector:'Sector',format:'Format'}[distDim];
     const dCur=this.oppCurrentMix(distDim), dTgt=this.oppLiveTargetMix(distDim);
     const dCol=this.oppDimColors(distDim), dNam=this.oppDimNames(distDim);
-    const dKeys=Array.from(new Set([...Object.keys(dCur),...Object.keys(dTgt)]));
+    /* item 54 — the strategy 'distance from target' chart must exclude Direct&Co-Invest/Secondaries (formats) + AI (sector) so they can't surface/jump in the strategy view */
+    const _stratExcl=(distDim==='strategy')?['secondaries','ai','directs']:[];
+    const dKeys=Array.from(new Set([...Object.keys(dCur),...Object.keys(dTgt)])).filter(k=>!_stratExcl.includes(k));
     const curSlices=dKeys.filter(k=>(dCur[k]||0)>0).map(k=>({n:dNam[k]||k,color:dCol[k]||'--data-9',p:dCur[k]||0}));
     const tgtSlices=dKeys.filter(k=>(dTgt[k]||0)>0).map(k=>({n:dNam[k]||k,color:dCol[k]||'--data-9',p:dTgt[k]||0}));
     const distZ=dKeys.map(k=>{ const dl=+(((dTgt[k]||0)-(dCur[k]||0))).toFixed(1); return {name:dNam[k]||k,color:dCol[k]||'--data-9',delta:dl,sig:Math.abs(dl)>=1}; }).filter(r=>r.delta!==0).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));

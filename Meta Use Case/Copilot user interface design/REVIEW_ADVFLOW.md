@@ -54,7 +54,7 @@ Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.
 - [x] 51. Next-best-actions must be the SAME page as investor view (import it, don't invent).
 - [x] 52. Show target portfolio (what needs filling) + click individual funds to add to portfolio.
 - [x] 53. Delete current-allocation-vs-target (useless, it's zero).
-- [ ] 54. Direct/co-investment shouldn't jump up in the chart.
+- [x] 54. Direct/co-investment shouldn't jump up in the chart.
 - [ ] 55. Click individual funds → open fund page (view before invest).
 - [ ] 56. Take investor next-best-action page + your-target section + opportunities + preview-before-buy.
 - [ ] 57. Let me change strategy/region/currency/sector mix (what matters most) or one goal to optimize all fast.
