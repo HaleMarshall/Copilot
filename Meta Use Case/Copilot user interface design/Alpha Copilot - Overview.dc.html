@@ -6447,16 +6447,22 @@ class Component extends DCLogic {
     const tgtSlices=dKeys.filter(k=>(dTgt[k]||0)>0).map(k=>({n:dNam[k]||k,color:dCol[k]||'--data-9',p:dTgt[k]||0}));
     const distZ=dKeys.map(k=>{ const dl=+(((dTgt[k]||0)-(dCur[k]||0))).toFixed(1); return {name:dNam[k]||k,color:dCol[k]||'--data-9',delta:dl,sig:Math.abs(dl)>=1}; }).filter(r=>r.delta!==0).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
     const targetSrc = s.oppMode==='single' ? 'your set target, kept as-is' : 'your set target, weighted live below';
-    const distPies=h('div',{style:{display:'flex',gap:'clamp(14px,3vw,34px)',alignItems:'flex-start',flexWrap:'wrap',justifyContent:'center'}},
-      h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutLabel('Current'), this.donutNamed(curSlices,150,distDimLabel,'today')),
-      h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutLabel('Target'), this.donutNamed(tgtSlices,150,distDimLabel,'target')));
-    const gapCard=this.card({title:'Distance from target',badge:this.badge('vs your target','synth'),right:distToggle,
+    /* item 52/53 — a new investor is at zero, so the 'current vs target' comparison is useless: when current is empty, show ONLY the TARGET portfolio (what to build), not an empty current pie */
+    const oppCurTot=curSlices.reduce((a,x)=>a+(+x.p||0),0); const oppEmpty=oppCurTot<1;
+    const distPies= oppEmpty
+      ? h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutLabel('Target portfolio'), this.donutNamed(tgtSlices,168,distDimLabel,'to build'))
+      : h('div',{style:{display:'flex',gap:'clamp(14px,3vw,34px)',alignItems:'flex-start',flexWrap:'wrap',justifyContent:'center'}},
+          h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutLabel('Current'), this.donutNamed(curSlices,150,distDimLabel,'today')),
+          h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutLabel('Target'), this.donutNamed(tgtSlices,150,distDimLabel,'target')));
+    const gapCard=this.card({title: oppEmpty?'Your target portfolio — what to fill':'Distance from target',badge:this.badge(oppEmpty?'to build':'vs your target','synth'),right:distToggle,
       children:h('div',{style:{display:'flex',gap:20,alignItems:'center',flexWrap:'wrap',padding:'6px 0'}},
         distPies,
         h('div',{style:{flex:'1 1 300px',minWidth:260}},
-          h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}}, distDimLabel+' · gap to target (pp)'),
+          h('div',{style:{fontSize:10.5,fontWeight:700,letterSpacing:'.05em',textTransform:'uppercase',color:'var(--muted)',marginBottom:8}}, distDimLabel+(oppEmpty?' \u00b7 what to fill (pp)':' \u00b7 gap to target (pp)')),
           distZ.length? this.miniZ(distZ) : h('div',{style:{fontSize:12.5,color:'var(--muted)',padding:'14px 0',textAlign:'center'}},'On target across this dimension.'))),
-      caption:'Your CURRENT '+distDimLabel.toLowerCase()+' mix (left) vs your TARGET (middle) — '+targetSrc+'. Bars = gap to target (right = below target, do more). Toggle the dimension top-right.'});
+      caption: oppEmpty
+        ? ('Your '+distDimLabel.toLowerCase()+' TARGET portfolio \u2014 '+targetSrc+'. Bars show how much of each sleeve to fill from zero. Pick the funds below to build toward it. Toggle the dimension top-right.')
+        : ('Your CURRENT '+distDimLabel.toLowerCase()+' mix (left) vs your TARGET (middle) \u2014 '+targetSrc+'. Bars = gap to target (right = below target, do more). Toggle the dimension top-right.')});
 
     // weighting card — review5 item 2: actually adjusts the target pie + funds LIVE
     const wPullMap={strategy:s.oppWeights.strategy,region:s.oppWeights.region,currency:s.oppWeights.currency,sector:s.oppWeights.sector};

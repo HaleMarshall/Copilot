@@ -52,7 +52,7 @@ Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.
 - [x] 49. Remove comparison/peer-benchmark/portfolio-comparison for NEW investor entirely (nothing to compare).
 - [x] 50. After Shape, next is ACT not Research (understand→shape→act→research order).
 - [x] 51. Next-best-actions must be the SAME page as investor view (import it, don't invent).
-- [ ] 52. Show target portfolio (what needs filling) + click individual funds to add to portfolio.
+- [x] 52. Show target portfolio (what needs filling) + click individual funds to add to portfolio.
 - [ ] 53. Delete current-allocation-vs-target (useless, it's zero).
 - [ ] 54. Direct/co-investment shouldn't jump up in the chart.
 - [ ] 55. Click individual funds → open fund page (view before invest).
