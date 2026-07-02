@@ -8159,10 +8159,15 @@ class Component extends DCLogic {
     if(this.state.advStage==='new'){ const CMP={multiComparison:1,peerComparison:1,compareToCurrent:1,changesSince:1,modelExisting:1}; seq=seq.filter(k=>!CMP[k]); }
     /* item 50 — enforce the Understand -> Shape -> Act -> Research order: research pages (manager/fund research) must never surface before the Act pages, so stable-move any research-workspace step to the end */
     { const research=seq.filter(k=>this.advStepWS(k)==='research'); if(research.length){ seq=seq.filter(k=>this.advStepWS(k)!=='research').concat(research); } }
+    /* item 59 — the Call Summary & Next Actions wrap-up is always the FINAL step of the journey */
+    if(!seq.includes('callSummary')) seq=seq.concat('callSummary');
     return seq; }
   advStageMeta(){ const m=(this.DB&&this.DB.advisorMeta)||{}; return m[this.state.advStage]||{objective:'',goals:[]}; }
   advGoals(){ return this.state.advPrepGoals || this.advStageMeta().goals || []; }
-  advPageMeta(k){ const p=(this.DB&&this.DB.advisorPages)||{}; return p[k]||{title:k,crumb:'',cfa:[],script:''}; }
+  advPageMeta(k){ const p=(this.DB&&this.DB.advisorPages)||{}; if(p[k]) return p[k];
+    /* item 59 — code-added step title fallback */
+    const FB={callSummary:{title:'Call summary & next actions',crumb:'Wrap-up',cfa:[],script:''}};
+    return FB[k]||{title:k,crumb:'',cfa:[],script:''}; }
   /* item 47 — the lifecycle badge next to the investor reflects the CURRENT journey stage (advStage), not a stale static DB field, so a new investor reads 'New' not 'Existing' */
   advStageBadge(){ return ({pregate:'Pre-Gate',new:'New',existing:'Existing',inactive:'Inactive'})[this.state.advStage] || (this.state.advStage||''); }
   /* item 46 — advisor PDF proposal builder: pick which flow pages (already-done or planned-ahead) to export, so the advisor can send the client a proposal before a call */
@@ -8242,7 +8247,8 @@ class Component extends DCLogic {
       execSummary:'understand', intake:'understand', intakeMin:'understand', overview:'understand', modelExisting:'understand', changesSince:'understand', aiThinking:'understand', modelPortfolio:'shape',
       setTarget:'shape', confirmTarget:'shape', simTarget:'shape', simExisting:'shape', simFull:'shape', targetSimulator:'shape', multiComparison:'shape', compareToCurrent:'shape', peerComparison:'shape', future:'shape',
       nextBest:'act', nextBestHints:'act', opportunities:'act', missedOut:'act', seize:'act', follower:'act', backToKyc:'act',
-      managerComparison:'research', fundComparison:'research'
+      managerComparison:'research', fundComparison:'research',
+      callSummary:'act' /* item 59 — wrap-up recap/notes */
     }[key] || 'understand'; }
   advJumpWS(ws){ const seq=this.advSeq(); const idx=seq.findIndex(k=>this.advStepWS(k)===ws); if(idx>=0) this.advStepTo(idx); }
   advPrev(){ this.advStepTo(this.state.advStep-1); }
@@ -9108,7 +9114,26 @@ class Component extends DCLogic {
             this.card({title:'Notification preview',children:right})),
           finishRow ]);
       }
-      case 'backToKyc': return wrap([ head('Continue on Moonfare','You’ve seen the tease — now the handoff to accreditation.'),
+      case 'callSummary': {
+        /* item 59 — Call summary & next actions: recap of what was decided + a reminders checklist + advisor notes, all from real state */
+        const _pm=this.myPmTarget()||20; const _cart=this.state.cart||[]; const _foll=this.state.following; const _notes=this.state.advCallNotes||'';
+        const recapRow=(label,val)=>h('div',{style:{display:'flex',justifyContent:'space-between',gap:12,padding:'9px 0',borderBottom:'1px solid var(--line)'}}, h('span',{style:{fontSize:12.5,color:'var(--muted)'}},label), h('span',{style:{fontSize:12.5,fontWeight:700,color:'var(--ink)',textAlign:'right'}},val));
+        const recapCard=this.card({title:'What we decided on this call',children:h('div',null,
+          recapRow('Private-markets target', _pm+'% of investable wealth'),
+          recapRow('Funds added to the plan', _cart.length? (_cart.length+' \u00b7 '+_cart.slice(0,3).join(', ')+(_cart.length>3?'\u2026':'')) : 'None yet'),
+          recapRow('Following', _foll? (_foll==='top10'?'Top 10% performers':(_foll==='custom'?'A custom group':'Your peer group')) : 'Not set'),
+          recapRow('Risk profile', (this.advRiskLabel?this.advRiskLabel():'\u2014'))),caption:'Auto-built from what was set during the call.'});
+        const defRem=((this.advGoals&&this.advGoals())||[]); const rem=defRem.length?defRem:['Send the proposal PDF to the client','Confirm accreditation / KYC','Review the target again after next quarter'];
+        const remDone=this.state.advRemDone||{}; const toggleRem=(i)=>{ const n=Object.assign({},this.state.advRemDone||{}); n[i]=!n[i]; this.setState({advRemDone:n}); };
+        const naCard=this.card({title:'Next actions & reminders',children:h('div',{style:{display:'flex',flexDirection:'column',gap:8}},
+          rem.map((r,i)=>{ const on=!!remDone[i];
+            return h('label',{key:i,'data-testid':'reminder-'+i,onClick:()=>toggleRem(i),style:{display:'flex',gap:10,alignItems:'flex-start',background:on?'var(--surface-2)':'var(--surface)',border:'1px solid var(--line)',borderRadius:9,padding:'10px 12px',cursor:'pointer'}},
+              h('span',{style:{marginTop:1,width:16,height:16,flex:'0 0 16px',borderRadius:5,border:'1px solid '+(on?'var(--over)':'var(--muted)'),background:on?'var(--over)':'transparent',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:800}}, on?'\u2713':''),
+              h('span',{style:{fontSize:12.5,color:'var(--ink)',textDecoration:on?'line-through':'none'}}, r)); })),caption:'Tick items as you complete them \u2014 they carry into the next call.'});
+        const notesCard=this.card({title:'Advisor notes',children:h('textarea',{'data-testid':'call-notes',value:_notes,onChange:e=>this.setState({advCallNotes:e.target.value}),placeholder:'Notes from the call \u2014 context, objections, what to prepare next time\u2026',style:{width:'100%',minHeight:120,resize:'vertical',border:'1px solid var(--line)',borderRadius:10,padding:'11px 12px',fontSize:12.5,fontFamily:'Inter,system-ui,sans-serif',color:'var(--ink)',background:'var(--surface)',outline:'none',boxSizing:'border-box'}}),caption:'Saved with this client \u2014 visible next time you open their cockpit.'});
+        return wrap([ head('Call summary & next actions','A recap of what you agreed, the reminders to carry forward, and your private notes for next time.'),
+          recapCard, naCard, notesCard ]); }
+            case 'backToKyc': return wrap([ head('Continue on Moonfare','You’ve seen the tease — now the handoff to accreditation.'),
         this.card({title:'What you’ve seen so far',children:h('div',{style:{display:'flex',flexDirection:'column',gap:7}}, ['A tailored model portfolio built for your profile','Where you’d sit versus your peer group','How it could build out over the next years'].map((t,i)=>h('div',{key:i,style:{display:'flex',gap:8,fontSize:13,lineHeight:1.45}}, h('span',{style:{color:'var(--over)'}},'✓'), t))),caption:'Pre-Gate tease complete — no account needed up to here.'}),
         this.card({title:'Open your account — 3 quick steps',tone:'alpha',children:h('div',{style:{display:'flex',flexDirection:'column',gap:12}},
           h('div',{style:{display:'flex',flexDirection:'column',gap:8}}, [['1','Verify identity','A short KYC — passport or ID.'],['2','Confirm accreditation','Self-certify as a qualified / professional investor.'],['3','Place your first commitment','Pick up exactly where this model left off.']].map((s,i)=>h('div',{key:i,style:{display:'flex',gap:10,alignItems:'flex-start'}}, h('span',{style:{width:20,height:20,flex:'0 0 20px',borderRadius:'50%',background:'rgba(255,255,255,.22)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700}},s[0]), h('div',null,h('div',{style:{fontSize:13.5,fontWeight:600,color:'#fff'}},s[1]),h('div',{style:{fontSize:12,color:'rgba(255,255,255,.78)',marginTop:1}},s[2]))))),
