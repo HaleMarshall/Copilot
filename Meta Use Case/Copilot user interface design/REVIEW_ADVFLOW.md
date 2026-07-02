@@ -44,7 +44,7 @@ Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.
 - [x] 41. Orient all charts in tailored model portfolio per the previous view.
 - [x] 42. Remove the useless yellow badge next to Sector mix / Format mix.
 - [x] 43. Format mix: remove co-investments; AI/tech isn't a format.
-- [ ] 44. Sector ordering: AI at 8% shouldn't sit above Healthcare at 18% — order by value.
+- [x] 44. Sector ordering: AI at 8% shouldn't sit above Healthcare at 18% — order by value.
 - [ ] 45. Currency says Euro but investor is USD — make consistent.
 - [ ] 46. Advisor can select done/future pages to download as PDF (plan ahead / send proposal).
 - [ ] 47. New investor: change 'existing' → 'new' next to investor.
