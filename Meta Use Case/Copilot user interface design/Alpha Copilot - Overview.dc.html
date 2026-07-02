@@ -8144,7 +8144,10 @@ class Component extends DCLogic {
   advClient(){ const id=this.state.advClientId; return this.advBook().find(c=>c.id===id)||null; }
   advSelf(){ return (this.DB&&this.DB.advisorSelf)||{name:'Advisor',init:'AD',role:'Relationship Manager'}; }
   advFlowKey(){ return this.state.advStage+'|'+this.state.advLevel; }
-  advSeq(){ const f=(this.DB&&this.DB.advisorFlows)||{}; const seq=f[this.advFlowKey()]||['intake','setTarget','aiThinking','modelPortfolio','future','nextBest','seize']; return seq.filter(k=>k!=='execSummary'); /* execSummary is a PRE-CALL artifact (prep view), never a cockpit step */ }
+  advSeq(){ const f=(this.DB&&this.DB.advisorFlows)||{}; let seq=(f[this.advFlowKey()]||['intake','setTarget','aiThinking','modelPortfolio','future','nextBest','seize']).filter(k=>k!=='execSummary'); /* execSummary is a PRE-CALL artifact (prep view), never a cockpit step */
+    /* item 49 — a NEW investor has no portfolio/holdings, so there is nothing to compare: drop the holdings comparison / peer-benchmark / portfolio-comparison steps (the TARGET compare already lives in the simulator/tailored-target step) */
+    if(this.state.advStage==='new'){ const CMP={multiComparison:1,peerComparison:1,compareToCurrent:1,changesSince:1,modelExisting:1}; seq=seq.filter(k=>!CMP[k]); }
+    return seq; }
   advStageMeta(){ const m=(this.DB&&this.DB.advisorMeta)||{}; return m[this.state.advStage]||{objective:'',goals:[]}; }
   advGoals(){ return this.state.advPrepGoals || this.advStageMeta().goals || []; }
   advPageMeta(k){ const p=(this.DB&&this.DB.advisorPages)||{}; return p[k]||{title:k,crumb:'',cfa:[],script:''}; }
