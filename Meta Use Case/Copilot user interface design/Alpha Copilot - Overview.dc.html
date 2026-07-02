@@ -8629,6 +8629,7 @@ class Component extends DCLogic {
     if(L!=='L1'){ const DELEG={overview:'homeOverviewBody', modelExisting:'homeOverviewBody',
         multiComparison:'comparisonBody', compareToCurrent:'comparisonBody', peerComparison:'comparisonBody',
         future:'futureBody', opportunities:'opportunitiesBody', missedOut:'opportunitiesBody',
+        nextBest:'opportunitiesBody', /* item 51 — the advisor next-best-actions step reuses the SAME investor next-best-actions page (opportunitiesBody), not a bespoke advisor version */
         managerComparison:'managerOverviewBody', fundComparison:'managerOverviewBody'};
       const fn=DELEG[key];
       if(fn && typeof this[fn]==='function'){ try{ const body=this[fn]();
