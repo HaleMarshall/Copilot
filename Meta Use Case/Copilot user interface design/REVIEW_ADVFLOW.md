@@ -46,7 +46,7 @@ Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.
 - [x] 43. Format mix: remove co-investments; AI/tech isn't a format.
 - [x] 44. Sector ordering: AI at 8% shouldn't sit above Healthcare at 18% — order by value.
 - [x] 45. Currency says Euro but investor is USD — make consistent.
-- [ ] 46. Advisor can select done/future pages to download as PDF (plan ahead / send proposal).
+- [x] 46. Advisor can select done/future pages to download as PDF (plan ahead / send proposal).
 - [ ] 47. New investor: change 'existing' → 'new' next to investor.
 - [ ] 48. Remove 'L3 full toolbox, the complete investor view...' noise text.
 - [ ] 49. Remove comparison/peer-benchmark/portfolio-comparison for NEW investor entirely (nothing to compare).

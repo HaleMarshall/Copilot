@@ -8148,6 +8148,31 @@ class Component extends DCLogic {
   advStageMeta(){ const m=(this.DB&&this.DB.advisorMeta)||{}; return m[this.state.advStage]||{objective:'',goals:[]}; }
   advGoals(){ return this.state.advPrepGoals || this.advStageMeta().goals || []; }
   advPageMeta(k){ const p=(this.DB&&this.DB.advisorPages)||{}; return p[k]||{title:k,crumb:'',cfa:[],script:''}; }
+  /* item 46 — advisor PDF proposal builder: pick which flow pages (already-done or planned-ahead) to export, so the advisor can send the client a proposal before a call */
+  advPdfPanel(){
+    const h=this.h, SF=this.SF; const seq=this.advSeq(); const step=Math.max(0,Math.min(this.state.advStep,seq.length-1));
+    const saved=this.state.advPdfPages||{};
+    const isSel=(k,i)=> (k in saved)? !!saved[k] : (i<=step); /* default: pages already completed are pre-ticked */
+    const toggle=(k,i)=>{ const cur=Object.assign({},this.state.advPdfPages||{}); cur[k]=!isSel(k,i); this.setState({advPdfPages:cur}); };
+    const chosen=seq.filter((k,i)=>isSel(k,i)).length;
+    const box=(on)=>h('span',{style:{width:16,height:16,flex:'0 0 16px',borderRadius:4,border:'1.5px solid '+(on?'var(--brand)':'var(--line)'),background:on?'var(--brand)':'var(--surface)',display:'inline-flex',alignItems:'center',justifyContent:'center',color:'#fff',fontSize:11,fontWeight:800}}, on?'\u2713':'');
+    const row=(k,i)=>{ const on=isSel(k,i); const done=i<=step; const pm=this.advPageMeta(k)||{}; const ws=this.advStepWS(k)||'';
+      return h('button',{key:k,'data-testid':'pdf-page-'+k,onClick:()=>toggle(k,i),style:{display:'flex',alignItems:'center',gap:10,width:'100%',textAlign:'left',border:'1px solid '+(on?'var(--brand-tint-3)':'var(--line)'),background:on?'var(--brand-wash)':'var(--surface)',borderRadius:9,padding:'9px 11px',cursor:'pointer'}},
+        box(on),
+        h('div',{style:{flex:1,minWidth:0}}, h('div',{style:{fontSize:12.5,fontWeight:600,color:'var(--ink)'}}, (i+1)+'. '+(pm.title||k)), h('div',{style:{fontSize:10,color:'var(--muted)',textTransform:'capitalize'}}, ws)),
+        h('span',{style:{fontSize:9.5,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',color:done?'var(--over)':'var(--muted)',background:done?'rgba(45,143,111,.12)':'var(--surface-2)',borderRadius:5,padding:'2px 7px'}}, done?'Done':'Planned')); };
+    return h('div',{'data-testid':'adv-pdf-panel',style:{position:'fixed',inset:0,zIndex:80,background:'rgba(14,14,14,.45)',display:'flex',alignItems:'center',justifyContent:'center',padding:20},onClick:()=>this.setState({advPdfOpen:false})},
+      h('div',{onClick:e=>e.stopPropagation(),style:{background:'var(--surface)',borderRadius:16,width:'min(560px,96vw)',maxHeight:'88vh',display:'flex',flexDirection:'column',overflow:'hidden',boxShadow:'0 24px 60px -20px rgba(0,0,0,.5)'}},
+        h('div',{style:{padding:'16px 20px',borderBottom:'1px solid var(--line)'}},
+          h('div',{style:{fontFamily:SF,fontSize:17,fontWeight:700,color:'var(--ink)'}},'Build a PDF proposal'),
+          h('div',{style:{fontSize:12,color:'var(--muted)',marginTop:3,lineHeight:1.45}},'Pick the pages to include \u2014 completed steps or ones you plan ahead \u2014 and send the client a proposal before the call.')),
+        h('div',{style:{flex:1,overflow:'auto',padding:'14px 20px',display:'flex',flexDirection:'column',gap:8}}, seq.map(row)),
+        h('div',{style:{padding:'14px 20px',borderTop:'1px solid var(--line)',display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap'}},
+          h('span',{style:{fontSize:12,color:'var(--muted)'}}, chosen+' of '+seq.length+' pages selected'),
+          h('div',{style:{display:'flex',gap:8}},
+            h('button',{onClick:()=>this.setState({advPdfOpen:false}),style:{border:'1px solid var(--line)',background:'var(--surface)',color:'var(--muted)',borderRadius:9,padding:'9px 14px',fontSize:12.5,fontWeight:600,cursor:'pointer'}},'Cancel'),
+            h('button',{'data-testid':'pdf-download',onClick:()=>{ if(!chosen) return; try{ window.print(); }catch(e){} },style:{border:'none',background:'var(--brand)',color:'#fff',borderRadius:9,padding:'9px 16px',fontSize:12.5,fontWeight:700,cursor:chosen?'pointer':'not-allowed',opacity:chosen?1:.5}}, 'Download PDF ('+chosen+')')))));
+  }
   advCurKey(){ const s=this.advSeq(); return s[Math.max(0,Math.min(this.state.advStep,s.length-1))]; }
   advLvl(a,b,c){ const l=this.state.advLevel; return l==='L1'?a:(l==='L3'?c:b); }
   /* ---- controls ---- */
@@ -8360,6 +8385,7 @@ class Component extends DCLogic {
               h('button',{'data-testid':'share-active',title:'Bring the client-view window to the front',onClick:()=>{ try{ this.presentWin && !this.presentWin.closed ? this.presentWin.focus() : this.openPresentWindow(); }catch(e){} },style:{display:'inline-flex',alignItems:'center',gap:7,border:'1px solid rgba(255,255,255,.25)',background:'var(--over)',color:'#fff',borderRadius:8,padding:'7px 12px',fontSize:11.5,fontWeight:700,cursor:'pointer'}}, h('span',{style:{width:8,height:8,borderRadius:'50%',background:'#fff'}}), 'Sharing to client'),
               h('button',{'data-testid':'share-stop',onClick:()=>this.stopPresenting(),style:{border:'1px solid rgba(255,255,255,.3)',background:'rgba(255,255,255,.1)',color:'#fff',borderRadius:8,padding:'7px 11px',fontSize:11.5,fontWeight:600,cursor:'pointer'}},'Stop'))
           : h('button',{'data-testid':'share-screen',title:'Open a client-safe window that shows only the investor content — share THAT window in your video call',onClick:()=>this.openPresentWindow(),style:{display:'inline-flex',alignItems:'center',gap:6,border:'none',background:'var(--brand)',color:'#fff',borderRadius:8,padding:'7px 13px',fontSize:11.5,fontWeight:700,cursor:'pointer',boxShadow:'0 6px 16px -8px rgba(44,45,254,.8)'}}, h('span',{style:{fontSize:13,lineHeight:1}},'⤢'), 'Share to client'),
+        h('button',{'data-testid':'adv-export-pdf',title:'Build a PDF proposal from the flow pages',onClick:()=>this.setState({advPdfOpen:true}),style:{border:'1px solid rgba(255,255,255,.3)',background:'rgba(255,255,255,.1)',color:'#fff',borderRadius:8,padding:'6px 11px',fontSize:11.5,cursor:'pointer'}},'Export PDF'),
         h('button',{onClick:()=>this.advToPrep(),style:{border:'1px solid rgba(255,255,255,.3)',background:'rgba(255,255,255,.1)',color:'#fff',borderRadius:8,padding:'6px 11px',fontSize:11.5,cursor:'pointer'}},'Exit')));
     const plan=this.advCallPlan(); const openA=this.state.advActionOpen;
     /* item 1/2 — OBJECTIVE first, always commercial */
@@ -8430,7 +8456,7 @@ class Component extends DCLogic {
       h('span',{style:{fontSize:11.5,color:'var(--muted)'}},'Step '+(step+1)+' of '+seq.length+' · '+(pm.title||'')),
       h('button',{onClick:()=>this.advNext(),disabled:step===seq.length-1,style:{display:'inline-flex',alignItems:'center',gap:8,border:'none',background:'var(--brand)',color:'#fff',borderRadius:10,padding:'11px 22px',fontSize:13,fontWeight:700,cursor:step===seq.length-1?'default':'pointer',opacity:step===seq.length-1?.5:1,boxShadow:'0 8px 20px -12px rgba(44,45,254,.6)'}}, (step===seq.length-1?'Finish':'Next step')+'  →'));
     const canvas=h('div',{style:{flex:1,minWidth:0,height:'100%',overflow:'auto',background:'var(--bg)',padding:'18px 26px 22px',display:'flex',flexDirection:'column'}}, wsNav, crumb, focusBanner, contentWrap, canvasNav, cFooter);
-    return h('div',{style:{position:'fixed',inset:0,zIndex:60,display:'flex',flexDirection:'column',background:'var(--bg)'}}, topbar, h('div',{style:{flex:1,display:'flex',minHeight:0}}, rail, canvas));
+    return h('div',{style:{position:'fixed',inset:0,zIndex:60,display:'flex',flexDirection:'column',background:'var(--bg)'}}, topbar, h('div',{style:{flex:1,display:'flex',minHeight:0}}, rail, canvas), this.state.advPdfOpen? this.advPdfPanel() : null);
   }
   /* Share-screen present mode — a clean, client-safe render of the CURRENT page only.
      Everything advisor-internal (the left rail with the call objective, 'Targets for this call',
