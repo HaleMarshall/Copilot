@@ -8148,6 +8148,8 @@ class Component extends DCLogic {
   advStageMeta(){ const m=(this.DB&&this.DB.advisorMeta)||{}; return m[this.state.advStage]||{objective:'',goals:[]}; }
   advGoals(){ return this.state.advPrepGoals || this.advStageMeta().goals || []; }
   advPageMeta(k){ const p=(this.DB&&this.DB.advisorPages)||{}; return p[k]||{title:k,crumb:'',cfa:[],script:''}; }
+  /* item 47 — the lifecycle badge next to the investor reflects the CURRENT journey stage (advStage), not a stale static DB field, so a new investor reads 'New' not 'Existing' */
+  advStageBadge(){ return ({pregate:'Pre-Gate',new:'New',existing:'Existing',inactive:'Inactive'})[this.state.advStage] || (this.state.advStage||''); }
   /* item 46 — advisor PDF proposal builder: pick which flow pages (already-done or planned-ahead) to export, so the advisor can send the client a proposal before a call */
   advPdfPanel(){
     const h=this.h, SF=this.SF; const seq=this.advSeq(); const step=Math.max(0,Math.min(this.state.advStep,seq.length-1));
@@ -8366,7 +8368,7 @@ class Component extends DCLogic {
       h('div',{style:{display:'flex',alignItems:'center',gap:9}}, h('div',{style:{width:30,height:30,borderRadius:8,background:'var(--brand)',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:700,fontSize:12}},'Aα'), h('div',null, h('div',{style:{fontSize:13,fontWeight:700,fontFamily:SF}},'AskAlpha'), h('div',{style:{fontSize:9,letterSpacing:'.1em',color:'rgba(255,255,255,.55)'}},'ADVISOR COCKPIT'))),
       h('div',{style:{width:1,height:30,background:'rgba(255,255,255,.14)'}}),
       h('div',{style:{display:'flex',alignItems:'center',gap:10,minWidth:0}}, h('div',{style:{width:34,height:34,borderRadius:'50%',background:'var(--brand)',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:SF,fontWeight:700,fontSize:13}},c.init),
-        h('div',{style:{minWidth:0}}, h('div',{style:{display:'flex',alignItems:'center',gap:7,flexWrap:'wrap'}}, h('span',{style:{fontFamily:SF,fontSize:14,fontWeight:700}},c.name), c.badge?h('span',{style:{fontSize:9,fontWeight:700,color:'#fff',background:'var(--over)',borderRadius:4,padding:'1px 6px'}},c.badge):null, h('span',{style:{fontSize:11,color:'rgba(255,255,255,.7)'}},'Investable '+(c.investable||'—'))),
+        h('div',{style:{minWidth:0}}, h('div',{style:{display:'flex',alignItems:'center',gap:7,flexWrap:'wrap'}}, h('span',{style:{fontFamily:SF,fontSize:14,fontWeight:700}},c.name), h('span',{'data-testid':'client-lifecycle-badge',style:{fontSize:9,fontWeight:700,color:'#fff',background:'var(--over)',borderRadius:4,padding:'1px 6px'}},this.advStageBadge()), h('span',{style:{fontSize:11,color:'rgba(255,255,255,.7)'}},'Investable '+(c.investable||'—'))),
           /* item 16 — surface the FULL profile summary right under the investor name & investable wealth (hidden on narrow per item 5) */
           narrow? null : (()=>{ const homeCcy=this.advHomeCcy(c); const firm=(c.company&&c.company!=='—')?c.company:null;
             const chips=[ topChip('Age '+(c.age||'—')), topChip(c.occupation||'—'), firm?topChip(firm):null, topChip(this.advRegionLabel()), topChip('Target '+(this.myPmTarget()||20)+'%'), topChip('Risk: '+this.advRiskLabel()), topChip('Home '+homeCcy) ];
