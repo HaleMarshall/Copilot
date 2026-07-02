@@ -58,5 +58,5 @@ Source: ~/Downloads/moonfare-alpha-advisor-flow-design-review.zip (action-items.
 - [x] 55. Click individual funds → open fund page (view before invest).
 - [x] 56. Take investor next-best-action page + your-target section + opportunities + preview-before-buy.
 - [x] 57. Let me change strategy/region/currency/sector mix (what matters most) or one goal to optimize all fast.
-- [ ] 58. Add whom to follow + platform.
+- [x] 58. Add whom to follow + platform.
 - [ ] 59. Add a Call Summary + Next Actions page (reminders + notes).
