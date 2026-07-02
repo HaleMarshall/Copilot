@@ -6414,6 +6414,8 @@ class Component extends DCLogic {
   }
   opportunitiesBody(){
     const h=this.h; const SF=this.SF; const o=this.oppNextActions(); const s=this.state;
+    /* items 52/53 — a NEW investor is at zero, so any current-vs-target framing (empty current pie, Target-fit score) is useless; oppEmpty gates it off */
+    const oppEmpty = Object.values(this.oppCurrentMix('strategy')||{}).reduce((a,b)=>a+(+b||0),0) < 1;
     // source picker
     const srcOpts=[{id:'baseline',label:'Baseline'},{id:'active',label:'Active sim'}].concat(s.savedSims.map(x=>({id:x.id,label:x.name}))); /* item 140 — Baseline first */
     const srcRow=h('div',{style:{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}},
@@ -6430,7 +6432,7 @@ class Component extends DCLogic {
           h('div',{style:{fontSize:11,letterSpacing:'.14em',textTransform:'uppercase',color:'#8C8DFF',fontWeight:700,marginBottom:7}},'Next Best Action'),
           h('div',{style:{fontFamily:SF,fontSize:22,fontWeight:600,lineHeight:1.25,marginBottom:6}}, o.actions.length?o.actions[0].head:'You\u2019re on target — no action needed'),
           h('div',{style:{fontSize:13,color:'rgba(234,235,255,.78)',lineHeight:1.5}}, o.actions.length?(o.actions[0].sub||'Closes your largest gap to target.'):'Your chosen simulation already sits within tolerance of every target.')),
-        h('div',{style:{display:'flex',gap:22}},
+        oppEmpty? null : h('div',{style:{display:'flex',gap:22}},
           this.oppStat('Target fit', o.fit+'', '/100'),
           this.oppStat('After top move', o.fitAfter+'', '/100','#7AB89E'))));
           /* expected return removed — it can't be predicted */
@@ -6447,8 +6449,7 @@ class Component extends DCLogic {
     const tgtSlices=dKeys.filter(k=>(dTgt[k]||0)>0).map(k=>({n:dNam[k]||k,color:dCol[k]||'--data-9',p:dTgt[k]||0}));
     const distZ=dKeys.map(k=>{ const dl=+(((dTgt[k]||0)-(dCur[k]||0))).toFixed(1); return {name:dNam[k]||k,color:dCol[k]||'--data-9',delta:dl,sig:Math.abs(dl)>=1}; }).filter(r=>r.delta!==0).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
     const targetSrc = s.oppMode==='single' ? 'your set target, kept as-is' : 'your set target, weighted live below';
-    /* item 52/53 — a new investor is at zero, so the 'current vs target' comparison is useless: when current is empty, show ONLY the TARGET portfolio (what to build), not an empty current pie */
-    const oppCurTot=curSlices.reduce((a,x)=>a+(+x.p||0),0); const oppEmpty=oppCurTot<1;
+    /* item 52/53 — oppEmpty (defined at top) drives the target-only view for a zero investor */
     const distPies= oppEmpty
       ? h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}, this.donutLabel('Target portfolio'), this.donutNamed(tgtSlices,168,distDimLabel,'to build'))
       : h('div',{style:{display:'flex',gap:'clamp(14px,3vw,34px)',alignItems:'flex-start',flexWrap:'wrap',justifyContent:'center'}},
@@ -6513,7 +6514,7 @@ class Component extends DCLogic {
       h('div',{style:{fontSize:12.5,lineHeight:1.6,color:'rgba(255,255,255,.95)',marginBottom:12}},
         'In priority order this closes your biggest gaps first — ',h('strong',{style:{color:'#fff'}},planAdds+' new commitment'+(planAdds!==1?'s':'')),planTrims?[' and ',h('strong',{key:'t',style:{color:'#fff'}},planTrims+' run-off'+(planTrims!==1?'s':''))]:null,
         '. Acting on the top move alone lifts your target-fit from ',h('strong',{style:{color:'#fff'}},o.fit),' to ',h('strong',{style:{color:'#9CF5D2'}},o.fitAfter),'; the full sequence converges your portfolio onto your target.'),
-      h('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}}, [['Moves in plan',o.actions.length+''],['Target fit now',o.fit+'/100'],['After top move',o.fitAfter+'/100']].map((t,i)=>
+      h('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}}, ([['Moves in plan',o.actions.length+'']].concat(oppEmpty?[]:[['Target fit now',o.fit+'/100'],['After top move',o.fitAfter+'/100']])).map((t,i)=>
         h('div',{key:i,style:{flex:'1 1 120px',background:'rgba(255,255,255,.12)',borderRadius:10,padding:'10px 12px'}},
           h('div',{style:{fontSize:10.5,color:'rgba(255,255,255,.75)'}},t[0]), h('div',{style:{fontFamily:SF,fontSize:18,fontWeight:700,marginTop:2}},t[1]))))) : null;
     const actionsCard=this.card({title:'Recommended sequence',
